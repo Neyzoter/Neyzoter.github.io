@@ -3,10 +3,16 @@
       - Single Chip
       - Ebedded Chip
       - C
+      - ASM
+      
+- name: Computer Language
+  keywords:
+      - C
+      - Python
+      - Java
       
 - name: Artificial Intelligent
   keywords:
-      - Python
       - Machine Learning
       - Deep Learning
       - Big Data
