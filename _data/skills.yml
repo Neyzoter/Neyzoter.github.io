@@ -4,15 +4,9 @@
       - Ebedded Chip
       - C
       
-- name: Computer Language
-  keywords:
-      - C
-      - Python
-      - Java
-      - ASM
-      
 - name: Artificial Intelligent
   keywords:
+      - Python
       - Machine Learning
       - Deep Learning
       - Big Data
