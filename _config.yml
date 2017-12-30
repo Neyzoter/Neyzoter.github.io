@@ -4,12 +4,12 @@
 baseurl:
 url: http://mazhuang.org
 date_format: "ordinal"
-title: 九九叔
-subtitle: 九九叔的github之家
-description: 九九叔的github之家
-keywords: 九九叔, JiuJiuShu, jjslogin, JiuJiuShu
+title: 宋超超
+subtitle: 宋超超的github
+description: 来自控制系的宋超超
+keywords: 宋超超, 控制, 人工智能, Python
 favicon: /favicon.ico
-timezone: Asia/Shenzhen
+timezone: Asia/Hangzhou
 encoding: "utf-8"
 side_bar_repo_limit: 5
 
@@ -18,10 +18,10 @@ side_bar_repo_limit: 5
 # ---------------- #
 author: JiuJiuShu
 organization: OPPO, Inc.
-organization_url: http://www.oppo.com
-github_username: wenfengtou
-location: Shenzhen, China
-email: qianmayi@gmail.com
+organization_url: http://www.cug.edu.cn/
+github_username: Neyzoter
+location: Hangzhou, China
+email: chao2song@qq.com
 
 # ---------------- #
 #    Navigation    #
@@ -87,7 +87,7 @@ repository: wenfengtou/mzlogin.github.io
 comments_provider: netease_gentie
 # !!!重要!!! 请修改下面这些信息为你自己申请的
 # !!!Important!!! Please modify infos below to yours
-disqus_username: mzlogin
+disqus_username: Neyzoter
 netease_gentie_key: 560ed243b708465d82d5a0a5f3b83da1
 # 在使用网易云跟帖时可点击显示 Disqus
 lazy_load_disqus : true
