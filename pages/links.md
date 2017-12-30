@@ -8,7 +8,7 @@ menu: 链接
 permalink: /links/
 ---
 
-> Thannks for my friends and teachers.
+> Thanks for my friends and teachers.
 
 {% for link in site.data.links %}
 * [{{ link.name }}]({{ link.url }})
