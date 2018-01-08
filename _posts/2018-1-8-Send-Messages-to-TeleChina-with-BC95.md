@@ -122,7 +122,7 @@ keywords: NB-IoT,物联网,电信,华为
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/findchajian.png" width = "900"  alt="部署成功" />
 
-### 注册设备
+### 3、注册设备
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/registerDevice.png" width = "900"  alt="开始注册设备" />
 
 选择我们刚刚做的profile。
