@@ -51,11 +51,13 @@ keywords: NB-IoT,物联网,电信,华为
 
 ###### 1.4新增属性
 打开“新增服务”后，给服务取名字（这个名字最后会显示在平台的设备数据前面，后面会看到），再点击新增属性。
+
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/serverAndcriterion.png" width = "900"  alt="点击新增属性"  />
 
 接下来就要设置这个属性。
 
 包括属性名、属性类型、长度等。
+
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/criterionSet.png" width = "400"  alt="属性设置" />
 
 > 注：我需要显示压力，所以设置成了字符串的格式。再把它设置成8个字节的数据，用来存储压力的正负（1byte）、数据（6byte）、单位（1byter，N）。枚举类可以不写。访问模式设置成RW，可读可写。后面有个是否必选，我们选择“必选”。  
@@ -65,6 +67,7 @@ keywords: NB-IoT,物联网,电信,华为
 ### 2、插件开发
 ###### 2.1添加插件和新建插件
 左栏“插件开发”，再点右上角“添加插件”，再按下“新建插件”。
+
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/chajianCreate1.png" width = "900"  alt="插件开发开始"  />
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/chajianCreate2.png" width = "900"  alt="插件开发开始"  />
