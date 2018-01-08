@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 电信NB物联网平台配置
+title: 从硬件开发者的角度实现简单的电信NB物联网平台配置
 categories: NB-IoT
 description: 以一个硬件开发者的角度实现简单的电信物联网平台配置及BC95数据发送
 keywords: NB-IoT,物联网,电信,华为
