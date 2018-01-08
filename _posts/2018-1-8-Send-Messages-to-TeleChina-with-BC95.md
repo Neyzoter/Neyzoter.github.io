@@ -13,38 +13,50 @@ keywords: NB-IoT,物联网,电信,华为
 ### 2、申请电信物联网平台
 关注微信公众号“天翼物联产业联盟”，点“联盟服务”，选择“实验服务申请”。
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/telechinaWechat.png" width="250" alt="天翼电信物联网平台" />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/telechinaWechat.png" width="250" alt="天翼电信物联网平台" align=center />
 
 ### 3、收到电信的邮件
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/letterTelechina.png" width = "900"  alt="天翼电信邮件" align=center />
-第一个红框是图形界面搭建profile和编解码插件的平台，可在上面进行可视化的平台配置。</br>
-第二个框是南向-终端设备接入地址，即在后面对BC95进行AT指令控制时，设置的CDP（“AT+NCDP=x.x.x.x,端口）。</br>
+
+第一个红框是图形界面搭建profile和编解码插件的平台，可在上面进行可视化的平台配置。
+
+第二个框是南向-终端设备接入地址，即在后面对BC95进行AT指令控制时，设置的CDP（“AT+NCDP=x.x.x.x,端口）。
+
 ### 4、进入到开发者门户
-见3中右键图片的第一个框。</br>
-并用电信邮件中的账号名和密码登录。</br>
+见3中右键图片的第一个框。
+
+并用电信邮件中的账号名和密码登录。
+
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/platformHome.png" width = "600"  alt="天翼电信物联网平台首页" align=center />
+
 #平台配置
 ### 1、profile开发
 ###### 1.1开始自定义产品
-点击左栏“profile在线开发”，再点击右上角“自定义产品”，最后点“创建全新产品”</br>
-<img src="./images/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile1.png" width = "600"  alt="天翼电信物联网平台首页" align=center />
+点击左栏“profile在线开发”，再点击右上角“自定义产品”，最后点“创建全新产品”
+
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile1.png" width = "600"  alt="天翼电信物联网平台首页" align=center />
 ###### 1.2创建全新产品
 我选择了Other，自己定义一个产品名字。
-<img src="./images/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile2_1.png" width = "365"  alt="创建全新产品的定义" align=center />
-<img src="./images/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile2_2.png" width = "300"  alt="创建全新产品的定义" align=center />
+
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile2_1.png" width = "365"  alt="创建全新产品的定义" align=center />
+
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile2_2.png" width = "300"  alt="创建全新产品的定义" align=center />
+
 ###### 1.3新建服务
-<img src="./images/2018-1-8-Send-Messages-to-TeleChina-with-BC95/server1.png" width = "900"  alt="新增服务" align=center />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/server1.png" width = "900"  alt="新增服务" align=center />
+
 ###### 1.4新增属性
 打开“新增服务”后，给服务取名字（这个名字最后会显示在平台的设备数据前面，后面会看到），再点击新增属性。
-<img src="./images/2018-1-8-Send-Messages-to-TeleChina-with-BC95/serverAndcriterion.png" width = "900"  alt="点击新增属性" align=center /></br>
+<img src="/images/ppsts2018-1-8-Send-Messages-to-TeleChina-with-BC95/serverAndcriterion.png" width = "900"  alt="点击新增属性" align=center /></br>
 接下来就要设置这个属性。</br>
 包括属性名、属性类型、长度等。
-<img src="./images/2018-1-8-Send-Messages-to-TeleChina-with-BC95/criterionSet.png" width = "400"  alt="属性设置" align=center />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/criterionSet.png" width = "400"  alt="属性设置" align=center />
 
-> 注：我需要显示压力，所以设置成了字符串的格式。再把它设置成8个字节的数据，用来存储压力的正负（1byte）、数据（6byte）、单位（1byter，N）。枚举类可以不写。访问模式设置成RW，可读可写。后面有个是否必选，我们选择“必选”。</br>
+> 注：我需要显示压力，所以设置成了字符串的格式。再把它设置成8个字节的数据，用来存储压力的正负（1byte）、数据（6byte）、单位（1byter，N）。枚举类可以不写。访问模式设置成RW，可读可写。后面有个是否必选，我们选择“必选”。
+
 > 记得点“确定”>>“保存”。如果没有出现服务列表中的属性，那么说明你没有设置好，或者没有点保存。（这个有点坑，点了确定还要点保存。）</br>
 
-<img src="./images/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile.png" width = "900"  alt="点击新增属性" align=center /></br>
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile.png" width = "900"  alt="点击新增属性" align=center /></br>
 ### 2、插件开发
 ###### 2.1添加插件和新建插件
 左栏“插件开发”，再点右上角“添加插件”，再按下“新建插件”。
