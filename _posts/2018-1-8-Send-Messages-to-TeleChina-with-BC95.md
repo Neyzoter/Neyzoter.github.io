@@ -17,7 +17,7 @@ keywords: NB-IoT,物联网,电信,华为
 ### 2、申请电信物联网平台
 关注微信公众号“天翼物联产业联盟”，点“联盟服务”，选择“实验服务申请”。
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/telechinaWechat.png" width="250" alt="天翼电信物联网平台" />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/telechinaWechat.png" width="300" alt="天翼电信物联网平台" />
 
 ### 3、收到电信的邮件
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/letterTelechina.png" width = "900"  alt="天翼电信邮件" />
@@ -42,9 +42,9 @@ keywords: NB-IoT,物联网,电信,华为
 ###### 1.2创建全新产品
 我选择了Other，自己定义一个产品名字。
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile2_1.png" width = "365"  alt="创建全新产品的定义"  />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile2_1.png" width = "400"  alt="创建全新产品的定义"  />
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile2_2.png" width = "300"  alt="创建全新产品的定义"  />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile2_2.png" width = "400"  alt="创建全新产品的定义"  />
 
 ###### 1.3新建服务
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/server1.png" width = "900"  alt="新增服务"  />
@@ -94,11 +94,11 @@ keywords: NB-IoT,物联网,电信,华为
 
 然后之前8bytes的服务属性都用于这个字段列表，所以我把字段列表也设置成了8bytes长度。可以看到偏移值是0-8byte。
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/list.png" width = "300"  alt="字段列表编辑"  />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/list.png" width = "400"  alt="字段列表编辑"  />
 
 点击完成后，消息变成了这样，
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/message.png" width = "250"  alt="消息的样子" />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/message.png" width = "300"  alt="消息的样子" />
 
 ###### 2.3profile和插件映射
 在当前界面右侧有一个“更多操作”>>“更换profile”。
@@ -111,7 +111,7 @@ keywords: NB-IoT,物联网,电信,华为
 
 “确定”后，右侧会有这个profile的属性。
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/RightCriterion.png" width = "250"  alt="出现profile的属性" />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/RightCriterion.png" width = "300"  alt="出现profile的属性" />
 
 拖过去和消息连接（映射）。
 
@@ -122,7 +122,7 @@ keywords: NB-IoT,物联网,电信,华为
 
 部署成功。
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/builtOK.png" width = "300"  alt="部署成功" />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/builtOK.png" width = "400"  alt="部署成功" />
 
 再回到主界面，发现我们的插件已经有了。
 
@@ -147,18 +147,18 @@ keywords: NB-IoT,物联网,电信,华为
 ### 1、配置模拟器
 我们可以用设备模拟器来模拟连接。
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/simulation.png" width = "350"  alt="设备模拟器软件" />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/simulation.png" width = "400"  alt="设备模拟器软件" />
 
 
 > 注：软件可以在电信的物联网平台下载。打开这个软件需要安装java1.8，具体见网上教程。
 
 打开模拟器后点“否”。
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/simulator.png" width = "350"  alt="设备模拟器软件"  />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/simulator.png" width = "400"  alt="设备模拟器软件"  />
 
 而后把自己的CDP地址（电信给你的邮件里有，即南向-设备接入地址，不用加端口）还有IMEI号（和设备注册那里一样）填入。点击注册设备。
 
-<img src="/images/p0sts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/simulatorSET.png" width = "350"  alt="设备模拟器软件"  />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/simulatorSET.png" width = "400"  alt="设备模拟器软件"  />
 
 ### 2、转化数据
 我们需要将字符串数据转化为十六进制的字符串发送。
