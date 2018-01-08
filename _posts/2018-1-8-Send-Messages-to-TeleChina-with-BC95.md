@@ -58,8 +58,7 @@ keywords: NB-IoT,物联网,电信,华为
 包括属性名、属性类型、长度等。
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/criterionSet.png" width = "400"  alt="属性设置" />
 
-> 注：我需要显示压力，所以设置成了字符串的格式。再把它设置成8个字节的数据，用来存储压力的正负（1byte）、数据（6byte）、单位（1byter，N）。枚举类可以不写。访问模式设置成RW，可读可写。后面有个是否必选，我们选择“必选”。
-
+> 注：我需要显示压力，所以设置成了字符串的格式。再把它设置成8个字节的数据，用来存储压力的正负（1byte）、数据（6byte）、单位（1byter，N）。枚举类可以不写。访问模式设置成RW，可读可写。后面有个是否必选，我们选择“必选”。  
 > 记得点“确定”>>“保存”。如果没有出现服务列表中的属性，那么说明你没有设置好，或者没有点保存。（这个有点坑，点了确定还要点保存。）
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profile.png" width = "900"  alt="点击新增属性"  />
