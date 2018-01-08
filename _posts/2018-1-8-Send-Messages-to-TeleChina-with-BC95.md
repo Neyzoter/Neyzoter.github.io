@@ -179,12 +179,12 @@ keywords: NB-IoT,物联网,电信,华为
 ### 4、查看数据
 我们回到平台查看收到的数据。
 
-通过“我的设备”>>“设备详情”>>“历史数据”查看受到的数据。
+通过“我的设备”>>“设备详情”>>“历史数据”查看收到的数据。
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/receivedMessages.png" width = "900"  alt="平台数据"  />
 
 # 四、BC95+串口发送数据
-懂硬件的人都知道可以用电脑的USB和USB转串口的电路（CH340）和模组连接即可通信。
+懂硬件的人都知道可以用电脑的USB接口和USB转串口的电路（CH340）和模组连接即可通信。
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/USBandBC95.png" width = "600"  alt="USB和BC95连接图"  />
 
@@ -215,7 +215,7 @@ keywords: NB-IoT,物联网,电信,华为
 
 ### 3、来源
 
-华为有简单的平台搭建过程/第一个视频
+华为有简单的平台搭建过程/第一个视频（IoT平台开发者Portal快速入门指导视频）
 
 [http://developer.huawei.com/ict/cn/site-oceanconnect_doc?id=12&resourceType=3&curPage=1&pageNum=12](http://developer.huawei.com/ict/cn/site-oceanconnect_doc?id=12&resourceType=3&curPage=1&pageNum=12)
 
