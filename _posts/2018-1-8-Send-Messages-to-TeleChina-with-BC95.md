@@ -8,19 +8,21 @@ keywords: NB-IoT,物联网,电信,华为
 
 # 前期准备
 ### 1、设备
-3.8V左右电源（给BC95模组供电）、USB转串口（和BC95模组的串口通信）、BC95模组、电信NB-IoT专用SIM、个人电脑（带上必要的驱动，如CH340的驱动等）。</br>
+3.8V左右电源（给BC95模组供电）、USB转串口（和BC95模组的串口通信）、BC95模组、电信NB-IoT专用SIM、个人电脑（带上必要的驱动，如CH340的驱动等）。
+
 ### 2、申请电信物联网平台
-关注微信公众号“天翼物联产业联盟”，点“联盟服务”，选择“实验服务申请”。</br>
-<img src="./images/2018-1-8-Send-Messages-to-TeleChina-with-BC95/telechinaWechat.png" width = "250"  alt="天翼电信物联网平台" align=center />
-填写信息后，等待电信的邮件。</br>
+关注微信公众号“天翼物联产业联盟”，点“联盟服务”，选择“实验服务申请”。
+
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/telechinaWechat.png" width="250" alt="天翼电信物联网平台" />
+
 ### 3、收到电信的邮件
-<img src="./images/2018-1-8-Send-Messages-to-TeleChina-with-BC95/letterTelechina.png" width = "900"  alt="天翼电信邮件" align=center />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/letterTelechina.png" width = "900"  alt="天翼电信邮件" align=center />
 第一个红框是图形界面搭建profile和编解码插件的平台，可在上面进行可视化的平台配置。</br>
 第二个框是南向-终端设备接入地址，即在后面对BC95进行AT指令控制时，设置的CDP（“AT+NCDP=x.x.x.x,端口）。</br>
 ### 4、进入到开发者门户
 见3中右键图片的第一个框。</br>
 并用电信邮件中的账号名和密码登录。</br>
-<img src="./images/2018-1-8-Send-Messages-to-TeleChina-with-BC95/platformHome.png" width = "600"  alt="天翼电信物联网平台首页" align=center />
+<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/platformHome.png" width = "600"  alt="天翼电信物联网平台首页" align=center />
 #平台配置
 ### 1、profile开发
 ###### 1.1开始自定义产品
