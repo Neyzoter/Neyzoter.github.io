@@ -6,7 +6,7 @@ description: 以一个硬件开发者的角度实现简单的电信物联网平�
 keywords: NB-IoT,物联网,电信,华为
 ---
 
-# 前期准备
+# 一、前期准备
 ### 1、设备
 3.8V左右电源（给BC95模组供电）、USB转串口（和BC95模组的串口通信）、BC95模组、电信NB-IoT专用SIM、个人电脑（带上必要的驱动，如CH340的驱动等）。
 
@@ -29,7 +29,7 @@ keywords: NB-IoT,物联网,电信,华为
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/platformHome.png" width = "600"  alt="天翼电信物联网平台首页" />
 
-# 平台配置
+# 二、平台配置
 ### 1、profile开发
 ###### 1.1开始自定义产品
 点击左栏“profile在线开发”，再点击右上角“自定义产品”，最后点“创建全新产品”
@@ -137,8 +137,8 @@ keywords: NB-IoT,物联网,电信,华为
 
 这个设备是我之前注册的，已经ONLINE了。刚注册的设备是OFFLINE的。
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/Devicestatus.png" width = "900"  alt="选择profile注册" />
-# 设备模拟器
-### 配置模拟器
+# 三、设备模拟器
+### 1、配置模拟器
 我们可以用设备模拟器来模拟连接。
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/simulation.png" width = "350"  alt="设备模拟器软件" />
@@ -154,7 +154,7 @@ keywords: NB-IoT,物联网,电信,华为
 
 <img src="/images/p0sts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/simulatorSET.png" width = "350"  alt="设备模拟器软件"  />
 
-### 转化数据
+### 2、转化数据
 我们需要将字符串数据转化为十六进制的字符串发送。
 
 比如，发送'+002331N'转化为"2b3030323332314e"。其中2b为+，30为0，以此类推。
@@ -163,21 +163,21 @@ keywords: NB-IoT,物联网,电信,华为
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/string2Hex.png" width = "700"  alt="字符串数据转化为十六进制的字符串" />
 
-### 发送数据
+### 3、发送数据
 接下来我们用模拟器发送转化后的十六进制字符串。
 
 将十六进制字符串复制到hex消息，点击发送即可。
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/sendMessage.png" width = "400"  alt="模拟器发送数据" />
 
-### 查看数据
+### 4、查看数据
 我们回到平台查看就收到的数据。
 
 通过“我的设备”>>“设备详情”>>“历史数据”查看受到的数据。
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/receivedMessages.png" width = "900"  alt="平台数据"  />
 
-# BC95+串口发送数据
+# 四、BC95+串口发送数据
 懂硬件的人都知道可以用电脑的USB和USB转串口的电路（CH340）和模组连接即可通信。
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/USBandBC95.png" width = "600"  alt="USB和BC95连接图"  />
@@ -193,7 +193,7 @@ keywords: NB-IoT,物联网,电信,华为
 > 注：如果发现AT+CFUN?或者AT+CGATT返回其数值为0，重新给这两者赋值。
 
 最后，我们也可以在平台收到相同的数据。
-# 说明
+# 五、说明
 * 关于注册</br>
 如果你的设备被demo注册过了。而且数据格式等不符合要求。
 
