@@ -198,20 +198,20 @@ keywords: NB-IoT,物联网,电信,华为
 
 最后，我们也可以在平台收到相同的数据。
 # 五、说明
-* 关于注册</br>
+### 1、关于注册
 如果你的设备被demo注册过了。而且数据格式等不符合要求。
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/demo.png" width = "400"  alt="demo开启界面" />
 
 那么请将其用同样的方法或者在平台删除该设备，再重新注册。
 
-* profile和插件的关系
+### 2、profile和插件的关系
 
 具体可以见电信平台的新手指导。
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/profileAndchajian.png" width = "800"  alt="demo开启界面" />
 
-* 来源
+### 3、来源
 
 华为有简单的平台搭建过程/第一个视频
 
@@ -220,11 +220,7 @@ keywords: NB-IoT,物联网,电信,华为
 本文档在此基础上加入了硬件的配置。
 
 
-
-
-----------
-宋超超
-
-[http://neyzoter.github.io](http://neyzoter.github.io "我的Github主页")
+>宋超超  
+>[http://neyzoter.github.io](http://neyzoter.github.io "我的Github主页")
 
 
