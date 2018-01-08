@@ -165,7 +165,7 @@ keywords: NB-IoT,物联网,电信,华为
 
 比如，发送'+002331N'转化为"2b3030323332314e"。其中2b为+，30为0，以此类推。
 
-下图是我用C写的String2HexString的小程序。可以实现字符串数据转化为十六进制的字符串。后期将一直到单片机中。
+下图是我用C写的String2HexString的小程序。可以实现字符串数据转化为十六进制的字符串。后期将移植到单片机中。
 
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/string2Hex.png" width = "700"  alt="字符串数据转化为十六进制的字符串" />
 
