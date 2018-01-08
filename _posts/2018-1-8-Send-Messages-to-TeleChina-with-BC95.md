@@ -6,6 +6,9 @@ description: 以一个硬件开发者的角度实现简单的电信物联网平�
 keywords: NB-IoT,物联网,电信,华为
 ---
 
+> 原创
+> 
+> 转载请注明出处，侵权必究。
 # 一、前期准备
 ### 1、设备
 3.8V左右电源（给BC95模组供电）、USB转串口（和BC95模组的串口通信）、BC95模组、电信NB-IoT专用SIM、个人电脑（带上必要的驱动，如CH340的驱动等）。
@@ -214,5 +217,13 @@ keywords: NB-IoT,物联网,电信,华为
 [http://developer.huawei.com/ict/cn/site-oceanconnect_doc?id=12&resourceType=3&curPage=1&pageNum=12](http://developer.huawei.com/ict/cn/site-oceanconnect_doc?id=12&resourceType=3&curPage=1&pageNum=12)
 
 本文档在此基础上加入了硬件的配置。
+
+
+
+
+----------
+宋超超
+
+[http://neyzoter.github.io](http://neyzoter.github.io "我的Github主页")
 
 
