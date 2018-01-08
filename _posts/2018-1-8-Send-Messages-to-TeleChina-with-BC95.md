@@ -177,7 +177,7 @@ keywords: NB-IoT,物联网,电信,华为
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/sendMessage.png" width = "400"  alt="模拟器发送数据" />
 
 ### 4、查看数据
-我们回到平台查看就收到的数据。
+我们回到平台查看收到的数据。
 
 通过“我的设备”>>“设备详情”>>“历史数据”查看受到的数据。
 
