@@ -55,7 +55,7 @@ keywords: NB-IoT,物联网,电信,华为,下行
 ### 2、查看消息
 我们可以通过这个demo查看设备发送到CDP服务器的数据或者信息。
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/queryData.png" width="700" alt="查询设备发送过来的消息" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/dispMsg.png" width="700" alt="查询设备发送过来的消息" />
 
 具体的包括：
 
