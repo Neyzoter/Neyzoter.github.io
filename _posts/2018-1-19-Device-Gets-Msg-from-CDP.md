@@ -25,7 +25,7 @@ keywords: NB-IoT,物联网,电信,华为,下行
 ### 2、服务命令的添加
 和《从硬件开发者的角度实现简单的电信NB物联网平台配置》不同的是，本章节在此基础上添加CDP命令的下行传输。
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/serviceCMD.png" width="300" alt="服务命令添加图" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/serviceCMD.png" width="700" alt="服务命令添加图" />
 
 可以看到在命令处，我添加了一个stressValue字段。只需要是你想要发送的信息格式即可。
 
@@ -44,13 +44,13 @@ keywords: NB-IoT,物联网,电信,华为,下行
 
 下面是北向demo的登录界面。
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/demoFace.png" width="700" alt="北向demo登录界面" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/demoFace.png" width="300" alt="北向demo登录界面" />
 
 前两个空填平台给你发过来的邮件中的“中国电信物联网开放平台北向API-企业应用接入地址”。
 <img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/telechinaMail.png" width="700" alt="北向API-企业应用接入地址" />
 
 后两个空是你在物联网平台创建你的应用的时候平台提供的。
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/APIinformation.png" width="700" alt="接口信息" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/APIinformation.png" width="400" alt="接口信息" />
 
 ### 2、查看消息
 我们可以通过这个demo查看设备发送到CDP服务器的数据或者信息。
@@ -70,18 +70,18 @@ keywords: NB-IoT,物联网,电信,华为,下行
 
 和浏览器形式平台上的信息一致。
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/dataonCDP.png" width="500" alt="平台上的数据用浏览器显示" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/dataonCDP.png" width="700" alt="平台上的数据用浏览器显示" />
 
 ### 3、发送命令
-3.1选择命令管理
+###### 3.1选择命令管理
 
 在Module中选择命令管理(Data Manager)
 
-3.2填写设备ID
+###### 3.2填写设备ID
 
 在Post Async Command中填写设备ID。然后点击Get Command。
 
-3.3发送数据
+###### 3.3发送数据
 
 选择你的服务命令，然后在Value和Expire Time内填写数据和过期时间。该数据和你在平台设置的数据格式一致，过期时间以秒为单位。
 
@@ -105,21 +105,28 @@ keywords: NB-IoT,物联网,电信,华为,下行
 
 平台上：
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/telechinaCMD.png" width="500" alt="平台上的数据情况" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/telechinaCMD.png" width="700" alt="平台上的数据情况" />
 
 北向demo上：
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/queryAsyncCMD.png" width="500" alt="demo上的数据情况" />
+
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/queryAsyncCMD.png" width="700" alt="demo上的数据情况" />
 
 
 # 五、总结
 CDP服务器发送数据，设备接收数据分为以下几步：
 
 ①平台服务命令的配置。
+
 ②插件设计
+
 ③插件部署
+
 ④设备注册
+
 ⑤通过demo将数据post
+
 ⑥设备通过“AT+NMGS=位数,十六进制数据”发送数据到CDP服务器
+
 ⑦设备通过“AT+NMGR”接收数据
 
 >宋超超  
