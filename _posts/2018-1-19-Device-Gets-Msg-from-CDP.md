@@ -3,7 +3,7 @@ layout: post
 title: BC95实现简单的CDP服务器下行数据接收
 categories: IoT
 description: BC95实现简单的CDP服务器下行数据接收
-keywords: NB-IoT,物联网,电信,华为
+keywords: NB-IoT,物联网,电信,华为,下行
 ---
 
 > 原创
