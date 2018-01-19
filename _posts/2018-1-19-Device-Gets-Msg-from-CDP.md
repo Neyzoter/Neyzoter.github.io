@@ -25,14 +25,14 @@ keywords: NB-IoT,物联网,电信,华为,下行
 ### 2、服务命令的添加
 和《从硬件开发者的角度实现简单的电信NB物联网平台配置》不同的是，本章节在此基础上添加CDP命令的下行传输。
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/serviceCMD.png" width="700" alt="服务命令添加图" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/serviceCMD.png" width="900" alt="服务命令添加图" />
 
 可以看到在命令处，我添加了一个stressValue字段。只需要是你想要发送的信息格式即可。
 
 ### 3、插件设计
 《从硬件开发者的角度实现简单的电信NB物联网平台配置》中已经跟说明了怎么实现插件设计（实现服务和设备信息的映射），我们这里只需要将服务命令也映射起来即可。服务命令同服务属性的信息传递方向不同，所以界面上的箭头方向也不同。这个很容易理解。
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/stressandsend.png" width="700" alt="插件设计" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/stressandsend.png" width="900" alt="插件设计" />
 
 ### 4、注册设备
 同《从硬件开发者的角度实现简单的电信NB物联网平台配置》。
@@ -44,10 +44,10 @@ keywords: NB-IoT,物联网,电信,华为,下行
 
 下面是北向demo的登录界面。
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/demoFace.png" width="300" alt="北向demo登录界面" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/demoFace.png" width="400" alt="北向demo登录界面" />
 
 前两个空填平台给你发过来的邮件中的“中国电信物联网开放平台北向API-企业应用接入地址”。
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/telechinaMail.png" width="700" alt="北向API-企业应用接入地址" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/telechinaMail.png" width="900" alt="北向API-企业应用接入地址" />
 
 后两个空是你在物联网平台创建你的应用的时候平台提供的。
 <img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/APIinformation.png" width="400" alt="接口信息" />
@@ -55,7 +55,7 @@ keywords: NB-IoT,物联网,电信,华为,下行
 ### 2、查看消息
 我们可以通过这个demo查看设备发送到CDP服务器的数据或者信息。
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/dispMsg.png" width="700" alt="查询设备发送过来的消息" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/dispMsg.png" width="900" alt="查询设备发送过来的消息" />
 
 具体的包括：
 
@@ -66,11 +66,11 @@ keywords: NB-IoT,物联网,电信,华为,下行
 
 见下图。
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/queryData.png" width="700" alt="查询设备发送过来的消息" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/queryData.png" width="900" alt="查询设备发送过来的消息" />
 
 和浏览器形式平台上的信息一致。
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/dataonCDP.png" width="700" alt="平台上的数据用浏览器显示" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/dataonCDP.png" width="900" alt="平台上的数据用浏览器显示" />
 
 ### 3、发送命令
 ###### 3.1选择命令管理
@@ -105,11 +105,11 @@ keywords: NB-IoT,物联网,电信,华为,下行
 
 平台上：
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/telechinaCMD.png" width="700" alt="平台上的数据情况" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/telechinaCMD.png" width="900" alt="平台上的数据情况" />
 
 北向demo上：
 
-<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/queryAsyncCMD.png" width="700" alt="demo上的数据情况" />
+<img src="/images/posts/2018-1-19-Device-Gets-Msg-from-CDP/queryAsyncCMD.png" width="900" alt="demo上的数据情况" />
 
 
 # 五、总结
