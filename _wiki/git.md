@@ -11,7 +11,9 @@ keywords: Git, 版本控制
 
 2、生成本地的git管理
 
+```
 git init 
+```
 
 文件夹里会多一个.git文件夹，可能是隐藏的。     
 
@@ -23,20 +25,28 @@ git add .
 
 4、添加评论
 
+```
 git commit -m "评论"
+```
 
 5、本地仓库关联到github
 
+```
 git remote add origin http://github.com/你的仓库地址
+```
 
 eg.
+```
 git remote add origin http://github.com/Neyzoter/Deeplearning_Course_Homework.git
+```
 
 把github上的https（仓库地址输入，不是我们在浏览器上的地址，而是建立后HTTPS|SSH那里的地址）。
 
 6、代码上传
 
+```
 git push -u origin master
+```
 
 7、输入账号和密码
 
