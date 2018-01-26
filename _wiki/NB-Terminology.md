@@ -1,6 +1,6 @@
 ---
 layout: wiki
-title: NB Terminology
+title: 窄带物联网专业词汇
 categories: IoT
 description: NB-IoT的专业术语
 keywords: NB-IoT,专业术语
