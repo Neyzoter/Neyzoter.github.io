@@ -7,10 +7,12 @@ keywords: NB-IoT,专业术语
 ---
 
 #NB专业词汇
+
 ###IMEI
 International Mobile Equipment Identity(IMEI)
 
 国际移动设备身份码的缩写
+
 ###DTLS
 Datagram Transport Layer Security(DTLS)
 
