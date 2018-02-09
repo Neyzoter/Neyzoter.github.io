@@ -25,4 +25,13 @@ Lowweight M2M(LWM2M)
 Machine-to-Machine/Man(M2M)
 
 一种以机器终端智能交互为核心的、网络化的应用与服务
+### GSM
+Global System for Mobile Communication
+
+全球移动通信系统，当前最广泛的移动电话标准
+### UMTS
+Universal Mobile Telecommunications System
+
+通用移动通信系统
+
 
