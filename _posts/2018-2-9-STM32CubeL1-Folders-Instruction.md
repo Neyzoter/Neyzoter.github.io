@@ -31,4 +31,4 @@ Cortex-M内核及其设备文件。
 ## 2 Middlewares
 <img src="/images/posts/2018-2-9-STM32CubeL1-Folders-Instruction/Middlewares.png" width="800" alt="Middlewares文件夹" />
 
-<img src="/images/posts/2018-2-9-STM32CubeL1-Folders-Instruction/Folders.png" width="300" alt="Middlewares文件夹" />
+<img src="/images/posts/2018-2-9-STM32CubeL1-Folders-Instruction/folders.png" width="300" alt="所有STM32CubeL1文件夹" />
