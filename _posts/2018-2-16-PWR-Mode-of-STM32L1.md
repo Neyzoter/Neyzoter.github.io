@@ -97,7 +97,7 @@ V_DDA 是为ADC、DAC复位模块、RC振荡器和PLL。
 
 <img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/SummaryofLow-PowerModes.png" width="600" alt="低功耗模式总结" />
 
-### 3.1 低功耗运行模式
+## 3.1 低功耗运行模式
 如果APB1时钟频率小于RTC时钟的7倍，需要软件读取两次RTC寄存器。如果两次读取结果不同，则需要读第三次。
 
 在V_CORE为RANGE2时，低功耗模式才能进入。
@@ -128,7 +128,7 @@ LPRUN and LPSDSR的位设置。
 
 3、系统时钟提升
 
-### 3.2 睡眠模式
+## 3.2 睡眠模式
 * 进入睡眠模式
 
 通过Cortex-M3系统控制寄存器SLEEPONEXIT，设置WFI（Wait For Interrupt）或者WFE（Wait For Event）指令：
@@ -151,7 +151,7 @@ WFE：事件（Event）出现时，退出睡眠模式。
 
 退出（中断）后睡眠的方式可以通过中断来唤醒。
 
-### 3.3 低功耗睡眠模式
+## 3.3 低功耗睡眠模式
 内部稳压器处于低功耗（LPR）模式，给WFI或者WFE指令。
 
 闪存停止使用，内存保持可用。
@@ -188,7 +188,7 @@ WFI：NVIC的任何中断，退出睡眠模式。
 
 WFE：事件（Event）出现时，退出睡眠模式。
 
-### 3.4 停止模式
+## 3.4 停止模式
 所有V_CORE域内的时钟停止，PLL、MSI、HSI和HSE RC晶振失能，内部的SRAM和寄存器保留。
 
 为了实现低功耗，内部的闪存进入低功耗模式。当闪存在掉电模式（Power Down Mode）时，从停止模式唤醒需要更多的唤醒时间。
@@ -222,12 +222,12 @@ RCC_CSR寄存器的RTCEN位设置。
 
 退出停止模式后，选MSI为系统时钟。
 
-### 3.5 待机模式
+## 3.5 待机模式
 最低功耗模式，基于Cortex-M3的deepsleep模式，同时内部稳压器失能（所以V_CORE也没上电）。
 
 PLL、MSI、HSI和HSE晶振失能。
 
-SRAM和寄存器数值丢失，除了RTC寄存器、RTC备份寄存器和备份电路（Standby circuitry ）。
+SRAM和寄存器数值丢失，除了RTC寄存器、RTC备份寄存器和待机电路（Standby circuitry ）。
 
 在待机模式下，下列特性可以被选择：
 
@@ -254,23 +254,23 @@ RCC_CSR寄存器的RTCEN位设置。
 
 WKUP引脚的上升沿、RTC Alarm（包括Alarm A和B）、RTC wakeup、tamper event、时间戳事件（time-stamp event）、外部的复位信号、IWDG的复位信号。
 
-**注**：IO处于高阻状态，除了Reset pad（仍然可用）、RTC_AF1引脚（PC13，如果设置为WKUP2、tamper、time-sleep、RTC Alarm out或者RTC时钟calibration out）、WKUP 引脚1（PA0，如果使能的话）、WKUP引脚3（PE6，如果使能的话，L152没有）
+**注**：IO处于高阻状态，除了Reset pad（仍然可用）、RTC_AF1引脚（PC13，如果设置为WKUP2、tamper、time-sleep、RTC闹钟输出——Alarm out或者RTC时钟校准输出——calibration out）、WKUP 引脚1（PA0，如果使能的话）、WKUP引脚3（PE6，如果使能的话，L152没有）
 
 在待机或者停止模式下，Debug连接丢失，Debug无法使用，因为M3内核无时钟作用。
 
-### 3.6 RTC和比较器退出停止或者待命模式
-RTC报警事件、RTC唤醒事件、篡改事件（tamper event）、时间戳事件或者比较器事件，而不需要外部中断。
+## 3.6 RTC和比较器退出停止或者待命模式
+RTC闹钟事件、RTC唤醒事件、篡改事件（tamper event）、时间戳事件或者比较器事件，而不需要外部中断。
 
 可以通过RCC_CSR寄存器的RTCSEL位来选择RTC唤醒停止或者待命模式的时钟。可见可以选择低功耗外部晶振LSE或者低功耗内部RC振荡器作为唤醒时钟源。
 
 <img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/EnteringStandbyMode.png" width="600" alt="RCC_CSR寄存器的RTCSEL位" />
 
-#### 3.6.1 RTC唤醒停止模式
-* RTC报警事件唤醒
+### 3.6.1 RTC唤醒停止模式
+* RTC闹钟事件唤醒
 
 1、设置外部中断线17（EXTI Line 17）为上升沿触发（中断或者事件模式）。
 
-2、在RTC\_CR寄存器中使能RTC报警中断。
+2、在RTC\_CR寄存器中使能RTC闹钟中断。
 
 3、配置RTC以生成RTC警报。
 
@@ -290,10 +290,10 @@ RTC报警事件、RTC唤醒事件、篡改事件（tamper event）、时间戳�
 
 3、配置RTC以产生RTC唤醒中断。
 
-#### 3.6.2 RTC唤醒待命模式
-* RTC报警事件唤醒
+### 3.6.2 RTC唤醒待命模式
+* RTC闹钟事件唤醒
 
-1、在RTC\_CR寄存器中使能RTC报警中断。
+1、在RTC\_CR寄存器中使能RTC闹钟中断。
 
 2、配置RTC以生成RTC警报。
 
@@ -311,12 +311,62 @@ RTC报警事件、RTC唤醒事件、篡改事件（tamper event）、时间戳�
 
 <img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/RTC_CR.png" width="600" alt="RTC_CR寄存器" />
 
-#### 3.6.3 比较器唤醒停止模式
+### 3.6.3 比较器唤醒停止模式
 1、设置外部中断线21（比较器1）或者外部中断线22（比较器2）为上升沿触发，中断或者事件模式。
 
 2、配置比较器以生成事件。
 
-# 4、说明
+## 3.7 待机模式实现
+### 3.7.1 电源控制寄存器PWR_CR介绍
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/CWUFandPDDS.png" width="600" alt="PWR_CR寄存器的CWUF和PDDS位" />
+
+* CWUF：将唤醒标志清零，clear wakeup flag，总是读到0。
+
+0：没有作用
+
+1：在两个系统时钟周期后，清除WUF唤醒标志位
+
+* PDDS：深度睡眠掉电，power-down deepsleep
+
+0：CPU深度睡眠时进入停止模式
+
+1：CPU深度睡眠时进入待机模式
+
+该寄存器我们只关心 bit1 和 bit2 这两个位，这里我们通过设置PWR_CR的PDDS位，使CPU进入深度睡眠时进入待机模式，同时我们通过CWUF位，清除之前的唤醒位。
+
+### 3.7.2 电源控制/状态寄存器PWR_CSR介绍
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/PWR_CSR.png" width="600" alt="PWR_CSR寄存器" />
+
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/WUF.png" width="600" alt="PWR_CSR寄存器的WUF" />
+
+WUF位是唤醒标志位，由硬件置1，系统复位或者CWUF位（PWR_CR寄存器中）置1来清除。
+
+0：没有唤醒时间发生
+
+1：从WAUP引脚、RTC闹钟、RTC入侵、RTC时间戳或者RTC唤醒，得到一个唤醒事件。
+
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/EWUP123.png" width="600" alt="PWR_CSR寄存器的EWUP1 2 3" />
+
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/STM32L15xREpinout.png" width="600" alt="STM32L15xRE的引脚图" />
+
+这里，我们通过设置 PWR_CSR 的 EWUP 位，来使能 WKUP 引脚用于待机模式唤醒。我们还可以从 WUF 来检查是否发生了唤醒事件，不过本章我们并没有用到。
+
+对于使能了RTC闹钟中断或RTC周期性唤醒等中断的时候，进入待机模式前，必须按如下操作处理：
+
+1， 禁止 RTC 中断（ALRAIE、ALRBIE、WUTIE、TAMPIE 和 TSIE 等）。
+
+2， 清零对应中断标志位。
+
+3， 清除 PWR 唤醒(WUF)标志（通过设置 PWR_CR 的 CWUF 位实现）。
+
+4， 重新使能 RTC 对应中断。
+
+5， 进入低功耗模式。
+
+未完待续...
+
+
+# 5、说明
 
 系统时钟：SYSCLK
 
