@@ -13,7 +13,7 @@ keywords: STM32L1, 运行模式, 电源, 时钟
 # 1、供电
 供电电压一览图
 
-<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/PowerSupplyOverview.png" width="300" alt="供电电压一览图" />
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/PowerSupplyOverview.png" width="700" alt="供电电压一览图" />
 
 * 设备输入电压
 
@@ -90,7 +90,7 @@ V_DDA 是为ADC、DAC复位模块、RC振荡器和PLL。
 
 下面是不同的RANGE对应不同的 V_DD 和 V_CORE：
 
-<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/PerformanceVersusVDDandVCORERange.png" width="300" alt="不同的RANGE对应不同的V_DD和V_CORE" />
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/PerformanceVersusVDDandVCORERange.png" width="700" alt="不同的RANGE对应不同的V_DD和V_CORE" />
 
 # 3、低功耗模式总结
 自上而下，功耗越来越低。
