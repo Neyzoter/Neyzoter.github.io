@@ -151,7 +151,7 @@ WFE：事件（Event）出现时，退出睡眠模式。
 
 退出（中断）后睡眠的方式可以通过中断来唤醒。
 
-### 3.3低功耗睡眠模式
+### 3.3 低功耗睡眠模式
 内部稳压器处于低功耗（LPR）模式，给WFI或者WFE指令。
 
 闪存停止使用，内存保持可用。
@@ -174,7 +174,7 @@ WFE：事件（Event）出现时，退出睡眠模式。
 
 3、降低系统时钟SYSCLK
 
-4、内部稳压器——
+4、内部稳压器
 
 用软件设置为低功耗模式（LPR）。
 
@@ -188,7 +188,7 @@ WFI：NVIC的任何中断，退出睡眠模式。
 
 WFE：事件（Event）出现时，退出睡眠模式。
 
-### 3.4停止模式
+### 3.4 停止模式
 所有V_CORE域内的时钟停止，PLL、MSI、HSI和HSE RC晶振失能，内部的SRAM和寄存器保留。
 
 为了实现低功耗，内部的闪存进入低功耗模式。当闪存在掉电模式（Power Down Mode）时，从停止模式唤醒需要更多的唤醒时间。
@@ -257,6 +257,64 @@ WKUP引脚的上升沿、RTC Alarm（包括Alarm A和B）、RTC wakeup、tamper 
 **注**：IO处于高阻状态，除了Reset pad（仍然可用）、RTC_AF1引脚（PC13，如果设置为WKUP2、tamper、time-sleep、RTC Alarm out或者RTC时钟calibration out）、WKUP 引脚1（PA0，如果使能的话）、WKUP引脚3（PE6，如果使能的话，L152没有）
 
 在待机或者停止模式下，Debug连接丢失，Debug无法使用，因为M3内核无时钟作用。
+
+### 3.6 RTC和比较器退出停止或者待命模式
+RTC报警事件、RTC唤醒事件、篡改事件（tamper event）、时间戳事件或者比较器事件，而不需要外部中断。
+
+可以通过RCC_CSR寄存器的RTCSEL位来选择RTC唤醒停止或者待命模式的时钟。可见可以选择低功耗外部晶振LSE或者低功耗内部RC振荡器作为唤醒时钟源。
+
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/EnteringStandbyMode.png" width="600" alt="RCC_CSR寄存器的RTCSEL位" />
+
+#### 3.6.1 RTC唤醒停止模式
+* RTC报警事件唤醒
+
+1、设置外部中断线17（EXTI Line 17）为上升沿触发（中断或者事件模式）。
+
+2、在RTC\_CR寄存器中使能RTC报警中断。
+
+3、配置RTC以生成RTC警报。
+
+* RTC篡改或者时间戳事件唤醒
+
+1、设置外部中断线19（EXTI Line 17）为上升沿触发（中断或者事件模式）。
+
+2、在RTC\_CR寄存器中使能RTC的时间戳中断；在RTC\_TCR寄存器中使能RTC篡改中断。
+
+3、配置RTC以探测到篡改中断和时间戳事件。
+
+* RTC唤醒事件（Wakeup Event）唤醒
+
+1、设置外部中断线20（EXTI Line 20）。
+
+2、在RTC\_CR寄存器中使能RTC唤醒中断。
+
+3、配置RTC以产生RTC唤醒中断。
+
+#### 3.6.2 RTC唤醒待命模式
+* RTC报警事件唤醒
+
+1、在RTC\_CR寄存器中使能RTC报警中断。
+
+2、配置RTC以生成RTC警报。
+
+* RTC篡改或者时间戳事件唤醒
+
+1、在RTC\_CR寄存器中使能RTC的时间戳中断；在RTC\_TCR寄存器中使能RTC篡改中断。
+
+2、配置RTC以探测到篡改中断和时间戳事件。
+
+* RTC唤醒事件（Wakeup Event）唤醒
+
+1、在RTC\_CR寄存器中使能RTC唤醒中断
+
+2、配置RTC以产生RTC唤醒中断
+
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/RTC_CR.png" width="600" alt="RTC_CR寄存器" />
+
+#### 3.6.3 比较器唤醒停止模式
+1、设置外部中断线21（比较器1）或者外部中断线22（比较器2）为上升沿触发，中断或者事件模式。
+
+2、配置比较器以生成事件。
 
 # 4、说明
 
