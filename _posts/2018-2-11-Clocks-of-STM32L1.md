@@ -68,3 +68,10 @@ MSI来自于内部RC振荡器。可设置为65.536 kHz, 131.072 kHz, 262.144 kHz
 RCC（Reset and Clock Control）提供AHB时钟（HCLK）经过8分频给Cortex SystemTimer（滴答时钟）外部时钟
 
 SysTick要么用HCLK，要么配置SysTick控制或者状态寄存器。
+
+#### 4 名称
+系统时钟：SYSCLK
+
+CPU时钟、AHB时钟：HCLK
+
+APB时钟：PCLK
