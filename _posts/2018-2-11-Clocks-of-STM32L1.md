@@ -12,7 +12,7 @@ keywords: STM32L1, 时钟
 
 # 时钟树
 
-<img src="/images/posts/2018-2-11-Clocks-of-STM32L1/clocktree.png" width="600" alt="时钟树" />
+<img src="/images/posts/2018-2-11-Clocks-of-STM32L1/clocktree.png" width="700" alt="时钟树" />
 
 ### 系统时钟的四个时钟源
 * HSI（High -speed internal）时钟振荡器
