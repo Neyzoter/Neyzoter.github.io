@@ -116,7 +116,7 @@ SYSCLK不能超过MSI的range1频率（应该是131.072KHz吧）。
 
 LPRUN and LPSDSR的位设置。
 
-<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/PWR_CR.png" width="600" alt="PWR_CR寄存器" />
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/PWR_CR.png" width="800" alt="PWR_CR寄存器" />
 
 * 退出低功耗模式
 
@@ -168,7 +168,7 @@ WFE：事件（Event）出现时，退出睡眠模式。
 
 采用FLASH_ACR寄存器中的SLEEP_PD位
 
-<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/FLASH_ACR.png" width="700" alt="FLASH_ACR寄存器" />
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/FLASH_ACR.png" width="800" alt="FLASH_ACR寄存器" />
 
 2、数字IP时钟使能或者失能
 
@@ -218,7 +218,7 @@ RCC_CSR寄存器的RTCEN位设置。
 
 下表是进入和退出停止模式：
 
-<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/EnteringStopMode.png" width="700" alt="进入和退出停止模式" />
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/EnteringStopMode.png" width="600" alt="进入和退出停止模式" />
 
 退出停止模式后，选MSI为系统时钟。
 
@@ -248,7 +248,7 @@ RCC_CSR寄存器的RTCEN位设置。
 
 下表是待机模式的进入和退出：
 
-<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/EnteringStandbyMode.png" width="700" alt="进入和退出停止模式" />
+<img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/EnteringStandbyMode.png" width="600" alt="进入和退出停止模式" />
 
 唤醒方式包括：
 
@@ -258,7 +258,7 @@ WKUP引脚的上升沿、RTC Alarm（包括Alarm A和B）、RTC wakeup、tamper 
 
 在待机或者停止模式下，Debug连接丢失，Debug无法使用，因为M3内核无时钟作用。
 
-# 说明
+# 4、说明
 
 系统时钟：SYSCLK
 
