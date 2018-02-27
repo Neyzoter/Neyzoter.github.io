@@ -272,7 +272,7 @@ RTC闹钟事件、RTC唤醒事件、篡改事件（tamper event）、时间戳�
 
 2、在RTC\_CR寄存器中使能RTC闹钟中断。
 
-3、配置RTC以生成RTC警报。
+3、配置RTC以生成RTC闹钟。
 
 * RTC篡改或者时间戳事件唤醒
 
@@ -295,7 +295,7 @@ RTC闹钟事件、RTC唤醒事件、篡改事件（tamper event）、时间戳�
 
 1、在RTC\_CR寄存器中使能RTC闹钟中断。
 
-2、配置RTC以生成RTC警报。
+2、配置RTC以生成RTC闹钟。
 
 * RTC篡改或者时间戳事件唤醒
 
