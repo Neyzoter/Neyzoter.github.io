@@ -27,3 +27,10 @@ keywords: keil
 由于小端模式，所以这几个数字要倒着放。比如00 21 00 08地址为0x08002100。也可以直接将memory 设置成long型（原来是char型）。
 
 <img src="/images/posts/2018-3-8-Keil-Find-Faults/SP2addr.png" width="700" alt="用SP查找上一次运行的代码" />
+
+3、根据上一个PC找到代码
+
+在ASM代码右键，点击show disassembbly at address...，将2中得到的地址复制到里面go to
+
+# 三、根据fault reports判断错误
+<img src="/images/posts/2018-3-8-Keil-Find-Faults/faultreports.png" width="700" alt="根据fault reports判断错误" />
