@@ -1,8 +1,8 @@
 ---
 layout: post
-title: keil的调试技巧
+title: keil的Debug调试技巧
 categories: Softwares
-description: keil的调试技巧
+description: keil的Debug调试技巧
 keywords: keil
 ---
 
