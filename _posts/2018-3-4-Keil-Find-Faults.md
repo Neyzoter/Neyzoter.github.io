@@ -37,3 +37,9 @@ keywords: Keil, Debug
 
 
 <img src="/images/posts/2018-3-8-Keil-Find-Faults/faultreports.png" width="700" alt="根据fault reports判断错误" />
+
+# 四、根据RCC_CSR判断上次复位的方式
+
+Debug时，peripheral ---》  寄存器状态，可以一边更新RCC寄存器的数值一边Debug。
+
+具体的复位方式对应什么位可以参考STM32的芯片参考手册。
