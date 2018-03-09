@@ -1,9 +1,9 @@
 ---
 layout: post
-title: keil的Debug调试技巧
+title: Keil的Debug调试技巧
 categories: Softwares
-description: keil的Debug调试技巧
-keywords: keil
+description: Keil的Debug调试技巧
+keywords: Keil, Debug
 ---
 
 > 原创
@@ -33,4 +33,7 @@ keywords: keil
 在ASM代码右键，点击show disassembbly at address...，将2中得到的地址复制到里面go to
 
 # 三、根据fault reports判断错误
+具体的错误类型参考Keil官网：[http://www.keil.com/support/man/docs/uv4/uv4_cp_m347_faults.htm](http://www.keil.com/support/man/docs/uv4/uv4_cp_m347_faults.htm "KeilMDK Fault Reports")
+
+
 <img src="/images/posts/2018-3-8-Keil-Find-Faults/faultreports.png" width="700" alt="根据fault reports判断错误" />
