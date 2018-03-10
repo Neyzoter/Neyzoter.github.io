@@ -1,6 +1,6 @@
 ---
 layout: wiki
-title: C
+title: C Program Language
 categories: C 
 description: C语言的一些注意点
 keywords: C, 语法
