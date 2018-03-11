@@ -28,10 +28,63 @@ Machine-to-Machine/Man(M2M)
 ### GSM
 Global System for Mobile Communication
 
-全球移动通信系统，当前最广泛的移动电话标准
+全球移动通信系统，当前最广泛的移动电话标准，3G
+
+### LTE
+Long Term Evolution
+
+长期演进，是4G移动通信网络的无线网标准。当前运营商宣称的4G即为LTE，其实是3.9G。
+
+### SAE
+System Architecture Evolution
+
+3GPP标准化组织定义的4G核心网领域的演进架构。
+
+### EPC
+Evolved Packet Core
+
+演进的分组核心网，是SAE在4G移动通信网络的核心网具体形式。
+
+#### SGW
+服务网关
+
+#### PGW
+PDN网关
+
+#### SCEF
+业务能力开放单元
+
+### EPS
+Evolved Packet System
+
+一套完整的演进分组系统。
+
+EPS = LTE + EPC + UE（用户终端）
+
+### MME
+Mobility Management Entity
+
+3GPP协议LTE接入网络的关键控制节点
+
+负责空闲模式的UE(User Equipment)的定位，传呼过程，包括中继，简单的说MME是负责信令处理部分。
+### CDMA
+Code Division Multiple Access
+
+码分多址，电信3G的网络模式。
+
+### WCDMA
+Wideband Code Division Multiple Access
+
+宽带码分多址，联通3G的网络模式。
+
+### TD-SCDMA
+Time Division-Synchronous Code Division Multiple Access
+
+时分同步码分多址，移动3G的网络模式。
+
 ### UMTS
 Universal Mobile Telecommunications System
 
-通用移动通信系统
+通用移动通信系统，3G网络协议体系。
 
 
