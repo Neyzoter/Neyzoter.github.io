@@ -15,7 +15,7 @@ keywords: STM32, MCU, OSC
 >以下官方参考手册PDF
 
  <img src="/images/posts/2018-3-15-STM32-OSC-Pins-Connect/HSE_LSE_ST.png" width="600" alt="STM32L1的HSE晶振连接方法" />
-### 不连接的注意点
+### 不连接的注意点和方法
 1、问题
 
 未知？？？
@@ -42,4 +42,4 @@ keywords: STM32, MCU, OSC
 
 # 官方推荐晶振
 
-<img src="/images/posts/2018-3-15-STM32-OSC-Pins-Connect/OSC_Recomanded.png" width="500" alt="STM32L1的LSE和HSE晶振推荐" />
+<img src="/images/posts/2018-3-15-STM32-OSC-Pins-Connect/OSC_Recomanded.jpg" width="500" alt="STM32L1的LSE和HSE晶振推荐" />
