@@ -42,6 +42,10 @@ keywords: STM32, MCU, OSC
 
 # 官方推荐晶振
 
+1、HSE
+
 <img src="/images/posts/2018-3-15-STM32-OSC-Pins-Connect/HSE_OSC_Recomanded.jpg" width="500" alt="STM32L1的HSE晶振推荐" />
+
+2、LSE
 
 <img src="/images/posts/2018-3-15-STM32-OSC-Pins-Connect/LSE_OSC_Recomanded.jpg" width="500" alt="STM32L1的LSE晶振推荐" />
