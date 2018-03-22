@@ -10,8 +10,8 @@ keywords: STM32L1, 低功耗, 待机
 > 
 > 转载请注明出处，侵权必究。
 
-## 1 待机模式实现回顾
-### 1.1 电源控制寄存器PWR_CR介绍
+# 1 待机模式实现回顾
+## 1.1 电源控制寄存器PWR_CR介绍
 <img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/CWUFandPDDS.png" width="600" alt="PWR_CR寄存器的CWUF和PDDS位" />
 
 * CWUF：将唤醒标志清零，clear wakeup flag，总是读到0。
@@ -28,7 +28,7 @@ keywords: STM32L1, 低功耗, 待机
 
 该寄存器我们只关心 bit1 和 bit2 这两个位，这里我们通过设置PWR_CR的PDDS位，使CPU进入深度睡眠时进入待机模式，同时我们通过CWUF位，清除之前的唤醒位。
 
-### 1.2 电源控制/状态寄存器PWR_CSR介绍
+## 1.2 电源控制/状态寄存器PWR_CSR介绍
 <img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/PWR_CSR.png" width="600" alt="PWR_CSR寄存器" />
 
 <img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/WUF.png" width="600" alt="PWR_CSR寄存器的WUF" />
