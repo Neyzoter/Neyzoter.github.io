@@ -151,3 +151,7 @@ __HAL_RCC_RTC_ENABLE();
 ## 2.3 说明
 
 目前无法实现同时支持待机模式RTC进入/唤醒和按键（WKUP）进入/唤醒，即RTC进入要RTC唤醒，wakeup进入则wakeup唤醒。
+
+## 2.4 代码
+
+[STM32L152RET6的待命模式](https://github.com/Neyzoter/STM32L1_Test/tree/master/LP_Code)
