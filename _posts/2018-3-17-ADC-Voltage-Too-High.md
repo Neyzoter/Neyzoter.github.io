@@ -18,3 +18,7 @@ STM32的ADC输入电压过高会烧坏引脚，需要添加过压保护。
 比如BAT45S芯片。
 
 <img src="/images/posts/2018-3-17-ADC-Voltage-Too-High/BAT45S.png" width="300" alt="BAT45S内部图" />
+
+但是由于二极管有压降，所以如果提供3.3V可能出现最高3.5V电压。
+
+而且给BAT45S的钳位电压要有较好的带负载能力，不能用电阻分压。
