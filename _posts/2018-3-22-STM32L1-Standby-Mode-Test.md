@@ -150,7 +150,23 @@ __HAL_RCC_RTC_ENABLE();
 
 ## 2.3 说明
 
-目前无法实现同时支持待机模式RTC进入/唤醒和按键（WKUP）进入/唤醒，即RTC进入要RTC唤醒，wakeup进入则wakeup唤醒。
+1)目前无法实现同时支持待机模式RTC进入/唤醒和按键（WKUP）进入/唤醒，即RTC进入要RTC唤醒，wakeup进入则wakeup唤醒。
+
+2)待机模式唤醒后相当于复位。
+
+3)待机模式下，除了配置了的WKUP引脚，都是高阻态。
+
+4)RTC寄存器修改时一定要DISABLE写保护。
+```
+__HAL_RTC_WRITEPROTECTION_DISABLE(&hrtc);
+
+```
+
+修改完后，就要使能写保护。
+```
+__HAL_RTC_WRITEPROTECTION_ENABLE(&hrtc);
+```
+
 
 ## 2.4 代码
 
