@@ -246,28 +246,15 @@ void float_task(void *pvParameters)
 int main(void)
 {
 
-  /* STM32L1xx HAL library initialization:
-       - Configure the Flash prefetch
-       - Systick timer is configured by default as source of time base, but user 
-         can eventually implement his proper time base source (a general purpose 
-         timer for example or other time source), keeping in mind that Time base 
-         duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined and 
-         handled in milliseconds basis.
-       - Set NVIC Group Priority to 4
-       - Low Level Initialization
-     */
-  HAL_Init();
-
-  /* Configure the system clock to 32 MHz */
-  SystemClock_Config();
+	HAL_Init();
+	SystemClock_Config();
 
 	TIM2_Init(9,2096);
 	HAL_TIM_Base_Start_IT(&htim2);
-  /* Add your application code here
-     */
 	uart_init(9600);              //初始化USART
 
 	BSP_LED_Init(LED2);//PA5
+
     xTaskCreate((TaskFunction_t )start_task,            //任务函数
                 (const char*    )"start_task",          //任务名称
                 (uint16_t       )START_STK_SIZE,        //任务堆栈大小
