@@ -24,7 +24,7 @@ keywords: FreeRTOS
 10）任务优先级不限。
 
 # 2、官方源码文件夹介绍
-## FreeRTOS文件夹
+## 2.1 FreeRTOS文件夹
 * Demo
 
 官方移植的不同设备的FreeRTOS程序。
@@ -42,7 +42,7 @@ keywords: FreeRTOS
 >源码中的Source文件夹中包含了移植需要的源码，其中portble文件夹中的文件包含了不同的编译器对应的源码，只需要留下需要的即可。
 比如要用keil来编译，那么keil文件夹中说参考RVDS，我们只需要将RVDS中的源码复制到Keil文件夹中，把除了keil和MemMang文件夹之外的删除即可。
 
-## FreeRTOS文件夹
+## 2.2 FreeRTOS-Plus文件夹
 包含许多在FreeRTOS源码基础上添加的功能块。
 
 
