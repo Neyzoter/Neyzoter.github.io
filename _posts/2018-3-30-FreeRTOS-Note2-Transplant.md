@@ -3,7 +3,7 @@ layout: post
 title: FreeRTOS学习笔记(2)FreeRTOS的移植
 categories: RTOS
 description: FreeRTOS学习笔记(2)FreeRTOS的移植，实现串口通信和点灯
-keywords: FreeRTOS, 移植, Keil
+keywords: FreeRTOS, 移植, Keil, STM32
 ---
 
 > 原创
@@ -42,17 +42,14 @@ RVDS和keil的文件相同，所以keil需要的文件只要从RVDS中复制即�
 
 是因为将5和4U进行了计算，在main.h中加入
 
-```
-//强制把__NVIC_PRIO_BITS定义为4，而不是4U
-#if 1
-#ifdef __NVIC_PRIO_BITS
-#undef __NVIC_PRIO_BITS
-#define __NVIC_PRIO_BITS      4
-#endif
-#endif
-```
-
-## 2.6 编译发现PendSV_Handler和SVC_Handler重定义
+    //强制把__NVIC_PRIO_BITS定义为4，而不是4U
+    #if 1
+    #ifdef __NVIC_PRIO_BITS
+    #undef __NVIC_PRIO_BITS
+    #define __NVIC_PRIO_BITS  4
+    #endif
+    #endif
+    ## 2.6 编译发现PendSV_Handler和SVC_Handler重定义
 
 屏蔽掉stm321xx_it.c中的这两个函数。
 
@@ -66,37 +63,35 @@ RVDS和keil的文件相同，所以keil需要的文件只要从RVDS中复制即�
 
 * sys.h文件
 
-```
-#define SYSTEM_SUPPORT_OS		1		//定义系统文件夹是否支持OS
-```
+
+    #define SYSTEM_SUPPORT_OS		1		//定义系统文件夹是否支持OS
+
 
 * usart.c文件
 
 1、添加FreeRTOS的h文件
 
-```
-#if SYSTEM_SUPPORT_OS
-#include "includes.h"					//os 使用	 
-#include "FreeRTOS.h"//FreeRTOS
-#endif
-```
+
+    #if SYSTEM_SUPPORT_OS
+    #include "includes.h"					//os 使用	 
+    #include "FreeRTOS.h"//FreeRTOS
+    #endif
+
 
 2、删掉UCOS的OSIntEnter和OSIntExit
 
 USARTx_IRQHandler中，以下的两段代码删除。
 
-```
-#if SYSTEM_SUPPORT_OS	 	//使用OS
-	OSIntEnter();    
-#endif
 
-```
+    #if SYSTEM_SUPPORT_OS	 	//使用OS
+    	OSIntEnter();
+    #endif
 
-```
-#if SYSTEM_SUPPORT_OS	 	//使用OS
-	OSIntExit();  											 
-#endif
-```
+
+    #if SYSTEM_SUPPORT_OS	 	//使用OS
+    	OSIntExit();  											 
+    #endif
+
 
 ## 2.8 更改系统时钟
 1、改写SysTick_Handler()
@@ -104,180 +99,178 @@ USARTx_IRQHandler中，以下的两段代码删除。
 配置FreeRTOS的系统时钟。FreeRTOS的心跳由滴答时钟产生。
 
 stm32l1xx_it.c文件
-```
-
-#ifdef SYSTEM_SUPPORT_OS
-	#include "FreeRTOS.h"
-	#include "task.h"
-#endif
 
 
-extern void xPortSysTickHandler(void);
-extern BaseType_t xTaskGetSchedulerState( void );
-void SysTick_Handler(void)
-{
-//    HAL_IncTick();
-	if(xTaskGetSchedulerState()!=taskSCHEDULER_NOT_STARTED)
-	{
-		xPortSysTickHandler();
-	}
-}
-```
+    #ifdef SYSTEM_SUPPORT_OS
+    	#include "FreeRTOS.h"
+    	#include "task.h"
+    #endif
+    
+    
+    extern void xPortSysTickHandler(void);
+    extern BaseType_t xTaskGetSchedulerState( void );
+    void SysTick_Handler(void)
+    {
+    //HAL_IncTick();
+    	if(xTaskGetSchedulerState()!=taskSCHEDULER_NOT_STARTED)
+    	{
+    		xPortSysTickHandler();
+    	}
+    }
+
 
 2、系统时钟配置
 
 sys.c文件中的SystemClock_Config函数：
-```
-/**配置SysTick系统滴答时钟中断时间 
- */
-HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/configTICK_RATE_HZ);
-```
+
+    /**配置SysTick系统滴答时钟中断时间 
+     */
+    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/configTICK_RATE_HZ);
+
 
 configTICK_RATE_HZ这里原来是数字1000，表示以1000hz的频率中断。configTICK_RATE_HZ在FreeRTOS中也定义为了1000，1ms中断一次。
 
 ## 2.9 例程代码测试
-原子代码
 
-```
-#include "main.h"
-#include "FreeRTOS.h"
-#include "task.h"
 
-  //任务优先级
-#define START_TASK_PRIO		1
-//任务堆栈大小	
-#define START_STK_SIZE 		128  
-//任务句柄
-TaskHandle_t StartTask_Handler;
-//任务函数
-void start_task(void *pvParameters);
-
-//任务优先级
-#define LED0_TASK_PRIO		2
-//任务堆栈大小	
-#define LED0_STK_SIZE 		50  
-//任务句柄
-TaskHandle_t LED0Task_Handler;
-//任务函数
-void led0_task(void *pvParameters);
-
-//任务优先级
-#define LED1_TASK_PRIO		3
-//任务堆栈大小	
-#define LED1_STK_SIZE 		50  
-//任务句柄
-TaskHandle_t LED1Task_Handler;
-//任务函数
-void led1_task(void *pvParameters);
-
-//任务优先级
-#define FLOAT_TASK_PRIO		4
-//任务堆栈大小	
-#define FLOAT_STK_SIZE 		128
-//任务句柄
-TaskHandle_t FLOATTask_Handler;
-//任务函数
-void float_task(void *pvParameters);
-
- 
-//开始任务任务函数
-void start_task(void *pvParameters)
-{
-    taskENTER_CRITICAL();           //进入临界区
+    #include "main.h"
+    #include "FreeRTOS.h"
+    #include "task.h"
+    
+      //任务优先级
+    #define START_TASK_PRIO		1
+    //任务堆栈大小	
+    #define START_STK_SIZE 		128  
+    //任务句柄
+    TaskHandle_t StartTask_Handler;
+    //任务函数
+    void start_task(void *pvParameters);
+    
+    //任务优先级
+    #define LED0_TASK_PRIO		2
+    //任务堆栈大小	
+    #define LED0_STK_SIZE 		50  
+    //任务句柄
+    TaskHandle_t LED0Task_Handler;
+    //任务函数
+    void led0_task(void *pvParameters);
+    
+    //任务优先级
+    #define LED1_TASK_PRIO		3
+    //任务堆栈大小	
+    #define LED1_STK_SIZE 		50  
+    //任务句柄
+    TaskHandle_t LED1Task_Handler;
+    //任务函数
+    void led1_task(void *pvParameters);
+    
+    //任务优先级
+    #define FLOAT_TASK_PRIO		4
+    //任务堆栈大小	
+    #define FLOAT_STK_SIZE 		128
+    //任务句柄
+    TaskHandle_t FLOATTask_Handler;
+    //任务函数
+    void float_task(void *pvParameters);
+    
+     
+    //开始任务任务函数
+    void start_task(void *pvParameters)
+    {
+    taskENTER_CRITICAL();   //进入临界区
     //创建LED0任务
-    xTaskCreate((TaskFunction_t )led0_task,     	
-                (const char*    )"led0_task",   	
-                (uint16_t       )LED0_STK_SIZE, 
-                (void*          )NULL,				
-                (UBaseType_t    )LED0_TASK_PRIO,	
-                (TaskHandle_t*  )&LED0Task_Handler);   
+    xTaskCreate((TaskFunction_t )led0_task, 	
+    (const char*)"led0_task",   	
+    (uint16_t   )LED0_STK_SIZE, 
+    (void*  )NULL,				
+    (UBaseType_t)LED0_TASK_PRIO,	
+    (TaskHandle_t*  )&LED0Task_Handler);   
     //创建LED1任务
-    xTaskCreate((TaskFunction_t )led1_task,     
-                (const char*    )"led1_task",   
-                (uint16_t       )LED1_STK_SIZE, 
-                (void*          )NULL,
-                (UBaseType_t    )LED1_TASK_PRIO,
-                (TaskHandle_t*  )&LED1Task_Handler);        
+    xTaskCreate((TaskFunction_t )led1_task, 
+    (const char*)"led1_task",   
+    (uint16_t   )LED1_STK_SIZE, 
+    (void*  )NULL,
+    (UBaseType_t)LED1_TASK_PRIO,
+    (TaskHandle_t*  )&LED1Task_Handler);
     //浮点测试任务
-    xTaskCreate((TaskFunction_t )float_task,     
-                (const char*    )"float_task",   
-                (uint16_t       )FLOAT_STK_SIZE, 
-                (void*          )NULL,
-                (UBaseType_t    )FLOAT_TASK_PRIO,
-                (TaskHandle_t*  )&FLOATTask_Handler);  
+    xTaskCreate((TaskFunction_t )float_task, 
+    (const char*)"float_task",   
+    (uint16_t   )FLOAT_STK_SIZE, 
+    (void*  )NULL,
+    (UBaseType_t)FLOAT_TASK_PRIO,
+    (TaskHandle_t*  )&FLOATTask_Handler);  
     vTaskDelete(StartTask_Handler); //删除开始任务
-    taskEXIT_CRITICAL();            //退出临界区
-}
-
-//LED0任务函数 
-void led0_task(void *pvParameters)
-{
+    taskEXIT_CRITICAL();//退出临界区
+    }
+    
+    //LED0任务函数 
+    void led0_task(void *pvParameters)
+    {
     while(1)
     {
-        printf("\r\n300ms\r\n");
-        vTaskDelay(300);
+    printf("\r\n300ms\r\n");
+    vTaskDelay(300);
     }
-}   
-
-//LED1任务函数
-void led1_task(void *pvParameters)
-{
+    }   
+    
+    //LED1任务函数
+    void led1_task(void *pvParameters)
+    {
     while(1)
     {
-        BSP_LED_On(LED2);
-        vTaskDelay(200);
-        BSP_LED_Off(LED2);;
-        vTaskDelay(800);
+    BSP_LED_On(LED2);
+    vTaskDelay(200);
+    BSP_LED_Off(LED2);;
+    vTaskDelay(800);
     }
-}
-
-//浮点测试任务
-void float_task(void *pvParameters)
-{
-	static float float_num=0.00;
-	while(1)
-	{
-		float_num+=0.01f;
-		printf("\r\nfloat_num的值为: %.4f\r\n",float_num);
-        vTaskDelay(2000);
-	}
-}
-
-int main(void)
-{
-
-  /* STM32L1xx HAL library initialization:
+    }
+    
+    //浮点测试任务
+    void float_task(void *pvParameters)
+    {
+    	static float float_num=0.00;
+    	while(1)
+    	{
+    		float_num+=0.01f;
+    		printf("\r\nfloat_num的值为: %.4f\r\n",float_num);
+    vTaskDelay(2000);
+    	}
+    }
+    
+    int main(void)
+    {
+    
+      /* STM32L1xx HAL library initialization:
        - Configure the Flash prefetch
        - Systick timer is configured by default as source of time base, but user 
-         can eventually implement his proper time base source (a general purpose 
-         timer for example or other time source), keeping in mind that Time base 
-         duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined and 
-         handled in milliseconds basis.
+     can eventually implement his proper time base source (a general purpose 
+     timer for example or other time source), keeping in mind that Time base 
+     duration should be kept 1ms since PPP_TIMEOUT_VALUEs are defined and 
+     handled in milliseconds basis.
        - Set NVIC Group Priority to 4
        - Low Level Initialization
      */
-  HAL_Init();
-
-  /* Configure the system clock to 32 MHz */
-  SystemClock_Config();
-
-	TIM2_Init(9,2096);
-	HAL_TIM_Base_Start_IT(&htim2);
-  /* Add your application code here
+      HAL_Init();
+    
+      /* Configure the system clock to 32 MHz */
+      SystemClock_Config();
+    
+    	TIM2_Init(9,2096);
+    	HAL_TIM_Base_Start_IT(&htim2);
+      /* Add your application code here
      */
-	uart_init(9600);              //初始化USART
-
-	BSP_LED_Init(LED2);//PA5
-    xTaskCreate((TaskFunction_t )start_task,            //任务函数
-                (const char*    )"start_task",          //任务名称
-                (uint16_t       )START_STK_SIZE,        //任务堆栈大小
-                (void*          )NULL,                  //传递给任务函数的参数
-                (UBaseType_t    )START_TASK_PRIO,       //任务优先级
-                (TaskHandle_t*  )&StartTask_Handler);   //任务句柄              
-    vTaskStartScheduler();          //开启任务调度
-	
-}
-```
+    	uart_init(9600);  //初始化USART
+    
+    	BSP_LED_Init(LED2);//PA5
+    xTaskCreate((TaskFunction_t )start_task,//任务函数
+    (const char*)"start_task",  //任务名称
+    (uint16_t   )START_STK_SIZE,//任务堆栈大小
+    (void*  )NULL,  //传递给任务函数的参数
+    (UBaseType_t)START_TASK_PRIO,   //任务优先级
+    (TaskHandle_t*  )&StartTask_Handler);   //任务句柄  
+    vTaskStartScheduler();  //开启任务调度
+    	
+    }
 
 
 
