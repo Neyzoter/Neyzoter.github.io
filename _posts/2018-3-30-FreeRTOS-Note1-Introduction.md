@@ -10,8 +10,6 @@ keywords: FreeRTOS
 > 
 > 转载请注明出处，侵权必究。
 
-2018-3-30-FreeRTOS-Note1-Introduction
-
 # 1、FreeRTOS特点
 1）文件数量比UCOS（II和III）小很多；
 2）内核抢占式、合作式和时间片调度；
