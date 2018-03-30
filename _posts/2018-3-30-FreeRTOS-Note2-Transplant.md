@@ -28,7 +28,7 @@ RVDS和keil的文件相同，所以keil需要的文件只要从RVDS中复制即�
 ## 2.2 Keil工程分组添加FreeRTOS文件
 分别添加FreeRTOS和FreeRTOS_PROTABLE。
 
-<img src="/images/posts/2018-3-30-FreeRTOS-Note2-Transplant/Add-RreeRTOS-Into-Keil.png" width="600" alt="在keil工程中添加FreeRTOS和PORTABLE" />
+<img src="/images/posts/2018-3-30-FreeRTOS-Note2-Transplant/Add-RreeRTOS-Into-Keil.png" width="250" alt="在keil工程中添加FreeRTOS和PORTABLE" />
 
 注：采用heap_x.c是几种不同的内存管理方法，这里选择4。
 
@@ -94,7 +94,7 @@ USARTx_IRQHandler中，以下的两段代码删除。
 
 ```
 #if SYSTEM_SUPPORT_OS	 	//使用OS
-	OSIntExit();  											 
+	OSIntExit();
 #endif
 ```
 
@@ -136,7 +136,7 @@ HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/configTICK_RATE_HZ);
 configTICK_RATE_HZ这里原来是数字1000，表示以1000hz的频率中断。configTICK_RATE_HZ在FreeRTOS中也定义为了1000，1ms中断一次。
 
 ## 2.9 例程代码测试
-原子代码
+main.c
 
 ```
 #include "main.h"
