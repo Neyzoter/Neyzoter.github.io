@@ -2,7 +2,7 @@
 layout: post
 title: FreeRTOS学习笔记(2)FreeRTOS的移植
 categories: RTOS
-description: FreeRTOS学习笔记(2)FreeRTOS的移植
+description: FreeRTOS学习笔记(2)FreeRTOS的移植，实现串口通信和点灯
 keywords: FreeRTOS, 移植, Keil
 ---
 
