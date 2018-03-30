@@ -3,7 +3,7 @@ layout: post
 title: STM32L152系列的代码移植
 categories: MCU
 description: STM32L152系列的移植
-keywords: FreeRTOS
+keywords: STM32, 移植
 ---
 
 > 原创
