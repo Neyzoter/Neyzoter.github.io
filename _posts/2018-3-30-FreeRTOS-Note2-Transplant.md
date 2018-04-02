@@ -19,6 +19,8 @@ RVDS和keil的文件相同，所以keil需要的文件只要从RVDS中复制即�
 
 <img src="/images/posts/2018-3-30-FreeRTOS-Note2-Transplant/portable.png" width="600" alt="portable文件夹结构" />
 
+说明：使用V10.0.1的源码和V9.0.0的FreeRTOSConfig.h配置文件。
+
 # 2、移植
 ## 2.1 添加FreeRTOS源码
 创建FreeRTOS文件夹，并将前期准备的Source文件里的文件复制到该文件夹内。
@@ -153,13 +155,13 @@ TaskHandle_t StartTask_Handler;
 void start_task(void *pvParameters);
 
 //任务优先级
-#define LED0_TASK_PRIO		2
+#define UART_TASK_PRIO		2
 //任务堆栈大小	
-#define LED0_STK_SIZE 		50  
+#define UART_STK_SIZE 		50  
 //任务句柄
-TaskHandle_t LED0Task_Handler;
+TaskHandle_t UartTask_Handler;
 //任务函数
-void led0_task(void *pvParameters);
+void uart_task(void *pvParameters);
 
 //任务优先级
 #define LED1_TASK_PRIO		3
@@ -184,13 +186,13 @@ void float_task(void *pvParameters);
 void start_task(void *pvParameters)
 {
     taskENTER_CRITICAL();           //进入临界区
-    //创建LED0任务
-    xTaskCreate((TaskFunction_t )led0_task,     	
-                (const char*    )"led0_task",   	
-                (uint16_t       )LED0_STK_SIZE, 
+    //创建UART任务
+    xTaskCreate((TaskFunction_t )uart_task,     	
+                (const char*    )"uart_task",   	
+                (uint16_t       )UART_STK_SIZE, 
                 (void*          )NULL,				
-                (UBaseType_t    )LED0_TASK_PRIO,	
-                (TaskHandle_t*  )&LED0Task_Handler);   
+                (UBaseType_t    )UART_TASK_PRIO,	
+                (TaskHandle_t*  )&UartTask_Handler);   
     //创建LED1任务
     xTaskCreate((TaskFunction_t )led1_task,     
                 (const char*    )"led1_task",   
@@ -209,8 +211,8 @@ void start_task(void *pvParameters)
     taskEXIT_CRITICAL();            //退出临界区
 }
 
-//LED0任务函数 
-void led0_task(void *pvParameters)
+//UART任务函数 
+void uart_task(void *pvParameters)
 {
     while(1)
     {
@@ -246,15 +248,19 @@ void float_task(void *pvParameters)
 int main(void)
 {
 
-	HAL_Init();
-	SystemClock_Config();
+  HAL_Init();
+
+  /* Configure the system clock to 32 MHz */
+  SystemClock_Config();
 
 	TIM2_Init(9,2096);
 	HAL_TIM_Base_Start_IT(&htim2);
+  /* Add your application code here
+     */
 	uart_init(9600);              //初始化USART
 
 	BSP_LED_Init(LED2);//PA5
-
+	
     xTaskCreate((TaskFunction_t )start_task,            //任务函数
                 (const char*    )"start_task",          //任务名称
                 (uint16_t       )START_STK_SIZE,        //任务堆栈大小
@@ -264,10 +270,20 @@ int main(void)
     vTaskStartScheduler();          //开启任务调度
 	
 }
+
 ```
 
+# 3、查看是否支持FPU
 
+前提：芯片自带FPU，浮点计算单元，比如STM32F4。而STM32L1系列没有。
 
+```
+float_num+=0.01f;
+```
+
+以上代码出断点，再进行硬件仿真。查看响应的asm代码。如果发现使用了s0等浮点寄存器，或者VLDR、VADD等浮点指令。说明FreeRTOS支持FPU。
+
+结论：FreeRTOS支持FPU。而STM32L1没有FPU单元，故采用CPU计算浮点。
 
 
 
