@@ -183,13 +183,107 @@ A和I同时使用了一个时间片轮，造成了A的时间变短了。
 设置为1，启动协程，协程可以节省开销，但是功能有限。
 
 ## 3.25 configUSE_COUNTING_SEMAPHORES
+设置为1，启用计数型信号量，相关API函数会被编译。
+
+## 3.26 configUSE_DAEMON_TASK_STARTUP_HOOK
+和configUSE_TIMERS同时定义为1时，需要定义函数
+
+```
+void vApplicationDaemonTaskStartupHook( void )
+```
+
+## 3.27 configUSE_IDLE_HOOK
+设置为1，使用空闲任务钩子函数。
+```
+void vApplicationIdleHook( void )
+```
+
+## 3.28 configUSE_MALLOC_FAILED_HOOK
+设置为1时，内存分配失败的钩子函数。
+```
+void vApplicationMallocFailedHook( void )
+```
+
+## 3.29 configUSE_MUTEXES
+设置为1，使用互斥信号量。
+
+## 3.30 configUSE_PORT_OPTIMISED_TASK_SELECTION
+FreeRTOS有两种方法来选择下一个要运行的任务。
+
+* 通用方法
+
+configUSE_PORT_OPTIMISED_TASK_SELECTION设置为0，或者硬件不支持；
+
+所有硬件通用时；
+
+全部用C语言实现，但是效率比特殊方法低；
+
+不限制最大优先级数目的时候。
+
+* 特殊方法（硬件方法）
+
+不是所有硬件都支持；
+
+宏configUSE_PORT_OPTIMISED_TASK_SELECTION为1时；
+
+硬件拥有特殊指令，比如计算前异零（CLZ）指令；
+
+比通用方法效率高；
+
+会限制优先级数目，一般是32个。
+
+## 3.31 configUSE_PREEMPTION
+设置为1时，采用抢占式调度器；为0时，采用协程。
+
+* 抢占式调度器
+
+每个时钟节拍中断时进行任务切换；
+
+* 协程
+
+切换方法包括：
+
+1）一个任务调用了函数taskYIELD()；
+
+2）一个任务调用了可以使任务进入阻塞态的API函数；
+
+3）应用程序明确定义了在中断中执行上下文切换。
 
 
+## 3.32 configUSE_QUEUE_SETS
+设置为1，启动队列集功能。
 
+## 3.33 configUSE_RECURSIVE_MUTEXES
+设置为1，启用递归互斥信号量。
 
+## 3.34 configUSE_STATS_FORMATTING_FUNCTIONS
+设置configUSE_TRACE_FACILITY 和 configUSE_STATS_FORMATTING_FUNCTIONS为1，则vTaskList()和vTaskGetRunTimeStats()编译。
 
+任意一个设置为0，都会使得跳过编译这两个函数。
 
+## 3.35 configUSE_TASK_NOTIFICATIONS
+设置为1，启动任务通知功能，相关API会被编译。开启此功能，每个任务会多消耗8字节。
 
+## 3.36 configUSE_TICK_HOOK
+设置为1，使能时间片钩子函数，用户需要实现时间片钩子函数。
+
+```
+void vApplicationTickHook( void )
+```
+
+## 3.37 configUSE_TICKLESS_IDLE
+设置为1，使能低功耗tickless模式。
+
+## 3.37 configUSE_TIMERS
+设置为1，使用软件定时器。并且configTIMER_TASK_PRIORITY、configTIMER_QUEUE_LENGTH和configTIMER_TASK_STACK_DEPTH必须定义。
+
+## 3.38 configUSE_TIME_SLICING
+FreeRTOS使用抢占式调度器，永远都在执行已经就绪了的最高优先级任务。configUSE_TIME_SLICING设置为1，优先级相同的任务在时钟节拍中断中进行切换。configUSE_TIME_SLICING设置为0，优先级相同的任务不会在时钟节拍中断中进行切换。
+
+默认为1。
+
+## 3.39 configUSE_TRACE_FACILITY
+设置为1，启动可视化跟踪调试。
 
 
 
