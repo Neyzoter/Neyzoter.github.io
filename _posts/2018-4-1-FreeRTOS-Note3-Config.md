@@ -46,22 +46,22 @@ FreeRTOS的堆内存是由编译器分配
 每个任务都有一个任务堆栈，如果用函数
 ```
 BaseType_t xTaskCreate(	TaskFunction_t pxTaskCode,
-						const char * const pcName,		/*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-						const configSTACK_DEPTH_TYPE usStackDepth,
-						void * const pvParameters,
-						UBaseType_t uxPriority,
-						TaskHandle_t * const pxCreatedTask )
+		const char * const pcName,		/*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+		const configSTACK_DEPTH_TYPE usStackDepth,
+		void * const pvParameters,
+		UBaseType_t uxPriority,
+		TaskHandle_t * const pxCreatedTask )
 ```
 
 创建一个任务，则任务自动从FreeRTOS的堆(ucHeap)中分配，堆栈的大小由函数xTaskCreate的参数usStackDepth来决定。如果用xTaskCreateStatic函数
 ```
 TaskHandle_t xTaskCreateStatic(	TaskFunction_t pxTaskCode,
-								const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-								const uint32_t ulStackDepth,
-								void * const pvParameters,
-								UBaseType_t uxPriority,
-								StackType_t * const puxStackBuffer,
-								StaticTask_t * const pxTaskBuffer ) PRIVILEGED_FUNCTION;
+		const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+		const uint32_t ulStackDepth,
+		void * const pvParameters,
+		UBaseType_t uxPriority,
+		StackType_t * const puxStackBuffer,
+		 StaticTask_t * const pxTaskBuffer ) PRIVILEGED_FUNCTION;
 
 ```
 
