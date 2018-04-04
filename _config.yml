@@ -9,7 +9,7 @@ subtitle: 宋超超的github
 description: 来自控制系的宋超超
 keywords: 宋超超, 控制, 人工智能, Python
 favicon: /favicon.ico
-timezone: Asia/Wuhan
+timezone: Asia/Hangzhou
 encoding: "utf-8"
 side_bar_repo_limit: 5
 
@@ -17,10 +17,10 @@ side_bar_repo_limit: 5
 #      Author      #
 # ---------------- #
 author: songchaochao
-organization: CUG, Sch.
+organization: ZJU, Sch.
 organization_url: http://www.cug.edu.cn/
 github_username: Neyzoter
-location: Wuhan, China
+location: Hangzhou, China
 email: chao2song@qq.com
 
 # ---------------- #
