@@ -70,7 +70,7 @@ RTOS调度器：确保当一个任务开始执行的时候上下文环境（寄�
 
 进入挂起态没有超时时间。进入和退出挂起态使用函数vTaskSuspend()和xTaskResume()。
 
-<img src="/images/posts/2018-4-4-FreeRTOS-Note5-Task-Dispatch/Task-TaskTrasform4State.png" width="600" alt="任务调度过程" />
+<img src="/images/posts/2018-4-4-FreeRTOS-Note5-Task-Dispatch/TaskTrasform4States.png" width="600" alt="任务调度过程" />
 
 # 4.任务优先级
 每个任务都可以分配一个从0到(configMAX_PRIORITIES-1)的优先级。如果所用的硬件平台支持类似计算前导零这样的指令（通过该指令执行下一个要运行的任务，Cortex-M支持该指令），并且宏configUSE_PORT_OPTIMISED_TASK_SELECTION（下一个要运行的任务的两种方法1：硬件方法，前导零CLZ）设置为1，**宏configMAX_PRIORITIES最大不超过32**。
