@@ -4,10 +4,10 @@
 baseurl:
 url: http://neyzoter.github.io
 date_format: "ordinal"
-title: 宋超超
-subtitle: 宋超超的github
+title: 宋超超/GitHub
+subtitle: 宋超超的技术人生
 description: 来自控制系的宋超超
-keywords: 宋超超, 控制, 人工智能, Python
+keywords: IoT, 控制, 人工智能, Python
 favicon: /favicon.ico
 timezone: Asia/Hangzhou
 encoding: "utf-8"
