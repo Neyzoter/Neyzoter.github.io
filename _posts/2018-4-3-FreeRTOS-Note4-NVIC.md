@@ -120,7 +120,7 @@ portNVIC_SYSPRI2_REG |= portNVIC_SYSTICK_PRI;
 
 * （4）configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY
 
-用来设置FreeRTOS系统可管理的最大优先级。低于该值的优先级归FreeRTOS管理；高于该值的优先级不归FreeRTOS管理。
+用来设置FreeRTOS系统可管理的最大中断优先级（不是任务优先级）。低于该值的优先级归FreeRTOS管理；高于该值的优先级不归FreeRTOS管理。
 
 将该值给BASEPRI寄存器赋值。FreeRTOS的开关中断通过操作BASEPRI寄存器实现的。关闭优先级小于该值的中断，打开大于该值的中断。
 
