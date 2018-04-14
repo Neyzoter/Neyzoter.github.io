@@ -87,4 +87,22 @@ Universal Mobile Telecommunications System
 
 通用移动通信系统，3G网络协议体系。
 
+### NB-IoT的两种上行物理信道
+（1）NPUSCH
 
+窄带物理上行共享通道
+
+（2）NPRACH
+
+窄带物理随机接入通道
+
+### MCL
+Maximum Coupling Loss
+
+最大耦合损耗，从基站天线端口到终端天线端口的路径损耗。
+
+上行MCL=上行最大发射功率-基站接收灵敏度
+
+下行MCL=下行最大发射功率-终端接收灵敏度
+
+NB-IoT的上行和下行MCL均为164dB
