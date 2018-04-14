@@ -33,8 +33,7 @@ FreeRTOS在处理器处理空闲任务的时候将处理器设置为低功耗模
 
 我们可以知道下一个任务到来的时间，只需要另外再开一个定时器，定时器的定时周期设置为这个时间即可。如果没有低功耗的定时器完成这个唤醒功能，滴答定时器也可以，下面有讲解。FreeRTOS具有得知下一个任务到来的时间的功能。
 
-# 2.Tickless具体体现
-## 2.1 宏
+# 2.Tickless具体实现
 **1.configUSE_TICKLESS_IDLE**
 
 1：使用Tickless模式，FreeRTOS提供了现成的portSUPPRESS_TICKS_AND_SLEEP函数。2：使用Tickless，并且用户自行编写进入Tickless低功耗的portSUPPRESS_TICKS_AND_SLEEP函数。该宏默认为0。
