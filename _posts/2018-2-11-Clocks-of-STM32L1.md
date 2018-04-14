@@ -72,6 +72,10 @@ SysTick要么用HCLK，要么配置SysTick控制或者状态寄存器。
 #### 4 名称
 系统时钟：SYSCLK
 
-CPU时钟、AHB时钟：HCLK
+CPU核时钟:FCLK
+
+AHB时钟：HCLK
 
 APB时钟：PCLK
+
+内核定时器：Core System Timer
