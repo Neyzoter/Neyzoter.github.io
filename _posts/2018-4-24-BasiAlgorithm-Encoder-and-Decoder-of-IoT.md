@@ -10,28 +10,28 @@ keywords: Algorithm, IoT, 编解码
 > 
 > 转载请注明出处，侵权必究。
 
-##1、反向不归零（NRZ）
+## 1、反向不归零（NRZ）
 
 反向不归零编码用高电平表示二进制的1，用低电平表示二进制的0。
 
 <img src="/images/posts/2018-4-24-BasiAlgorithm-Encoder-and-Decoder-of-IoT/NRZ.png" width="600" alt="NRZ的图像" />
 
-##2、曼彻斯特编码
+## 2、曼彻斯特编码
 在曼彻斯特编码中，用电压跳变的相位不同来区分1和0，其中从高到低的跳变表示1，从低到高的跳变表示0。
 
 <img src="/images/posts/2018-4-24-BasiAlgorithm-Encoder-and-Decoder-of-IoT/Manchester.png" width="600" alt="Manchester的图像" />
 
-##3、差动双相（DBP）编码
+## 3、差动双相（DBP）编码
 差动双相编码在半个比特周期中的任意的边沿表示二进制“0”，而没有边沿就是二进制“1”，如下图所示。此外在每个比特周期开始时，电平都要反相。因此，对于接收器来说，位节拍比较容易重建。
 
 <img src="/images/posts/2018-4-24-BasiAlgorithm-Encoder-and-Decoder-of-IoT/DBP.png" width="600" alt="DBP的图像" />
 
-##4、PIE编码
+## 4、PIE编码
 PIE编码符号有4个，分别是数据0、数据1、数据帧开始SOF和数据帧结束EOF。
 
 <img src="/images/posts/2018-4-24-BasiAlgorithm-Encoder-and-Decoder-of-IoT/PIE.png" width="600" alt="PIE的图像" />
 
-##5、Python3.6实现效果和代码
+## 5、Python3.6实现效果和代码
 效果1：
 
 <img src="/images/posts/2018-4-24-BasiAlgorithm-Encoder-and-Decoder-of-IoT/face1.png" width="600" alt="效果1" />
