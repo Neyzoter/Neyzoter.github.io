@@ -29,7 +29,7 @@ keywords: Algorithm, IoT, 编解码
 ## 4、PIE编码
 PIE编码符号有4个，分别是数据0、数据1、数据帧开始SOF和数据帧结束EOF。
 
-<img src="/images/posts/2018-4-24-BasiAlgorithm-Encoder-and-Decoder-of-IoT/PIE.png" width="600" alt="PIE的图像" />
+<img src="/images/posts/2018-4-24-BasiAlgorithm-Encoder-and-Decoder-of-IoT/PIE.png" width="300" alt="PIE的图像" />
 
 ## 5、Python3.6实现效果和代码
 效果1：
