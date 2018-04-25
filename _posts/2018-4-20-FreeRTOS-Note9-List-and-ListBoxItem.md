@@ -1,7 +1,7 @@
 ---
 layout: post
 title: FreeRTOS学习笔记（9）列表和列表项
-categories: FreeRTOS
+categories: RTOS
 description: FreeRTOS学习笔记（9）列表和列表项
 keywords: FreeRTOS, 列表, 列表项
 ---
