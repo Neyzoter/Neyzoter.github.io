@@ -18,3 +18,4 @@ keywords: Python, 数据处理
 ```python
 X_train_flatten = X_train_orig.reshape(X_train_orig.shape[0], -1).T
 ```
+
