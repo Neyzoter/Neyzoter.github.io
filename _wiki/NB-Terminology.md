@@ -11,6 +11,11 @@ International Mobile Equipment Identity(IMEI)
 
 国际移动设备身份码的缩写
 
+### IMSI
+International Mobile Subscriber Identification Number
+
+国际移动用户识别码，区别移动用户的标志，存储在sim卡中，可用于区别移动用户的有效信息。
+
 ### DTLS
 Datagram Transport Layer Security(DTLS)
 
