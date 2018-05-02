@@ -1,8 +1,8 @@
 ---
 layout: post
-title: FreeRTOS学习笔记（10）调度器开启和任务相关函数
+title: FreeRTOS学习笔记(10)调度器开启和任务相关函数
 categories: RTOS
-description: FreeRTOS学习笔记（10）调度器开启和任务相关函数
+description: FreeRTOS学习笔记(10)调度器开启和任务相关函数
 keywords: FreeRTOS, 调度器
 ---
 
