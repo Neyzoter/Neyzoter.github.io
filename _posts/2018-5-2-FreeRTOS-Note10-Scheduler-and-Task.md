@@ -10,7 +10,7 @@ keywords: FreeRTOS, 调度器
 > 
 > 转载请注明出处，侵权必究。
 
-# 任务创建函数
+# 1、任务创建函数
 
 ```C
 BaseType_t xTaskCreate(	TaskFunction_t pxTaskCode,
