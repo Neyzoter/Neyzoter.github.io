@@ -14,7 +14,7 @@ keywords: SVC,PendSV
 
 用于产生系统函数的调用请求。例如操作系统不让用户程序直接访问硬件，而是通过提供一些系统服务函数，用户程序使用SVC 发出对系统服务函数的呼叫请求，以这种方法调用它们来间接访问硬件。因此，当用户程序想要控制特定的硬件时，它就会产生一个SVC异常，然后操作系统提供的SVC异常服务例程得到执行，它再调用相关的操作系统函数，后者完成用户程序请求的服务。 
 
-<img src="/images/posts/2018-5-2-FreeRTOS-Note10-Scheduler-and-Task/SVC.png" width="600" alt="SVC作为操作系统门户的示意图"/>
+<img src="/images/posts/2018-5-2-SVC-and-PendSV/SVC.png" width="600" alt="SVC作为操作系统门户的示意图"/>
 
 # 2、PendSV（可悬起的系统调用）
 
@@ -25,11 +25,11 @@ PendSV典型应用：上下文切换。
 
 如果一个系统通过Systick异常启动上下文切换，则可能出现正在响应另一个异常，Systick会抢占ISR（Interrupt Service Routines，中断服务程序）。OS不允许中断过程中执行上下文切换。如下图。
 
-<img src="/images/posts/2018-5-2-FreeRTOS-Note10-Scheduler-and-Task/IRQ_happended.png" width="600" alt="IRQ发生时，上下文切换的问题"/>
+<img src="/images/posts/2018-5-2-SVC-and-PendSV/IRQ_happened.png" width="600" alt="IRQ发生时，上下文切换的问题"/>
 
 而PendSV能悬起，很好的解决该问题。
 
-<img src="/images/posts/2018-5-2-FreeRTOS-Note10-Scheduler-and-Task/PendSVControlContext.png" width="600" alt="PendSV控制上下文切换"/>
+<img src="/images/posts/2018-5-2-SVC-and-PendSV/PendSVControlContext.png" width="600" alt="PendSV控制上下文切换"/>
 
 # 3、例子
 
