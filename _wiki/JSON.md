@@ -1,0 +1,158 @@
+---
+layout: wiki
+title: JSON/XML
+categories: JSON/XML
+description: JSON/XML语法
+keywords: JSON, XML
+---
+
+# 1、JSON
+## 1.1 介绍
+JavaScript Object Notation(JavaScript 对象表示法) JavaScript Object Notation(JavaScript对象表示法)。非常多的动态编程语言（PHP、JSP、.NET）支持JSON。
+
+JSON 是存储和交换文本信息的语法。
+
+JSON 比 XML 更小、更快，更易解析。
+
+JavaScript 程序能够使用内建的 eval() 函数，用 JSON 数据来生成原生的 JavaScript 对象。
+
+## 1.2 第一个代码
+NB-IoT的设备描述文件：
+
+```JSON
+{
+    "devices": [
+        {
+            "manufacturerId": "Huawei",
+            "manufacturerName": "Huawei",
+            "model":  "NBIoTDevice",
+            "protocolType": "CoAP",
+            "deviceType": "WaterMeter",
+            "serviceTypeCapabilities": [
+                {
+                    "serviceId": "WaterMeterBasic",
+                    "serviceType": "WaterMeterBasic",
+                    "option": "Mandatory"
+                },
+                {
+                    "serviceId": "WaterMeterAlarm",
+                    "serviceType": "WaterMeterAlarm",
+                    "option": "Mandatory"
+                },
+                {
+                    "serviceId": "Battery",
+                    "serviceType": "Battery",
+                    "option": "Optional"
+                },
+                {
+                    "serviceId": "DeliverySchedule",
+                    "serviceType": "DeliverySchedule",
+                    "option": "Mandatory"
+                },
+                {
+                    "serviceId": "Connectivity",
+                    "serviceType": "Connectivity",
+                    "option": "Mandatory"
+                }
+            ]
+        }
+    ]
+}
+```
+
+## 1.3 JSON语法
+
+### 1.3.1 JSON语法规则
+1、数据在名称/值对中
+
+JSON的数据书写格式：名称/值对
+
+名称（双引号中）:数值
+
+2、数据由逗号分隔
+
+3、大括号保存对象
+
+4、中括号保存数组（可以包含多个对象）
+
+```JSON
+{ "site":["name":"菜鸟教程" , "url":"www.runoob.com"] }
+```
+
+其中"site"是对象名称。
+
+### 1.3.2 JSON值
+数字（整数或浮点数）、字符串（在双引号中）、逻辑值（true 或 false）、数组（在中括号中）、对象（在大括号中）、null
+
+### 1.3.3 JSON使用JSP语法
+访问
+
+```
+site[0].name;
+```
+
+修改数据
+
+```
+site[0].name="菜鸟";
+```
+
+## 1.4 JSON对象
+### 1.4.1 对象语法
+在大括号中书写。
+
+对象可以包含多个**key/value(键/值)**对。
+
+key必须是字符串，value可以是合法的JSON数据类型(字符串, 数字, 对象, 数组, 布尔值或 null)。
+
+key 和 value 中使用冒号分割。
+
+每个 key/value 对使用逗号分割
+
+### 1.4.2 访问对象值
+
+方法1：用.来访问
+
+```
+var myObj, x;
+myObj = { "name":"runoob", "alexa":10000, "site":null };
+x = myObj.name;
+```
+
+方法2：用[]访问
+
+```
+var myObj, x;
+myObj = { "name":"runoob", "alexa":10000, "site":null };
+x = myObj["name"];
+```
+
+### 1.4.3 循环对象
+
+用for-in来循环对象的属性，返回
+
+name
+
+alexa
+
+site
+
+```
+var myObj = { "name":"runoob", "alexa":10000, "site":null };
+for (x in myObj) {
+    document.getElementById("demo").innerHTML += x + "<br>";
+}
+```
+
+用for-in来循环对象的属性，用[]访问
+
+```
+var myObj = { "name":"runoob", "alexa":10000, "site":null };
+for (x in myObj) {
+    document.getElementById("demo").innerHTML += myObj[x] + "<br>";
+}
+
+```
+
+
+# 2、XML
