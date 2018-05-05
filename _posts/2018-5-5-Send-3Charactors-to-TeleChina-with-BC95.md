@@ -29,7 +29,7 @@ StressMonitorUnion_ZJU_Union001.zip
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \|-----devicetype-capability.json（设备类型能力json）
 
-|----  service（服务文件夹）
+\|----  service（服务文件夹）
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \|-----  Stress（压力服务文件夹）
 
