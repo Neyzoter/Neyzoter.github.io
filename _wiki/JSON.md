@@ -154,5 +154,65 @@ for (x in myObj) {
 
 ```
 
+### 1.4.4 嵌套JSON对象
+```
+
+myObj = {
+    "name":"runoob",
+    "alexa":10000,
+    "sites": {
+        "site1":"www.runoob.com",
+        "site2":"m.runoob.com",
+        "site3":"c.runoob.com"
+    }
+}
+```
+
+用.或者[]访问
+
+```
+x = myObj.sites.site1;
+// 或者
+x = myObj.sites["site1"];
+```
+
+### 1.4.5 删除对象
+关键字delete删除
+
+```
+delete myObj.sites.site1;
+//或者
+delete myObj.sites["site1"];
+```
+
+## 1.5 JSON对象中的数组
+### 1.5.1 JSON数组语法
+JSON 数组在中括号中书写。
+
+JSON 中数组值必须是合法的 JSON 数据类型（字符串, 数字, 对象, 数组, 布尔值或 null）。
+```
+{
+"name":"网站",
+"num":3,
+"sites":[ "Google", "Runoob", "Taobao" ]
+}
+```
+
+### 1.5.2 循环数组
+for-in循环数组，并用[]索引
+
+```
+for (i in myObj.sites) {
+    x += myObj.sites[i] + "<br>";
+}
+```
+
+### 1.5.3 删除数组元素
+关键字delete删除数组元素
+
+```
+delete myObj.sites[1];
+```
+
 
 # 2、XML
