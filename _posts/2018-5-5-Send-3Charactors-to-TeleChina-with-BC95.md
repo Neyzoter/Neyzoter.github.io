@@ -37,7 +37,7 @@ StressMonitorUnion_ZJU_Union001.zip
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-----   servicetype-capability.json（压力服务类型能力json）
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/files.png" width = "300"  alt="文件夹"  />
+<img src="/images/posts/2018-5-5-Send-3Charactors-to-TeleChina-with-BC95/files.png" width = "300"  alt="文件夹"  />
 
 **  **
 
@@ -128,7 +128,7 @@ StressMonitorUnion_ZJU_Union001.zip
 ## 2.3 插件开发
 参考之前的插件开发方法。将压力服务的三个属性都拖入到编解码。
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/encode_decode.png" width = "600"  alt="编解码"  />
+<img src="/images/posts/2018-5-5-Send-3Charactors-to-TeleChina-with-BC95/encode_decode.png" width = "600"  alt="编解码"  />
 
 而后部署即可。
 
@@ -139,7 +139,7 @@ StressMonitorUnion_ZJU_Union001.zip
 
 在NB模拟器这里进行数据发送的模拟。
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/NB_device_simu.png" width = "600"  alt="NB设备模拟数据"  />
+<img src="/images/posts/2018-5-5-Send-3Charactors-to-TeleChina-with-BC95/NB_device_simu.png" width = "600"  alt="NB设备模拟数据"  />
 
 我们输入十六进制数据，比如我们要发送压力中值（AAAAAA）、压力最小值（AAAAAA）、压力最大值（AAAAAA）。A对应十进制65，十六进制41，则我们这里发送18个字符41。
 
@@ -149,7 +149,7 @@ StressMonitorUnion_ZJU_Union001.zip
 
 而后我们可以在设备的历史文件中查看数据。
 
-<img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/data.png" width = "800"  alt="查看数据"  />
+<img src="/images/posts/2018-5-5-Send-3Charactors-to-TeleChina-with-BC95/data.png" width = "800"  alt="查看数据"  />
 
 可以发现，数据虽然以一连串的方式发送，但是被分解成了三个：middleStressValue、lowestStressValue和highestStressValue。
 
