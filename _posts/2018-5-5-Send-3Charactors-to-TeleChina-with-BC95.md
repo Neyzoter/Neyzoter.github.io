@@ -21,8 +21,7 @@ keywords: NB-IoT,物联网,电信,华为
 
 profile文件（zip文件）命名格式为设备类型_厂商ID_设备名称.zip（deviceType_manufacturerId_model.zip)。我的压力profile文件结构如下所示：
 
-**     **
-
+```
 StressMonitorUnion_ZJU_Union001.zip
 
 |----  profile（设备的profile文件夹）
@@ -31,15 +30,14 @@ StressMonitorUnion_ZJU_Union001.zip
 
 |----  service（服务文件夹）
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-----  Stress（压力服务文件夹）
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |-----  Stress（压力服务文件夹）
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-----  profile（压力服务profile文件夹）
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-----   servicetype-capability.json（压力服务类型能力json）
 
 <img src="/images/posts/2018-5-5-Send-3Charactors-to-TeleChina-with-BC95/files.png" width = "300"  alt="文件夹"  />
-
-**  **
+```
 
 代码如下：
 
