@@ -11,6 +11,7 @@ keywords: MAVEN, Java
 POM 代表工程对象模型。它是使用 Maven 工作时的基本组建，是一个 xml 文件。它被放在工程根目录下，文件命名为 pom.xml。
 
 ## 生命周期
+一个典型MAVEN工程的生命周期序列。
 
 阶段|处理|描述
 prepare-resources|资源拷贝|本阶段可以自定义需要拷贝的资源
