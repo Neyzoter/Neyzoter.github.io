@@ -74,7 +74,7 @@ java -cp "$(CURRENT_DIRECTORY)" "$(NAME_PART)"
 
 然后保存Java编译javac和执行java。
 
-<img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/saveJava.png" width="400" alt="保存Java编译和执行" />
+<img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/saveJava.png" width="700" alt="保存Java编译和执行" />
 
 5、设置快捷键
 
@@ -86,6 +86,6 @@ java -cp "$(CURRENT_DIRECTORY)" "$(NAME_PART)"
 
 helloworld程序的执行结果如下。
 
-<img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/runOut.png" width="400" alt="执行NppExec" />
+<img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/runOut.png" width="800" alt="执行NppExec" />
 
 
