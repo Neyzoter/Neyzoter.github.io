@@ -25,12 +25,18 @@ keywords: Notepad++, Python, Java
 3、加入Python路径
 
 ```
+
 cmd /k 你的python.exe（比如我的是F:\Program\Anaconda\python.exe） "$(FULL_CURRENT_PATH)" & PAUSE & EXIT
+
 ```
 
 栗子：
 
-```cmd /k F:\Program\Anaconda\python.exe "$(FULL_CURRENT_PATH)" & PAUSE & EXIT```
+```
+
+cmd /k F:\Program\Anaconda\python.exe "$(FULL_CURRENT_PATH)" & PAUSE & EXIT
+
+```
 
 <img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/run_path.png" width="300" alt="运行程序" />
 
