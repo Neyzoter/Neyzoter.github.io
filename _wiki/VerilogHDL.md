@@ -68,4 +68,24 @@ always@(posedge clk or negedge rst_n)
 
 <img src="/images/wiki/VerilogHDL/Auto.png" width="600" alt="工具自动优化" />
 
+## 4.2 模块复用
+能用简单模块代替则代替。
+
+比如乘法器很耗费资源。
+
+```Verilog HDL
+//需要两个乘法器
+assign square=(data_in[7])? (data_bar*data_bar) : (data_in*data_in);
+```
+
+可代替为
+
+```Verilog HDL
+//需要一个乘法器
+assign data_tmp = (data_in[7])? (~data_in + 1) : data_in;
+assign square = data_tmp * data_tmp;
+```
+
+
+
 
