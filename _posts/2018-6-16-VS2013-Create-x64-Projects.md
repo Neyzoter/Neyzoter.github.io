@@ -76,7 +76,7 @@ l  Where to build the binaries 填写新建的build文件路劲
 
 2 右键INSTALL文件，选择生成（时间视情况而定）
 
-四 配置环境变量
+四、配置环境变量
 
 在path中添加编译后的    build文件夹\install\x64\vc12\bin
 
@@ -128,7 +128,7 @@ opencv_videostab340d.lib
 
 六、测试
 
-```C++
+```CPP
 #include<iostream>
 #include<opencv2/core/core.hpp>
 #include<opencv2/highgui/highgui.hpp>
