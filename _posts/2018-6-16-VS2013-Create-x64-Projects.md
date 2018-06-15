@@ -18,7 +18,7 @@ keywords: VS2013, x64,win，opencv
 
 <img src="/images/posts/2018-6-16-VS2013-Create-x64-Projects/chaMana.png" width="500" alt="属性管理器" />
 
-如果没有配置，则初始化为win32，没有Debug|x64和Release|x64。
+如果没有配置，则初始化为win32，没有Debug\|x64和Release\|x64。
 
 # x64的配置
 “生成”-》“配置管理器”
@@ -86,7 +86,7 @@ l  Where to build the binaries 填写新建的build文件路劲
 
 1、建立一个空的控制台项目，然后再配置成x64。见上面的**配置**。
 
-2、Debug|x64-》Microsoft.Cpp.x64.user
+2、Debug\|x64-》Microsoft.Cpp.x64.user
 
 3、VC++目录-》包含目录
 
