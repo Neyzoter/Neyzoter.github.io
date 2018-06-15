@@ -145,3 +145,9 @@ int main()
 ```
 
 这里的picture.jpg是图片，需要自行放置图片到CPP工程中。
+
+# 参考文献
+
+https://blog.csdn.net/ture_dream/article/details/52600897
+
+https://blog.csdn.net/nickcry/article/details/79148772
