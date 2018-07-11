@@ -11,7 +11,6 @@ keywords: STM32, 启动模式, BOOT
 > 转载请注明出处，侵权必究。
 
 
-
 # 一、启动模式
 
 <img src="/images/posts/2018-2-27-BOOT-Mode-of-STM32/mode.png" width="700" alt="启动模式表" />

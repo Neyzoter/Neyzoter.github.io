@@ -99,6 +99,7 @@ helloworld程序的执行结果如下。
 <img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/runOut.png" width="800" alt="执行NppExec" />
 
 # CPP的运行
+## 1 notepad运行cpp
 1、安装MinGW
 
 2、将MinGW的bin路径加入到环境变量中
@@ -124,3 +125,30 @@ cmd /k cd /d "$(CURRENT_DIRECTORY)" & g++ "$(FILE_NAME)" -o "$(NAME_PART)" & "$(
 复制进去，并保存，设置快捷键。
 
 5、快捷键运行即可
+
+## 2 如何用命令行运行cpp？
+
+1、打开cmd命令行
+
+2、进入包含cpp的文件夹
+
+3、编译
+
+生成一个默认的a.exe执行文件
+
+```
+$ g++ 文件名.cpp  
+```
+
+或者指定exe文件名
+
+```
+$ g++ 文件名.cpp  -o 文件名（可以任意取）
+```
+
+4.运行
+
+如果是默认的a.exe，则在cmd窗口输入“a.exe”或者“a”
+
+如果是指定了文件名，则在cmd窗口输入“文件名.exe”或者“文件名”
+
