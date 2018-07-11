@@ -10,7 +10,7 @@ keywords: FreeRTOS, 列表, 列表项
 > 
 > 转载请注明出处，侵权必究。
 
-#列表和列表项介绍
+# 1、列表和列表项介绍
 列表是FreeRTOS的一个数据结构，概念上和链表类似，用于跟踪FreeRTOS的任务。
 
 任务优先级为0的***就绪列表**、列表项和TCB的关系如下：
@@ -33,7 +33,7 @@ keywords: FreeRTOS, 列表, 列表项
 >
 >总结：列表->某一个列表项（通过链表遍历到其他的列表项）->任务控制块<-当前任务
 
-## 1.列表
+## 1.1 列表
 ```
 typedef struct xLIST
 {
@@ -49,7 +49,7 @@ typedef struct xLIST
 
 <img src="/images/posts/2018-4-20-FreeRTOS-Note9-List-and-ListBoxItem/list.png" width="300" alt="列表结构" />
 
-##2.列表项
+## 1.2 列表项
 
 列表项即存放在列表中的项目，分为列表项和迷你列表项。
 
@@ -71,7 +71,7 @@ typedef struct xLIST_ITEM ListItem_t;
 
 <img src="/images/posts/2018-4-20-FreeRTOS-Note9-List-and-ListBoxItem/listitem.png" width="300" alt="列表项结构" />
 
-## 3.迷你列表项
+## 1.3 迷你列表项
 
 ```
 struct xMINI_LIST_ITEM
@@ -88,9 +88,9 @@ typedef struct xMINI_LIST_ITEM MiniListItem_t;
 
 <img src="/images/posts/2018-4-20-FreeRTOS-Note9-List-and-ListBoxItem/minilistitem.png" width="300" alt="迷你列表项结构" />
 
-# 列表和列表项初始化
+# 2、列表和列表项初始化
 
-## 1.列表初始化
+## 2.1 列表初始化
 ```
 void vListInitialise( List_t * const pxList )
 {
@@ -116,7 +116,7 @@ void vListInitialise( List_t * const pxList )
 
 <img src="/images/posts/2018-4-20-FreeRTOS-Note9-List-and-ListBoxItem/listinit.png" width="300" alt="列表初始化" />
 
-## 2.列表项初始化
+## 2.2 列表项初始化
 
 ```
 void vListInitialiseItem( ListItem_t * const pxItem )
@@ -130,7 +130,7 @@ void vListInitialiseItem( ListItem_t * const pxItem )
 }
 ```
 
-# 列表项插入
+# 3、列表项插入
 
 ```
 void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem )
@@ -182,7 +182,7 @@ void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem )
 
 <img src="/images/posts/2018-4-20-FreeRTOS-Note9-List-and-ListBoxItem/insertItem3.png" width="800" alt="插入第三个列表项" />
 
-#列表项末尾插入
+# 4、列表项末尾插入
 
 不使用列表项的数值来决定列表的先后顺序。
 
@@ -222,7 +222,7 @@ void vListInsertEnd( List_t * const pxList, ListItem_t * const pxNewListItem )
 
 <img src="/images/posts/2018-4-20-FreeRTOS-Note9-List-and-ListBoxItem/insertEndItem3.png" width="600" alt="插入前两个列表项" />
 
-# 列表项的删除
+# 5、列表项的删除
 ```
 UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove )
 {
@@ -254,7 +254,7 @@ List_t * const pxList = ( List_t * ) pxItemToRemove->pvContainer;
 
 ```
 
-# 列表的遍历
+# 6、列表的遍历
 ```
 //pxTCB用于保存pxIndex所指向的列表项的pvOwner变量值，即列表属于谁。通常是一个任务的任务控制块。
 //pxList表示要遍历的列表
