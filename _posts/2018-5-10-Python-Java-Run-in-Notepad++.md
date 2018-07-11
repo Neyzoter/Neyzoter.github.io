@@ -111,7 +111,7 @@ C:\Program Files\mingw-w64\x86_64-5.3.0-posix-seh-rt_v4-rev0\mingw64\bin
 
 win+r调出cmd窗口，输入“g++ -v”，查看g++的版本。我的是5.3.0。
 
-<img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/gpp.png" width="800" alt="查看g++的版本" />
+<img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/gpp.png" width="500" alt="查看g++的版本" />
 
 4、配置notepad++
 
