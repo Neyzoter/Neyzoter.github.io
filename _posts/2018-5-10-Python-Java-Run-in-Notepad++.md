@@ -98,7 +98,7 @@ helloworld程序的执行结果如下。
 
 <img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/runOut.png" width="800" alt="执行NppExec" />
 
-# 3、CPP的运行
+# CPP的运行
 1、安装MinGW
 
 2、将MinGW的bin路径加入到环境变量中
