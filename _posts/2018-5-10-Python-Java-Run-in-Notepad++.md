@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Notepad++运行Python和Java
+title: Notepad++运行Python、Java和CPP
 categories: Softwares
-description: 在Notepad上实现Python和Java程序的运行
+description: 在Notepad上实现Python、Java和CPP程序的运行
 keywords: Notepad++, Python, Java
 ---
 
@@ -98,4 +98,29 @@ helloworld程序的执行结果如下。
 
 <img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/runOut.png" width="800" alt="执行NppExec" />
 
+# 3、CPP的运行
+1、安装MinGW
 
+2、将MinGW的bin路径加入到环境变量中
+
+比如我的是
+
+C:\Program Files\mingw-w64\x86_64-5.3.0-posix-seh-rt_v4-rev0\mingw64\bin
+
+3、验证g++有用
+
+win+r调出cmd窗口，输入“g++ -v”，查看g++的版本。我的是5.3.0。
+
+<img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/gpp.png" width="800" alt="查看g++的版本" />
+
+4、配置notepad++
+
+按下F5或者菜单栏-》运行-》运行
+
+将
+
+cmd /k cd /d "$(CURRENT_DIRECTORY)" & g++ "$(FILE_NAME)" -o "$(NAME_PART)" & "$(NAME_PART).exe"
+
+复制进去，并保存，设置快捷键。
+
+5、快捷键运行即可
