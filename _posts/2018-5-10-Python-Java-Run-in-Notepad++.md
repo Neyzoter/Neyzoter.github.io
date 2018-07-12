@@ -120,9 +120,17 @@ win+r调出cmd窗口，输入“g++ -v”，查看g++的版本。我的是5.3.0�
 
 将
 
+```
 cmd /k cd /d "$(CURRENT_DIRECTORY)" & g++ "$(FILE_NAME)" -o "$(NAME_PART)" & "$(NAME_PART).exe"
+```
 
 复制进去，并保存，设置快捷键。
+
+如果想要支持C++11，以上输入的代码需要加上“-std=c++11”，即
+
+```
+cmd /k cd /d "$(CURRENT_DIRECTORY)" & g++ -std=c++11 "$(FILE_NAME)" -o "$(NAME_PART)" & "$(NAME_PART).exe"
+```
 
 5、快捷键运行即可
 
