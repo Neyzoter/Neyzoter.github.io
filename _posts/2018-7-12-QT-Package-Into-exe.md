@@ -17,7 +17,7 @@ keywords: QT, C++
 
 # 2、步骤
 
-# 2.1 release一个QT程序
+## 2.1 release一个QT程序
 
 <img src="/images/posts/2018-7-12-QT-Package-Into-exe/release.png" width="400" alt="release" />
 
