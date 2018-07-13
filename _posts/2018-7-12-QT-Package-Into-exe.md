@@ -19,11 +19,11 @@ keywords: QT, C++
 
 # 2.1 release一个QT程序
 
-<img src="/images/posts/2018-7-10-VS2013-QT-Install/release.png" width="400" alt="release" />
+<img src="/images/posts/2018-7-12-QT-Package-Into-exe/release.png" width="400" alt="release" />
 
 会生成一个编译后的文件夹。
 
-<img src="/images/posts/2018-7-10-VS2013-QT-Install/releaseFile.png" width="600" alt="release编译文件" />
+<img src="/images/posts/2018-7-12-QT-Package-Into-exe/releaseFile.png" width="600" alt="release编译文件" />
 
 ## 2.2 拷贝exe文件
 找到release编译文件夹中的exe文件，我的地址是C:\Users\Thinkpad\Desktop\Socket-Test-QT\build-Socket-Test-Desktop_Qt_5_3_MSVC2013_OpenGL_32bit-Release\release。
@@ -36,13 +36,13 @@ keywords: QT, C++
 
 找到QT的运行文件
 
-<img src="/images/posts/2018-7-10-VS2013-QT-Install/findQT.png" width="400" alt="找到QT的文件夹" />
+<img src="/images/posts/2018-7-12-QT-Package-Into-exe/findQT.png" width="400" alt="找到QT的文件夹" />
 
 通过cd进入2.2节建立的新的文件夹。
 
 命令行输入：windeployqt 程序名，得到运行结果。
 
-<img src="/images/posts/2018-7-10-VS2013-QT-Install/windeployqtResult.png" width="400" alt="windeployqtResult结果" />
+<img src="/images/posts/2018-7-12-QT-Package-Into-exe/windeployqtResult.png" width="400" alt="windeployqtResult结果" />
 
 再次双击这个exe文件，则可以运行了。
 
@@ -52,11 +52,11 @@ keywords: QT, C++
 
 (1)打开Engima Virtual Box软件，填写要打包的文件信息。
 
-<img src="/images/posts/2018-7-10-VS2013-QT-Install/pack1.png" width="600" alt="软件使用1" />
+<img src="/images/posts/2018-7-12-QT-Package-Into-exe/pack1.png" width="600" alt="软件使用1" />
 
 (2)点右下角的Files Options，选择将文件压缩。
 
-<img src="/images/posts/2018-7-10-VS2013-QT-Install/compress.png" width="400" alt="软件使用2——压缩" />
+<img src="/images/posts/2018-7-12-QT-Package-Into-exe/compress.png" width="400" alt="软件使用2——压缩" />
 
 (3)Process
 
