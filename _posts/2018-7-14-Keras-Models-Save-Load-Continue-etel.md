@@ -90,7 +90,7 @@ model.add(Dense(10, name="new_dense"))  # 将不会加载权重
 model.load_weights(fname, by_name=True)
 ```
 
-# 参考文献
+# 2、参考文献
 
 如何保存Keras模型？：[http://keras-cn.readthedocs.io/en/latest/for_beginners/FAQ/#keras_1](http://keras-cn.readthedocs.io/en/latest/for_beginners/FAQ/#keras_1 "如何保存Keras模型？")
 
