@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Python的keras出现了softmax() got an unexpected keyword argument 'axis'
+title: keras出现了softmax() got an unexpected keyword argument 'axis'
 categories: Python
 description: Python的keras出现了softmax() got an unexpected keyword argument 'axis'
 keywords: Python, keras, softmax, tensorflow
