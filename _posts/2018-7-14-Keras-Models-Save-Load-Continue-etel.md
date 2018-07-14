@@ -50,7 +50,7 @@ print ( "Test Accuracy = " + str( preds[1] ) )
 
 只保存模型的结构（到json或者yaml格式），不包含权重或配置信息。返回一个json_string或者yaml_string。
 
-```
+```python
 json_string = model.to_json()
 yaml_string = model.to_yaml()
 ```
@@ -67,12 +67,12 @@ yaml_string = model.to_yaml()
 
 加载权重到不同的网络结构（有些层一样），比如迁移学习，可以通过层的名字来加载模型：
 
-```
+```python
 # by_name:是否采用名字来加载模型权重
 model.load_weights('my_model_weights.h5', by_name=True)
 ```
 
-```
+```python
 """
 假如原模型为：
     model = Sequential()
