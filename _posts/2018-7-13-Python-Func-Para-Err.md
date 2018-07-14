@@ -12,7 +12,7 @@ keywords: Python, 参数输入
 
 # 1、问题
 
-```Python
+```python
 X = identity_block(X, f = 3, [64, 64, 256], stage=2, block='b')
 ```
 报错：
@@ -27,12 +27,12 @@ SyntaxError: positional argument follows keyword argument
 # 3、改正
 第一种解决方案，将前面的关键字参数f = 3变为位置参数 3。
 
-```Python
+```python
 X = identity_block(X, 3, [64, 64, 256], stage=2, block='b')
 ```
 
 第二种解决方案，位置参数[64, 64, 256]改为位置参数filters = [64, 64, 256].
 
-```Python
+```python
 X = identity_block(X, f = 3, filters = [64, 64, 256], stage=2, block='b')
 ```
