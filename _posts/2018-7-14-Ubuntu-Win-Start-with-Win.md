@@ -18,7 +18,7 @@ keywords: Ubuntu, Windows, 双系统
 
 1、查看启动项（开机的时候就能看到）
 
-<img src="/images/posts/2018-7-14-Ubunt-Win-Start-with-Win/start.png" width="700" alt="启动项" />
+<img src="/images/posts/2018-7-14-Ubunt-Win-Start-with-Win/start.jpg" width="700" alt="启动项" />
 
 可以看到我的Ubuntu是第0项，Ubuntu高级选项是第1项，win启动是第2项，System setup是第3项。
 
