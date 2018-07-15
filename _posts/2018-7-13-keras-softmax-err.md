@@ -48,3 +48,9 @@ def softmax(x, axis=-1):
 ```
 
 中的softmax(x, axis=axis)改为softmax(x, dim=axis)。
+
+# 4、说明
+
+该问题的出现是因为tensoflow后期修改了tensorflow.nn.softmax()的参数dim为axis。
+
+除了修改keras的函数，也可以直接更新tensorflow，使得和keras版本匹配。
