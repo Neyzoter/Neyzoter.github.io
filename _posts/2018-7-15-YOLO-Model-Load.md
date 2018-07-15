@@ -50,6 +50,13 @@ python ./yad2k.py yolov2.cfg yolov2.weights model_data/yolo.h5
 python ./test_yolo.py model_data/yolo.h5 # output in images/out/
 ```
 
+## 2.6 keras调用
+```
+yolo_model = keras.models.load_model("model_data/yolo.h5") 
+```
+
+这个模型已经可以直接使用了。
+
 # 3、问题
 可能出现tensorflow和keras不兼容的问题。如tensorflow版本为1.2.1，keras为2.1.6，则有的地方不兼容，如tensorflow没有leaky_relu。
 
@@ -61,6 +68,6 @@ python ./test_yolo.py model_data/yolo.h5 # output in images/out/
 conda install --channel https://conda.anaconda.org/anaconda tensorflow
 ```
 
-# 参考
+# 4、参考
 
 allanzelener/YAD2K[https://github.com/allanzelener/YAD2K](https://github.com/allanzelener/YAD2K "yadk2k")
