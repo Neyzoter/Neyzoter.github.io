@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Python YOLOv2模型的重建为keras模型
-categories: Python, AIA
+categories: Python AIA
 description: Python YOLOv2模型的重建为keras模型
 keywords: Python, YOLO
 ---

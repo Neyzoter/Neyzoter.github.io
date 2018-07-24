@@ -44,4 +44,4 @@ Step3:程序下载完成后，又有需要将BOOT0设置为GND，手动复位，
 
 <img src="/images/posts/2018-2-27-BOOT-Mode-of-STM32/boot_circuit.png" width="700" alt="启动模式选择电路" />
 
-以上为可选择的模式，由于一般采用BOOT=0的模式，所以可以直接BOOT0接地，BOOT1悬空。
+以上为可选择的模式，由于一般采用BOOT0=0的模式，所以可以直接BOOT0接地，BOOT1悬空。
