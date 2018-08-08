@@ -83,7 +83,9 @@ void rsi_interrupt_handler(void)
 	//中断不在这里处理
 //  rsi_app_cb.pkt_pending = RSI_TRUE;
 //  rsi_irq_disable();
-}```
+}
+
+```
 
 * 类型不匹配
 
