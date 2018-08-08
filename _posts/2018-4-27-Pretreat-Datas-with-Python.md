@@ -19,3 +19,11 @@ keywords: Python, 数据处理
 X_train_flatten = X_train_orig.reshape(X_train_orig.shape[0], -1).T
 ```
 
+# array的拼接
+方法1，转成列表，再append
+
+效率较低。
+
+方法2，
+np.append()
+
