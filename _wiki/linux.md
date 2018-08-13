@@ -8,9 +8,200 @@ keywords: Linux
 
 类 Unix 系统下的一些常用命令和用法。
 
-## 实用命令
+# 1、远程控制相关
+## 1.1 登录远程服务器
+1、登录远程服务器
 
-### fuser
+```
+$ shh <username>@<hostname or ip_address> -p <port>
+```
+
+我的IP是：115.159.154.***,域名是neyzoter.cn,(-p port 可以省略，表示端口)
+
+2、退出远程服务器
+
+Ctrl+D
+
+## 1.2 scp上传文件
+```
+scp 本地文件地址+文件名  远程用户名@IP地址:+服务器内存放文件的地址。（这里用户名用root）
+```
+
+例如：scp /home/wj/桌面/aa.txt root@111.231.1.101:/home/aa.txt
+
+## 1.x 安装java
+1、查看有java包
+
+```
+$ java
+```
+腾讯提供的一些包——
+
+>default-jre
+gcj-5-jre-headless
+openjdk-8-jre-headless
+gcj-4.8-jre-headless
+gcj-4.9-jre-headless
+openjdk-9-jre-headless
+
+2、安装java8
+
+```
+sudo apt-get install openjdk-8-jre-headless
+```
+
+3、查看java版本
+
+```
+$ java -version
+```
+
+## 1.x 安装mysql-server
+1、apt安装
+```
+$ sudo apt-get install mysql-server
+```
+
+不需要安装mysql-client。
+
+2、登录MySQL并更改用户授权
+
+```
+$ mysql -u root -p
+```
+
+输入密码。
+
+```
+$ use mysql
+```
+
+```
+mysql> $ update user set host='%' whereuser='root';
+```
+
+```
+myslq> $ grant all privileges on  *.* TO 'root'@'%' identified by 'XXX' WITHGRANT OPTION;
+```
+
+XXX的位置是root的密码
+
+```
+myslq> $ FLUSH PRIVILEGES;
+```
+exit退出。
+
+3、修改本地访问的3306端口
+
+首先，修改配置文件：
+
+```
+vi /etc/mysql/mysql.conf.d/mysqld.cnf
+```
+
+首先输入上面的的命令打开文本文件，输入 i 进入编辑状态。
+
+然后注释掉bind-address   =127.0.0.1这一句。
+
+编辑完成后按ESC键退出编辑，然后输入 :wq 敲回车保存退出
+
+4、重启MySQL
+
+重启：
+
+```
+$ service mysql restart
+```
+
+查看状态：
+
+```
+$ systemctl status mysql.service
+```
+
+5、云服务器配置安全组
+
+到云服务器中添加安全组规则，协议选择3306，优先级100，授权对象0.0.0.0/0
+
+
+## 1.x 分盘与格式化
+购买了数据盘，需要先分区、格式化。
+
+1、查看磁盘
+
+```
+$ fdisk -l
+```
+
+看到/dev/vdb有50GB。
+
+2、分区
+>输入fdisk /dev/vdb(对数据盘进行分区)，回车；
+输入n(新建分区)，回车；
+输入p(新建扩展分区)，回车；
+输入1(使用第 1 个主分区)，回车；
+输入回车(使用默认配置)；
+再次输入回车(使用默认配置)；
+输入wq(保存分区表)，回车开始分区。
+
+3、格式化数据盘
+
+格式化分区，ext1、ext2、ext3均可。
+
+```
+$ mkfs.ext3 /dev/vdb1
+```
+
+
+挂载分区。
+
+```
+$ mkdir /mydata
+$ mount /dev/vdb1 /mydata
+```
+
+使用命令查看挂载。
+
+```
+$ df -h
+```
+
+3、设置自动挂载
+
+见腾讯文档。
+
+https://cloud.tencent.com/document/product/213/2936
+
+
+
+# 2、 实用命令
+## 卸载程序
+sudo apt-get purge <程序名>
+
+eg，卸载firefox。
+
+```
+$ dpkg --get-selections |grep firefox
+```
+
+firefox
+
+firefox-locale-en
+
+...
+
+```
+$ sudo apt-get purge firefox firefox-locale-en
+```
+
+## vim使用
+```
+vm <file>
+```
+
+首先输入上面的的命令打开文本文件，输入 i 进入编辑状态，编辑完成后按ESC键退出编辑，然后输入 :wq 敲回车保存退出
+
+## fuser
 
 查看文件被谁占用。
 
@@ -18,35 +209,35 @@ keywords: Linux
 fuser -u .linux.md.swp
 ```
 
-### id
+## id
 
 查看当前用户、组 id。
 
-### lsof
+## lsof
 
 查看打开的文件列表。
 
 > An  open  file  may  be  a  regular  file,  a directory, a block special file, a character special file, an executing text reference, a library, a stream or a network file (Internet socket, NFS file or UNIX domain socket.)  A specific file or all the files in a file system may be selected by path.
 
-#### 查看网络相关的文件占用
+### 查看网络相关的文件占用
 
 ```sh
 lsof -i
 ```
 
-#### 查看端口占用
+### 查看端口占用
 
 ```sh
 lsof -i tcp:5037
 ```
 
-#### 查看某个文件被谁占用
+### 查看某个文件被谁占用
 
 ```sh
 lsof .linux.md.swp
 ```
 
-#### 查看某个用户占用的文件信息
+### 查看某个用户占用的文件信息
 
 ```sh
 lsof -u mazhuang
@@ -54,10 +245,103 @@ lsof -u mazhuang
 
 `-u` 后面可以跟 uid 或 login name。
 
-#### 查看某个程序占用的文件信息
+### 查看某个程序占用的文件信息
 
 ```sh
 lsof -c Vim
 ```
 
 注意程序名区分大小写。
+
+# 3、wubuntu目录
+1、/    这是根目录，一个Ubuntu系统下只有一个根目录。
+
+2、/root  系统管理员的目录
+
+3、/boot   系统启动文件
+
+4、/bin  存放系统程序
+
+5、/etc   存放系统配置方面的文件
+
+6、/dev   存放与设备有观点文件 ，例如：USB驱动、磁盘驱动等。
+
+7、/home   存放个人数据。每个用户的设置文件、用户桌面文件夹、用户数据都放在这里。
+
+8、/tmp   临时目录。有些文件被用过一两次之后，就不会再用到，像这样的文件就存放在这里。
+
+9、/usr   这个目录下存放着不适合放在/bin或/etc目录下的额外工具。/usr 目录包含了许多子目录：/usr/bin目录下用 于存放程序；/usr/share 用于存放一些共享数据
+
+/usr/lib 用于存放那些不能直接运行的，但是许多程序所必需的一些库文件（就是库）。
+
+10、/opt   存放一些可选的程序。如果想尝试新的东西，就存放在/opt 下，这样当你想删除就可以直接删除，不会影 响其他任何设置。安装在/opt 目录下的程序，它的所有数据和库文件等都放在这个目录下。
+
+11、/media   这个目录是用来挂载那些USB接口的移动硬盘、cd/dvd驱动等。
+
+12、/usr/local 存放那些手动安装的软件，即不是通过“新立得”或apt-get安装的软件。它和/usr目录具有相类似      的目录结构。让软件包管理器来管理/usr目录，而把自定义的脚本（scripts）放到/usr/local目录下面。
+
+# ubuntu安装java8和java9
+## 导入Webupd8 PPA
+
+说明：安装java9的时候，这里的webupd8team不用改成9
+```
+sudo add-apt-repository ppa:webupd8team/java
+```
+
+```
+sudo apt-get update
+```
+
+## 安装
+
+说明：安装java9的话，把8改成9
+```
+sudo apt-get install oracle-java8-installer
+```
+
+## 设置为默认jdk
+说明：安装java9的话，把8改成9
+```
+sudo apt install oracle-java8-set-default
+```
+
+# ubuntu安装C++
+## 1、安装
+```
+$ sudo apt-get install g++ build-essential
+```
+
+## 2、gedit编写C++
+
+## 3、编译
+
+```
+$ g++ <CPP文件名(如helloworld.cpp)> -o <输出.out文件名(如helloworld.out)>
+```
+
+## 4、运行
+
+```
+$ ./<.out文件名>
+```
+
+# git安装
+```
+$ sudo apt install git
+```
+
+# axel安装
+axel是Linux命令行界面的多线程下载工具，比wget的好处就是可以指定多个线程同时在命令行终端里
+
+```
+$ sudo apt-get install axel
+```
+
+
+
+
+
+
+
+
+
