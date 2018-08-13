@@ -350,3 +350,16 @@ echo "Error: you need to update from remote first"
 
 exit 1
 ```
+
+#### 解决CRLF和LF的冲突
+换行的时候，win：CRLF，linux：LF。
+
+禁用自动转换，即将设置：
+
+```
+git config --global core.autocrlf false
+
+git init
+
+git add xxx.xx
+```
