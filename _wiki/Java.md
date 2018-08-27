@@ -1,3 +1,12 @@
+---
+layout: wiki
+title: JSON/XML
+categories: JSON/XML
+description: JSON/XML语法
+keywords: JSON, XML
+---
+
+
 # 1、java规范
 ## 1.1 基本数据类型
 ### 1.1.1 内置数据类型
