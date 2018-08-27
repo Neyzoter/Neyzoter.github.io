@@ -13,7 +13,7 @@ keywords: Linux
 1、登录远程服务器
 
 ```
-$ shh <username>@<hostname or ip_address> -p <port>
+$ ssh <username>@<hostname or ip_address> -p <port>
 ```
 
 我的IP是：115.159.154.***,域名是neyzoter.cn,(-p port 可以省略，表示端口)
@@ -28,6 +28,12 @@ scp 本地文件地址+文件名  远程用户名@IP地址:+服务器内存放�
 ```
 
 例如：scp /home/wj/桌面/aa.txt root@111.231.1.101:/home/aa.txt
+
+## 1.2 发送udp包
+
+```
+$ echo "hello" |socat - udp4-datagram:115.159.154.xxx:8080
+```
 
 ## 1.x 安装java
 1、查看有java包
@@ -175,6 +181,28 @@ https://cloud.tencent.com/document/product/213/2936
 
 
 # 2、 实用命令
+
+## 删除文件/文件夹
+```
+$ sudo rm -r 文件夹名
+```
+
+```
+$ sudo rm 文件名
+``` 
+
+## 修改/移动文件
+修改文件名：
+
+```
+$ rm 旧文件名 新文件名
+```
+
+移动文件：
+
+```
+$ rm 文件 目标文件
+```
 ## 卸载程序
 sudo apt-get purge <程序名>
 
@@ -253,7 +281,7 @@ lsof -c Vim
 
 注意程序名区分大小写。
 
-# 3、wubuntu目录
+# 3、ubuntu目录
 1、/    这是根目录，一个Ubuntu系统下只有一个根目录。
 
 2、/root  系统管理员的目录
@@ -274,12 +302,18 @@ lsof -c Vim
 
 /usr/lib 用于存放那些不能直接运行的，但是许多程序所必需的一些库文件（就是库）。
 
-10、/opt   存放一些可选的程序。如果想尝试新的东西，就存放在/opt 下，这样当你想删除就可以直接删除，不会影 响其他任何设置。安装在/opt 目录下的程序，它的所有数据和库文件等都放在这个目录下。
+10、/opt   存放一些可选的程序。如果想尝试新的东西，就存放在/opt 下，这样当你想就可以直接删除，不会影 响其他任何设置。安装在/opt 目录下的程序，它的所有数据和库文件等都放在这个目录下。
 
 11、/media   这个目录是用来挂载那些USB接口的移动硬盘、cd/dvd驱动等。
 
 12、/usr/local 存放那些手动安装的软件，即不是通过“新立得”或apt-get安装的软件。它和/usr目录具有相类似      的目录结构。让软件包管理器来管理/usr目录，而把自定义的脚本（scripts）放到/usr/local目录下面。
 
+# 问题解决
+## Ubuntu 16.04 python升级后terminal终端无法打开
+```
+$ sudo rm /usr/bin/python3
+$ sudo ln -s python3.5 /usr/bin/python3
+```
 # ubuntu安装java8和java9
 ## 导入Webupd8 PPA
 
@@ -337,6 +371,40 @@ axel是Linux命令行界面的多线程下载工具，比wget的好处就是可�
 $ sudo apt-get install axel
 ```
 
+# shadowsocks安装
+
+1、安装python和pip
+
+2、
+
+# Linux下配置Eclipse+CPP+MySQL
+
+想要在C++中调用mysql库函数，需要#include <mysql.h>
+
+所以需要在eclipse中加上对mysql.h的路径
+
+项目->属性->C/C++Build -> settings -> gcc c++ complier -> includes -> include paths 
+
+添加两个路径：/usr/lib/mysql；/usr/include/mysql
+
+对于64位的mysql：/usr/lib64/mysql ； /usr/include/mysql
+
+要让eclipse工具能正确实现编译指令：
+
+g++ -o test test.c -lmysqlclient -lm -I/usr/include/msqyl -L/usr/lib64/mysql
+
+还需要添加对 -lmysqlclient -lm两个参数：
+
+项目->属性->C/C++Build -> settings -> gcc c++ linker-> libraries 
+
+在libraries(l) 中添加两个参数mysqlclient和m
+
+从这里可以看出gcc l参数的作用。其中m是包含了数学方法 。
+
+
+在libraryies search path (L)中添加/usr/lib/mysql
+
+到这个地址去找libmysqlclient.a这个文件。
 
 
 

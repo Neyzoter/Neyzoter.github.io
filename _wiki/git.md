@@ -357,6 +357,12 @@ exit 1
 禁用自动转换，即将设置：
 
 ```
+# push时转化CRLF为LF ，pull时把LF转化成CRLF
+git config --global core.autocrlf true
+
+# git在push时，把CRLF转换成LF，pull时不变
+git config --global core.autocrlf input
+# 本地和代码中都保留CRLF，无论pull还是push都不边
 git config --global core.autocrlf false
 
 git init

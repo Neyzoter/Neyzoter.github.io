@@ -22,6 +22,9 @@ tables：所有的表
 
 ```
 
+# 2、C语言API
+
+
 # X.MySQL安装
 服务器端的安装见，wiki->Linux说明。
 
