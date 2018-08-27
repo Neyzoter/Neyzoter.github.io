@@ -322,6 +322,7 @@ Math.random()：返回随机数0.0到1.0
 
 ## 1.8 数组
 * 创建
+
 ```
 dataType[] arrayRefVar;//首选方法
 dataType arrayRefVar[];//效果相同，但不是首选方法
@@ -442,6 +443,7 @@ public class DateDemo {
 ```
 
 ### 1.9.3 休眠sleep
+
 ```Java
 import java.util.*;
   
@@ -459,6 +461,7 @@ public class SleepDemo {
 ```
 
 ### 1.9.4 测量时间
+
 ```Java
 import java.util.*;
   
@@ -533,13 +536,13 @@ public class RegexMatches
 ```
 ### 1.10.2 正则表达式语法
 
-\\：插入一个正则表达式的反斜线，其后的字符具有特殊意义。即\\d表示\d。
+\\\\：插入一个正则表达式的反斜线，其后的字符具有特殊意义。即\\\\d表示\\d。
 
 具体将菜鸟教程。
 
 ## 1.11 可变参数
 
-```
+```Java
 public static void printMax(double... numbers){  //可输入多个参数
   if(numbers.length == 0){   
     System.out.println("No argument passed");
@@ -619,7 +622,8 @@ public class BRRead {
 
 输出：
 
->输入字符, 按下 'q' 键退出。
+```
+输入字符, 按下 'q' 键退出。
 runoob
 r
 u
@@ -631,6 +635,7 @@ b
 
 q
 q
+```
 
 * 读字符串
 
@@ -654,7 +659,9 @@ public class BRReadLines {
 ```
 
 输出：
->Enter lines of text.
+
+```
+Enter lines of text.
 Enter 'end' to quit.
 This is line one
 This is line one
@@ -662,7 +669,7 @@ This is line two
 This is line two
 end
 end
-
+```
 
 **Scanner**
 hasNext()和hasNextLine()来判断是否还有输入数据
@@ -714,13 +721,15 @@ class ScannerDemo {
 
 输入输出：
 
->12
+```
+12
 23
 15
 21.4
 end
 4个数的和为71.4
 4个数的平均值是17.85
+```
 
 **Console**
 
@@ -825,6 +834,311 @@ public class fileStreamTest2 {
 ```
 
 ## 1.14 异常处理
+
+### 1.14.1 异常发生原因分类
+1、用户输入非法数据
+
+2、要打开的文件不存在
+
+3、网络通信时连接中断，或者JVM内存溢出
+
+### 1.14.2 Exception类的层次
+异常类都是java.lang.Exception类继承的子类。
+
+Exception是Throwable类的子类，Throwable类还有子类Error。
+
+Throwable
+
+|
+
+|-----Error
+
+|
+
+|-----Exception
+
+
+Exception
+
+|
+
+|-----IOException
+
+|
+
+|-----RuntimeException
+
+* 内置异常类
+
+java定义了异常类在java.lang标准包中
+
+**非检查性异常**
+
+运行时出现的异常。比如溢出等。
+
+```
+ArithmeticException 当出现异常的运算条件时，抛出此异常。例如，一个整数"除以零"时，抛出此类的一个实例。
+ArrayIndexOutOfBoundsException  用非法索引访问数组时抛出的异常。如果索引为负或大于等于数组大小，则该索引为非法索引。
+ArrayStoreException 试图将错误类型的对象存储到一个对象数组时抛出的异常。
+ClassCastException  当试图将对象强制转换为不是实例的子类时，抛出该异常。
+IllegalArgumentException    抛出的异常表明向方法传递了一个不合法或不正确的参数。
+IllegalMonitorStateException    抛出的异常表明某一线程已经试图等待对象的监视器，或者试图通知其他正在等待对象的监视器而本身没有指定监视器的线程。
+IllegalStateException   在非法或不适当的时间调用方法时产生的信号。换句话说，即 Java 环境或 Java 应用程序没有处于请求操作所要求的适当状态下。
+IllegalThreadStateException 线程没有处于请求操作所要求的适当状态时抛出的异常。
+IndexOutOfBoundsException   指示某排序索引（例如对数组、字符串或向量的排序）超出范围时抛出。
+NegativeArraySizeException  如果应用程序试图创建大小为负的数组，则抛出该异常。
+NullPointerException    当应用程序试图在需要对象的地方使用 null 时，抛出该异常
+NumberFormatException   当应用程序试图将字符串转换成一种数值类型，但该字符串不能转换为适当格式时，抛出该异常。
+SecurityException   由安全管理器抛出的异常，指示存在安全侵犯。
+StringIndexOutOfBoundsException 此异常由 String 方法抛出，指示索引或者为负，或者超出字符串的大小。
+UnsupportedOperationException   当不支持请求的操作时，抛出该异常。
+```
+
+**检查性异常**
+
+编译的时候的异常。例如打开一个不存在的文件，一个异常发生。
+
+```
+ClassNotFoundException  应用程序试图加载类时，找不到相应的类，抛出该异常。
+CloneNotSupportedException  当调用 Object 类中的 clone 方法克隆对象，但该对象的类无法实现 Cloneable 接口时，抛出该异常。
+IllegalAccessException  拒绝访问一个类的时候，抛出该异常。
+InstantiationException  当试图使用 Class 类中的 newInstance 创建一个类的实例，而指定的类对象因为是一个接口或是一个抽象类而无法实例化时，抛出该异常。
+InterruptedException    一个线程被另一个线程中断，抛出该异常。
+NoSuchFieldException    请求的变量不存在
+NoSuchMethodException   请求的方法不存在
+```
+
+**异常方法**
+
+```
+public String getMessage()    返回关于发生的异常的详细信息。这个消息在Throwable 类的构造函数中初始化了。
+public Throwable getCause()    返回一个Throwable 对象代表异常原因。
+public String toString()     使用getMessage()的结果返回类的串级名字。
+public void printStackTrace()    打印toString()结果和栈层次到System.err，即错误输出流。
+public StackTraceElement [] getStackTrace()   返回一个包含堆栈层次的数组。下标为0的元素代表栈顶，最后一个元素代表方法调用堆栈的栈底。
+public Throwable fillInStackTrace()     用当前的调用栈层次填充Throwable 对象栈层次，添加到栈层次任何先前信息中。
+```
+
+实例：
+
+```Java
+import java.io.*;
+public class ExcepTest{
+ 
+   public static void main(String args[]){
+      try{
+         int a[] = new int[2];
+         System.out.println("Access element three :" + a[3]);
+      }catch(ArrayIndexOutOfBoundsException e){    //这里是定义一个要捕获的异常名，这里是ArrayIndexOutOfBoundsException
+         System.out.println("Exception thrown  :" + e);
+      }
+      System.out.println("Out of the block");
+   }
+}
+```
+
+多重捕获块：
+
+```Java
+try{
+   // 程序代码
+}catch(异常类型1 异常的变量名1){   //如果异常，先抛给这个。如果不匹配，则抛给下一个。
+  // 程序代码
+}catch(异常类型2 异常的变量名2){
+  // 程序代码
+}catch(异常类型2 异常的变量名2){
+  // 程序代码
+}
+```
+
+### 1.14.3 throws/throw关键字
+
+如果一个方法不处理检查性异常，而交给方法调用处进行处理，则该方法必须使用throws关键字来声明。可以抛出多个异常，用逗号隔开。
+
+也可以用throw关键字抛出异常，无论它是新实例化的还是刚捕获到的。
+
+区别：throws表示一个方法声明可能抛出一个异常，throw表示此处抛出一个自定义的异常（可以自定义，需要继承Exception，也可以是java自身给出的异常类）
+
+```
+import java.io.*;
+public class className
+{
+  public void deposit(double amount) throws RemoteException,InsufficientFundsException    //异常交给
+  {
+    // Method implementation
+    throw new RemoteException();//抛出异常
+  }
+  //Remainder of class definition
+}
+```
+
+### 1.14.4 finally关键字
+
+finally代码块中，可以运行清理类型等收尾善后性质的语句。
+
+* 使用案例
+```
+try{
+  // 程序代码
+}catch(异常类型1 异常的变量名1){
+  // 程序代码
+}catch(异常类型2 异常的变量名2){
+  // 程序代码
+}finally{
+  // 程序代码
+}
+```
+
+* 特殊情况
+
+**这里会返回2,而不是1。因为finally总是比catch的return先执行。**
+
+ **catch 块中有退出系统的语句 System.exit(-1); finally就不会被执行**
+
+```
+
+try{
+   //待捕获代码    
+}catch（Exception e）{
+    System.out.println("catch is begin");
+    return 1 ；
+}finally{
+     System.out.println("finally is begin");
+     return 2 ;
+}
+```
+
+
+### 1.14.5 声明自定义异常
+* 所有异常都是必须时Trowable的子类
+* 如果希望写一个检查性异常类，则需要继承Exception类。
+* 如果希望写一个运行时异常类，需要继承RuntimeException
+
+* 自定义一个异常类
+
+CheckingAccount类中包含一个withdraw方法抛出一个insufficientFundsException
+
+```Java
+// 文件名称 CheckingAccount.java
+import java.io.*;
+ 
+//此类模拟银行账户
+public class CheckingAccount
+{
+  //balance为余额，number为卡号
+   private double balance;
+   private int number;
+   public CheckingAccount(int number)
+   {
+      this.number = number;
+   }
+  //方法：存钱
+   public void deposit(double amount)
+   {
+      balance += amount;
+   }
+  //方法：取钱
+   public void withdraw(double amount) throws
+                              InsufficientFundsException
+   {
+      if(amount <= balance)
+      {
+         balance -= amount;
+      }
+      else
+      {
+         double needs = amount - balance;
+         throw new InsufficientFundsException(needs);
+      }
+   }
+  //方法：返回余额
+   public double getBalance()
+   {
+      return balance;
+   }
+  //方法：返回卡号
+   public int getNumber()
+   {
+      return number;
+   }
+}
+```
+
+```Java
+//文件名称 BankDemo.java
+public class BankDemo
+{
+   public static void main(String [] args)
+   {
+      CheckingAccount c = new CheckingAccount(101);
+      System.out.println("Depositing $500...");
+      c.deposit(500.00);
+      try
+      {
+         System.out.println("\nWithdrawing $100...");
+         c.withdraw(100.00);
+         System.out.println("\nWithdrawing $600...");
+         c.withdraw(600.00);
+      }catch(InsufficientFundsException e)
+      {
+         System.out.println("Sorry, but you are short $"
+                                  + e.getAmount());
+         e.printStackTrace();
+      }
+    }
+}
+
+```
+
+* 实用案例
+
+```Java
+/**
+ * 异常:
+ * finally不一定被执行，，例如 catch 块中有退出系统的语句 System.exit(-1); finally就不会被执行
+ *
+ */
+import java.io.*;
+public class Demo {
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        
+        //检查异常1.打开文件
+        FileReader fr=null;
+        try {
+            fr=new FileReader("d:\\aa.text");
+            // 在出现异常的地方，下面的代码的就不执行
+            System.out.println("aaa");
+        } catch (Exception e) {
+            System.out.println("进入catch");
+            // 文档读取异常
+            // System.exit(-1);
+            System.out.println("message="+e.getLocalizedMessage());  //没有报哪一行出错
+            e.printStackTrace();   // 打印出错异常还出现可以报出错先异常的行
+        }
+        // 这个语句块不管发生没有发生异常，都会执行
+        // 一般来说，把需要关闭的资源，文件，连接，内存等
+        finally
+        {
+            System.out.println("进入finally");
+            if(fr!=null);
+            {
+                try {
+                    fr.close();
+                } catch (Exception e) {
+                    // TODO: handle exception
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println("OK");
+    }
+}```
+
+
 
 ## 1.X 注释
 
