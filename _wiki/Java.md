@@ -1,9 +1,9 @@
 ---
 layout: wiki
-title: JSON/XML
-categories: JSON/XML
-description: JSON/XML语法
-keywords: JSON, XML
+title: Java
+categories: Java
+description: Java语法
+keywords: Java
 ---
 
 
