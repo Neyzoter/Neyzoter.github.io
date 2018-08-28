@@ -7,7 +7,7 @@ keywords: Java
 ---
 
 
-# 1、java规范
+# 1、java基础
 ## 1.1 基本数据类型
 ### 1.1.1 内置数据类型
 
@@ -139,7 +139,10 @@ String a = "\u0001";
 
 说明：关于protected的Y/N，子类与基类不在同一个包内时，子类实例可以访问其从基类继承而来的protected方法，但是不能访问基类实例的protected方法。
 ### 1.3.2 abstract修饰符
-抽象类，不能用来实例化对象， 声明抽象类的唯一目的时为了将来堆该类进行扩充,具体实现由子类提供。**任何继承抽象类的子类必须实现父类的所有抽象方法，除非该子类也是抽象类。**
+
+* 抽象类
+
+抽象类，不能用来实例化对象， 声明抽象类的唯一目的时为了将来对该类进行扩充,具体实现由子类提供。**任何继承抽象类的子类必须实现父类的所有抽象方法，除非该子类也是抽象类。**
 
 如果一个类包含抽象方法，那么一定要声明为抽象类。
 
@@ -157,6 +160,34 @@ class C extends Caravan{
   public abstract void changeColor();
 } 
 ```
+
+|参数|  抽象类| 接口|
+|-|-|-|
+|默认的方法实现| 它可以有默认的方法实现 |接口完全是抽象的。它根本不存在方法的实现|
+|-|-|-|
+|实现  |子类使用extends关键字来继承抽象类。如果子类不是抽象类的话，它需要提供抽象类中所有声明的方法的实现。 |  子类使用关键字implements来实现接口。它需要提供接口中所有声明的方法的实现|
+|-|-|-|
+|构造器| 抽象类可以有构造器 |  接口不能有构造器|
+|-|-|-|
+|与正常Java类的区别 |除了你不能实例化抽象类之外，它和普通Java类没有任何区别  | 接口是完全不同的类型|
+|-|-|-|
+|访问修饰符 |  抽象方法可以有public、protected和default这些修饰符 |   接口方法默认修饰符是public。你不可以使用其它修饰符。|
+|-|-|-|
+|main方法 | 抽象方法可以有main方法并且我们可以运行它 | 接口没有main方法，因此我们不能运行它。|
+|-|-|-|
+|多继承 抽象方法可以继承一个类和实现多个接口|  接口只可以继承一个或多个其它接口|
+|-|-|-|
+|速度 | 它比接口速度要快    |接口是稍微有点慢的，因为它需要时间去寻找在类中实现的方法。|
+|-|-|-|
+|添加新方法|   如果你往抽象类中添加新的方法，你可以给它提供默认的实现。因此你不需要改变你现在的代码。| 如果你往接口中添加方法，那么你必须改变实现该接口的类。|
+|-|-|-|
+
+* 抽象方法
+
+抽象方法具体实现在子类中。在父类中，抽象方法只包含一个方法名，没有方法体。
+
+子类必须重写父类的抽象方法，或者声明自身为**抽象类**。
+
 
 ### 1.3.3 synchronized修饰符
 synchronized关键字声明的方法同一时间只能被**同一个线程**访问。
@@ -1136,9 +1167,8 @@ public class Demo {
         }
         System.out.println("OK");
     }
-}```
-
-
+}
+```
 
 ## 1.X 注释
 
@@ -1173,6 +1203,1018 @@ public class Demo {
 */
 ```
 
+# 2、Java面向对象
+## 2.1 简单使用
+注：Java不支持多继承，即一个子类不能继承多个父类。但是可以支持多重继承，即A类继承B，B类继承C。
+
+使用：
+
+```Java
+//公共父类
+public class Animal { 
+    private String name;  
+    private int id; 
+    public Animal(String myName, int myid) { 
+        name = myName; 
+        id = myid;
+    } 
+    public void eat(){ 
+        System.out.println(name+"正在吃"); 
+    }
+    public void sleep(){
+        System.out.println(name+"正在睡");
+    }
+    public void introduction() { 
+        System.out.println("大家好！我是"         + id + "号" + name + "."); 
+    } 
+}
+```
+
+```Java
+//企鹅类
+public class Penguin extends Animal {   //extends继承
+    public Penguin(String myName, int myid) { 
+        super(myName, myid); //通过super来调用父类的方法来初始化
+    } 
+}
+```
+
+## 2.2 关键字
+### 2.2.1 extends关键字
+只能继承一个父类。
+
+
+### 2.2.2 implements关键字
+implements关键字可以变相使java具有多继承的特性，适用范围为类继承接口的情况，可以同时继承多个接口。
+
+```Java
+public interface A {
+    public void eat();
+    public void sleep();
+}
+ 
+public interface B {
+    public void show();
+}
+ 
+public class C implements A,B {
+}
+```
+
+### 2.2.3 final关键字
+在实例变量中也出现过final，表示该变量不能被修改。
+
+在继承中，final修饰的class（类）不能被继承,同时类内的方法自动声明为final，但是类内的实例变量不是final。
+
+```Java
+//final声明类名
+final class 类名{}
+```
+
+```Java
+//final声明方法
+修饰符(public/private/default/protected) final 返回值类型 方法名(){}
+```
+
+final的总结：
+
+final修饰属性或变量：不管是基本类型还是引用，其中的值不能变。引用类型变量里买内存放的是一个地址，所以用final修饰引用类型变量指的是它的地址不变，而地址中的数值可以改变。
+
+final修饰类中的方法：方法可以被继承，但是无法重写。
+
+final修饰类：类不可以被继承。
+
+## 2.3 构造器
+
+调用父类的构造方法的唯一途径是使用super关键字。
+
+子类不能继承父类的构造器，如果父类的构造器**带有参数**，则**必须**在子类的构造其中显式通过super关键字调用父类的构造器并配以适当的参数列表。
+
+如果没有参数并且子类的构造函数没有显式调用父类的含参构造方法，在编译的时候，会自动给子类的第一个语句放上super()。
+
+```Java
+
+class SuperClass {
+  private int n;
+  SuperClass(){
+    System.out.println("SuperClass()");
+  }
+  SuperClass(int n) {
+    System.out.println("SuperClass(int n)");
+    this.n = n;
+  }
+}
+class SubClass extends SuperClass{
+  private int n;
+  
+  SubClass(){
+    super(300);
+    System.out.println("SubClass");
+  }  
+  
+  public SubClass(int n){
+    System.out.println("SubClass(int n):"+n);
+    this.n = n;
+  }
+}
+public class TestSuperSub{
+  public static void main (String args[]){
+    SubClass sc = new SubClass();
+    SubClass sc2 = new SubClass(200); 
+  }
+}
+```
+
+注意：
+
+java文件被编译成class文件时，在子类的所有构造函数中的第一行（第一个语句）默认自动添加super()语句，在执行子类的构造函数之前，总是会先执行父类中的构造函数。
+
+1、如果父类中不包含默认构造函数，那么子类中的super()语句 就会执行失败，系统就会报错。一般默认构造函数编译时会自动添加，但如果类中已经有了一个构造函数，就不会添加。
+
+2、执行父类构造函数的语句只能放在函数内语句的首句，不然会报错。
+
+在继承关系中，在调用函数（方法）或者类中的成员变量时，JVM（Java虚拟机）会先检测 当前类（子类）是否含有该函数或者成员变量，如果有就执行子类中的，如果咩有才会执行父类的。
+
+## 2.4 Java转型问题
+1、父类引用指向子类对象，而子类引用不能指向父类对象。
+
+```
+Father f1 = new Son();//向上转型，父类引用可以指向子类对象
+Son s1 = (Son)f1;//向下转型，f1指向子类对象，s1指向f1即指向子类对象
+```
+
+但是f1不能调用Son中Father没有的方法。
+
+```Java
+Father f2 = new Father();
+Son s2 = (Son)f2;//错误，子类引用不能指向父类对象，
+```
+
+## 2.5 Java重写(Override)和重载(Overload)
+### 2.5.1 重写
+1、子类对父类的允许访问的方法实现过程进行重新编写，返回值和形参都不能改变。即外壳不变，核心重写。
+
+2、重写方法不能抛出新的检查异常或者比被重写方法更加宽泛的异常。
+
+例如，父类抛出检查异常IOException，重写的时候不能Exception异常（因为Exception是IOException的父类，只能抛出IOException的子类异常）。
+
+**重写规则**
+
+>参数列表必须完全与被重写方法的相同；
+>返回类型必须完全与被重写方法的返回类型相同；
+>访问权限不能比父类中被重写的方法的访问权限更低。例如：如果父类的一个方法被声明为public，那么在子类中重写该方法就不能声明为protected。
+>父类的成员方法只能被它的子类重写。
+>声明为final的方法不能被重写。
+>声明为static的方法不能被重写，但是能够被再次声明。
+>子类和父类在同一个包中，那么子类可以重写父类所有方法，除了声明为private和final的方法。
+>子类和父类不在同一个包中，那么子类只能够重写父类的声明为public和protected的非final方法。
+>重写的方法能够抛出任何非强制异常，无论被重写的方法是否抛出异常。但是，重写的方法不能抛出新的强制性异常，或者比被重写方法声明的更广泛的强制性异常，反之则可以。
+>构造方法不能被重写。
+>如果不能继承一个方法，则不能重写这个方法。
+
+可以使用super来调用父类被重写的方法。
+
+### 2.5.2 重载
+在同一个类中，方法名字相同，但是参数不同。
+
+**重载规则**
+
+>被重载的方法必须改变参数列表(参数个数或类型不一样)；
+>被重载的方法可以改变返回类型；
+>被重载的方法可以改变访问修饰符；
+>被重载的方法可以声明新的或更广的检查异常；
+>方法能够在同一个类中或者在一个子类中被重载。
+>无法以返回值类型作为重载函数的区分标准。
+
+### 2.5.3 重写与重载的区别
+
+|区别点 |重载方法|    重写方法|
+|-|-|-|
+|参数列表|    必须修改 |   一定不能修改|
+|-|-|-|
+|返回类型|    可以修改|    一定不能修改|
+|-|-|-|
+|异常|  可以修改|    可以减少或删除，一定不能抛出新的或者更广的异常|
+|-|-|-|
+|访问 | 可以修改   | 一定不能做更严格的限制（可以降低限制）|
+|-|-|-|
+
+## 2.6 多态
+### 2.6.1 介绍
+同一个行为具有多个不同表现形式或者形态的能力。
+
+下面使用instanceof实现了识别不通的类，进行不同的操作（多态）。
+```Java
+public class Test {
+    public static void main(String[] args) {
+      show(new Cat());  // 以 Cat 对象调用 show 方法
+      show(new Dog());  // 以 Dog 对象调用 show 方法
+                
+      Animal a = new Cat();  // 向上转型  
+      a.eat();               // 调用的是 Cat 的 eat
+      Cat c = (Cat)a;        // 向下转型  
+      c.work();        // 调用的是 Cat 的 work
+  }  
+            
+    public static void show(Animal a)  {
+      a.eat();  
+        // 类型判断
+        if (a instanceof Cat)  {  // 猫做的事情 
+            Cat c = (Cat)a;  
+            c.work();  
+        } else if (a instanceof Dog) { // 狗做的事情 
+            Dog c = (Dog)a;  
+            c.work();  
+        }  
+    }  
+}
+ 
+abstract class Animal {  
+    abstract void eat();  
+}  
+  
+class Cat extends Animal {  
+    public void eat() {  
+        System.out.println("吃鱼");  
+    }  
+    public void work() {  
+        System.out.println("抓老鼠");  
+    }  
+}  
+  
+class Dog extends Animal {  
+    public void eat() {  
+        System.out.println("吃骨头");  
+    }  
+    public void work() {  
+        System.out.println("看家");  
+    }  
+}
+```
+
+* Java对比C++(多态)
+
+C++的多态通过定义虚函数来实现，即用virtual来声明方法，子类可以重新定义该方法。如果在父类中没有声明virtual则子类对象实际调用的是父类的方法。
+
+Java中，当子类对象调用重写的方法时，调用的是子类的方法，而不是父类中被重写的方法。
+
+>C++的虚函数可以在子类中重写，调用是根据实际的对象来判别的，而不是通过指针类型(普通函数的调用是根据当前指针类型来判断的)。纯虚函数是一种在父函数中只定义而不实现的一种函数，不能用来声明对象，也可以被称为抽象类。纯虚函数的实现也可以在类声明外进行定义。C++中的抽象类abstract class是指至少有一个纯虚函数的类，如果一个类全部由纯虚函数组成，不包括任何的实现，被称为纯虚类。
+
+>Java中的普通函数自带虚函数功能，调用是根据指针所指向的对象的类型进行判断的。Java中没有virtual这个关键字，java管虚函数叫abstract function，管抽象类叫做abstract class，没有pure这个概念，而是发明了一种叫接口interface的东西来代替纯虚类。interface和abstract class的区别就类似于C++中一般抽象类和纯虚类的区别。
+
+>抽象类只能作为基类来使用，不能被定义对象，其纯虚函数的实现在派生类中，如果派生类也没有给出实现，则该派生类还是一个抽象类，只有给出了纯虚函数实现的派生类才能建立对象。由此看出抽象类是注孤生的节奏啊，永远没有对象。
+
+### 2.6.2 多态的实现方法
+
+1、重写
+
+Java函数自带重写功能，不需要像C++一样声明virtual。（C++父类声明virtual方法，才能在子类中重写）
+
+2、接口
+
+Java用interface声明接口，用implement继承接口。
+
+3、抽象类和抽象方法
+
+抽象类不能实例化对象，必须被继承后才能使用。
+
+抽象方法即在父类中声明该方法为抽象方法，具体实现由子类决定。
+
+## 2.7 Java封装
+比如把属性和变量设为pirvate，并只能通过方法名来获取或者重新赋值。
+
+## 2.8 Java接口
+[可见度] interface 接口名称[extends 其他接口]
+
+注：这里的extends没有错误，接口和接口通过exterds继承，并且可以**多继承**。
+
+只能够有静态的不能被修改的数据成员，即public static final。不过在interface中一般不定义数据成员。
+
+接口中的方法都必须时抽象方法，不能包含除了static和final的变量。**接口是需要被类实现的，接口的方法没有具体的实现。**
+
+**接口的意义**
+
+可以理解成统一的协议，实现类和接口分离。
+
+## 2.9 标记接口
+没有包含任何方法和属性的接口。
+
+作用：
+
+1、建立一个公共的父接口
+
+比如EventListener接口，由几十个其他接口拓展的Java API，可以用一个标记接口建立一组接口的父接口。
+
+如果继承了EventListener接口，JVM就知道该接口将要备用与一个事件的代理方案。
+
+**可以用if(obj instanceof ...)进行类型查询。**
+
+2、向一个类添加数据类型
+
+## 2.10 Java包
+
+### 2.10.1 包的作用
+
+1、把功能相似或相关的类或接口组织在同一个包中，方便类的查找和使用。
+
+2、如同文件夹一样，包也采用了树形目录的存储方式。同一个包中的类名字是不同的，不同的包中的类的名字是可以相同的，当同时调用两个不同包中相同类名的类时，应该加上包名加以区别。因此，包可以避免名字冲突。
+
+3、包也限定了访问权限，拥有包访问权限的类才能访问某个包中的类。
+
+### 2.10.2 包的使用
+
+package pkg1[.pkg2[.pkg3...]]
+
+* package创建包
+
+创建一个目录，包放置其中，并用"package 目录名"来声明。
+
+```Java
+/* 文件名: Animal.java */
+//如果一个源文件中没有使用包声明，则其中的类、函数、枚举、注释等将放在一个无名的包中
+package animals;  //包声明应该在源文件的第一行，每个源文件只能包含一个包声明
+ 
+interface Animal {
+   public void eat();
+   public void travel();
+}
+```
+
+* import导入包
+
+```Java
+import pkg1[.pkg2..].(classname|\*);
+```
+
+* package的目录结构
+
+通常一个公司使用它互联网域名的颠倒形式来作为它的包名。
+
+例如....\com\runoob\test\Runoob.java
+
+# 3、Java高级编程
+## 3.1 数据结构
+### 3.1.1 枚举(Enumeration)
+枚举接口定义了一种从数据结构中取回连续元素的方式。
+
+方法：（传统的接口已经被迭代器取代）
+
+|boolean hasMoreElements( ) |测试此枚举是否包含更多的元素。|
+|-|-|
+|Object nextElement( )|如果此枚举对象至少还有一个可提供的元素，则返回此枚举的下一个元素。|
+
+```Java
+import java.util.Vector;
+import java.util.Enumeration;
+ 
+public class EnumerationTester {
+ 
+   public static void main(String args[]) {
+      Enumeration<String> days;//定义一个枚举
+      Vector<String> dayNames = new Vector<String>();
+      dayNames.add("Sunday");
+      dayNames.add("Monday");
+      dayNames.add("Tuesday");
+      dayNames.add("Wednesday");
+      dayNames.add("Thursday");
+      dayNames.add("Friday");
+      dayNames.add("Saturday");
+      days = dayNames.elements();
+      while (days.hasMoreElements()){  //测试此枚举是否包含更多的元素
+         System.out.println(days.nextElement()); //返回枚举的下一个元素
+      }
+   }
+}
+```
+
+### 3.1.2 位集合(BitSet)
+位集合类实现了一组可以单独设置和清除的位和标志。
+
+```Java
+import java.util.BitSet;
+ 
+public class BitSetDemo {
+ 
+  public static void main(String args[]) {
+     BitSet bits1 = new BitSet(16);//指定16位，初始化为0
+     BitSet bits2 = new BitSet(16);
+      
+     // set some bits
+     for(int i=0; i<16; i++) {
+        if((i%2) == 0) bits1.set(i);
+        if((i%5) != 0) bits2.set(i);
+     }
+     System.out.println("Initial pattern in bits1: ");
+     System.out.println(bits1);
+     System.out.println("\nInitial pattern in bits2: ");
+     System.out.println(bits2);
+ 
+     // AND bits，逻辑与
+     bits2.and(bits1);//这里bits2变成了逻辑与后的值
+     System.out.println("\nbits2 AND bits1: ");
+     System.out.println(bits2);
+ 
+     // OR bits
+     bits2.or(bits1);
+     System.out.println("\nbits2 OR bits1: ");
+     System.out.println(bits2);
+ 
+     // XOR bits
+     bits2.xor(bits1);
+     System.out.println("\nbits2 XOR bits1: ");
+     System.out.println(bits2);
+  }
+}
+```
+
+输出：
+
+```
+Initial pattern in bits1:
+{0, 2, 4, 6, 8, 10, 12, 14}
+
+Initial pattern in bits2:
+{1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14}
+
+bits2 AND bits1:   
+{2, 4, 6, 8, 12, 14}
+
+bits2 OR bits1:   // bits2 = {2, 4, 6, 8, 12, 14} 
+{0, 2, 4, 6, 8, 10, 12, 14}
+
+bits2 XOR bits1:   // bits2 = {0, 2, 4, 6, 8, 10, 12, 14}
+{}
+```
+
+### 3.1.3 向量(Vector)
+```Java
+Vector();//建立一个默认的向量，长度10
+Vector(int size);//指定大小
+Vector(int size,int incr);//指定大小，并增量用incr指定
+Vector(Collection c);//创建一个包含集合c元素的向量
+```
+
+具体方法见菜鸟。
+
+### 3.1.4 栈(Stack)
+
+方法
+
+```
+Stack();//  创建一个默认的栈
+boolean empty();//测试栈是否为空
+Object peek( );//查看栈顶，但不弹出
+Object pop( );//移除堆栈顶部的对象，并作为此函数的值返回该对象。
+Object push(Object element);//把项压入堆栈顶部。
+int search(Object element);//返回对象在堆栈中的位置，以 1 为基数。
+```
+
+### 3.1.5 字典Dictionary
+* 字典类
+
+字典**类**是一个抽象类，定义了键映射到值的数据结构。
+
+字典已经过时，实际开发中，可以实现Map接口来获取键/值的存储关系。
+
+* Map**接口**
+
+map已经代替了字典dictionary。
+
+```Java
+import java.util.*;
+
+public class CollectionsDemo {
+
+   public static void main(String[] args) {
+      Map m1 = new HashMap(); //hashmap
+      m1.put("Zara", "8");
+      m1.put("Mahnaz", "31");
+      m1.put("Ayan", "12");
+      m1.put("Daisy", "14");
+      System.out.println();
+      System.out.println(" Map Elements");
+      System.out.print("\t" + m1);
+   }
+}
+```
+
+* 使用规则
+
+>给定一个键和一个值，你可以将该值存储在一个Map对象. 之后，你可以通过键来访问对应的值。
+>当访问的值不存在的时候，方法就会抛出一个NoSuchElementException异常.
+>当对象的类型和Map里元素类型不兼容的时候，就会抛出一个 ClassCastException异常。
+>当在不允许使用Null对象的Map中使用Null对象，会抛出一个NullPointerException 异常。
+>当尝试修改一个只读的Map时，会抛出一个UnsupportedOperationException异常。
+
+```
+void clear( )
+ 从此映射中移除所有映射关系（可选操作）。
+boolean containsKey(Object k)
+如果此映射包含指定键的映射关系，则返回 true。
+boolean containsValue(Object v)
+如果此映射将一个或多个键映射到指定值，则返回 true。
+Set entrySet( )
+返回此映射中包含的映射关系的 Set 视图。
+boolean equals(Object obj)
+比较指定的对象与此映射是否相等。
+Object get(Object k)
+返回指定键所映射的值；如果此映射不包含该键的映射关系，则返回 null。
+int hashCode( )
+返回此映射的哈希码值。
+boolean isEmpty( )
+如果此映射未包含键-值映射关系，则返回 true。
+Set keySet( )
+返回此映射中包含的键的 Set 视图。
+Object put(Object k, Object v)
+将指定的值与此映射中的指定键关联（可选操作）。
+void putAll(Map m)
+从指定映射中将所有映射关系复制到此映射中（可选操作）。
+Object remove(Object k)
+如果存在一个键的映射关系，则将其从此映射中移除（可选操作）。
+int size( )
+返回此映射中的键-值映射关系数。
+Collection values( )
+返回此映射中包含的值的 Collection 视图。
+```
+
+### 3.1.6 哈希表(Hashtable)
+哈希表是java.util的一部分，是Dictionary具体的实现，提供了一种在用户定义键结构的基础上组织数据的手段。Hashtable类和HashMap类很相似，但是Hashtable支持同步。
+
+Hashtable也存储键/值对。
+
+例如，在地址列表的哈希表中，可以根据邮政编码作为键来存储和排序数据，而不是通过人名。
+
+* 构造方法
+
+```Java
+Hashtable();
+Hashtable(int size );
+Hashtable(int size,float fillRatio);//通过fillRatio指定填充比例，介于0.0至1.0之间，决定了哈希表在重新调整大小之前的充满程度
+Hashtable(Map m);//构建一个以m中元素为初始化元素的哈希表，哈希表容量设置为m的两倍
+```
+
+**Hashtable包括Map接口中定义的方法**，还定义了：
+
+```Java
+void clear( )
+ 将此哈希表清空，使其不包含任何键。
+Object clone( )
+创建此哈希表的浅表副本。
+boolean contains(Object value)
+ 测试此映射表中是否存在与指定值关联的键。
+boolean containsKey(Object key)
+测试指定对象是否为此哈希表中的键。
+boolean containsValue(Object value)
+如果此 Hashtable 将一个或多个键映射到此值，则返回 true。
+Enumeration elements( )
+返回此哈希表中的值的枚举。
+Object get(Object key)
+ 返回指定键所映射到的值，如果此映射不包含此键的映射，则返回 null. 更确切地讲，如果此映射包含满足 (key.equals(k)) 的从键 k 到值 v 的映射，则此方法返回 v；否则，返回 null。
+boolean isEmpty( )
+测试此哈希表是否没有键映射到值。
+Enumeration keys( )
+ 返回此哈希表中的键的枚举。
+Object put(Object key, Object value)
+将指定 key 映射到此哈希表中的指定 value。
+void rehash( )
+增加此哈希表的容量并在内部对其进行重组，以便更有效地容纳和访问其元素。
+Object remove(Object key)
+从哈希表中移除该键及其相应的值。
+int size( )
+ 返回此哈希表中的键的数量。
+String toString( )
+返回此 Hashtable 对象的字符串表示形式，其形式为 ASCII 字符 ", " （逗号加空格）分隔开的、括在括号中的一组条目。
+```
+
+### 3.1.7 属性(Properties)
+**Properties继承于Hashtable**,表示一个持久的属性集。属性列表中每个键和其对因值都是一个字符串。
+
+* 构造函数
+
+```Java
+Properties();
+Properties(Properties propDefault);//使用propDefault作为默认值
+
+```
+
+```Java
+String getProperty(String key)
+ 用指定的键在此属性列表中搜索属性。
+String getProperty(String key, String defaultProperty)
+用指定的键在属性列表中搜索属性。
+void list(PrintStream streamOut)
+ 将属性列表输出到指定的输出流。
+void list(PrintWriter streamOut)
+将属性列表输出到指定的输出流。
+void load(InputStream streamIn) throws IOException
+ 从输入流中读取属性列表（键和元素对）。
+Enumeration propertyNames( )
+按简单的面向行的格式从输入字符流中读取属性列表（键和元素对）。
+Object setProperty(String key, String value)
+ 调用 Hashtable 的方法 put。
+void store(OutputStream streamOut, String description)
+ 以适合使用  load(InputStream)方法加载到 Properties 表中的格式，将此 Properties 表中的属性列表（键和元素对）写入输出流。
+```
+
+实例：
+
+```Java
+import java.util.*;
+ 
+public class PropDemo {
+ 
+   public static void main(String args[]) {
+      Properties capitals = new Properties();
+      Set states;
+      String str;
+      
+      capitals.put("Illinois", "Springfield");//加入属性
+      capitals.put("Missouri", "Jefferson City");
+      capitals.put("Washington", "Olympia");
+      capitals.put("California", "Sacramento");
+      capitals.put("Indiana", "Indianapolis");
+ 
+      // Show all states and capitals in hashtable.
+      states = capitals.keySet(); // key的set视图
+      Iterator itr = states.iterator();//生成一个迭代器
+      while(itr.hasNext()) {
+         str = (String) itr.next();
+         System.out.println("The capital of " +
+            str + " is " + capitals.getProperty(str) + ".");
+      }
+      System.out.println();
+ 
+      // look for state not in list -- specify default
+      str = capitals.getProperty("Florida", "Not Found");
+      System.out.println("The capital of Florida is "
+          + str + ".");
+   }
+}
+
+```
+
+* 迭代器
+
+
+> (1) 使用方法 iterator() 要求容器返回一个 Iterator。第一次调用 Iterator 的 next() 方法时，它返回序列的第一个元素。注意：iterator() 方法是 java.lang.Iterable 接口,被 Collection 继承。
+ >(2) 使用 next() 获得序列中的下一个元素。
+ >(3) 使用 hasNext() 检查序列中是否还有元素。
+ >(4) 使用 remove() 将迭代器新返回的元素删除。
+
+## 3.2 Java集合框架
+集合框架包括：
+
+**接口**：代表集合的抽象数据类型，例如Collection、List、Set、Map。之所以定义多个接口，是为了以不同的方式操作集合对象。
+
+**实现(类)**：集合接口的具体体现。它们是可重复使用的数据结构，如ArrayList、LinkedList、HashSet、HashMap等
+
+**算法**：实现集合接口的对象里的方法执行的一些有用的计算，如搜索和排序。这些算法被称为多态，因为相同的方法可以在相似的接口上有着不同的实现。
+
+
+
+```
+Collection 接口
+Collection 是最基本的集合接口，一个 Collection 代表一组 Object，即 Collection 的元素, Java不提供直接继承自Collection的类，只提供继承于的子接口(如List和set)。
+Collection 接口存储一组不唯一，无序的对象。
+
+List 接口
+List接口是一个有序的 Collection，使用此接口能够精确的控制每个元素插入的位置，能够通过索引(元素在List中位置，类似于数组的下标)来访问List中的元素，第一个元素的索引为 0，而且允许有相同的元素。
+
+List 接口存储一组不唯一，有序（插入顺序）的对象。
+
+Set
+Set 具有与 Collection 完全一样的接口，只是行为上不同，Set 不保存重复的元素。
+
+Set 接口存储一组唯一，无序的对象。
+
+SortedSet 
+继承于Set保存有序的集合。
+
+Map
+Map 接口存储一组键值对象，提供key（键）到value（值）的映射。
+
+Map.Entry 
+描述在一个Map中的一个元素（键/值对）。是一个Map的内部类。
+
+SortedMap
+继承于 Map，使 Key 保持在升序排列。
+
+Enumeration
+这是一个传统的接口和定义的方法，通过它可以枚举（一次获得一个）对象集合中的元素。这个传统接口已被迭代器取代。
+```
+
+![avatar](./pic/JavaSets1.gif)
+
+![avatar](./pic/JavaSets2.pngs)
+
+**List和Set的区别**
+
+1. Set 接口实例存储的是无序的，无法保证每个元素的存储顺序，不重复的数据。List 接口实例存储的是有序的，保持了每个元素的插入顺序，输出的顺序就是插入的顺序，可以重复的元素。
+
+2. Set检索效率低下，删除和插入效率高，插入和删除不会引起元素位置改变 <实现类有HashSet,TreeSet>。
+
+3. List和数组类似，可以动态增长，根据实际存储的数据的长度自动增长List的长度。查找元素效率高，插入删除效率低，因为会引起其他元素位置改变 <实现类有ArrayList,LinkedList,Vector> 。
+
+* 集合实现类
+
+```
+AbstractCollection 
+实现了大部分的集合接口。
+
+AbstractList 
+继承于AbstractCollection 并且实现了大部分List接口。
+
+AbstractSequentialList 
+继承于 AbstractList ，提供了对数据元素的链式访问而不是随机访问。
+
+LinkedList
+该类实现了List接口，允许有null（空）元素。主要用于创建链表数据结构，该类没有同步方法，如果多个线程同时访问一个List，则必须自己实现访问同步，解决方法就是在创建List时候构造一个同步的List。例如：
+Listlist=Collections.synchronizedList(newLinkedList(...));
+LinkedList 查找效率低。
+
+ArrayList
+该类也是实现了List的接口，实现了可变大小的数组，随机访问和遍历元素时，提供更好的性能。该类也是非同步的,在多线程的情况下不要使用。ArrayList 增长当前长度的50%，插入删除效率低。
+
+AbstractSet 
+继承于AbstractCollection 并且实现了大部分Set接口。
+
+HashSet
+该类实现了Set接口，不允许出现重复元素，不保证集合中元素的顺序，允许包含值为null的元素，但最多只能一个。
+
+LinkedHashSet
+具有可预知迭代顺序的 Set 接口的哈希表和链接列表实现。
+
+TreeSet
+该类实现了Set接口，可以实现排序等功能。
+
+AbstractMap 
+实现了大部分的Map接口。
+
+HashMap 
+HashMap 是一个散列表，它存储的内容是键值对(key-value)映射。
+该类实现了Map接口，根据键的HashCode值存储数据，具有很快的访问速度，最多允许一条记录的键为null，不支持线程同步。
+
+TreeMap 
+继承了AbstractMap，并且使用一颗树。
+
+WeakHashMap 
+继承AbstractMap类，使用弱密钥的哈希表。
+
+LinkedHashMap 
+继承于HashMap，使用元素的自然顺序对元素进行排序.
+
+IdentityHashMap 
+继承AbstractMap类，比较文档时使用引用相等。
+
+```
+
+* 迭代器使用
+
+```Java
+import java.util.*;
+ 
+public class Test{
+ public static void main(String[] args) {
+     List<String> list=new ArrayList<String>();
+     list.add("Hello");
+     list.add("World");
+     list.add("HAHAHAHA");
+     //第一种遍历方法使用foreach遍历List
+     for (String str : list) {            //也可以改写for(int i=0;i<list.size();i++)这种形式
+        System.out.println(str);
+     }
+ 
+     //第二种遍历，把链表变为数组相关的内容进行遍历
+     String[] strArray=new String[list.size()];
+     list.toArray(strArray);
+     for(int i=0;i<strArray.length;i++) //这里也可以改写为  foreach(String str:strArray)这种形式
+     {
+        System.out.println(strArray[i]);
+     }
+     
+    //第三种遍历 使用迭代器进行相关遍历
+     
+     Iterator<String> ite=list.iterator();
+     while(ite.hasNext())//判断下一个元素之后有值
+     {
+         System.out.println(ite.next());
+     }
+ }
+}
+```
+
+## 3.3 Java泛型
+泛型提供编译时类型安全检测机制，该机制允许程序员在编译时检测到非法的类型。
+
+需求：写一个排序方法，能够对整数数组、字符串数组甚至其他任何类型的数组进行排序，该如何实现?
+
+泛型方法在调用时可以接受到不同类型的参数。根据传递给泛型方法的参数类型，编译器适当的处理每一个方法调用。
+
+### 3.3.1 泛型方法
+
+* 案例
+
+**如何使用泛型方法打印不同字符串的元素**
+
+下面案例，将int、float和char类型泛化，这样就不会出现写三个函数的问题。System.out.printf( "%s ", element )三者都可以输出，而E[] inputArray也可以是以上三种类型。
+
+
+```Java
+public class GenericMethodTest
+{
+   // 泛型方法 printArray                         
+   public static < E > void printArray( E[] inputArray )
+   {
+      // 输出数组元素            
+         for ( E element : inputArray ){        //除了字符型，%s还能输出整型、float型。这里的E用于泛这三种类型
+            System.out.printf( "%s ", element );
+         }
+         System.out.println();
+    }
+ 
+    public static void main( String args[] )
+    {
+        // 创建不同类型数组： Integer, Double 和 Character
+        Integer[] intArray = { 1, 2, 3, 4, 5 };
+        Double[] doubleArray = { 1.1, 2.2, 3.3, 4.4 };
+        Character[] charArray = { 'H', 'E', 'L', 'L', 'O' };
+ 
+        System.out.println( "整型数组元素为:" );
+        printArray( intArray  ); // 传递一个整型数组
+ 
+        System.out.println( "\n双精度型数组元素为:" );
+        printArray( doubleArray ); // 传递一个双精度型数组
+ 
+        System.out.println( "\n字符型数组元素为:" );
+        printArray( charArray ); // 传递一个字符型数组
+    } 
+}
+
+```
+
+输出：
+
+```
+整型数组元素为:
+1 2 3 4 5 
+
+双精度型数组元素为:
+1.1 2.2 3.3 4.4 
+
+字符型数组元素为:
+H E L L O   
+```
+
+**"extends"如何使用在一般意义上的意思"extends"（类）或者"implements"（接口）**
+
+```Java
+public class MaximumTest
+{
+   // 比较三个值并返回最大值
+   public static <T extends Comparable<T>> T maximum(T x, T y, T z)
+   {                     
+      T max = x; // 假设x是初始最大值
+      if ( y.compareTo( max ) > 0 ){
+         max = y; //y 更大
+      }
+      if ( z.compareTo( max ) > 0 ){
+         max = z; // 现在 z 更大           
+      }
+      return max; // 返回最大对象
+   }
+   public static void main( String args[] )
+   {
+      System.out.printf( "%d, %d 和 %d 中最大的数为 %d\n\n",
+                   3, 4, 5, maximum( 3, 4, 5 ) );
+ 
+      System.out.printf( "%.1f, %.1f 和 %.1f 中最大的数为 %.1f\n\n",
+                   6.6, 8.8, 7.7, maximum( 6.6, 8.8, 7.7 ) );
+ 
+      System.out.printf( "%s, %s 和 %s 中最大的数为 %s\n","pear",
+         "apple", "orange", maximum( "pear", "apple", "orange" ) );
+   }
+}
+```
+
+输出：
+
+```
+3, 4 和 5 中最大的数为 5
+
+6.6, 8.8 和 7.7 中最大的数为 8.8
+
+pear, apple 和 orange 中最大的数为 pear
+```
+
+### 3.2.2 泛型方法
+```
+public class Box<T> {
+   
+  private T t;
+ 
+  public void add(T t) {
+    this.t = t;
+  }
+ 
+  public T get() {
+    return t;
+  }
+ 
+  public static void main(String[] args) {
+    Box<Integer> integerBox = new Box<Integer>();//这里指定了Integer类型
+    Box<String> stringBox = new Box<String>();
+ 
+    integerBox.add(new Integer(10));
+    stringBox.add(new String("菜鸟教程"));
+ 
+    System.out.printf("整型值为 :%d\n\n", integerBox.get());
+    System.out.printf("字符串为 :%s\n", stringBox.get());
+  }
+}
+```
+
+### 3.2.3 类型通配符
+类型通配符一般使用?代替具体的类型参数。例如，List<?>在逻辑上是List<String> ,List<Integer>等所有List<具体类型实参>的父类。
+
+1、案例1
+
+```Java
+import java.util.*;
+ 
+public class GenericTest {
+     
+    public static void main(String[] args) {
+        List<String> name = new ArrayList<String>();
+        List<Integer> age = new ArrayList<Integer>();
+        List<Number> number = new ArrayList<Number>();
+        
+        name.add("icon");
+        age.add(18);
+        number.add(314);
+ 
+        getData(name);
+        getData(age);
+        getData(number);
+       
+   }
+ 
+   public static void getData(List<?> data) {
+      System.out.println("data :" + data.get(0));
+   }
+}
+
+```
+
+输出：
+
+```
+data :icon
+data :18
+data :314
+```
+
+2、案例2（通配符上限）
+
+类型通配符上限通过形如List来定义，如此定义就是通配符泛型值接受Number及其下层子类类型。
+
+```Java
+import java.util.*;
+ 
+public class GenericTest {
+     
+    public static void main(String[] args) {
+        List<String> name = new ArrayList<String>();
+        List<Integer> age = new ArrayList<Integer>();
+        List<Number> number = new ArrayList<Number>();
+        
+        name.add("icon");
+        age.add(18);
+        number.add(314);
+ 
+        //getUperNumber(name);//1，由于getUperNumber定义时，extendsNumber，限制了参数泛型的上限为Number，所以String不在这个范围内 
+        getUperNumber(age);//2
+        getUperNumber(number);//3
+       
+   }
+ 
+   public static void getData(List<?> data) {
+      System.out.println("data :" + data.get(0));
+   }
+   
+   public static void getUperNumber(List<? extends Number> data) {    //这里extends表示通配符所代表的类型是T类型的子类。如果想要代表父类，换成super。
+          System.out.println("data :" + data.get(0));
+       }
+}
+```
+
+
+* 通配符的extends和super区别
+
+<? extends T>表示该通配符所代表的类型是T类型的子类。
+
+<? super T>表示该通配符所代表的类型是T类型的父类。
+
+类型通配符下限通过形如 List<? super Number>来定义，表示类型只能接受Number及其三层父类类型，如Objec类型的实例。
 
 # java备忘
 
