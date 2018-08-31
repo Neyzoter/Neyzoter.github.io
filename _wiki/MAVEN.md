@@ -20,6 +20,45 @@ package|打包|本阶段根据 pom.xml 中描述的打包配置创建 JAR / WAR 
 install|安装|本阶段在本地 / 远程仓库中安装工程包
 
 # 2、Maven配置
+## 安装本地jar包
+1、安装
+
+```
+mvn install:install-file -Dfile=jar包的位置(参数一) -DgroupId=groupId(参数二) -DartifactId=artifactId(参数三) -Dversion=version(参数四) -Dpackaging=jar
+```
+
+eg.
+
+```
+mvn install:install-file -Dfile="/home/songchaochao/Dev/repository/mongo-java-drive-3.8.1.jar" -DgroupId=org.mongodb -DartifactId=mongo-java-drive -Dversion=3.8.1 -Dpackaging=jar
+```
+
+2、查看默认仓库中是否安装了MongoDB
+
+如默认在/home/songchaochao/Dev/repository/，则是否有org/mongodb/...目录。
+
+**设置默认仓库的方法**
+
+maven安装包的setting.xml中加入
+
+<localRepository>/home/songchaochao/Dev/repository</localRepository>
+
+3、导入
+
+如果本地没有的话，也可以通过这个pom.xml中的语句来安装jar包。
+
+```
+<dependencies>
+    <dependency>
+        <groupId>org.mongodb</groupId>
+        <artifactId>mongodb-driver-sync</artifactId>
+        <version>3.8.1</version>
+    </dependency>
+</dependencies>
+```
+
+
+
 
 ## maven配置默认jdk
 
