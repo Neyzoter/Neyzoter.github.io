@@ -35,6 +35,13 @@ scp 本地文件地址+文件名  远程用户名@IP地址:+服务器内存放�
 $ echo "hello" |socat - udp4-datagram:115.159.154.xxx:8080
 ```
 
+## 1.3 关掉某个端口的进程
+
+```
+$ netstat -tlnp   # 查看正在监听的端口
+$ sudo lsof -i:端口号    # 查看某个端口号 的PID
+$ sudo kill -9 端口的PID    # 根据端口的PID来关闭端口监听
+```
 ## 1.x 安装java
 1、查看有java包
 
