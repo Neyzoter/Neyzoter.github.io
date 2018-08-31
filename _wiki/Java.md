@@ -201,6 +201,8 @@ public synchronized void showDetails(){
 ### 1.3.4 transient修饰符
 序列化的对象包含被transient修饰的实例变量时，java虚拟机（JVM）跳过该特定的变量。
 
+作用：在序列化时，有的属性需要序列化，有的不需要序列化。比如一个用户的敏感信息（密码、银行卡号等），不希望在网络操作中被传输，则可以加上transient。这个字段的生命周期仅存于调用者的内存中而不会写到磁盘中持久化。
+
 ### 1.3.5 volatile修饰符
 每次线程访问时，都强制从共享内存中重新读取改成员变量的值。当成员变量发生变化时，会强制线程将变化值写回共享内存。
 
@@ -208,9 +210,9 @@ public synchronized void showDetails(){
 
 ### 1.4.1 >>>和>>
 
-\>>：表示有符号右移，正数右移高位补0,负数右移高位补1。
+\>\>：表示有符号右移，正数右移高位补0,负数右移高位补1。
 
-\>>>：表示无符号右移，负数和正数，高位通通补0。
+\>\>\>：表示无符号右移，负数和正数，高位通通补0。
 
 ### 1.4.2 条件运算符
 
@@ -984,7 +986,7 @@ try{
 
 ### 1.14.3 throws/throw关键字
 
-如果一个方法不处理检查性异常，而交给方法调用处进行处理，则该方法必须使用throws关键字来声明。可以抛出多个异常，用逗号隔开。
+如果一个方法不处理检查性异常，而交给方法调用处进行处理，则该方法必须使用throws关键字来声明。可以抛出多个异常，用逗号隔开。throws表示这个方法有可能抛出的异常。
 
 也可以用throw关键字抛出异常，无论它是新实例化的还是刚捕获到的。
 
@@ -1008,7 +1010,7 @@ public class className
 finally代码块中，可以运行清理类型等收尾善后性质的语句。
 
 * 使用案例
-```
+```Java
 try{
   // 程序代码
 }catch(异常类型1 异常的变量名1){
@@ -1026,7 +1028,7 @@ try{
 
  **catch 块中有退出系统的语句 System.exit(-1); finally就不会被执行**
 
-```
+```Java
 
 try{
    //待捕获代码    
@@ -2107,6 +2109,8 @@ pear, apple 和 orange 中最大的数为 pear
 ```
 
 ### 3.2.2 泛型方法
+
+
 ```
 public class Box<T> {
    
@@ -2215,6 +2219,663 @@ public class GenericTest {
 <? super T>表示该通配符所代表的类型是T类型的父类。
 
 类型通配符下限通过形如 List<? super Number>来定义，表示类型只能接受Number及其三层父类类型，如Objec类型的实例。
+
+## 3.3 Java序列化
+序列化机制：一个对象可以被表示为一个字节序列，该字节序列包括对象的数据、有关对象的类型的信息和存储在对象中数据的类型。
+
+将序列化对象写入文件后，可以从文件中读取出来，并且对它进行反序列化，即对象的类型信息、对象的数据和对象中的数据类型可以在内存中新建对象。
+
+类ObjectInputStream和ObjectOutputStream是高层次的数据流，包括反序列化和序列化对象的方法。
+
+ObjectOutputStream 类包含很多写方法来写各种数据类型，但是一个特别的方法例外：
+
+```Java
+public final void writeObject(Object x) throws IOException;//序列化一个对象，并将它发送到输出流。
+public final Object readObject() throws IOException, ClassNotFoundException;//从流中取出下一个对象，并将对象反序列化。
+
+```
+
+### 3.3.1 序列化对象
+序列化的两个条件：
+
+1、该类必须实现java.io.Serializable对象
+
+2、该类的所有属性必须是可序列化的。如果有一个属性不可序列化，则该属性必须注明是短暂的。
+
+Java标准类是否可序列化，可查看该类的文档。确定该类有没有实现java.io.Serializable接口。
+
+
+
+```Java
+//首先定义一个要序列化的对象
+public class Employee implements java.io.Serializable
+{
+   public String name;
+   public String address;
+   public transient int SSN;//transient表示序列化的时候，不会序列化到指定的目的地中。
+   public int number;
+   public void mailCheck()
+   {
+      System.out.println("Mailing a check to " + name
+                           + " " + address);
+   }
+}
+```
+
+
+```Java
+
+//序列化
+import java.io.*;
+ 
+public class SerializeDemo
+{
+   public static void main(String [] args)
+   {
+      Employee e = new Employee();
+      e.name = "Reyan Ali";
+      e.address = "Phokka Kuan, Ambehta Peer";
+      e.SSN = 11122333;
+      e.number = 101;
+      try
+      {
+         FileOutputStream fileOut =
+         new FileOutputStream("/tmp/employee.ser");//文件输出流
+         ObjectOutputStream out = new ObjectOutputStream(fileOut);//对象输出流，输出到fileOut文件
+         out.writeObject(e);
+         out.close();
+         fileOut.close();
+         System.out.printf("Serialized data is saved in /tmp/employee.ser");
+      }catch(IOException i)
+      {
+          i.printStackTrace();
+      }
+   }
+}
+```
+
+### 3.3.2 反序列化对象
+
+```Java
+//反序列化
+import java.io.*;
+ 
+public class DeserializeDemo
+{
+   public static void main(String [] args)
+   {
+      Employee e = null;
+      try
+      {
+         FileInputStream fileIn = new FileInputStream("/tmp/employee.ser");//文件输入流
+         ObjectInputStream in = new ObjectInputStream(fileIn);//对象输入流，输入fileIn这个流
+         e = (Employee) in.readObject();//这里需要将反序列化后，进行Object指定
+         in.close();
+         fileIn.close();
+      }catch(IOException i)
+      {
+         i.printStackTrace();
+         return;
+      }catch(ClassNotFoundException c)//如果JVM反序列化对象的过程中找不到该类，就会抛出该异常
+      {
+         System.out.println("Employee class not found");
+         c.printStackTrace();
+         return;
+      }
+      System.out.println("Deserialized Employee...");
+      System.out.println("Name: " + e.name);
+      System.out.println("Address: " + e.address);
+      System.out.println("SSN: " + e.SSN);//SSN是transient，所以没有序列化，在反序列化后，SSN属性为0
+      System.out.println("Number: " + e.number);
+    }
+}
+```
+
+输出：
+
+```
+Deserialized Employee...
+Name: Reyan Ali
+Address:Phokka Kuan, Ambehta Peer
+SSN: 0
+Number:101
+```
+
+## 3.4 多线程
+
+### 3.4.1 线程的优先级
+
+Java 线程的优先级是一个整数，其取值范围是 1 （Thread.MIN_PRIORITY ） - 10 （Thread.MAX_PRIORITY ）。
+
+默认情况下，每一个线程都会分配一个优先级 NORM_PRIORITY（5）。
+
+具有较高优先级的线程对程序更重要，并且应该在低优先级的线程之前分配处理器资源。
+
+### 3.4.2 创建线程的方法
+
+1、通过实现 Runnable 接口；
+
+2、通过继承 Thread 类本身；
+
+3、通过 Callable 和 Future 创建线程。
+
+### 3.4.3 Runnable接口
+
+构造方法有多个
+
+```Java
+Thread(Runnable threadOb,String threadName);
+```
+
+一个类只需要执行一个方法调用 run()
+
+```Java
+public void run()
+```
+
+新线程创建之后，你调用它的 start() 方法它才会运行。
+
+```Java
+void start();
+```
+
+实例：
+
+```Java
+class RunnableDemo implements Runnable {
+   private Thread t;
+   private String threadName;
+   
+   RunnableDemo( String name) {
+      threadName = name;
+      System.out.println("Creating " +  threadName );
+   }
+   
+   public void run() {
+      System.out.println("Running " +  threadName );
+      try {
+         for(int i = 4; i > 0; i--) {
+            System.out.println("Thread: " + threadName + ", " + i);
+            // 让线程睡眠一会
+            Thread.sleep(50);
+         }
+      }catch (InterruptedException e) {
+         System.out.println("Thread " +  threadName + " interrupted.");
+      }
+      System.out.println("Thread " +  threadName + " exiting.");
+   }
+   
+   public void start () {
+      System.out.println("Starting " +  threadName );
+      if (t == null) {
+         t = new Thread (this, threadName);
+         t.start ();
+      }
+   }
+}
+ 
+public class TestThread {
+ 
+   public static void main(String args[]) {
+      RunnableDemo R1 = new RunnableDemo( "Thread-1");
+      R1.start();
+      
+      RunnableDemo R2 = new RunnableDemo( "Thread-2");
+      R2.start();
+   }   
+}
+
+```
+
+### 3.4.4 继承Tread类
+
+本质上Tread是实现了接口Runnable的实例。
+
+```Java
+class ThreadDemo extends Thread {
+   private Thread t;
+   private String threadName;
+   
+   ThreadDemo( String name) {
+      threadName = name;
+      System.out.println("Creating " +  threadName );
+   }
+   
+   public void run() {
+      System.out.println("Running " +  threadName );
+      try {
+         for(int i = 4; i > 0; i--) {
+            System.out.println("Thread: " + threadName + ", " + i);
+            // 让线程睡眠一会
+            Thread.sleep(50);
+         }
+      }catch (InterruptedException e) {
+         System.out.println("Thread " +  threadName + " interrupted.");
+      }
+      System.out.println("Thread " +  threadName + " exiting.");
+   }
+   
+   public void start () {
+      System.out.println("Starting " +  threadName );
+      if (t == null) {
+         t = new Thread (this, threadName);
+         t.start ();
+      }
+   }
+}
+ 
+public class TestThread {
+ 
+   public static void main(String args[]) {
+      ThreadDemo T1 = new ThreadDemo( "Thread-1");
+      T1.start();
+      
+      ThreadDemo T2 = new ThreadDemo( "Thread-2");
+      T2.start();
+   }   
+}
+```
+
+Thread类对象的方法
+
+|1 | public void start()
+使该线程开始执行；Java 虚拟机调用该线程的 run 方法。|
+|-|-|
+|2 | public void run()
+如果该线程是使用独立的 Runnable 运行对象构造的，则调用该 Runnable 对象的 run 方法；否则，该方法不执行任何操作并返回。|
+|-|-|
+|3 | public final void setName(String name)
+改变线程名称，使之与参数 name 相同。|
+|-|-|
+|4 | public final void setPriority(int priority)
+ 更改线程的优先级。|
+|-|-|
+|5 | public final void setDaemon(boolean on)
+将该线程标记为守护线程或用户线程。|
+|-|-|
+|6 | public final void join(long millisec)
+等待该线程终止的时间最长为 millis 毫秒。|
+|-|-|
+|7 | public void interrupt()
+中断线程。|
+|-|-|
+|8 | public final boolean isAlive()
+测试线程是否处于活动状态。|
+
+Thread类的静态fangfa
+
+|1 | public static void yield()
+暂停当前正在执行的线程对象，并执行其他线程。|
+|-|-|
+|2 | public static void sleep(long millisec)
+在指定的毫秒数内让当前正在执行的线程休眠（暂停执行），此操作受到系统计时器和调度程序精度和准确性的影响。|
+|-|-|
+|3 | public static boolean holdsLock(Object x)
+当且仅当当前线程在指定的对象上保持监视器锁时，才返回 true。|
+|-|-|
+|4 | public static Thread currentThread()
+返回对当前正在执行的线程对象的引用。|
+|-|-|
+|5 |public static void dumpStack()
+将当前线程的堆栈跟踪打印至标准错误流。|
+
+### 3.4.5 Callable和Future创建线程
+
+1. 创建 Callable 接口的实现类，并实现 call() 方法，该 call() 方法将作为线程执行体，并且有返回值。
+
+2. 创建 Callable 实现类的实例，使用 FutureTask 类来包装 Callable 对象，该 FutureTask 对象封装了该 Callable 对象的 call() 方法的返回值。
+
+3. 使用 FutureTask 对象作为 Thread 对象的 target 创建并启动新线程。
+
+4. 调用 FutureTask 对象的 get() 方法来获得子线程执行结束后的返回值。
+
+```Java
+public class CallableThreadTest implements Callable<Integer> {
+    public static void main(String[] args)  
+    {  
+        CallableThreadTest ctt = new CallableThreadTest();  
+        FutureTask<Integer> ft = new FutureTask<>(ctt);  
+        for(int i = 0;i < 100;i++)  
+        {  
+            System.out.println(Thread.currentThread().getName()+" 的循环变量i的值"+i);  
+            if(i==20)  
+            {  
+                new Thread(ft,"有返回值的线程").start();  
+            }  
+        }  
+        try  
+        {  
+            System.out.println("子线程的返回值："+ft.get());  
+        } catch (InterruptedException e)  
+        {  
+            e.printStackTrace();  
+        } catch (ExecutionException e)  
+        {  
+            e.printStackTrace();  
+        }  
+  
+    }
+    @Override  
+    public Integer call() throws Exception  
+    {  
+        int i = 0;  
+        for(;i<100;i++)  
+        {  
+            System.out.println(Thread.currentThread().getName()+" "+i);  
+        }  
+        return i;  
+    }  
+}
+```
+
+### 3.4.6 线程池
+容纳多个线程的容器，其中的线程可以反复使用，省去了频繁创建线程对象的操作，无需反复创建线程而消耗过多资源
+
+在java中，如果每个请求到达就创建一个新线程，开销是相当大的。在实际使用中，创建和销毁线程花费的时间和消耗的系统资源都相当大，甚至可能要比在处理实际的用户请求的时间和资源要多的多。除了创建和销毁线程的开销之外，活动的线程也需要消耗系统资源。如果在一个jvm里创建太多的线程，可能会使系统由于过度消耗内存或“切换过度”而导致系统资源不足。为了防止资源不足，需要采取一些办法来限制任何给定时刻处理的请求数目，尽可能减少创建和销毁线程的次数，特别是一些资源耗费比较大的线程的创建和销毁，尽量利用已有对象来进行服务。（为什么）
+
+线程池主要用来解决线程生命周期开销问题和资源不足问题。通过对多个任务重复使用线程，线程创建的开销就被分摊到了多个任务上了，而且由于在请求到达时线程已经存在，所以消除了线程创建所带来的延迟。这样，就可以立即为请求服务，使用应用程序响应更快；另外，通过适当的调整线程中的线程数目可以防止出现资源不足的情况。
+
+* 方法
+
+```
+ Executors：线程池创建工厂类
+ public static ExecutorServicenewFixedThreadPool(int nThreads)：返回线程池对象
+ ExecutorService：线程池类
+ Future<?> submit(Runnable task)：获取线程池中的某一个线程对象，并执行
+ Future 接口：用来记录线程任务执行完毕后产生的结果。线程池创建与使用
+```
+
+* 使用Runnable创建线程池
+
+1、创建线程池对象
+
+2、创建 Runnable 接口子类对象
+
+3、提交 Runnable 接口子类对象
+
+4、关闭线程池
+
+```Java
+//Test.java
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class Test {
+    public static void main(String[] args) {
+        //创建线程池对象  参数5，代表有5个线程的线程池
+        ExecutorService service = Executors.newFixedThreadPool(5);
+        //创建Runnable线程任务对象
+        TaskRunnable task = new TaskRunnable();
+        //从线程池中获取线程对象
+        service.submit(task);
+        System.out.println("----------------------");
+        //再获取一个线程对象
+        service.submit(task);
+        //关闭线程池
+        service.shutdown();
+    }
+}
+```
+
+```Java
+public class TaskRunnable implements Runnable{
+    @Override
+    public void run() {
+        for (int i = 0; i < 1000; i++) {
+            System.out.println("自定义线程任务在执行"+i);
+        }
+    }
+}
+```
+
+# 4、网络编程
+## 4.1 TCP连接过程
+
+服务器实例化一个 ServerSocket 对象，表示通过服务器上的端口通信。
+
+服务器调用 ServerSocket 类的 accept() 方法，该方法将一直等待，直到客户端连接到服务器上给定的端口。
+
+服务器正在等待时，一个客户端实例化一个 Socket 对象，指定服务器名称和端口号来请求连接。
+
+Socket 类的构造函数试图将客户端连接到指定的服务器和端口号。如果通信被建立，则在客户端创建一个 Socket 对象能够与服务器进行通信。
+
+在服务器端，accept() 方法返回服务器上一个新的 socket 引用，该 socket 连接到客户端的 socket。
+
+## 4.2 方法
+### 4.2.1 ServerSocket类
+服务器应用程序通过使用 java.net.ServerSocket 类以获取一个端口,并且侦听客户端请求。
+
+* 构造方法
+
+|1 |**public ServerSocket(int port) throws IOException**
+创建**绑定**到特定端口的服务器套接字。|
+|-|-|
+|2 | **public ServerSocket(int port, int backlog) throws IOException**
+利用指定的 backlog 创建服务器套接字并将其绑定到指定的本地端口号。|
+|-|-|
+|3 | **public ServerSocket(int port, int backlog, InetAddress address) throws IOException**
+使用指定的端口、侦听 backlog 和要绑定到的本地 IP 地址创建服务器。|
+|-|-|
+|4| **public ServerSocket() throws IOException**
+创建非绑定服务器套接字。|
+
+说明：创建非绑定服务器套接字。 如果 ServerSocket 构造方法没有抛出异常，就意味着你的应用程序已经成功绑定到指定的端口，并且侦听客户端请求。
+
+* 常用方法
+
+|1 |**public int getLocalPort()**
+  返回此套接字在其上侦听的端口。|
+|-|-|
+|2 |**public Socket accept() throws IOException**
+侦听并接受到此套接字的连接。|
+|-|-|
+|3 |**public void setSoTimeout(int timeout)**
+ 通过指定超时值启用/禁用 SO_TIMEOUT，以毫秒为单位。|
+ |-|-|
+|4 |**public void bind(SocketAddress host, int backlog)**
+将 ServerSocket 绑定到特定地址（IP 地址和端口号）。|
+
+### 4.2.2 Socket类
+java.net.Socket 类代表客户端和服务器都用来互相沟通的套接字。客户端要获取一个 Socket 对象通过实例化 ，而 服务器获得一个 Socket 对象则通过 accept() 方法的返回值。
+
+* 构造方法
+
+|1 |**public Socket(String host, int port) throws UnknownHostException, IOException.**
+创建一个流套接字并将其连接到指定主机上的指定端口号。|
+|-|-|
+|2 |**public Socket(InetAddress host, int port) throws IOException**
+创建一个流套接字并将其连接到指定 IP 地址的指定端口号。|
+|-|-|
+|3 |**public Socket(String host, int port, InetAddress localAddress, int localPort) throws IOException.**
+创建一个套接字并将其连接到指定远程主机上的指定远程端口。|
+|-|-|
+|4 |**public Socket(InetAddress host, int port, InetAddress localAddress, int localPort) throws IOException.**
+创建一个套接字并将其连接到指定远程地址上的指定远程端口。|
+|-|-|
+|5 |**public Socket()**
+通过系统默认类型的 SocketImpl 创建未连接套接字|
+
+* 常用方法
+
+|1 |**public void connect(SocketAddress host, int timeout) throws IOException**
+将此套接字连接到服务器，并指定一个超时值。|
+|-|-|
+|2 |**public InetAddress getInetAddress()**
+ 返回套接字连接的地址。|
+ |-|-|
+|3 |**public int getPort()**
+返回此套接字连接到的远程端口。|
+|-|-|
+|4 |**public int getLocalPort()**
+返回此套接字绑定到的本地端口。|
+|-|-|
+|5 |**public SocketAddress getRemoteSocketAddress()**
+返回此套接字连接的端点的地址，如果未连接则返回 null。|
+|-|-|
+|6 |**public InputStream getInputStream() throws IOException**
+返回此套接字的输入流。|
+|-|-|
+|7 |**public OutputStream getOutputStream() throws IOException**
+返回此套接字的输出流。|
+|-|-|
+|8 |**public void close() throws IOException**
+关闭此套接字。|
+
+### 4.2.3 InetAddress类
+
+这个类表示互联网协议(IP)地址。
+
+|1 |**static InetAddress getByAddress(byte[] addr)**
+在给定原始 IP 地址的情况下，返回 InetAddress 对象。|
+|-|-|
+|2 |**static InetAddress getByAddress(String host, byte[] addr)**
+根据提供的主机名和 IP 地址创建 InetAddress。|
+|-|-|
+|3 |**static InetAddress getByName(String host)**
+在给定主机名的情况下确定主机的 IP 地址。|
+|-|-|
+|4 |**String getHostAddress()**
+返回 IP 地址字符串（以文本表现形式）。|
+|-|-|
+|5 |**String getHostName()**
+ 获取此 IP 地址的主机名。|
+ |-|-|
+|6 |**static InetAddress getLocalHost()**
+返回本地主机。|
+|-|-|
+|7 |**String toString()**
+将此 IP 地址转换为 String。|
+
+## 4.3 实例
+
+```Java
+//客户端
+// 文件名 GreetingClient.java
+ 
+import java.net.*;
+import java.io.*;
+ 
+public class GreetingClient
+{
+   public static void main(String [] args)
+   {
+      String serverName = args[0];
+      int port = Integer.parseInt(args[1]);//将字符串转成int
+      try
+      {
+         System.out.println("连接到主机：" + serverName + " ，端口号：" + port);
+         Socket client = new Socket(serverName, port);//创建一个socket
+         System.out.println("远程主机地址：" + client.getRemoteSocketAddress());//获取远程socket的地址
+         OutputStream outToServer = client.getOutputStream();//
+         DataOutputStream out = new DataOutputStream(outToServer);
+ 
+         out.writeUTF("Hello from " + client.getLocalSocketAddress());
+         InputStream inFromServer = client.getInputStream();//返回此套接字的输入流
+         DataInputStream in = new DataInputStream(inFromServer);//数据流
+         System.out.println("服务器响应： " + in.readUTF());
+         client.close();
+      }catch(IOException e)
+      {
+         e.printStackTrace();
+      }
+   }
+}
+```
+
+```Java
+//服务器
+// 文件名 GreetingServer.java
+ 
+import java.net.*;
+import java.io.*;
+ 
+public class GreetingServer extends Thread
+{
+   private ServerSocket serverSocket;
+   
+   public GreetingServer(int port) throws IOException
+   {
+      serverSocket = new ServerSocket(port);//创建socket并绑定到特定的端口
+      serverSocket.setSoTimeout(10000);
+   }
+ 
+   public void run()
+   {
+      while(true)
+      {
+         try
+         {
+            System.out.println("等待远程连接，端口号为：" + serverSocket.getLocalPort() + "...");
+            Socket server = serverSocket.accept();
+            System.out.println("远程主机地址：" + server.getRemoteSocketAddress());
+            DataInputStream in = new DataInputStream(server.getInputStream());
+            System.out.println(in.readUTF());//如果接受纯数据的话，这里不能用readUTF
+            DataOutputStream out = new DataOutputStream(server.getOutputStream());
+            out.writeUTF("谢谢连接我：" + server.getLocalSocketAddress() + "\nGoodbye!");
+            server.close();
+         }catch(SocketTimeoutException s)
+         {
+            System.out.println("Socket timed out!");
+            break;
+         }catch(IOException e)
+         {
+            e.printStackTrace();
+            break;
+         }
+      }
+   }
+   public static void main(String [] args)
+   {
+      int port = Integer.parseInt(args[0]);
+      try
+      {
+         Thread t = new GreetingServer(port);
+         t.run();
+      }catch(IOException e)
+      {
+         e.printStackTrace();
+      }
+   }
+}
+```
+
+## 4.4 名词
+* 同步和异步
+
+同步指的是用户进程触发IO 操作并等待或者轮询的去查看IO 操作是否就绪
+
+异步是指用户进程触发IO 操作以后便开始做自己的事情，而当IO 操作已经完成的时候会得到IO 完成的通知。
+
+* 阻塞与非阻塞
+
+阻塞和非阻塞是针对于进程在访问数据的时候，根据IO操作的就绪状态来采取的不同方式
+
+阻塞方式下读取或者写入函数将一直等待
+
+非阻塞方式下，读取或者写入方法会立即返回一个状态值
+
+* BIO 编程
+
+Blocking IO： 同步阻塞的编程方式。
+
+JDK1.4版本之前常用的编程方式。首先在服务端启动一个ServerSocket来监听网络请求，客户端启动Socket发起网络请求，默认情况下ServerSocket回建立一个线程来处理此请求，如果服务端没有线程可用，客户端则会阻塞等待或遭到拒绝。
+
+同步并阻塞，服务器实现模式为一个连接一个线程，即客户端有连接请求时服务器端就需要启动一个线程进行处理，如果这个连接不做任何事情会造成不必要的线程开销，当然可以通过线程池机制改善。
+
+* NIO 编程
+
+Unblocking IO（New IO）： 同步非阻塞的编程方式
+
+NIO本身是基于事件驱动思想来完成的，其主要想解决的是BIO的大并发问题，NIO基于Reactor，当socket有流可读或可写入socket时，操作系统会相应的通知引用程序进行处理，应用再将流读取到缓冲区或写入操作系统。
+
+NIO的最重要的地方是当一个连接创建后，不需要对应一个线程，这个连接会被注册到多路复用器上面，所以所有的连接只需要一个线程就可以搞定，当这个线程中的多路复用器进行轮询的时候，**发现连接上有请求的话，才开启一个线程进行处理**，也就是一个请求一个线程模式。
+
+* AIO编程
+
+Asynchronous IO： 异步非阻塞的编程方式。
+
+对于读操作而言，当有流可读取时，操作系统会将可读的流传入read方法的缓冲区，并通知应用程序；对于写操作而言，当操作系统将write方法传递的流写入完毕时，操作系统主动通知应用程序。
+
 
 # java备忘
 
