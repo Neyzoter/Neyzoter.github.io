@@ -6,7 +6,7 @@ description: MAVEN的介绍和使用
 keywords: MAVEN, Java
 ---
 
-
+# 1、Maven介绍
 ## pom.xml
 POM 代表工程对象模型。它是使用 Maven 工作时的基本组建，是一个 xml 文件。它被放在工程根目录下，文件命名为 pom.xml。
 
@@ -19,3 +19,107 @@ compile|编译|本阶段完成源代码编译
 package|打包|本阶段根据 pom.xml 中描述的打包配置创建 JAR / WAR 包
 install|安装|本阶段在本地 / 远程仓库中安装工程包
 
+# 2、Maven配置
+
+## maven配置默认jdk
+
+setting.xml中添加
+
+```
+<profile>    
+    <id>jdk-1.8</id>    
+     <activation>    
+          <activeByDefault>true</activeByDefault>    
+          <jdk>1.8</jdk>    
+      </activation>    
+<properties>    
+<maven.compiler.source>1.8</maven.compiler.source>    
+<maven.compiler.target>1.8</maven.compiler.target>    
+<maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>    
+</properties>    
+</profile>
+```
+
+# 3、Maven使用
+## Maven编译
+
+到项目根目录下运行命令
+
+```
+mvn clean compile
+```
+
+## 添加jar库
+
+在pom.xml中加入jar的信息
+
+```
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-all</artifactId>
+        <version>4.1.29.Final</version>
+    </dependency>
+  </dependencies>
+```
+
+## 打包和运行
+
+* 打包
+
+生成jar（target目录中），但是这个包只能被引用，不能运行。这个jar没有带有main方法的类信息。
+
+```
+mvn clean package  
+```
+
+如果想要运行还需要在pom.xml中配置maven-shade-plugin，添加main方法的类信息。
+
+```
+  <build>
+  <plugins>
+  <plugin>  
+<groupId>org.apache.maven.plugins</groupId>  
+  <artifactId>maven-shade-plugin</artifactId>  
+  <version>1.2.1</version>  
+  <executions>  
+    <execution>  
+      <phase>package</phase>  
+      <goals>  
+        <goal>shade</goal>  
+      </goals>  
+      <configuration>  
+        <transformers>  
+          <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">            <mainClass>com.nesc.NettyServer.App</mainClass>  
+         </transformer>  
+       </transformers>  
+     </configuration>  
+     </execution>  
+  </executions>  
+</plugin> 
+</plugins>
+</build>
+```
+
+"com.nesc.NettyServer.App"需要改成当前项目的住类索引。
+
+再次生成包，可以得到origin（jar包名字中有origin）和非origin（jar包名字中没有origin）的包。其中非origin的包已经包含了main，可以运行。
+
+* 运行
+
+
+```
+java -jar jar的文件名
+```
+
+## 其他的Maven项目直接引用这个jar
+
+```
+mvn clean instlal
+```
