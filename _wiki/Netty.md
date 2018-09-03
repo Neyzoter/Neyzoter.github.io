@@ -2,7 +2,7 @@
 layout: wiki
 title: Netty
 categories: Frame
-description: Netty的介绍和使用
+description: Netty的介绍和使用，来源于《Netty实战-刘品译》
 keywords: Netty
 ---
 
@@ -87,7 +87,7 @@ Netty 使用不同的事件来通知我们更改的状态或操作的状态。�
 
 一个事件可以由一连串的事件处理器来处理，如下图
 
-![avatar](./pic/EventFlow.jpg)
+<img src="/images/wiki/Netty/EventFlow.jpg" width="700" alt="EventFlow" />
 
 ### 1.1.4 组成部分的整合说明
 
@@ -139,7 +139,7 @@ Netty 所有的 I/O 操作都是异步。因为一个操作可能无法立即返
 
 ### 1.2.1 Channel, Event 和 I/O
 
-![avatar](./pic/ChannelEventIO.jpg)
+<img src="/images/wiki/Netty/ChannelEventIO.jpg" width="700" alt="ChannelEventIO" />
 
 一个 EventLoopGroup 具有一个或多个 EventLoop。想象 EventLoop 作为一个 Thread 给 Channel 执行工作。 （事实上，一个 EventLoop 是势必为它的生命周期一个线程。）
 
@@ -152,20 +152,20 @@ Bootstrapping（引导） 是出现在Netty 配置程序的过程中，Bootstrap
 |-|-|-|
 |网络功能  |  连接到远程主机和端口 | 绑定本地端口|
 |-|-|-|
-|EventLoopGroup | 数量  | 1 |  2|
+|EventLoopGroup数量  | 1 |  2|
 
 Bootstrap和ServerBootstrap的差异：1、“ServerBootstrap”监听在服务器监听一个端口轮询客户端的“Bootstrap”或DatagramChannel是否连接服务器；2、一个 ServerBootstrap 可以认为有2个 Channel 集合，第一个集合包含一个单例 ServerChannel，代表持有一个绑定了本地端口的 socket；第二集合包含所有创建的 Channel，处理服务器所接收到的客户端进来的连接。
 
-![avatar](./pic/ServerWith2EventLoopGroups.jpg)
+<img src="/images/wiki/Netty/ServerWith2EventLoopGroups.jpg" width="700" alt="ServerWith2EventLoopGroups" />
 
 ### 1.2.3 Channel和ChannlePipeline
 ChannelInboundHandler 和 ChannelOutboundHandler 继承自父接口 ChannelHandler
 
-![avatar](./pic/ChannelHandlerClassHierarchy.jpg)
+<img src="/images/wiki/Netty/ChannelHandlerClassHierarchy.jpg" width="700" alt="ChannelHandlerClassHierarchy" />
 
 为了使数据从一端到达另一端，一个或多个 ChannelHandler 将以某种方式操作数据。这些 ChannelHandler 会在程序的“引导”阶段被添加ChannelPipeline中，并且被添加的顺序将决定处理数据的顺序。进站和出站的处理器都可以被安装在相同的 pipeline 
 
-![avatar](./pic/ChannelPipelineWithInboundOutboundChannelHandlers.jpg)
+<img src="/images/wiki/Netty/ChannelPipelineWithInboundOutboundChannelHandlers.jpg" width="700" alt="ChannelPipelineWithInboundOutboundChannelHandlers" />
 
 **在当前的链（chain）中，事件可以通过 ChanneHandlerContext 传递给下一个 handler。Netty 为此提供了抽象基类ChannelInboundHandlerAdapter 和 ChannelOutboundHandlerAdapter，用来处理你想要的事件。**可以简单地通过调用 ChannelHandlerContext 上的相应方法将事件传递给下一个 handler。在实际应用中，您可以按需覆盖相应的方法即可。
 
@@ -320,6 +320,728 @@ public class NettyOioServer {
 |flush()  | 刷新先前的数据|
 |-|-|
 |writeAndFlush(...) | 一个方便的方法用户调用write(...)而后调用y flush()|
+
+通过Channel写数据到远程已连接客户端
+
+```Java
+Channel channel = ...; // 获取channel的引用
+ByteBuf buf = Unpooled.copiedBuffer("your data", CharsetUtil.UTF_8);            //1
+ChannelFuture cf = channel.writeAndFlush(buf); //2
+
+cf.addListener(new ChannelFutureListener() {    //3
+    @Override
+    public void operationComplete(ChannelFuture future) {
+        if (future.isSuccess()) {                //4
+            System.out.println("Write successful");
+        } else {
+            System.err.println("Write error");    //5
+            future.cause().printStackTrace();
+        }
+    }
+});
+```
+
+1.创建 ByteBuf 保存写的数据
+
+2.写数据，并刷新
+
+3.添加 ChannelFutureListener 即可写操作完成后收到通知，
+
+4.写操作没有错误完成
+
+5.写操作完成时出现错误
+
+
+Channel 是线程安全(thread-safe)的，它可以被多个不同的线程安全的操作，在多线程环境下，所有的方法都是安全的。
+
+```Java
+final Channel channel = ...; // 获取channel的引用
+final ByteBuf buf = Unpooled.copiedBuffer("your data",
+        CharsetUtil.UTF_8).retain();    //1
+Runnable writer = new Runnable() {        //2
+    @Override
+    public void run() {
+        channel.writeAndFlush(buf.duplicate());
+    }
+};
+Executor executor = Executors.newCachedThreadPool();//3
+
+//写进一个线程
+executor.execute(writer);        //4
+
+//写进另外一个线程
+executor.execute(writer);        //5
+```
+
+#### 1.3.3 Netty中的传输方式
+|方法名称  |  包  | 描述|
+|-|-|-|
+|NIO | io.netty.channel.socket.nio | 基于java.nio.channels的工具包，使用选择器作为基础的方法。|
+|-|-|-|
+|OIO | io.netty.channel.socket.oio | 基于java.net的工具包，使用阻塞流。|
+|-|-|-|
+|Local  | io.netty.channel.local | 用来在虚拟机之间本地通信。|
+|-|-|-|
+|Embedded  |  io.netty.channel.embedded |  嵌入传输，它允许在没有真正网络的传输中使用 ChannelHandler，可以非常有用的来测试ChannelHandler的实现。|
+
+OIO-在低连接数、需要低延迟时、阻塞时使用
+
+NIO-在高连接数时使用
+
+Local-在同一个JVM内通信时使用
+
+Embedded-测试ChannelHandler时使用
+
+* NIO
+
+<img src="/images/wiki/Netty/SelectProcessStateChanges.jpg" width="700" alt="ChannelHandlerClassHierarchy" />
+
+1.新信道注册 WITH 选择器
+
+2.选择处理的状态变化的通知
+
+3.以前注册的通道
+
+4.Selector.select（）方法阻塞，直到新的状态变化接收或配置的超时 已过
+
+5.检查是否有状态变化
+
+6.处理所有的状态变化
+
+7.在选择器操作的同一个线程执行其他任务
+
+* OIO
+
+<img src="/images/wiki/Netty/OIOProcessingLogic.jpg" width="700" alt="OIOProcessingLogic" />
+
+1.线程分配给 Socket
+
+2.Socket 连接到远程
+
+3.读操作（可能会阻塞）
+
+4.读完成
+
+5.处理可读的字节
+
+6.执行提交到 socket 的其他任务
+
+7.再次尝试读
+
+* Local
+
+Netty 提供了“本地”传输，为运行在同一个 Java 虚拟机上的服务器和客户之间提供异步通信。此传输支持所有的 Netty 常见的传输实现的 API。
+
+在此传输中，与服务器 Channel 关联的 SocketAddress 不是“绑定”到一个物理网络地址中，而是在服务器是运行时它被存储在注册表中，当 Channel 关闭时它会注销。由于该传输不是“真正的”网络通信，它不能与其他传输实现互操作。因此，客户端是希望连接到使用本地传输的的服务器时，要注意正确的用法。除此限制之外，它的使用是与其他的传输是相同的。
+
+* 内嵌Transport
+
+Netty中 还提供了可以嵌入 ChannelHandler 实例到其他的 ChannelHandler 的传输，使用它们就像辅助类，增加了灵活性的方法，使您可以与你的 ChannelHandler 互动。
+
+该嵌入技术通常用于测试 ChannelHandler 的实现，但它也可用于将功能添加到现有的 ChannelHandler 而无需更改代码。嵌入传输的关键是Channel 的实现，称为“EmbeddedChannel”。
+
+## 1.4 Netty的Buffer API
+### 1.4.1 特点
+包括Bytebuf和BytebufHolder
+
+Netty 根据 reference-counting(引用计数)来确定何时可以释放 ByteBuf 或 ByteBufHolder 和其他相关资源，从而可以利用池和其他技巧来提高性能和降低内存的消耗。
+
+特点：
+
+1、可以自定义缓冲类型
+
+2、通过一个内置的复合缓冲类型实现零拷贝
+
+3、扩展性好，比如 StringBuilder
+
+4、不需要调用 flip() 来切换读/写模式
+
+5、读取和写入索引分开
+
+6、方法链
+
+7、引用计数
+
+8、Pooling(池)
+
+### 1.4.2 Bytebuf工作原理
+写入数据到 ByteBuf 后，writerIndex（写入索引）增加写入的字节数。读取字节后，readerIndex（读取索引）也增加读取出的字节数。可以读取字节，直到写入索引和读取索引处在相同的位置。此时ByteBuf不可读，所以下一次读操作将会抛出 IndexOutOfBoundsException，就像读取数组时越位一样。
+
+<img src="/images/wiki/Netty/16-byteBytebufwithItsIndicesSet.jpg" width="700" alt="OIOProcessingLogic" />
+
+**调用 ByteBuf 的以 "read" 或 "write" 开头的任何方法都将自动增加相应的索引。另一方面，"set" 、 "get"操作字节将不会移动索引位置，它们只会在指定的相对位置上操作字节。**如readUnsignedByte()，getUnsignedByte()
+
+
+**ByteBuf 使用模式**
+
+Bytebuf的分配见   [1.4.5 Bytebuf分配](### 1.4.5 Bytebuf分配)
+
+*1、HEAP BUFFER(堆缓冲区)*
+
+最常用的模式是 ByteBuf 将数据存储在 JVM 的堆空间。通过 ByteBuf.array() 来获取 byte[]数据。 
+
+```Java
+ByteBuf heapBuf = ...;
+if (heapBuf.hasArray()) {                //1
+    byte[] array = heapBuf.array();        //2
+    int offset = heapBuf.arrayOffset() + heapBuf.readerIndex();                //3
+    int length = heapBuf.readableBytes();//4
+    handleArray(array, offset, length); //5
+}
+```
+
+1.检查 ByteBuf 是否有支持数组。
+
+2.如果有的话，得到引用数组。
+
+3.计算第一字节的偏移量。
+
+4.获取可读的字节数。
+
+5.使用数组，偏移量和长度作为调用方法的参数
+
+*2、DIRECT BUFFER(直接缓冲区)*
+
+在 JDK1.4 中被引入 NIO 的ByteBuffer 类允许 JVM 通过本地方法调用分配内存，其目的是
+
+* 通过免去中间交换的内存拷贝, 提升IO处理速度; 直接缓冲区的内容可以驻留在垃圾回收扫描的堆区以外。
+
+* DirectBuffer 在 -XX:MaxDirectMemorySize=xxM大小限制下, 使用 Heap 之外的内存, GC对此”无能为力”,也就意味着规避了在高负载下频繁的GC过程对应用线程的中断影响
+
+如果你的数据是存放在堆中分配的缓冲区，那么实际上，在通过 socket 发送数据之前，JVM 需要将先数据复制到直接缓冲区。
+
+如果要将数据传递给遗留代码处理，因为数据不是在堆上，可能不得不作出一个副本。如下：
+
+```Java
+ByteBuf directBuf = ...    //这是一个存放在物理内存直接缓存区的Bytebuf
+if (!directBuf.hasArray()) {            //1
+    int length = directBuf.readableBytes();//2
+    byte[] array = new byte[length];    //3
+    directBuf.getBytes(directBuf.readerIndex(), array);        //4    
+    handleArray(array, 0, length);  //5
+}
+
+```
+
+1.检查 ByteBuf 是不是由数组支持。如果不是，这是一个直接缓冲区。
+
+2.获取可读的字节数
+
+3.分配一个新的数组来保存字节
+
+4.字节复制到数组
+
+5.将数组，偏移量和长度作为参数调用某些处理方法
+
+这比使用数组要多做一些工作。因此，如果你事前就知道容器里的数据将作为一个数组被访问，你可能更愿意使用堆内存。
+
+**非直接缓冲区与直接缓冲区**
+
+非直接缓冲区：通过 allocate() 方法分配缓冲区，将缓冲区建立在 JVM 的内存中
+
+直接缓冲区：通过 allocateDirect() 方法分配直接缓冲区，将缓冲区建立在物理内存中。可以提高效率
+
+直接缓存区，在JVM内存外开辟内存，在每次调用基础操作系统的一个本机IO之前或者之后，虚拟机都会避免将缓冲区的内容复制到中间缓冲区（或者从中间缓冲区复制内容），缓冲区的内容驻留在物理内存内，会少一次复制过程，如果需要循环使用缓冲区，用直接缓冲区可以很大地提高性能。虽然直接缓冲区使JVM可以进行高效的I/O操作，但它使用的内存是操作系统分配的，绕过了JVM堆栈，建立和销毁比堆栈上的缓冲区要更大的开销。
+
+
+
+<img src="/images/wiki/Netty/NonDirectBuffer.jpg" width="700" alt="非直接缓冲区" />
+
+<img src="/images/wiki/Netty/DirectBuffer.jpg" width="700" alt="直接缓冲区" />
+
+*3、COMPOSITE BUFFER(复合缓冲区)*
+
+创建多个不同的 ByteBuf，然后提供一个这些 ByteBuf 组合的视图。复合缓冲区就像一个列表，我们可以动态的添加和删除其中的 ByteBuf，JDK 的 ByteBuffer 没有这样的功能。
+
+Netty 提供了 ByteBuf 的子类 CompositeByteBuf 类来处理复合缓冲区，CompositeByteBuf 只是一个视图。
+
+**注**：CompositeByteBuf.hasArray() 总是返回 false，因为它可能既包含堆缓冲区，也包含直接缓冲区
+
+一条消息由 header 和 body 两部分组成，将 header 和 body 组装成一条消息发送出去，**可能 body 相同，只是 header 不同，使用CompositeByteBuf 就不用每次都重新分配一个新的缓冲区**。下图显示CompositeByteBuf 组成 header 和 body：
+
+<img src="/images/wiki/Netty/16-CompositeByteBuf.jpg" width="700" alt="复合缓冲区" />
+
+实现：
+
+```Java
+CompositeByteBuf messageBuf = ...;   //这是一个复合缓存区
+ByteBuf headerBuf = ...; // 可以支持或直接
+ByteBuf bodyBuf = ...; // 可以支持或直接
+messageBuf.addComponents(headerBuf, bodyBuf);
+// ....
+messageBuf.removeComponent(0); // 移除头    //2
+
+for (int i = 0; i < messageBuf.numComponents(); i++) {                        //3
+    System.out.println(messageBuf.component(i).toString());
+}
+```
+
+1.追加 ByteBuf 实例的 CompositeByteBuf
+
+2.删除 索引1的 ByteBuf
+
+3.遍历所有 ByteBuf 实例。
+
+下面时处理数据：
+
+```Java
+CompositeByteBuf compBuf = ...;
+int length = compBuf.readableBytes();    //1
+byte[] array = new byte[length];        //2
+compBuf.getBytes(compBuf.readerIndex(), array);    //3
+handleArray(array, 0, length);    //4
+```
+
+1.得到的可读的字节数。
+
+2.分配一个新的数组,数组长度为可读字节长度。
+
+3.读取字节到数组
+
+4.使用数组，把偏移量和长度作为参数
+
+### 1.4.3 Netty字节级别操作
+<img src="/images/wiki/Netty/BytebufInternalSegmentation.jpg" width="700" alt="Bytebuf内部满足的关系" />
+
+1.字节，可以被丢弃，因为它们已经被读。通过调用discardReadBytes() 来回收空间。
+
+2.还没有被读的字节是：“readable bytes（可读字节）”
+
+3.空间可加入多个字节的是：“writeable bytes（写字节）”
+
+通过调用discardReadBytes() 来回收空间后。这个段的初始大小存储在readerIndex，为 0，当“read”操作被执行时递增（“get”操作不会移动 readerIndex）。
+
+<img src="/images/wiki/Netty/AfterDiscardingReadBytes.jpg" width="700" alt="抛弃掉已读数据后的Bytebuf" />
+
+* 索引管理
+
+设置和重新定位ByteBuf readerIndex 和 writerIndex 通过调用 markReaderIndex(), markWriterIndex(), resetReaderIndex() 和 resetWriterIndex()。这些是分别用来 **标记流中的当前位置和复位流到该位置**。
+
+通过调用 readerIndex(int) 或 writerIndex(int) 将指标移动到指定的位置。
+
+* 查询操作
+
+bytebuf.indexOf()：找到特定byte值所的索引
+
+bytebuf.forEachByte(ByteBufProcessor.FIND_CR)：找到"\r"
+
+* 衍生缓冲区
+
+由 duplicate(), slice(), slice(int, int),readOnly(), 和 order(ByteOrder) 方法创建的。所有这些都返回一个新的 ByteBuf 实例包括它自己的 reader, writer 和标记索引。
+
+拷贝的方法：
+
+如果需要已有的缓冲区的全新副本，使用 copy() 或者 copy(int, int)。不同于派生缓冲区，这个调用返回的 ByteBuf 有数据的独立副本。
+
+若需要操作某段数据，使用 slice(int, int)
+
+```Java
+Charset utf8 = Charset.forName("UTF-8");
+ByteBuf buf = Unpooled.copiedBuffer("Netty in Action rocks!", utf8); //1
+
+ByteBuf sliced = buf.slice(0, 14);          //2
+System.out.println(sliced.toString(utf8));  //3
+
+buf.setByte(0, (byte) 'J');                 //4
+assert buf.getByte(0) == sliced.getByte(0);
+```
+
+1.创建一个 ByteBuf 保存特定字节串。
+
+2.创建从索引 0 开始，并在 14 结束的 ByteBuf 的新 slice。
+
+3.打印 Netty in Action
+
+4.更新索引 0 的字节。
+
+5.断言成功，因为数据是共享的，并以一个地方所做的修改将在其他地方可见。
+
+* 读/写操作
+
+主要包括get()/set()和read()/write()。
+
+get()/set() 操作从给定的索引开始，保持不变
+
+read()/write() 操作从给定的索引开始，与字节访问的数量来适用，递增当前的写索引或读索引
+
+|get方法名称  |  描述|
+|-|-|
+|getBoolean(int)| 返回当前索引的 Boolean 值|
+|-|-|
+|getByte(int)  / getUnsignedByte(int) |  返回当前索引的(无符号)字节
+|-|-|
+|getMedium(int) / getUnsignedMedium(int)  | 返回当前索引的 (无符号) 24-bit 中间值|
+|-|-|
+|getInt(int) / getUnsignedInt(int) | 返回当前索引的(无符号) 整型|
+|-|-|
+|getLong(int) / getUnsignedLong(int) |  返回当前索引的 (无符号) Long 型|
+|-|-|
+|getShort(int) / getUnsignedShort(int) | 返回当前索引的 (无符号) Short 型|
+|-|-|
+|getBytes(int, ...)  | 字节|
+
+
+|set方法名称  |  描述|
+|-|-|
+|setBoolean(int, boolean)   | 在指定的索引位置设置 Boolean 值|
+|-|-|
+|setByte(int, int)  | 在指定的索引位置设置 byte 值|
+|-|-|
+|setMedium(int, int) | 在指定的索引位置设置 24-bit 中间 值|
+|-|-|
+|setInt(int, int)  |  在指定的索引位置设置 int 值|
+|-|-|
+|setLong(int, long) | 在指定的索引位置设置 long 值|
+|-|-|
+|setShort(int, int) |  在指定的索引位置设置 short 值|
+
+```Java
+Charset utf8 = Charset.forName("UTF-8");
+ByteBuf buf = Unpooled.copiedBuffer("Netty in Action rocks!", utf8);    //1创建一个新的 ByteBuf 给指定 String 保存字节
+System.out.println((char)buf.getByte(0));                    //2
+
+int readerIndex = buf.readerIndex();                        //3
+int writerIndex = buf.writerIndex();
+
+buf.setByte(0, (byte)'B');                            //4
+
+System.out.println((char)buf.getByte(0));                    //5
+assert readerIndex == buf.readerIndex();                    //6这些断言成功，因为这些操作永远不会改变索引
+assert writerIndex ==  buf.writerIndex();
+```
+
+|read方法名称  |  描述|
+|-|-|
+|readBoolean()　 | 　Reads the Boolean value at the current readerIndex and increases the readerIndex by 1.|
+|-|-|
+|readByte()　/  readUnsignedByte()　|  Reads the (unsigned) byte value at the current readerIndex and increases　the readerIndex by 1.|
+|-|-|
+|readMedium()　/ readUnsignedMedium()　|  Reads the (unsigned) 24-bit medium value at the current readerIndex and　increases the readerIndex by 3.|
+|-|-|
+|readInt()　/ readUnsignedInt() |　Reads the (unsigned) int value at the current readerIndex and increases　the readerIndex by 4.|
+|-|-|
+|readLong()　/ readUnsignedLong()　| 　Reads the (unsigned) int value at the current readerIndex and increases　the readerIndex by 8.|
+|-|-|
+|readShort()　/ readUnsignedShort()　  |  Reads the (unsigned) int value at the current readerIndex and increases　the readerIndex by 2.|
+|-|-|
+|readBytes(int,int, ...) | Reads the value on the current readerIndex for the given length into the　given object. Also increases the readerIndex by the length.|
+
+|write方法名称  |  描述|
+|-|-|
+|writeBoolean(boolean)  | 　Writes the Boolean value on the current writerIndex and increases the　writerIndex by 1.|
+|-|-|
+|writeByte(int) | 　Writes the byte value on the current writerIndex and increases the　writerIndex by 1.|
+|-|-|
+|writeMedium(int) |   　Writes the medium value on the current writerIndex and increases the　writerIndex by 3.|
+|-|-|
+|writeInt(int)  | 　Writes the int value on the current writerIndex and increases the　writerIndex by 4.|
+|-|-|
+|writeLong(long) |　Writes the long value on the current writerIndex and increases the　writerIndex by 8.|
+|-|-|
+|writeShort(int) |　Writes the short value on the current writerIndex and increases thewriterIndex by 2.|
+|-|-|
+|writeBytes(int，...） |　Transfers the bytes on the current writerIndex from given resources.|
+
+```Java
+Charset utf8 = Charset.forName("UTF-8");
+ByteBuf buf = Unpooled.copiedBuffer("Netty in Action rocks!", utf8);    //1
+System.out.println((char)buf.readByte());                    //2
+
+int readerIndex = buf.readerIndex();                        //3
+int writerIndex = buf.writerIndex();                        //4
+
+buf.writeByte((byte)'?');                            //5
+
+assert readerIndex == buf.readerIndex();
+assert writerIndex != buf.writerIndex();
+```
+
+
+|其他方法名称  |  描述|
+|-|-|
+|isReadable() |   Returns true if at least one byte can be read.
+|-|-|
+|isWritable()  |  Returns true if at least one byte can be written.|
+|-|-|
+|readableBytes() | Returns the number of bytes that can be read.|
+|-|-|
+|writablesBytes()   | Returns the number of bytes that can be written.|
+|-|-|
+|capacity() | Returns the number of bytes that the ByteBuf can hold. After this it will try to expand again until maxCapacity() is reached.|
+|-|-|
+|maxCapacity()  | Returns the maximum number of bytes the ByteBuf can hold.|
+|-|-|
+|hasArray() | Returns true if the ByteBuf is backed by a byte array.|
+|-|-|
+|array() | Returns the byte array if the ByteBuf is backed by a byte array, otherwise throws an UnsupportedOperationException|
+
+### 1.4.4 BytebufHolder
+需要另外存储除有效的实际数据各种属性值
+
+|名称 | 描述|
+|-|-|
+|data() | 返回 ByteBuf 保存的数据|
+|-|-|
+|copy() | 制作一个 ByteBufHolder 的拷贝，但不共享其数据(所以数据也是拷贝).|
+
+如果你想实现一个“消息对象”有效负载存储在 ByteBuf，使用ByteBufHolder 是一个好主意。   
+
+### 1.4.5 Bytebuf分配
+* ByteBufAllocator
+
+为了减少分配和释放内存的开销，Netty 通过支持 **池类 ByteBufAllocator** ，可用于分配的任何 ByteBuf 我们已经描述过的类型的实例。
+
+Netty 默认使用 PooledByteBufAllocator，我们可以通过 ChannelConfig 或通过引导设置一个不同的实现来改变。
+
+|名称 | 描述|
+|-|-|
+|buffer() / buffer(int) / buffer(int, int) |  Return a ByteBuf with heap-based or direct data storage.|
+|-|-|
+|heapBuffer() / heapBuffer(int) / heapBuffer(int, int)  | Return a ByteBuf with heap-based storage.|
+|-|-|
+|directBuffer() / directBuffer(int) / directBuffer(int, int) | Return a ByteBuf with direct storage.|
+|-|-|
+|compositeBuffer() / compositeBuffer(int) / heapCompositeBuffer() / heapCompositeBuffer(int) / directCompositeBuffer() / directCompositeBuffer(int)  | Return a CompositeByteBuf that can be expanded by adding heapbased or direct buffers.|
+|-|-|
+|ioBuffer() | Return a ByteBuf that will be used for I/O operations on a socket.|
+
+```Java
+Channel channel = ...;
+ByteBufAllocator allocator = channel.alloc(); //1从 channel 获得 ByteBufAllocator
+....
+ChannelHandlerContext ctx = ...;
+ByteBufAllocator allocator2 = ctx.alloc(); //2从 ChannelHandlerContext 获得 ByteBufAllocator
+...
+```
+
+* Unpooled （非池化）缓存
+
+当未引用 ByteBufAllocator 时，上面的方法无法访问到 ByteBuf。对于这个用例 Netty 提供一个实用工具类称为 Unpooled,，它提供了静态辅助方法来创建非池化的 ByteBuf 实例。
+
+|名称 | 描述|
+|-|-|
+|buffer() / buffer(int) / buffer(int, int) |  Returns an unpooled ByteBuf with heap-based storage|
+|-|-|
+|directBuffer() / directBuffer(int) / directBuffer(int, int) | Returns an unpooled ByteBuf with direct storage|
+|-|-|
+|wrappedBuffer() | Returns a ByteBuf, which wraps the given data.|
+|-|-|
+|copiedBuffer() | Returns a ByteBuf, which copies the given data|
+
+```
+Unpooled.copiedBuffer("Netty rocks!",
+        CharsetUtil.UTF_8)
+```
+
+* ByteBufUtil
+
+ByteBufUtil 静态辅助方法来操作 ByteBuf，因为这个 API 是通用的，与使用池无关，这些方法已经在外面的分配类实现。
+
+hexDump() 方法，这个方法返回指定 ByteBuf 中可读字节的十六进制字符串，可以用于调试程序时打印 ByteBuf 的内容。
+
+### 1.4.6 Netty引用计数器
+在Netty 4中为 ByteBuf 和 ByteBufHolder（两者都实现了 ReferenceCounted 接口）引入了引用计数器。
+
+```Java
+Channel channel = ...;
+ByteBufAllocator allocator = channel.alloc(); //1从 channel 获取 ByteBufAllocator
+....
+ByteBuf buffer = allocator.directBuffer(); //2从 ByteBufAllocator 分配一个 ByteBuf
+assert buffer.refCnt() == 1; //3检查引用计数器是否是 1
+...
+
+```
+
+
+
+```Java
+ByteBuf buffer = ...;
+boolean released = buffer.release(); //1  release（）将会递减对象引用的数目。当这个引用计数达到0时，对象已被释放，并且该方法返回 true。
+...
+```
+
+如果尝试访问已经释放的对象，将会抛出 IllegalReferenceCountException 异常。
+
+需要注意的是一个特定的类可以定义自己独特的方式其释放计数的“规则”。 例如，release() 可以将引用计数器直接计为 0 而不管当前引用的对象数目。
+
+## 1.5 ChannelHandler和ChannelPipeline
+### 1.5.1  Channel 生命周期
+
+ Channel 的四个状态
+
+|状态 | 描述|
+|-|-|
+|channelUnregistered | channel已创建但未注册到一个 EventLoop.|
+|-|-|
+|channelRegistered |  channel 注册到一个 EventLoop.|
+|-|-|
+|channelActive  | channel 变为活跃状态(连接到了远程主机)，现在可以接收和发送数据了|
+|-|-|
+|channelInactive | channel 处于非活跃状态，没有连接到远程主机|
+
+<img src="/images/wiki/Netty/ChannelStateModel.jpg" width="700" alt="Channel的四个状态" />
+### 1.5.2 ChannelHandler 生命周期
+
+|类型 | 描述|
+|-|-|
+|handlerAdded  |  当 ChannelHandler 添加到 ChannelPipeline 调用|
+|-|-|
+|handlerRemoved   | 当 ChannelHandler 从 ChannelPipeline 移除时调用|
+|-|-|
+|exceptionCaught | 当 ChannelPipeline 执行抛出异常时调用|
+
+### 1.5.3 ChannelHandler 子接口
+
+ChannelInboundHandler - 处理进站数据和所有状态更改事件
+
+ChannelOutboundHandler - 处理出站数据，允许拦截各种操作
+
+*ChannelHandler 适配器*
+
+*Netty 提供了一个简单的 ChannelHandler 框架实现，给所有声明方法签名。这个类 ChannelHandlerAdapter 的方法,主要推送事件 到 pipeline 下个 ChannelHandler 直到 pipeline 的结束。这个类 也作为 ChannelInboundHandlerAdapter 和ChannelOutboundHandlerAdapter 的基础。所有三个适配器类的目的是作为自己的实现的起点;您可以扩展它们,覆盖你需要自定义的方法。*
+
+### 1.5.4 ChannelInboundHandler
+
+|类型 | 描述|
+|-|-|
+|channelRegistered |  Invoked when a Channel is registered to its EventLoop and is able to handle I/O.|
+|-|-|
+|channelUnregistered | Invoked when a Channel is deregistered from its EventLoop and cannot handle any I/O.|
+|-|-|
+|channelActive |  Invoked when a Channel is active; the Channel is connected/bound and ready.|
+|-|-|
+|channelInactive | Invoked when a Channel leaves active state and is no longer connected to its remote peer.|
+|-|-|
+|channelReadComplete | Invoked when a read operation on the Channel has completed.|
+|-|-|
+|channelRead | Invoked if data are read from the Channel.|
+|-|-|
+|channelWritabilityChanged |  Invoked when the writability state of the Channel changes. The user can ensure writes are not done too fast (with risk of an 
+OutOfMemoryError) or can resume writes when the Channel becomes writable again.Channel.isWritable() can be used to detect the actual writability of the channel. The threshold for writability can be set via Channel.config().setWriteHighWaterMark() and Channel.config().setWriteLowWaterMark().|
+|-|-|
+|userEventTriggered(...) | Invoked when a user calls Channel.fireUserEventTriggered(...) to pass a pojo through the ChannelPipeline. This can be used to pass user specific events through the ChannelPipeline and so allow handling those events.|
+
+
+ChannelInboundHandler 实现覆盖了 channelRead() 方法处理进来的数据用来响应释放资源。Netty 在 ByteBuf 上使用了资源池，所以当执行释放资源时可以减少内存的消耗。
+
+```Java
+@ChannelHandler.Sharable
+public class DiscardHandler extends ChannelInboundHandlerAdapter {        //1扩展 ChannelInboundHandlerAdapter
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx,
+                                     Object msg) {
+        ReferenceCountUtil.release(msg); //2ReferenceCountUtil.release() 来丢弃收到的信息
+    }
+
+}
+```
+
+由于手工管理资源会很繁琐,您可以通过使用 SimpleChannelInboundHandler 简化问题。
+
+```Java
+@ChannelHandler.Sharable
+public class SimpleDiscardHandler extends SimpleChannelInboundHandler<Object> {  //1扩展 SimpleChannelInboundHandler
+
+    @Override
+    public void channelRead0(ChannelHandlerContext ctx,
+                                     Object msg) {
+        // No need to do anything special //2不需做特别的释放资源的动作
+    }
+
+}
+```
+
+### 1.5.5 ChannelOutboundHandler
+
+
+|类型 | 描述|
+|-|-|
+|bind   | Invoked on request to bind the Channel to a local address|
+|-|-|
+|connect | Invoked on request to connect the Channel to the remote peer|
+|-|-|
+|disconnect | Invoked on request to disconnect the Channel from the remote peer|
+|-|-|
+|close  | Invoked on request to close the Channel|
+|-|-|
+|deregister | Invoked on request to deregister the Channel from its EventLoop|
+|-|-|
+|read   | Invoked on request to read more data from the Channel|
+|-|-|
+|flush  | Invoked on request to flush queued data to the remote peer through the Channel|
+|-|-|
+|write |  Invoked on request to write data through the Channel to the remote peer|
+
+几乎所有的方法都将 ChannelPromise 作为参数,一旦请求结束要通过 ChannelPipeline 转发的时候，必须通知此参数。
+
+*ChannelPromise vs. ChannelFuture*
+
+*ChannelPromise 是 特殊的 ChannelFuture，允许你的 ChannelPromise 及其 操作 成功或失败。所以任何时候调用例如 Channel.write(...) 一个新的 ChannelPromise将会创建并且通过 ChannelPipeline传递。这次写操作本身将会返回 ChannelFuture， 这样只允许你得到一次操作完成的通知。Netty 本身使用 ChannelPromise 作为返回的 ChannelFuture 的通知，事实上在大多数时候就是 ChannelPromise 自身（ChannelPromise 扩展了 ChannelFuture）*
+
+### 1.5.6 资源管理
+
+当你通过 ChannelInboundHandler.channelRead(...) 或者 ChannelOutboundHandler.write(...) 来处理数据，重要的是在处理资源时要确保资源不要泄漏。
+
+Netty 使用引用计数器来处理池化的 ByteBuf。所以当 ByteBuf 完全处理后，要确保引用计数器被调整。
+
+引用计数的权衡之一是用户时必须小心使用消息。当 JVM 仍在 GC(不知道有这样的消息引用计数)这个消息，以至于可能是之前获得的这个消息不会被放回池中。因此很可能,如果你不小心释放这些消息，很可能会耗尽资源。
+
+为了让用户更加简单的找到遗漏的释放，Netty 包含了一个 ResourceLeakDetector ，将会从已分配的缓冲区 1% 作为样品来检查是否存在在应用程序泄漏。因为 1% 的抽样,开销很小。
+
+检测等级：
+
+|Level Description |  DISABLED|
+|-|-|
+|Disables |   Leak detection completely. While this even eliminates the 1 % overhead you should only do this after extensive testing.|
+|-|-|
+SIMPLE  Tells if a leak was found or not. Again uses the sampling rate of 1%, the default level and a good fit for most cases.
+|-|-|
+|ADVANCED  |  Tells if a leak was found and where the message was accessed, using the sampling rate of 1%.|
+|-|-|
+|PARANOID  |  Same as level ADVANCED with the main difference that every access is sampled. This it has a massive impact on performance. Use this only in the debugging phase.|
+
+修改检测等级的方法：
+
+```Java
+# java -Dio.netty.leakDetectionLevel=paranoid //我们就能在 ChannelInboundHandler.channelRead(...) 和 ChannelOutboundHandler.write(...) 避免泄漏。
+```
+
+
+处理 channelRead(...) 操作，并在消费消息(不是通过 ChannelHandlerContext.fireChannelRead(...) 来传递它到下个 ChannelInboundHandler) 时，要释放它。如下：
+
+
+```Java
+@ChannelHandler.Sharable
+public class DiscardInboundHandler extends ChannelInboundHandlerAdapter {  //1
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx,
+                                     Object msg) {
+        ReferenceCountUtil.release(msg); //2使用 ReferenceCountUtil.release(...) 来释放资源
+    }
+}
+
+```
+
+当你在处理写操作，并丢弃消息时，你需要释放它。如下。
+
+```Java
+@ChannelHandler.Sharable 
+public class DiscardOutboundHandler extends ChannelOutboundHandlerAdapter { //1
+@Override
+public void write(ChannelHandlerContext ctx,
+                                 Object msg, ChannelPromise promise) {
+    ReferenceCountUtil.release(msg);  //2使用 ReferenceCountUtil.release(...) 来释放资源
+    promise.setSuccess();    //3通知 ChannelPromise 数据已经被处理
+
+}
+
+```
+
+释放资源并通知 ChannelPromise。如果，ChannelPromise 没有被通知到，这可能会引发 ChannelFutureListener 不会被处理的消息通知的状况。
+
+如果消息是被 消耗/丢弃 并不会被传入下个 ChannelPipeline 的 ChannelOutboundHandler ，调用 ReferenceCountUtil.release(message) 。一旦消息经过实际的传输，在消息被写或者 Channel 关闭时，它将会自动释放。
 
 
 # 2、Netty使用
@@ -480,7 +1202,7 @@ channelRead0()：这种方法会在接收到数据时被调用。注意，由服
 
 **SimpleChannelInboundHandler vs. ChannelInboundHandler**
 
-何时用这两个要看具体业务的需要。在客户端，当 channelRead0() 完成，我们已经拿到的入站的信息。当方法返回时，SimpleChannelInboundHandler 会小心的释放对 ByteBuf（保存信息） 的引用。而在 EchoServerHandler,我们需要将入站的信息返回给发送者，由于 write() 是异步的，在 channelRead() 返回时，可能还没有完成。所以，我们使用 ChannelInboundHandlerAdapter,无需释放信息。最后在 channelReadComplete() 我们调用 ctxWriteAndFlush() 来释放信息。
+何时用这两个要看具体业务的需要。在客户端，当 channelRead0() 完成，我们已经拿到的入站的信息。**当方法返回时，SimpleChannelInboundHandler 会小心的释放对 ByteBuf（保存信息） 的引用**(在channelRead0()中，不需要程序员自行调用释放资源的函数)。而在 EchoServerHandler,我们需要将入站的信息返回给发送者，由于 write() 是异步的，在 channelRead() 返回时，可能还没有完成。所以，我们使用 ChannelInboundHandlerAdapter,无需释放信息。最后在 channelReadComplete() 我们调用 ctxWriteAndFlush() 来释放信息。
 
 ```Java
 public class EchoClient {

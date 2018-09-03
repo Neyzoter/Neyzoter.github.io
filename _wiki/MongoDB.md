@@ -180,7 +180,7 @@ db.collection.save(
 
 ```
 db.col.save(document)
-``` 
+```
 
 如果不提供_id字段，则save和insert一样新生成一个文档。
 
@@ -190,6 +190,7 @@ db.col.save(document)
 * delete
 
 删除集合下的所有文档
+
 
 ```
 db.col.deleteMany({})
@@ -208,6 +209,7 @@ db.col.deleteOne( { status: "D" } )
 已经过时。
 
 ```
+
 db.collection.remove(
    <query>,
    {
@@ -872,7 +874,7 @@ mongodb://example1.com:27017,example2.com:27017
 
 最后三个字节是随机数
 
-![avatar]./pic/MongoDB_ObjectId.jpeg
+<img src="/images/wiki/MongoDB/MongoDB_ObjectId.jpeg" width="400" alt="ObjectId" />
 
 ```
 var newObject = ObjectId()
