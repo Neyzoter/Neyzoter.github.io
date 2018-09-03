@@ -373,7 +373,7 @@ executor.execute(writer);        //4
 executor.execute(writer);        //5
 ```
 
-#### 1.3.3 Netty中的传输方式
+### 1.3.3 Netty中的传输方式
 |方法名称  |  包  | 描述|
 |-|-|-|
 |NIO | io.netty.channel.socket.nio | 基于java.nio.channels的工具包，使用选择器作为基础的方法。|
@@ -545,9 +545,9 @@ if (!directBuf.hasArray()) {            //1
 
 
 
-<img src="/images/wiki/Netty/NonDirectBuffer.jpg" width="700" alt="非直接缓冲区" />
+<img src="/images/wiki/Netty/NonDirectBuffer.png" width="700" alt="非直接缓冲区" />
 
-<img src="/images/wiki/Netty/DirectBuffer.jpg" width="700" alt="直接缓冲区" />
+<img src="/images/wiki/Netty/DirectBuffer.png" width="700" alt="直接缓冲区" />
 
 *3、COMPOSITE BUFFER(复合缓冲区)*
 
@@ -559,7 +559,7 @@ Netty 提供了 ByteBuf 的子类 CompositeByteBuf 类来处理复合缓冲区�
 
 一条消息由 header 和 body 两部分组成，将 header 和 body 组装成一条消息发送出去，**可能 body 相同，只是 header 不同，使用CompositeByteBuf 就不用每次都重新分配一个新的缓冲区**。下图显示CompositeByteBuf 组成 header 和 body：
 
-<img src="/images/wiki/Netty/16-CompositeByteBuf.jpg" width="700" alt="复合缓冲区" />
+<img src="/images/wiki/Netty/CompositeByteBuf.jpg" width="700" alt="复合缓冲区" />
 
 实现：
 
@@ -995,7 +995,7 @@ Netty 使用引用计数器来处理池化的 ByteBuf。所以当 ByteBuf 完全
 |-|-|
 |Disables |   Leak detection completely. While this even eliminates the 1 % overhead you should only do this after extensive testing.|
 |-|-|
-SIMPLE  Tells if a leak was found or not. Again uses the sampling rate of 1%, the default level and a good fit for most cases.
+|SIMPLE | Tells if a leak was found or not. Again uses the sampling rate of 1%, the default level and a good fit for most cases.|
 |-|-|
 |ADVANCED  |  Tells if a leak was found and where the message was accessed, using the sampling rate of 1%.|
 |-|-|
