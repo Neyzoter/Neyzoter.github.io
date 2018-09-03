@@ -42,6 +42,7 @@ $ netstat -tlnp   # 查看正在监听的端口
 $ sudo lsof -i:端口号    # 查看某个端口号 的PID
 $ sudo kill -9 端口的PID    # 根据端口的PID来关闭端口监听
 ```
+
 ## 1.x 安装java
 1、查看有java包
 
