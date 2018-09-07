@@ -3,7 +3,7 @@ layout: post
 title: FreeRTOS学习笔记(3)FreeRTOS的系统配置
 categories: RTOS
 description: FreeRTOS学习笔记(3)FreeRTOS的系统配置，即FreeRTOSConfig.h文件
-keywords: FreeRTOS, 配置, 
+keywords: FreeRTOS, 配置
 ---
 
 > 原创

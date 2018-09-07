@@ -191,13 +191,14 @@ https://cloud.tencent.com/document/product/213/2936
 # 2、 实用命令
 
 ## 删除文件/文件夹
+
 ```
 $ sudo rm -r 文件夹名
 ```
 
 ```
 $ sudo rm 文件名
-``` 
+```
 
 ## 修改/移动文件
 修改文件名：
@@ -413,6 +414,114 @@ g++ -o test test.c -lmysqlclient -lm -I/usr/include/msqyl -L/usr/lib64/mysql
 在libraryies search path (L)中添加/usr/lib/mysql
 
 到这个地址去找libmysqlclient.a这个文件。
+
+# 云端服务器安装Mongodb
+
+## 1、下载到自己的电脑
+
+找到mongdb对应的版本。
+
+[mongodb的community-server](https://www.mongodb.com/download-center#community "mongodb的community-server")
+
+eg
+
+```
+$ wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.0.2.tgz
+```
+
+也可以网页下载。
+
+## 2、scp发送到云端服务器
+
+## 3、解压安装包
+
+```
+$ tar -xvf mongodb-linux-x86_64-ubuntu1604-4.0.2.tgz
+```
+
+## 4、解压包拷贝到/usr/local/mongodb
+```
+$ sudo mv mongodb-linux-x86_64-ubuntu1604-4.0.2 /usr/local/mongodb
+```
+
+## 5、设置环境变量
+1、vi开始编辑
+
+```
+$ vi ~/.bashrc
+```
+
+2、insert
+
+按下按键"i"，开始插入到文件末尾。
+
+```
+export PATH=/usr/local/mongodb/bin:$PATH
+```
+
+3、退出并保存
+
+Ctrl+C：退出inster模式
+
+输入":wq"+回车：保存并退出
+
+4、刷新环境变量
+
+```
+$ source ~/.bashrc
+```
+
+## 6、创建MongoDB数据库目录
+
+MongoDB的数据存储在Data目录的db目录下，但这些目录不会自动创建，需要手动创建/data/db目录，现在根目录(/)下创建data/db目录。
+
+```
+$ sudo mkdir -p /data/db
+```
+
+注：若用户在其他位置创建data/db目录，需要启动mongod 服务时用--dbpath=xxxx来制定数据库的存储目录。/data/db这里是默认的路径，所以不需要设置。
+
+## 7、测试安装情况
+Question1:
+
+```
+$ mongod
+
+>>mongod: error while loading shared libraries: libcurl.so.4: cannot open shared object file: No such file or directory
+```
+
+Solve1:
+
+```
+$ sudo apt-get install libcurl4-openssl-dev
+>>
+```
+
+Question2:
+
+```
+$ mongod
+
+>>......
+>>......
+>>exception in initAndListen: IllegalOperation: Attempted to create a lock file on a read-only directory: /data/db, terminating
+>>......
+```
+
+Solve2:
+
+出现的原因是因为 /data/db的权限不足导致的。
+
+```
+$sudo chmod 777 -R /data
+```
+
+
+以上问题解决，可以运行。
+
+开两个ssh，一个打开mongod，一个测试mongo。
+
+
 
 
 

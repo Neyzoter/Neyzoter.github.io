@@ -160,5 +160,5 @@ java -jar jar的文件名
 ## 其他的Maven项目直接引用这个jar
 
 ```
-mvn clean instlal
+mvn clean install
 ```
