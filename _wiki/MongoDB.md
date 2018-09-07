@@ -592,9 +592,9 @@ MongoDB的副本集于常见的主从有所不同，主从在主机死掉后所�
 
 当MongoDB存储海量的数据时，一台机器可能不足以存储数据，也可能不足以提供可接受的读写吞吐量。这时，我们就可以通过在多台机器上分割数据，使得数据库系统能存储和处理更多的数据。
 
-# 4、备份与恢复
+# 3、备份与恢复
 
-## 4.1 备份
+## 3.1 备份
 ```
 mongodump -h dbhost -d dbname -o dbdirectory
 ```
@@ -611,7 +611,7 @@ MongDB所在服务器地址，例如：127.0.0.1，当然也可以指定端口�
 
 备份的数据存放位置，例如：c:\data\dump，当然该目录需要提前建立，在备份完成后，系统自动在dump目录下建立一个test目录，这个目录里面存放该数据库实例的备份数据。
 
-## 4.2 数据恢复
+## 3.2 数据恢复
 ```
 mongorestore -h <hostname><:port> -d dbname <path>
 ```
@@ -640,8 +640,8 @@ mongorestore 最后的一个参数，设置备份数据所在位置，例如：c
 
 你不能同时指定 <path> 和 --dir 选项。
 
-# 5、监控
-## 5.1 mongostat 
+# 4、监控
+## 4.1 mongostat 
 mongostat是mongodb自带的状态检测工具，在命令行下使用。
 
 它会间隔固定时间获取mongodb的当前运行状态，并输出。如果你发现数据库突然变慢或者有其他问题的话，你第一手的操作就考虑采用mongostat来查看mongo的状态。
@@ -652,7 +652,7 @@ mongostat是mongodb自带的状态检测工具，在命令行下使用。
 
 2、进入到你安装的MongoDB目录下的bin目录， 然后输入mongostat命令
 
-## 5.2 mongotop 
+## 4.2 mongotop 
 mongotop提供了一个方法，用来跟踪一个MongoDB的实例，查看哪些大量的时间花费在读取和写入数据。
 
 启动方法：
@@ -686,7 +686,7 @@ write：
 
 提供这个命名空间进行写操作，这mongod花了大量的时间。
 
-# 设置
+# 5、设置
 ### 启动服务
 
 ```
@@ -700,7 +700,12 @@ write：
 ```
 
 ### 元数据
-<dbname>.system.*是包含多种系统信息的特殊集合
+
+```
+<dbname>.system.*
+```
+
+是包含多种系统信息的特殊集合
 
 ```
 dbname.system.namespaces	列出所有名字空间。
@@ -709,6 +714,7 @@ dbname.system.profile	包含数据库概要(profile)信息。
 dbname.system.users	列出所有可访问数据库的用户。
 dbname.local.sources	包含复制对端（slave）的服务器信息和状态。
 ```
+
 ### MongoDB连接
 #### 启动MongoDB服务
 
@@ -756,7 +762,7 @@ mongodb://admin:123456@localhost/test
 mongodb://example1.com:27017,example2.com:27017
 ```
 
-# 概念
+# 6、概念
 ### SQL和MongoDB
 
 |SQL术语/概念 | MongoDB术语/概念 | 解释/说明|
@@ -771,7 +777,7 @@ mongodb://example1.com:27017,example2.com:27017
 |-|-|-|
 |index | index | 索引|
 |-|-|-|
-|table joins |  | 表连接,MongoDB不支持|
+|table joins |-| 表连接,MongoDB不支持|
 |-|-|-|
 |primary key	| primary key | 主键,MongoDB自动将_id字段设置为主键|
 
