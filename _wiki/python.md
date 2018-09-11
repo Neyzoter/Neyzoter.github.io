@@ -5,7 +5,12 @@ categories: Python
 description: Python 常用模块及资源记录。
 keywords: Python
 ---
-
+# 语句备忘
+## 列表中是否存在某个值
+```python
+if val in list:
+	# 处理语句
+```
 ### requests
 
 优雅简单的 HTTP 模块。
