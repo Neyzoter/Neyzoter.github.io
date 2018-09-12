@@ -10,19 +10,20 @@ keywords: 信息增益,决策树
 ## 1.1 熵
 表示随机变量不确定性的量度
 
-$H(X)=-$\sum_{i=1}^{n}$p_{i}log(p_{i})$
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= H(X)=-\sum_{i=1}^{n}p_{i}log(p_{i})" style="border:none;">
 
 熵越大，随机变量的不确定性就越大。
 
 ## 1.2 条件熵
 条件熵H(Y|X)表示在已知随机变量X的条件下随机变量Y的不确定性
 
-$H(Y|X) = \sum_{i=1}^{n}p_{i}H(Y|X=x_{i})$
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= H(Y|X) = \sum_{i=1}^{n}p_{i}H(Y|X=x_{i})" style="border:none;">
 
 ## 1.3 信息增益
 表示得知特征X的信息而使得类Y的信息的不确定性减少的程度
 
-$g(D|A)=H(D)-H(D|A)$
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= g(D|A)=H(D)-H(D|A)" style="border:none;">
+
 
 给定训练数据集D和特征A，经验熵H(D)表示对数据集D进行分类的不确定性。经验条件熵D(D|A)表示在特征A给定的条件下对数据集D尽心分类的不确定性。两者之差就是信息增益。
 
