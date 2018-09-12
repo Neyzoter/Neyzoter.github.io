@@ -25,21 +25,39 @@ keywords: 信息增益,决策树
 <img src="http://chart.googleapis.com/chart?cht=tx&chl= g(D|A)=H(D)-H(D|A)" style="border:none;">
 
 
-给定训练数据集D和特征A，经验熵H(D)表示对数据集D进行分类的不确定性。经验条件熵D(D|A)表示在特征A给定的条件下对数据集D尽心分类的不确定性。两者之差就是信息增益。
+给定训练数据集D和特征A，经验熵H(D)表示对数据集D进行分类的不确定性。经验条件熵D(D\|A)表示在特征A给定的条件下对数据集D尽心分类的不确定性。两者之差就是信息增益。
 
-具体算法见《统计学习方法》李航
+具体D(D\|A)计算方法见《统计学习方法》李航P62
+
+## 1.4 信息增益比
+信息增益在计算某个特征具有较多取值时，会因为其取值多而变大，偏向于选择取值多的特征。
+
+为了解决该问题，使用信息增益比对其矫正。
+
+信息增益比为
+
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= g_{R}(D,A)=g(D,A)/{H_{A}(D)}" style="border:none;">
+
+其中，
+
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= H_{A}(D)=-\sum_{i=1}^{n}\frac{|D_{i}|}{|D|}log_{2}(\frac{|D_{i}|}{|D|})" style="border:none;">
+
+可见，某个特征取值越多，<img src="http://chart.googleapis.com/chart?cht=tx&chl= H_{A}(D)" style="border:none;"> 越大，起到了矫正的作用。
 
 # 2、代码实现
 ```python
-# -*- coding: utf-8 -*-
 """
-信息增益算法
+信息增益算法，信息增益比算法
 
 用于得知特征A的信息而使得类Y的信息的不确定性减少的程度。《统计学习方法》P61
+
+信息增益比矫正了信息增益存在偏向于选择取值较多的特征的问题。
 
 用途：表示决策树的分类好坏
 
 @author: HP528
+
+@date: 2018-9-12
 """
 
 import math
@@ -77,8 +95,10 @@ def getInfoGain(A,Y,prt):
             dct_A[item] = [idx]  # 创建一个新的特征数值分类
     ## 2.2 计算得到子集Di中属于类Ck的样本的集合——Dik和H(D|A)
     H_DA = 0
+    HA_D = 0  # 训练集D关于特征A的值得熵
     for item in dct_A.keys(): # 获取到A特征的某个值
         H_Di = 0
+        
         dct_Dik = {}  # {Y数值:个数}，且在Di中
         for idx in dct_A[item]: # 获取下标
             if Y[idx] in dct_Dik.keys(): # 如果已经有了记录
@@ -92,20 +112,26 @@ def getInfoGain(A,Y,prt):
 #            print('Dir_len=  '+str(Dik_len)+ '   len(dct_A[item])=  ' + str(len(dct_A[item])) +'  H(Di)=  '+str(H_Di))
         # 计算D(D|A)的和
         H_DA += -len(dct_A[item]) / D_num * H_Di
-                
+        HA_D += -len(dct_A[item]) / D_num * math.log2(len(dct_A[item]) / D_num)
     # 3.计算信息增益g(D,A)
-        g_DA = H_D - H_DA
-      
+    g_DA = H_D - H_DA
+    # 4.计算信息增益比gr(D,A)
+    gr_DA = g_DA / HA_D
+     
     if prt:
-        print("H(D) = "+str(H_D))
-        print("H(D|A) = "+str(H_DA)) 
-        print("g(D|A) = "+str(g_DA))
+        print("数据集D的经验熵              H(D) = "+str(H_D))
+        print("特征A对数据集D的经验条件熵  H(D|A) = "+str(H_DA)) 
+        print("信息增益                   g(D|A) = "+str(g_DA))
+        print("信息增益比                gr(D|A) = "+str(gr_DA))
     
     
-    return g_DA
+    return g_DA,gr_DA
 
 if __name__ == "__main__":
     Y = [6,9,6,6,7,8,8,7,4,9,9,9,9,10]
     
     getInfoGain([1,1,3,4,5,5,4,3,3,3,2,3,4,5],Y,True)
+
+
+    
 ```
