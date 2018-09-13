@@ -209,7 +209,6 @@ db.col.deleteOne( { status: "D" } )
 已经过时。
 
 ```
-
 db.collection.remove(
    <query>,
    {
@@ -226,8 +225,11 @@ db.collection.remove(
 **writeConcern** :（可选）抛出异常的级别。
 
 ### 查询文档
-* find
+* DBQuery.shellBatchSize
 
+设置查询到的doc个数。
+
+* find
 
 ```
 db.collection.find(query, projection)
