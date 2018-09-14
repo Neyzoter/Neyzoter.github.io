@@ -227,6 +227,9 @@ db.collection.remove(
 ### 查询文档
 * DBQuery.shellBatchSize
 
+```
+DBQuery.shellBatchSize
+```
 设置查询到的doc个数。
 
 * find
