@@ -53,8 +53,25 @@ Orient2User = pd.merge(temp, Orient2User, on='User_id', how='outer')：两个df�
 
 Orient2User = off_train.groupby(['User_id'], as_index = False)['sum'].agg({'count':np.sum})：根据User_id计算一共多少人，每个人的频率。需要在原df上加df['sum']=1
 
-# 5、注意点
-## 5.1 copy问题
+# 5、缺失值处理
+## 5.1 data.isnull().any()
+isnull：返回data中数据是否缺失，以矩阵的形式
+
+any：只要矩阵中有一个true，就返回true
+## 5.2 清理无效数据
+
+```python
+df.dropna() # 删除所有含nan项的row
+d.dropna(axis=1,thred=3)  # 将在列的方向上三个为NaN的项删除
+df.dropna(how='ALL') # 将所有项都是nan的row删除
+df.drop(['a']) # 删除行，其中'a'是删除的行的index
+df.drop(['Ohio'],axis=1) # 删除列，'Ohio'是删除的列的名称
+df.drop(['a'],inplace=True) # 就地修改原来的数据df，inplace = True
+```
+
+
+# X、注意点
+## X.1 copy问题
 有的时候直接复制
 
 ```
