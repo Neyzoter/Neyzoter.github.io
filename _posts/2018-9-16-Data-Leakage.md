@@ -18,7 +18,7 @@ keywords: 数据泄露,数据处理
 
 这就是一个数据泄露。
 
-<img src="/images/posts/2018-9-16-Data-Leakage/UsableNotUsable.jpg" width="500" alt="哪些特征可用那些不可用" />
+<img src="/images/posts/2018-9-16-Data-Leakage/UsableNotUsable.png" width="500" alt="哪些特征可用那些不可用" />
 
 ## 1.2 验证策略泄露
 
