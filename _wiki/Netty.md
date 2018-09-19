@@ -452,6 +452,14 @@ Netty 根据 reference-counting(引用计数)来确定何时可以释放 ByteBuf
 
 2、通过一个内置的复合缓冲类型实现零拷贝
 
+>1) Netty的接收和发送ByteBuffer采用DIRECT BUFFERS，使用堆外直接内存进行Socket读写，不需要进行字节缓冲区的二次拷贝。如果使用传统的堆内存（HEAP BUFFERS）进行Socket读写，JVM会将堆内存Buffer拷贝一份到直接内存中，然后才写入Socket中。
+
+
+>2) Netty提供了组合Buffer对象，可以聚合多个ByteBuffer对象，用户可以像操作一个Buffer那样方便的对组合Buffer进行操作，避免了传统通过内存拷贝的方式将几个小Buffer合并成一个大的Buffer。
+
+
+>3) Netty的文件传输采用了transferTo方法，它可以直接将文件缓冲区的数据发送到目标Channel，避免了传统通过循环write方式导致的内存拷贝问题。
+
 3、扩展性好，比如 StringBuilder
 
 4、不需要调用 flip() 来切换读/写模式
@@ -463,6 +471,15 @@ Netty 根据 reference-counting(引用计数)来确定何时可以释放 ByteBuf
 7、引用计数
 
 8、Pooling(池)
+
+使用内存池分配器创建直接内存缓冲区ByteBuf比普通ByteBuf效率更高。
+
+```
+//使用内存池分配器创建直接内存缓冲区
+poolBuffer = PooledByteBufAllocator.DEFAULT.directBuffer(1024);
+//基于非内存池创建的非堆内存缓冲区测试用例
+poolBuffer = Unpooled.directBuffer(1024);
+```
 
 ### 1.4.2 Bytebuf工作原理
 写入数据到 ByteBuf 后，writerIndex（写入索引）增加写入的字节数。读取字节后，readerIndex（读取索引）也增加读取出的字节数。可以读取字节，直到写入索引和读取索引处在相同的位置。此时ByteBuf不可读，所以下一次读操作将会抛出 IndexOutOfBoundsException，就像读取数组时越位一样。
