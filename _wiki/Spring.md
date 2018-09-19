@@ -85,3 +85,307 @@ Web，Web-MVC，Web-Socket 和 Web-Portlet
 **Messaging** 模块为 STOMP 提供了支持作为在应用程序中 WebSocket 子协议的使用。它也支持一个注解编程模型，它是为了选路和处理来自 WebSocket 客户端的 STOMP 信息。
 
 测试模块支持对具有 JUnit 或 TestNG 框架的 Spring 组件的测试。
+
+# IoC容器
+Spring 容器是 Spring 框架的核心。容器将创建对象，把它们连接在一起，配置它们，并管理他们的整个生命周期从创建到销毁。Spring 容器使用依赖注入（DI）来管理组成一个应用程序的组件。这些对象被称为 Spring Beans。
+
+Spring IoC 容器利用 Java 的 POJO 类和配置元数据来生成完全配置和可执行的系统或应用程序。
+## 容器的种类
+* Spring BeanFactory 容器
+
+它是最简单的容器，给 DI 提供了基本的支持，它用 org.springframework.beans.factory.BeanFactory 接口来定义。
+
+```Java
+XmlBeanFactory beanFac = new XmlBeanFactory (new ClassPathResource("Beans.xml"));
+Helloworld objBeanFac = (Helloworld) beanFac.getBean("helloWorld");//获得所需的 bean，对应bean的id
+objBeanFac.getMessage();
+```
+* Spring ApplicationContext 容器
+
+该容器添加了更多的企业特定的功能，例如从一个属性文件中解析文本信息的能力，发布应用程序事件给感兴趣的事件监听器的能力。该容器是由 org.springframework.context.ApplicationContext 接口定义。
+
+ApplicationContext 容器包括 BeanFactory 容器的所有功能
+
+```Java
+//    	ApplicationContext appContext = new FileSystemXmlApplicationContext ("E:/SoftwareCodes/Java/Spring_Test/test/src/main/java/Beans.xml");//创建应用程序的上下文
+        ApplicationContext appContext = new ClassPathXmlApplicationContext("Beans.xml");//创建应用程序的上下文
+        Helloworld objAppContext = (Helloworld) appContext.getBean("helloWorld");
+        objAppContext.getMessage();
+```
+
+## Bean定义
+|属性	| 描述|
+|-|-|
+|class	| 这个属性是强制性的，并且指定用来创建 bean 的 bean 类。|
+|-|-|
+|name	| 这个属性指定唯一的 bean 标识符。在基于 XML 的配置元数据中，你可以使用 ID 和/或 name 属性来指定 bean 标识符。|
+|-|-|
+|scope	| 这个属性指定由特定的 bean 定义创建的对象的作用域，它将会在 bean 作用域的章节中进行讨论。|
+|-|-|
+|constructor-arg|	它是用来注入依赖关系的，并会在接下来的章节中进行讨论。|
+|-|-|
+|properties	| 它是用来注入依赖关系的，并会在接下来的章节中进行讨论。|
+|-|-|
+|autowiring mode	| 它是用来注入依赖关系的，并会在接下来的章节中进行讨论。|
+|-|-|
+|lazy-initialization mode	| 延迟初始化的 bean 告诉 IoC 容器在它第一次被请求时，而不是在启动时去创建一个 bean 实例。|
+|-|-|
+|initialization 方法	|在 bean 的所有必需的属性被容器设置之后，调用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
+|-|-|
+|destruction 方法	| 当包含该 bean 的容器被销毁时，使用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
+
+## Bean作用域
+**scope属性**
+
+|作用域 |	描述|
+|-|-|
+|singleton	|
+在spring IoC容器仅存在一个Bean实例，Bean以单例方式存在，默认值。每次需要时（getBean）都返回同一个bean实例。|
+|-|-|
+|prototype	| 每次从容器中调用Bean时，都返回一个新的实例，即每次调用getBean()时，相当于执行newXxxBean()|
+|-|-|
+|request	| 每次HTTP请求都会创建一个新的Bean，该作用域仅适用于WebApplicationContext环境|
+|-|-|
+|session	| 同一个HTTP Session共享一个Bean，不同Session使用不同的Bean，仅适用于WebApplicationContext环境|
+|-|-|
+|global-session	| 一般用于Portlet应用环境，该运用域仅适用于WebApplicationContext环境|
+
+*singleton*
+
+Singleton是单例类型，就是在创建起容器时就同时自动创建了一个bean的对象，不管你是否使用，他都存在了，每次获取到的对象都是同一个对象。注意，Singleton作用域是Spring中的缺省作用域。
+
+```xml
+<!-- A bean definition with singleton scope -->
+<bean id="..." class="..." scope="singleton">
+    <!-- collaborators and configuration for this bean go here -->
+</bean>
+```
+
+*prototype*
+
+Prototype是原型类型，它在我们创建容器的时候并没有实例化，而是当我们获取bean的时候才会去创建一个对象，而且我们每次获取到的对象都不是同一个对象。
+
+## Bean生命周期
+当一个 bean 被实例化时，它可能需要执行一些初始化使它转换成可用状态。同样，当 bean 不再需要，并且从容器中移除时，可能需要做一些清除工作。
+
+为了定义安装和拆卸一个 bean，我们只要声明带有 init-method 和/或 destroy-method 参数的 。init-method 属性指定一个方法，在实例化 bean 时，立即调用该方法。同样，destroy-method 指定一个方法，只有从容器中移除 bean 之后，才能调用该方法。
+
+**单独设置初始化和销毁方法**
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Beans.xml 用于给不同的 bean 分配唯一的 ID ，并且控制不同值的对象的创建，而不会影响 Spring 的任何源文件。-->
+<!-- 例如，使用下面的文件，你可以为 “message” 变量传递任何值，因此你就可以输出信息的不同值，而不会影响的 HelloWorld.java和MainApp.java 文件。 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+<!--scope="prototype"--><!--scope Bean作用域-->
+<!--init-method="init"--><!--bean实例化时调用的方法-->
+<!--destroy-method="destroy"--><!--容器移除bean时调用的方法-->
+   <bean id="helloWorld" class="com.neyzoter.test.Helloworld" 
+   	init-method="init" destroy-method="destroy"> 
+       <property name="message" value="Hello World!"/>
+   </bean>
+
+</beans>
+```
+
+**默认的初始化和销毁方法**
+
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+    default-init-method="init" 
+    default-destroy-method="destroy">
+
+   <bean id="..." class="...">
+       <!-- collaborators and configuration for this bean go here -->
+   </bean>
+
+</beans>
+```
+
+AbstractApplicationContext 类中声明的关闭 hook 的 registerShutdownHook() 方法
+
+```Java
+package com.neyzoter.test;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+public class MainApp {
+   public static void main(String[] args) {
+      AbstractApplicationContext context = new ClassPathXmlApplicationContext("Beans.xml");
+      HelloWorld obj = (HelloWorld) context.getBean("helloWorld");
+      obj.getMessage();
+      context.registerShutdownHook();
+   }
+}
+```
+
+```Java
+package com.neyzoter.test;
+
+public class HelloWorld {
+   private String message;
+
+   public void setMessage(String message){
+      this.message  = message;
+   }
+   public void getMessage(){
+      System.out.println("Your Message : " + message);
+   }
+   public void init(){
+      System.out.println("Bean is going through init.");
+   }
+   public void destroy(){
+      System.out.println("Bean will destroy now.");
+   }
+}
+```
+
+## Bean后置处理器
+BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供自己的实例化逻辑，依赖解析逻辑等。你也可以在 Spring 容器通过插入一个或多个 BeanPostProcessor 的实现来完成实例化，配置和初始化一个bean之后实现一些自定义逻辑回调方法。
+
+可以在bean初始化前，自动调用postProcessBeforeInitialization；初始化后自动调用postProcessAfterInitialization。
+
+## Bean定义继承
+bean 定义可以包含很多的配置信息，包括构造函数的参数，属性值，容器的具体信息例如初始化方法，静态工厂方法名，等等。
+
+子 bean 的定义继承父定义的配置数据。子定义可以根据需要重写一些值，或者添加其他值。
+
+Spring Bean 定义的继承与 Java 类的继承无关，但是继承的概念是一样的。你可以定义一个父 bean 的定义作为模板和其他子 bean 就可以从父 bean 中继承所需的配置。
+
+当你使用基于 XML 的配置元数据时，通过使用父属性，指定父 bean 作为该属性的值来表明子 bean 的定义。
+
+```xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <bean id="helloWorld" class="com.tutorialspoint.HelloWorld">
+      <property name="message1" value="Hello World!"/>
+      <property name="message2" value="Hello Second World!"/>
+   </bean>
+
+   <bean id="helloIndia" class="com.tutorialspoint.HelloIndia" parent="helloWorld">
+      <property name="message1" value="Hello India!"/>
+      <property name="message3" value="Namaste India!"/>
+   </bean>
+
+</beans>
+```
+
+```Java
+package com.tutorialspoint;
+public class HelloWorld {
+   private String message1;
+   private String message2;
+   public void setMessage1(String message){
+      this.message1  = message;
+   }
+   public void setMessage2(String message){
+      this.message2  = message;
+   }
+   public void getMessage1(){
+      System.out.println("World Message1 : " + message1);
+   }
+   public void getMessage2(){
+      System.out.println("World Message2 : " + message2);
+   }
+}
+```
+
+```Java
+package com.tutorialspoint;
+
+public class HelloIndia {
+   private String message1;
+   private String message2;
+   private String message3;
+
+   public void setMessage1(String message){
+      this.message1  = message;
+   }
+
+   public void setMessage2(String message){
+      this.message2  = message;
+   }
+
+   public void setMessage3(String message){
+      this.message3  = message;
+   }
+
+   public void getMessage1(){
+      System.out.println("India Message1 : " + message1);
+   }
+
+   public void getMessage2(){
+      System.out.println("India Message2 : " + message2);
+   }
+
+   public void getMessage3(){
+      System.out.println("India Message3 : " + message3);
+   }
+}
+```
+
+```Java
+package com.tutorialspoint;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = new ClassPathXmlApplicationContext("Beans.xml");
+
+      HelloWorld objA = (HelloWorld) context.getBean("helloWorld");
+
+      objA.getMessage1();
+      objA.getMessage2();
+
+      HelloIndia objB = (HelloIndia) context.getBean("helloIndia");
+      objB.getMessage1();
+      objB.getMessage2();
+      objB.getMessage3();
+   }
+}
+```
+
+>World Message1 : Hello World!
+World Message2 : Hello Second World!
+India Message1 : Hello India!
+India Message2 : Hello Second World!
+India Message3 : Namaste India!
+
+**Bean定义模板**
+
+创建一个 Bean 定义模板，不需要花太多功夫它就可以被其他子 bean 定义使用。在定义一个 Bean 定义模板时，你不应该指定类的属性，而应该指定带 true 值的抽象属性
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<!-- 父 bean 自身不能被实例化，因为它是不完整的，而且它也被明确地标记为抽象的。当一个定义是抽象的，它仅仅作为一个纯粹的模板 bean 定义来使用的，充当子定义的父定义使用。 -->
+   <bean id="beanTeamplate" abstract="true">
+      <property name="message1" value="Hello World!"/>
+      <property name="message2" value="Hello Second World!"/>
+      <property name="message3" value="Namaste India!"/>
+   </bean>
+
+   <bean id="helloIndia" class="com.tutorialspoint.HelloIndia" parent="beanTeamplate">
+      <property name="message1" value="Hello India!"/>
+      <property name="message3" value="Namaste India!"/>
+   </bean>
+
+</beans>
+```
