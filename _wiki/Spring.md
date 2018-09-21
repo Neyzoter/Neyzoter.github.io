@@ -36,7 +36,7 @@ keywords: Spring, Java
 ## 面向方面的程序设计（AOP）
 一个程序中跨越多个点的功能被称为横切关注点，这些横切关注点在概念上独立于应用程序的业务逻辑。有各种各样常见的很好的关于方面的例子，比如日志记录、声明性事务、安全性，和缓存等等。
 # 体系结构
-<img src="/images/wiki/Spring/SpringArch.jpg" width="600" alt="Spring体系结构" />
+<img src="/images/wiki/Spring/SpringArch.png" width="600" alt="Spring体系结构" />
 
 ## 核心容器
 **spring-core**模块提供了框架的基本组成部分，包括 IoC 和依赖注入功能。
@@ -97,7 +97,7 @@ Spring IoC 容器利用 Java 的 POJO 类和配置元数据来生成完全配置
 
 它是最简单的容器，给 DI 提供了基本的支持，它用 org.springframework.beans.factory.BeanFactory 接口来定义。
 
-```Java
+```java
 XmlBeanFactory beanFac = new XmlBeanFactory (new ClassPathResource("Beans.xml"));
 Helloworld objBeanFac = (Helloworld) beanFac.getBean("helloWorld");//获得所需的 bean，对应bean的id
 objBeanFac.getMessage();
@@ -108,7 +108,7 @@ objBeanFac.getMessage();
 
 ApplicationContext 容器包括 BeanFactory 容器的所有功能
 
-```Java
+```java
 //    	ApplicationContext appContext = new FileSystemXmlApplicationContext ("E:/SoftwareCodes/Java/Spring_Test/test/src/main/java/Beans.xml");//创建应用程序的上下文
         ApplicationContext appContext = new ClassPathXmlApplicationContext("Beans.xml");//创建应用程序的上下文
         Helloworld objAppContext = (Helloworld) appContext.getBean("helloWorld");
@@ -141,8 +141,7 @@ ApplicationContext 容器包括 BeanFactory 容器的所有功能
 
 |作用域 |	描述|
 |-|-|
-|singleton	|
-在spring IoC容器仅存在一个Bean实例，Bean以单例方式存在，默认值。每次需要时（getBean）都返回同一个bean实例。|
+|singleton|在spring IoC容器仅存在一个Bean实例，Bean以单例方式存在，默认值。每次需要时（getBean）都返回同一个bean实例。|
 |-|-|
 |prototype	| 每次从容器中调用Bean时，都返回一个新的实例，即每次调用getBean()时，相当于执行newXxxBean()|
 |-|-|
@@ -212,7 +211,7 @@ Prototype是原型类型，它在我们创建容器的时候并没有实例化�
 
 AbstractApplicationContext 类中声明的关闭 hook 的 registerShutdownHook() 方法
 
-```Java
+```java
 package com.neyzoter.test;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -226,7 +225,7 @@ public class MainApp {
 }
 ```
 
-```Java
+```java
 package com.neyzoter.test;
 
 public class HelloWorld {
@@ -283,7 +282,7 @@ Spring Bean 定义的继承与 Java 类的继承无关，但是继承的概念�
 </beans>
 ```
 
-```Java
+```java
 package com.tutorialspoint;
 public class HelloWorld {
    private String message1;
@@ -303,7 +302,7 @@ public class HelloWorld {
 }
 ```
 
-```Java
+```java
 package com.tutorialspoint;
 
 public class HelloIndia {
@@ -337,7 +336,7 @@ public class HelloIndia {
 }
 ```
 
-```Java
+```java
 package com.tutorialspoint;
 
 import org.springframework.context.ApplicationContext;
