@@ -625,7 +625,7 @@ mongorestore -h <hostname><:port> -d dbname <path>
 
 MongoDB所在服务器地址，默认为： localhost:27017
 
-**\-\-db , \-d **：
+**\-\-db,\-d**：
 
 需要恢复的数据库实例，例如：test，当然这个名称也可以和备份时候的不一样，比如test2
 
@@ -633,7 +633,7 @@ MongoDB所在服务器地址，默认为： localhost:27017
 
 恢复的时候，先删除当前数据，然后恢复备份的数据。就是说，恢复后，备份后添加修改的数据都会被删除，慎用哦！
 
-**path**：
+**\<path\>**：
 
 mongorestore 最后的一个参数，设置备份数据所在位置，例如：c:\data\dump\test。
 
