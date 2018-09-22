@@ -90,7 +90,7 @@ eg.  Site site = new Site("Runoob");
 ### 1.1.3 常量
 final修饰，声明后无法更改。
 
-```Java
+```java
 final double PI = 3.1415926
 ```
 
@@ -98,7 +98,7 @@ final double PI = 3.1415926
 
 eg.   
 
-```Java
+```java
 char a = '\u0001'; // 16进制Unicode字符
 String a = "\u0001";
 ```
@@ -146,7 +146,7 @@ String a = "\u0001";
 
 如果一个类包含抽象方法，那么一定要声明为抽象类。
 
-```Java
+```java
 public abstract class Caravan{
   private double price;
   private String model;
@@ -192,7 +192,7 @@ class C extends Caravan{
 ### 1.3.3 synchronized修饰符
 synchronized关键字声明的方法同一时间只能被**同一个线程**访问。
 
-```
+```java
 public synchronized void showDetails(){
 
 }
@@ -222,7 +222,7 @@ public synchronized void showDetails(){
 
 检查对象是否是一个特定类型（类类型和接口类型）
 
-```Java
+```java
 String name = "James";
 boolean result = name instanceof String;//检查name是否时String类型
 ```
@@ -240,7 +240,7 @@ boolean result = name instanceof String;//检查name是否时String类型
 
 主要用于数组遍历。
 
-```Java
+```java
 String names[] = {"James","Larry","Tom","Lacy"};
 for(String name:names)[
   System.out.print("name");
@@ -275,7 +275,7 @@ equals()：判断number对象是否与参数相等。
 
 valueOf()：返回一个Number对象指定的内置数据类型。
 
-```
+```java
 Integer X = Integer.valueOf(9);
 
 Integer a = Integer.valueOf("444",16);//使用16进制,返回1092( = 0x444)
@@ -356,7 +356,7 @@ Math.random()：返回随机数0.0到1.0
 ## 1.8 数组
 * 创建
 
-```
+```java
 dataType[] arrayRefVar;//首选方法
 dataType arrayRefVar[];//效果相同，但不是首选方法
 
@@ -365,19 +365,19 @@ dataType[] arrayRefVar = new dataType[arraySize];//第一步，使用dataType[ar
 
 * foreach循环
 
-```
+```java
 for(dataType element : arrayRefVar){}
 ```
 
 * 多维数组
 
-```
+```java
 int a[][] = new int[2][3];
 ```
 
 多维数组的动态初始化
 
-```
+```java
 String s[][] = new String[2][];
 s[0] = new String[2];//这里确定每一行的元素个数
 s[1] = new String[3];
@@ -404,7 +404,7 @@ sort(Object[] a)：升序排列。
 
 ### 1.9.1 Date时间创建
 
-```Java
+```java
 Date(int year,int month,int date);//以int型表示年月日
 
 Date(int year,int month,int date,int hour,int min);
@@ -417,7 +417,7 @@ Date(int year,int month,int date,int hour,int min,int sec);
 
 * get时间
 
-```Java
+```java
 //格林尼治时间
 Date(long date);//date:距离格林尼治标准时间1970年1月1日0时0分0秒的毫秒数
 
@@ -449,7 +449,7 @@ S：毫秒。
 
 * 解析字符串
 
-```Java
+```java
 
 import java.util.*;
 import java.text.*;
@@ -477,7 +477,7 @@ public class DateDemo {
 
 ### 1.9.3 休眠sleep
 
-```Java
+```java
 import java.util.*;
   
 public class SleepDemo {
@@ -495,7 +495,7 @@ public class SleepDemo {
 
 ### 1.9.4 测量时间
 
-```Java
+```java
 import java.util.*;
   
 public class DiffDemo {
@@ -539,7 +539,7 @@ Matcher对象是对输入字符串进行解释和匹配操作的引擎。没有�
 
 使用方法：
 
-```Java
+```java
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
  
@@ -575,7 +575,7 @@ public class RegexMatches
 
 ## 1.11 可变参数
 
-```Java
+```java
 public static void printMax(double... numbers){  //可输入多个参数
   if(numbers.length == 0){   
     System.out.println("No argument passed");
@@ -596,7 +596,7 @@ public static void printMax(double... numbers){  //可输入多个参数
 ## 1.12 finalize()方法
 清除回收对象。
 
-```Java
+```java
 public class FinalizationDemo {
   public static void main(String[] args) {
     Cake c1 = new Cake(1);
@@ -627,7 +627,7 @@ class Cake extends Object {
 **BufferReader**
 为获得一个绑定到控制台的字符流，将System.in包装在一个BufferedReader对象中来创建一个字符流。
 
-```Java
+```java
 BufferReader br = new BufferReader(new InputStreamReader(System.in));
 ```
 
@@ -635,7 +635,7 @@ BufferReader br = new BufferReader(new InputStreamReader(System.in));
 
 * 读取字符
 
-```Java
+```java
 import java.io.*;
  
 public class BRRead {
@@ -672,7 +672,7 @@ q
 
 * 读字符串
 
-```Java
+```java
 //使用 BufferedReader 在控制台读取字符
 import java.io.*;
  
@@ -709,7 +709,7 @@ hasNext()和hasNextLine()来判断是否还有输入数据
 
 next()和nextLine()方法获取输入的字符串。
 
-```
+```java
 Scanner s = new Scanner(System.in);
 ```
 
@@ -729,7 +729,7 @@ Scanner s = new Scanner(System.in);
 
 先hasNextXxx()方法进行验证，在使用nextXxx()来读取（Xxx表示Int或者Float）。
 
-```Java
+```java
 import java.util.Scanner;
  
 class ScannerDemo {
@@ -768,7 +768,7 @@ end
 
 输入的时候字符都是可见的，所以Scanner类不适合从控制台读取密码。从Java SE 6开始特别引入了Console类来实现这个目的。若要读取一个密码，可以采用下面这段代码:
 
-```Java
+```java
 Console cons = System.console();
 String username = cons.readline("User name: ");
 char[] passwd = cons.readPassword("Password: ");
@@ -778,7 +778,7 @@ char[] passwd = cons.readPassword("Password: ");
 
 该流从文件读取数据，可以用new来创建。
 
-```Java
+```java
 FileInputStream f = new FileInputStream("C:/java/hello");
 或者
 File file = new File("C:/java/hello");//使用文件对象来创建一个输入流对象
@@ -816,7 +816,7 @@ public class fileStreamTest {
 
 ```
 
-```
+```java
 import java.io.*;
  
 public class fileStreamTest2 {
@@ -954,7 +954,7 @@ public Throwable fillInStackTrace()     用当前的调用栈层次填充Throwab
 
 实例：
 
-```Java
+```java
 import java.io.*;
 public class ExcepTest{
  
@@ -972,7 +972,7 @@ public class ExcepTest{
 
 多重捕获块：
 
-```Java
+```java
 try{
    // 程序代码
 }catch(异常类型1 异常的变量名1){   //如果异常，先抛给这个。如果不匹配，则抛给下一个。
@@ -992,7 +992,7 @@ try{
 
 区别：throws表示一个方法声明可能抛出一个异常，throw表示此处抛出一个自定义的异常（可以自定义，需要继承Exception，也可以是java自身给出的异常类）
 
-```
+```java
 import java.io.*;
 public class className
 {
@@ -1010,7 +1010,7 @@ public class className
 finally代码块中，可以运行清理类型等收尾善后性质的语句。
 
 * 使用案例
-```Java
+```java
 try{
   // 程序代码
 }catch(异常类型1 异常的变量名1){
@@ -1028,7 +1028,7 @@ try{
 
  **catch 块中有退出系统的语句 System.exit(-1); finally就不会被执行**
 
-```Java
+```java
 
 try{
    //待捕获代码    
@@ -1051,7 +1051,7 @@ try{
 
 CheckingAccount类中包含一个withdraw方法抛出一个insufficientFundsException
 
-```Java
+```java
 // 文件名称 CheckingAccount.java
 import java.io.*;
  
@@ -1097,7 +1097,7 @@ public class CheckingAccount
 }
 ```
 
-```Java
+```java
 //文件名称 BankDemo.java
 public class BankDemo
 {
@@ -1125,7 +1125,7 @@ public class BankDemo
 
 * 实用案例
 
-```Java
+```java
 /**
  * 异常:
  * finally不一定被执行，，例如 catch 块中有退出系统的语句 System.exit(-1); finally就不会被执行
@@ -1174,7 +1174,7 @@ public class Demo {
 
 ## 1.X 注释
 
-```
+```java
 /**
 * Copyright (C), 2006-2010, ChengDu Lovo info. Co., Ltd.
 * FileName: Test.java
@@ -1186,7 +1186,7 @@ public class Demo {
 */
 ```
 
-```
+```java
 /**
 * 类方法的详细使用说明
 *
@@ -1196,7 +1196,7 @@ public class Demo {
 */
 ```
 
-```
+```java
 /**
 * 构造方法的详细使用说明
 *
@@ -1211,7 +1211,7 @@ public class Demo {
 
 使用：
 
-```Java
+```java
 //公共父类
 public class Animal { 
     private String name;  
@@ -1232,7 +1232,7 @@ public class Animal {
 }
 ```
 
-```Java
+```java
 //企鹅类
 public class Penguin extends Animal {   //extends继承
     public Penguin(String myName, int myid) { 
@@ -1249,7 +1249,7 @@ public class Penguin extends Animal {   //extends继承
 ### 2.2.2 implements关键字
 implements关键字可以变相使java具有多继承的特性，适用范围为类继承接口的情况，可以同时继承多个接口。
 
-```Java
+```java
 public interface A {
     public void eat();
     public void sleep();
@@ -1268,12 +1268,12 @@ public class C implements A,B {
 
 在继承中，final修饰的class（类）不能被继承,同时类内的方法自动声明为final，但是类内的实例变量不是final。
 
-```Java
+```java
 //final声明类名
 final class 类名{}
 ```
 
-```Java
+```java
 //final声明方法
 修饰符(public/private/default/protected) final 返回值类型 方法名(){}
 ```
@@ -1294,7 +1294,7 @@ final修饰类：类不可以被继承。
 
 如果没有参数并且子类的构造函数没有显式调用父类的含参构造方法，在编译的时候，会自动给子类的第一个语句放上super()。
 
-```Java
+```java
 
 class SuperClass {
   private int n;
@@ -1340,14 +1340,14 @@ java文件被编译成class文件时，在子类的所有构造函数中的第�
 ## 2.4 Java转型问题
 1、父类引用指向子类对象，而子类引用不能指向父类对象。
 
-```
+```java
 Father f1 = new Son();//向上转型，父类引用可以指向子类对象
 Son s1 = (Son)f1;//向下转型，f1指向子类对象，s1指向f1即指向子类对象
 ```
 
 但是f1不能调用Son中Father没有的方法。
 
-```Java
+```java
 Father f2 = new Father();
 Son s2 = (Son)f2;//错误，子类引用不能指向父类对象，
 ```
@@ -1406,7 +1406,7 @@ Son s2 = (Son)f2;//错误，子类引用不能指向父类对象，
 同一个行为具有多个不同表现形式或者形态的能力。
 
 下面使用instanceof实现了识别不通的类，进行不同的操作（多态）。
-```Java
+```java
 public class Test {
     public static void main(String[] args) {
       show(new Cat());  // 以 Cat 对象调用 show 方法
@@ -1531,7 +1531,7 @@ package pkg1[.pkg2[.pkg3...]]
 
 创建一个目录，包放置其中，并用"package 目录名"来声明。
 
-```Java
+```java
 /* 文件名: Animal.java */
 //如果一个源文件中没有使用包声明，则其中的类、函数、枚举、注释等将放在一个无名的包中
 package animals;  //包声明应该在源文件的第一行，每个源文件只能包含一个包声明
@@ -1544,7 +1544,7 @@ interface Animal {
 
 * import导入包
 
-```Java
+```java
 import pkg1[.pkg2..].(classname|\*);
 ```
 
@@ -1565,7 +1565,7 @@ import pkg1[.pkg2..].(classname|\*);
 |-|-|
 |Object nextElement( )|如果此枚举对象至少还有一个可提供的元素，则返回此枚举的下一个元素。|
 
-```Java
+```java
 import java.util.Vector;
 import java.util.Enumeration;
  
@@ -1592,7 +1592,7 @@ public class EnumerationTester {
 ### 3.1.2 位集合(BitSet)
 位集合类实现了一组可以单独设置和清除的位和标志。
 
-```Java
+```java
 import java.util.BitSet;
  
 public class BitSetDemo {
@@ -1649,7 +1649,7 @@ bits2 XOR bits1:   // bits2 = {0, 2, 4, 6, 8, 10, 12, 14}
 ```
 
 ### 3.1.3 向量(Vector)
-```Java
+```java
 Vector();//建立一个默认的向量，长度10
 Vector(int size);//指定大小
 Vector(int size,int incr);//指定大小，并增量用incr指定
@@ -1662,7 +1662,7 @@ Vector(Collection c);//创建一个包含集合c元素的向量
 
 方法
 
-```
+```java
 Stack();//  创建一个默认的栈
 boolean empty();//测试栈是否为空
 Object peek( );//查看栈顶，但不弹出
@@ -1682,7 +1682,7 @@ int search(Object element);//返回对象在堆栈中的位置，以 1 为基数
 
 map已经代替了字典dictionary。
 
-```Java
+```java
 import java.util.*;
 
 public class CollectionsDemo {
@@ -1748,7 +1748,7 @@ Hashtable也存储键/值对。
 
 * 构造方法
 
-```Java
+```java
 Hashtable();
 Hashtable(int size );
 Hashtable(int size,float fillRatio);//通过fillRatio指定填充比例，介于0.0至1.0之间，决定了哈希表在重新调整大小之前的充满程度
@@ -1757,7 +1757,7 @@ Hashtable(Map m);//构建一个以m中元素为初始化元素的哈希表，哈
 
 **Hashtable包括Map接口中定义的方法**，还定义了：
 
-```Java
+```java
 void clear( )
  将此哈希表清空，使其不包含任何键。
 Object clone( )
@@ -1793,13 +1793,13 @@ String toString( )
 
 * 构造函数
 
-```Java
+```java
 Properties();
 Properties(Properties propDefault);//使用propDefault作为默认值
 
 ```
 
-```Java
+```java
 String getProperty(String key)
  用指定的键在此属性列表中搜索属性。
 String getProperty(String key, String defaultProperty)
@@ -1820,7 +1820,7 @@ void store(OutputStream streamOut, String description)
 
 实例：
 
-```Java
+```java
 import java.util.*;
  
 public class PropDemo {
@@ -1972,7 +1972,7 @@ IdentityHashMap
 
 * 迭代器使用
 
-```Java
+```java
 import java.util.*;
  
 public class Test{
@@ -2021,7 +2021,7 @@ public class Test{
 下面案例，将int、float和char类型泛化，这样就不会出现写三个函数的问题。System.out.printf( "%s ", element )三者都可以输出，而E[] inputArray也可以是以上三种类型。
 
 
-```Java
+```java
 public class GenericMethodTest
 {
    // 泛型方法 printArray                         
@@ -2069,7 +2069,7 @@ H E L L O
 
 **"extends"如何使用在一般意义上的意思"extends"（类）或者"implements"（接口）**
 
-```Java
+```java
 public class MaximumTest
 {
    // 比较三个值并返回最大值
@@ -2111,7 +2111,7 @@ pear, apple 和 orange 中最大的数为 pear
 ### 3.2.2 泛型方法
 
 
-```
+```java
 public class Box<T> {
    
   private T t;
@@ -2142,7 +2142,7 @@ public class Box<T> {
 
 1、案例1
 
-```Java
+```java
 import java.util.*;
  
 public class GenericTest {
@@ -2181,7 +2181,7 @@ data :314
 
 类型通配符上限通过形如List来定义，如此定义就是通配符泛型值接受Number及其下层子类类型。
 
-```Java
+```java
 import java.util.*;
  
 public class GenericTest {
@@ -2229,7 +2229,7 @@ public class GenericTest {
 
 ObjectOutputStream 类包含很多写方法来写各种数据类型，但是一个特别的方法例外：
 
-```Java
+```java
 public final void writeObject(Object x) throws IOException;//序列化一个对象，并将它发送到输出流。
 public final Object readObject() throws IOException, ClassNotFoundException;//从流中取出下一个对象，并将对象反序列化。
 
@@ -2246,7 +2246,7 @@ Java标准类是否可序列化，可查看该类的文档。确定该类有没�
 
 
 
-```Java
+```java
 //首先定义一个要序列化的对象
 public class Employee implements java.io.Serializable
 {
@@ -2263,7 +2263,7 @@ public class Employee implements java.io.Serializable
 ```
 
 
-```Java
+```java
 
 //序列化
 import java.io.*;
@@ -2296,7 +2296,7 @@ public class SerializeDemo
 
 ### 3.3.2 反序列化对象
 
-```Java
+```java
 //反序列化
 import java.io.*;
  
@@ -2363,25 +2363,25 @@ Java 线程的优先级是一个整数，其取值范围是 1 （Thread.MIN_PRIO
 
 构造方法有多个
 
-```Java
+```java
 Thread(Runnable threadOb,String threadName);
 ```
 
 一个类只需要执行一个方法调用 run()
 
-```Java
+```java
 public void run()
 ```
 
 新线程创建之后，你调用它的 start() 方法它才会运行。
 
-```Java
+```java
 void start();
 ```
 
 实例：
 
-```Java
+```java
 class RunnableDemo implements Runnable {
    private Thread t;
    private String threadName;
@@ -2431,7 +2431,7 @@ public class TestThread {
 
 本质上Tread是实现了接口Runnable的实例。
 
-```Java
+```java
 class ThreadDemo extends Thread {
    private Thread t;
    private String threadName;
@@ -2529,7 +2529,7 @@ Thread类的静态fangfa
 
 4. 调用 FutureTask 对象的 get() 方法来获得子线程执行结束后的返回值。
 
-```Java
+```java
 public class CallableThreadTest implements Callable<Integer> {
     public static void main(String[] args)  
     {  
@@ -2595,7 +2595,7 @@ public class CallableThreadTest implements Callable<Integer> {
 
 4、关闭线程池
 
-```Java
+```java
 //Test.java
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -2617,7 +2617,7 @@ public class Test {
 }
 ```
 
-```Java
+```java
 public class TaskRunnable implements Runnable{
     @Override
     public void run() {
@@ -2748,7 +2748,7 @@ java.net.Socket 类代表客户端和服务器都用来互相沟通的套接字�
 
 ## 4.3 实例
 
-```Java
+```java
 //客户端
 // 文件名 GreetingClient.java
  
@@ -2782,7 +2782,7 @@ public class GreetingClient
 }
 ```
 
-```Java
+```java
 //服务器
 // 文件名 GreetingServer.java
  
@@ -2979,7 +2979,7 @@ CPU从主内存中读数据的效率相对来说不高，现在主流的计算�
 
 顺序性指的是，程序执行的顺序按照代码的先后顺序执行。
 
-```Java
+```java
 boolean started = false; // 语句1
 long counter = 0L; // 语句2
 counter = 1; // 语句3
@@ -2998,7 +2998,7 @@ started = true; // 语句4
 
 常用的保证Java操作原子性的工具是锁和同步方法（或者同步代码块）。使用锁，可以保证同一时间只有一个线程能拿到锁，也就保证了同一时间只有一个线程能执行申请锁和释放锁之间的代码。
 
-```Java
+```java
 public void testLock () {
   lock.lock();
   try{
@@ -3013,7 +3013,7 @@ public void testLock () {
 **同步**
 与锁类似的是同步方法或者同步代码块。使用非静态同步方法时，锁住的是当前实例；使用静态同步方法时，锁住的是该类的Class对象；使用静态代码块时，锁住的是synchronized关键字后面括号内的对象。
 
-```Java
+```java
 public void testLock () {
   synchronized (anyObject){
     int j = i;
@@ -3028,7 +3028,7 @@ public void testLock () {
 
 原子操作补充：所谓原子操作是指不会被线程调度机制打断的操作；这种操作一旦开始，就一直运行到结束，中间不会有任何 context switch （切换到另一个线程）。
 
-```Java
+```java
 AtomicInteger atomicInteger = new AtomicInteger();
 for(int b = 0; b < numThreads; b++) {
   new Thread(() -> {
