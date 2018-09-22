@@ -6,11 +6,6 @@ description: Markdown 常用语法示例。
 keywords: Markdown
 ---
 
-**目录**
-
-* TOC
-{:toc}
-
 ### 超链接
 
 ```
@@ -147,233 +142,233 @@ This is a text with footnote[^1].
 
 |language	| key|
 |-|-|
-|1C|	1c|
+|1C |	1c|
 |-|-|
-|ActionScript|	actionscript|
+|ActionScript |	actionscript|
 |-|-|
-|Apache|	apache|
+|Apache |	apache|
 |-|-|
-|AppleScript|	applescript|
+|AppleScript  |	applescript|
 |-|-|
-|AsciiDoc|	asciidoc|
+|AsciiDoc |	asciidoc|
 |-|-|
-|AspectJ|	asciidoc|
+|AspectJ |	asciidoc|
 |-|-|
-|AutoHotkey|	autohotkey|
+|AutoHotkey |	autohotkey|
 |-|-|
-|AVR Assembler|	avrasm|
+|AVR Assembler |	avrasm|
 |-|-|
-|Axapta	|axapta|
+|Axapta	| axapta|
 |-|-|
-|Bash	|bash|
+|Bash	| bash|
 |-|-|
-|BrainFuck|	brainfuck|
+|BrainFuck |	brainfuck|
 |-|-|
-|Cap’n Proto	|capnproto|
+|Cap’n Proto	| capnproto|
 |-|-|
-|Clojure REPL|	clojure|
+|Clojure REPL |	clojure|
 |-|-|
-|Clojure	|clojure|
+|Clojure	| clojure|
 |-|-|
-|CMake	|cmake|
+|CMake	| cmake|
 |-|-|
-|CoffeeScript|	coffeescript|
+|CoffeeScript |	coffeescript|
 |-|-|
-|C++|	cpp|
+|C++ |	cpp|
 |-|-|
-|C#|	cs|
+|C# |	cs|
 |-|-|
-|CSS|	css|
+|CSS |	css|
 |-|-|
-|D	|d|
+|D	| d|
 |-|-|
-|Dart|	d|
+|Dart |	d|
 |-|-|
-|Delphi|	delphi|
+|Delphi |	delphi|
 |-|-|
-|Diff	|diff|
+|Diff	| diff|
 |-|-|
-|Django|	django|
+|Django |	django|
 |-|-|
-|DOS.bat|	dos|
+|DOS.bat |	dos|
 |-|-|
-|Dust	|dust|
+|Dust	| dust|
 |-|-|
-|Elixir|	elixir|
+|Elixir |	elixir|
 |-|-|
-|ERB(Embedded Ruby)|	erb|
+|ERB(Embedded Ruby) |	erb|
 |-|-|
-|Erlang REPL	|erlang-repl|
+|Erlang REPL	| erlang-repl|
 |-|-|
-|Erlang	|erlang|
+|Erlang	| erlang|
 |-|-|
-|FIX|	fix|
+|FIX |	fix|
 |-|-|
-|F#|	fsharp|
+|F# |	fsharp|
 |-|-|
-|G-code(ISO 6983)|	gcode|
+|G-code(ISO 6983) |	gcode|
 |-|-|
-|Gherkin	|gherkin|
+|Gherkin	| gherkin|
 |-|-|
-|GLSL	|glsl|
+|GLSL	| glsl|
 |-|-|
-|Go|	go|
+|Go |	go|
 |-|-|
-|Gradle	|gradle|
+|Gradle	| gradle|
 |-|-|
-|Groovy|	groovy|
+|Groovy |	groovy|
 |-|-|
-|Haml|	haml|
+|Haml |	haml|
 |-|-|
-|Handlebars	|handlebars|
+|Handlebars	| handlebars|
 |-|-|
-|Haskell|	haskell|
+|Haskell |	haskell|
 |-|-|
-|Haxe	|haxe|
+|Haxe	| haxe|
 |-|-|
-|HTML	|html|
+|HTML	| html|
 |-|-|
-|HTTP	|http|
+|HTTP	| http|
 |-|-|
-|Ini file|	ini|
+|Ini file |	ini|
 |-|-|
-|Java	|java|
+|Java	| java|
 |-|-|
-|JavaScript|	javascript|
+|JavaScript |	javascript|
 |-|-|
-|JSON	|json|
+|JSON	| json|
+|-|-| 
+|Lasso	| lasso|
 |-|-|
-|Lasso	|lasso|
+|Less |	less|
 |-|-|
-|Less|	less|
+|Lisp |	lisp|
 |-|-|
-|Lisp|	lisp|
+|LiveCode |	livecodeserver|
 |-|-|
-|LiveCode|	livecodeserver|
+|LiveScript	| livescript|
 |-|-|
-|LiveScript	|livescript|
+|Lua	| lua|
 |-|-|
-|Lua	|lua|
+|Makefile	| makefile|
 |-|-|
-|Makefile	|makefile|
+|Markdown |	markdown|
 |-|-|
-|Markdown|	markdown|
+|Mathematica	| mathematica|
 |-|-|
-|Mathematica	|mathematica|
+|Matlab	| matlab|
 |-|-|
-|Matlab	|matlab|
+|MEL (Maya Embedded Language) |	mel|
 |-|-|
-|MEL (Maya Embedded Language)|	mel|
+|Mercury	| mercury|
 |-|-|
-|Mercury	|mercury|
+|Mizar |	mizar|
 |-|-|
-|Mizar|	mizar|
+|Monkey |	monkey|
 |-|-|
-|Monkey|	monkey|
+|Nginx |	nginx|
 |-|-|
-|Nginx|	nginx|
+|Nimrod |	nimrod|
 |-|-|
-|Nimrod|	nimrod|
+|Nix	| nix|
 |-|-|
-|Nix	|nix|
+|NSIS	| nsis|
 |-|-|
-|NSIS	|nsis|
+|Objective C |	objectivec|
 |-|-|
-|Objective C|	objectivec|
+|OCaml	| ocaml|
 |-|-|
-|OCaml	|ocaml|
+|Oxygene |	oxygene|
 |-|-|
-|Oxygene|	oxygene|
+|Parser 3 |	parser3|
 |-|-|
-|Parser 3|	parser3|
+|Perl |	perl|
 |-|-|
-|Perl|	perl|
+|PHP |	php|
 |-|-|
-|PHP|	php|
+|PowerShell |	powershell|
 |-|-|
-|PowerShell|	powershell|
+|Processing	| processing|
 |-|-|
-|Processing	|processing|
+|Python’s profiler output |	profile|
 |-|-|
-|Python’s profiler output|	profile|
+|Protocol Buffers |	protobuf|
 |-|-|
-|Protocol Buffers|	protobuf|
+|Puppet	| puppet|
 |-|-|
-|Puppet	|puppet|
+|Python	| python|
 |-|-|
-|Python	|python|
+|Q |	q|
 |-|-|
-|Q|	q|
+|R |	r|
 |-|-|
-|R|	r|
+|RenderMan RIB |	rib|
 |-|-|
-|RenderMan RIB|	rib|
+|Roboconf |	roboconf|
 |-|-|
-|Roboconf|	roboconf|
+|RenderMan RSL |	rsl|
 |-|-|
-|RenderMan RSL|	rsl|
+|Ruby	| ruby|
 |-|-|
-|Ruby	|ruby|
+|Oracle Rules Language |	ruleslanguage|
 |-|-|
-|Oracle Rules Language|	ruleslanguage|
+|Rust	| rust|
 |-|-|
-|Rust	|rust|
+|Scala |	scala|
 |-|-|
-|Scala|	scala|
+|Scheme	| scheme|
 |-|-|
-|Scheme	|scheme|
+|Scilab	| scilab|
 |-|-|
-|Scilab	|scilab|
+|SCSS	| scss|
 |-|-|
-|SCSS	|scss|
+|Smali	| smali|
 |-|-|
-|Smali	|smali|
+|SmallTalk |	smalltalk|
 |-|-|
-|SmallTalk|	smalltalk|
+|SML |	sml|
 |-|-|
-|SML|	sml|
+|SQL	| sql|
 |-|-|
-|SQL	|sql|
+|Stata	| stata|
 |-|-|
-|Stata	|stata|
+|STEP Part21(ISO 10303-21) |	step21|
 |-|-|
-|STEP Part21(ISO 10303-21)|	step21|
+|Stylus |	stylus|
 |-|-|
-|Stylus|	stylus|
+|Swift	| swift|
 |-|-|
-|Swift	|swift|
+|Tcl	| tcl|
 |-|-|
-|Tcl	|tcl|
+|Tex |	tex|
 |-|-|
-|Tex|	tex|
+|text	| text/plain|
 |-|-|
-|text	|text/plain|
+|Thrift	| thrift|
 |-|-|
-|Thrift	thrift|
+|Twig	| twig|
 |-|-|
-|Twig	|twig|
+|TypeScript	| typescript|
 |-|-|
-|TypeScript	|typescript|
+|Vala	| vala|
 |-|-|
-|Vala	|vala|
+|VB.NET	| vbnet|
 |-|-|
-|VB.NET	|vbnet|
+|VBScript in HTML	| vbscript-html|
 |-|-|
-|VBScript in HTML	|vbscript-html|
+|VBScript |	vbscript|
 |-|-|
-|VBScript|	vbscript|
+|Verilog	| verilog|
 |-|-|
-|Verilog	|verilog|
+|VHDL |	vhdl|
 |-|-|
-|VHDL|	vhdl|
+|Vim Script |	vim|
 |-|-|
-Vim Script	vim
+|Intel x86 Assembly |	x86asm|
 |-|-|
-|Intel x86 Assembly|	x86asm|
+|XL	| xl|
 |-|-|
-|XL	|xl|
+|XML |	xml|
 |-|-|
-|XML|	xml|
-|-|-|
-|YAML	|yml|
+|YAML	| yml|
 
