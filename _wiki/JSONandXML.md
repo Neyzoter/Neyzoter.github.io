@@ -19,7 +19,7 @@ JavaScript 程序能够使用内建的 eval() 函数，用 JSON 数据来生成�
 ## 1.2 第一个代码
 NB-IoT的设备描述文件：
 
-```JSON
+```json
 {
     "devices": [
         {
@@ -75,7 +75,7 @@ JSON的数据书写格式：名称/值对
 
 4、中括号保存数组（可以包含多个对象）
 
-```JSON
+```json
 { "site":["name":"菜鸟教程" , "url":"www.runoob.com"] }
 ```
 
@@ -87,13 +87,13 @@ JSON的数据书写格式：名称/值对
 ### 1.3.3 JSON使用JSP语法
 访问
 
-```
+```json
 site[0].name;
 ```
 
 修改数据
 
-```
+```json
 site[0].name="菜鸟";
 ```
 
@@ -113,7 +113,7 @@ key 和 value 中使用冒号分割。
 
 方法1：用.来访问
 
-```
+```json
 var myObj, x;
 myObj = { "name":"runoob", "alexa":10000, "site":null };
 x = myObj.name;
@@ -121,7 +121,7 @@ x = myObj.name;
 
 方法2：用[]访问
 
-```
+```json
 var myObj, x;
 myObj = { "name":"runoob", "alexa":10000, "site":null };
 x = myObj["name"];
@@ -137,7 +137,7 @@ alexa
 
 site
 
-```
+```json
 var myObj = { "name":"runoob", "alexa":10000, "site":null };
 for (x in myObj) {
     document.getElementById("demo").innerHTML += x + "<br>";
@@ -146,7 +146,7 @@ for (x in myObj) {
 
 用for-in来循环对象的属性，用[]访问
 
-```
+```json
 var myObj = { "name":"runoob", "alexa":10000, "site":null };
 for (x in myObj) {
     document.getElementById("demo").innerHTML += myObj[x] + "<br>";
@@ -155,7 +155,7 @@ for (x in myObj) {
 ```
 
 ### 1.4.4 嵌套JSON对象
-```
+```json
 
 myObj = {
     "name":"runoob",
@@ -170,7 +170,7 @@ myObj = {
 
 用.或者[]访问
 
-```
+```json
 x = myObj.sites.site1;
 // 或者
 x = myObj.sites["site1"];
@@ -179,7 +179,7 @@ x = myObj.sites["site1"];
 ### 1.4.5 删除对象
 关键字delete删除
 
-```
+```json
 delete myObj.sites.site1;
 //或者
 delete myObj.sites["site1"];
@@ -190,7 +190,7 @@ delete myObj.sites["site1"];
 JSON 数组在中括号中书写。
 
 JSON 中数组值必须是合法的 JSON 数据类型（字符串, 数字, 对象, 数组, 布尔值或 null）。
-```
+```json
 {
 "name":"网站",
 "num":3,
@@ -201,7 +201,7 @@ JSON 中数组值必须是合法的 JSON 数据类型（字符串, 数字, 对�
 ### 1.5.2 循环数组
 for-in循环数组，并用[]索引
 
-```
+```json
 for (i in myObj.sites) {
     x += myObj.sites[i] + "<br>";
 }
@@ -210,7 +210,7 @@ for (i in myObj.sites) {
 ### 1.5.3 删除数组元素
 关键字delete删除数组元素
 
-```
+```json
 delete myObj.sites[1];
 ```
 
