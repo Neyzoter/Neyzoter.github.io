@@ -126,18 +126,6 @@ print 'Hello, World!'
 
 * [目录](#目录)
 
-### Emoji
-
-:camel:
-:blush:
-:smile:
-
-### Footnotes
-
-This is a text with footnote[^1].
-
-[^1]: Here is the footnote 1 definition.
-
 ### 代码高亮
 
 |language	| key|
@@ -371,4 +359,18 @@ This is a text with footnote[^1].
 |XML |	xml|
 |-|-|
 |YAML	| yml|
+
+### Emoji
+
+:camel:
+:blush:
+:smile:
+
+### Footnotes
+
+This is a text with footnote[^1].
+
+[^1]: Here is the footnote 1 definition.
+
+
 
