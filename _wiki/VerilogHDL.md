@@ -27,7 +27,7 @@ keywords: FPGA,Verilog HDL
 
 ## 2.2 特殊情况
 
-```Verilog
+```verilog
 //过程1
 always@(posedge clk or negedge rst_n)
 	begin
@@ -39,7 +39,7 @@ always@(posedge clk or negedge rst_n)
 
 ```
 
-```Verilog
+```verilog
 //过程2
 always@(posedge clk or negedge rst_n)
 	begin
@@ -73,14 +73,14 @@ always@(posedge clk or negedge rst_n)
 
 比如乘法器很耗费资源。
 
-```Verilog HDL
+```verilog
 //需要两个乘法器
 assign square=(data_in[7])? (data_bar*data_bar) : (data_in*data_in);
 ```
 
 可代替为
 
-```Verilog HDL
+```verilog
 //需要一个乘法器
 assign data_tmp = (data_in[7])? (~data_in + 1) : data_in;
 assign square = data_tmp * data_tmp;
