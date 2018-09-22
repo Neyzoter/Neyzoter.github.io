@@ -35,6 +35,19 @@ keywords: Spring, Java
 
 ## 面向方面的程序设计（AOP）
 一个程序中跨越多个点的功能被称为横切关注点，这些横切关注点在概念上独立于应用程序的业务逻辑。有各种各样常见的很好的关于方面的例子，比如日志记录、声明性事务、安全性，和缓存等等。
+
+## IOC和AOP
+
+IOC：控制反转，是一种设计模式。一层含义是控制权的转移：由传统的在程序中控制依赖转移到由容器来控制；第二层是依赖注入：将相互依赖的对象分离，在spring配置文件中描述他们的依赖关系。他们的依赖关系只在使用的时候才建立。简单来说就是不需要NEW一个对象了。
+
+AOP：面向切面，是一种编程思想，OOP的延续。将系统中非核心的业务提取出来，进行单独处理。比如事务、日志和安全等。这个简单来说就是可以在一段程序之前或者之后做一些事。
+
+Spring 的AOP和IOC都是为了解决系统代码耦合度过高的问题。使代码重用度高、易于维护。
+
+不过AOP和IOC并不是spring中特有的，只是spring把他们应用的更灵活方便
+
+<img src="/images/wiki/Spring/AOPStructure.gif" width="800" alt="AOPStructure" />
+
 # 体系结构
 <img src="/images/wiki/Spring/SpringArch.png" width="600" alt="Spring体系结构" />
 
@@ -454,12 +467,14 @@ public class MainApp {
    }
 }
 ```
-
->World Message1 : Hello World!
+```
+输出
+World Message1 : Hello World!
 World Message2 : Hello Second World!
 India Message1 : Hello India!
 India Message2 : Hello Second World!
 India Message3 : Namaste India!
+```
 
 **Bean定义模板**
 
@@ -911,7 +926,11 @@ public class JavaCollection {
 
 ```
 @Required 
-@
+@Qualifier
+@Autowired
+@PostConstruct 
+@PreDestroy
+@Resource
 ```
 
 ## @Required
@@ -1067,7 +1086,9 @@ public class Profile {
 
 为了定义一个 bean 的安装和卸载，我们使用 init-method 和/或 destroy-method 参数简单的声明一下 。init-method 属性指定了一个方法，该方法在 bean 的实例化阶段会立即被调用。同样地，destroy-method 指定了一个方法，该方法只在一个 bean 从容器中删除之前被调用。
 
- @PostConstruct 注释作为初始化回调函数的一个替代，@PreDestroy 注释作为销毁回调函数的一个替代
+ @PostConstruct 注释作为初始化回调函数的一个替代;@PreDestroy 注释作为销毁回调函数的一个替代 ; @Resource 注释使用一个 ‘name’ 属性，该属性以一个 bean 名称的形式被注入。
+
+*@PostConstruct和@PreDestroy*
 
 ```java
 package com.tutorialspoint;
@@ -1081,11 +1102,11 @@ public class HelloWorld {
       System.out.println("Your Message : " + message);
       return message;
    }
-   @PostConstruct
+   @PostConstruct   //注释作为初始化回调函数的一个替代
    public void init(){
       System.out.println("Bean is going through init.");
    }
-   @PreDestroy
+   @PreDestroy    //注释作为销毁回调函数
    public void destroy(){
       System.out.println("Bean will destroy now.");
    }
@@ -1114,5 +1135,431 @@ public class HelloWorld {
 </beans>
 ```
 
+*@ Resource*
+
+```
+package com.tutorialspoint;
+import javax.annotation.Resource;
+public class TextEditor {
+   private SpellChecker spellChecker;
+   @Resource(name= "spellChecker")
+   public void setSpellChecker( SpellChecker spellChecker ){
+      this.spellChecker = spellChecker;
+   }
+   public SpellChecker getSpellChecker(){
+      return spellChecker;
+   }
+   public void spellCheck(){
+      spellChecker.checkSpelling();
+   }
+}
+```
+
+## 基于Java的配置
+
+```java
+package com.tutorialspoint;
+import org.springframework.context.annotation.*;
+@Configuration
+public class HelloWorldConfig {
+   @Bean 
+   public HelloWorld helloWorld(){
+      return new HelloWorld();
+   }
+}
+```
+
+```java
+package com.tutorialspoint;
+
+public class HelloWorld {
+   private String message;
+
+   public void setMessage(String message){
+      this.message  = message;
+   }
+
+   public void getMessage(){
+      System.out.println("Your Message : " + message);
+   }
+}
+```
+
+**不需要xml配置文件**
+
+一旦定义了配置类，你就可以使用 AnnotationConfigApplicationContext 来加载并把他们提供给 Spring 容器
+
+```java
+public static void main(String[] args) {
+   ApplicationContext ctx = 
+   new AnnotationConfigApplicationContext(HelloWorldConfig.class); 
+   HelloWorld helloWorld = ctx.getBean(HelloWorld.class);
+   helloWorld.setMessage("Hello World!");
+   helloWorld.getMessage();
+}
+```
+
+## bean事件处理
+ApplicationContext负责管理 beans 的完整生命周期。当加载 beans 时，ApplicationContext 发布某些类型的事件。
+
+例如，当上下文启动时，ContextStartedEvent 发布，当上下文停止时，ContextStoppedEvent 发布。
+
+context的类型为ConfigurableApplicationContext 。
+
+|序号 |	Spring 内置事件 & 描述|
+|-|-|
+|1	|**ContextRefreshedEvent**ApplicationContext 被初始化或刷新时，该事件被发布。这也可以在 ConfigurableApplicationContext 接口中使用 refresh() 方法来发生。|
+|-|-|
+|2	|**ContextStartedEvent**当使用 ConfigurableApplicationContext 接口中的 start() 方法启动 ApplicationContext 时，该事件被发布。你可以调查你的数据库，或者你可以在接受到这个事件后重启任何停止的应用程序。|
+|-|-|
+|3	|**ContextStoppedEvent**当使用 ConfigurableApplicationContext 接口中的 stop() 方法停止 ApplicationContext 时，发布这个事件。你可以在接受到这个事件后做必要的清理的工作。|
+|-|-|
+|4	| **ContextClosedEvent**当使用 ConfigurableApplicationContext 接口中的 close() 方法关闭 ApplicationContext 时，该事件被发布。一个已关闭的上下文到达生命周期末端；它不能被刷新或重启。|
+|-|-|
+|5	|**RequestHandledEvent**这是一个 web-specific 事件，告诉所有 bean HTTP 请求已经被服务。|
+
+```java
+package com.tutorialspoint;
+public class HelloWorld {
+   private String message;
+   public void setMessage(String message){
+      this.message  = message;
+   }
+   public void getMessage(){
+      System.out.println("Your Message : " + message);
+   }
+}
+```
+
+```java
+//CStartEventHandler.java
+package com.tutorialspoint;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextStartedEvent;
+public class CStartEventHandler 
+   implements ApplicationListener<ContextStartedEvent>{
+   public void onApplicationEvent(ContextStartedEvent event) {
+      System.out.println("ContextStartedEvent Received");
+   }
+}
+```
+
+```java
+//CStopEventHandler.java
+package com.tutorialspoint;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextStoppedEvent;
+public class CStopEventHandler 
+   implements ApplicationListener<ContextStoppedEvent>{
+   public void onApplicationEvent(ContextStoppedEvent event) {
+      System.out.println("ContextStoppedEvent Received");
+   }
+}
+```
+
+```java
+
+package com.tutorialspoint;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class MainApp {
+   public static void main(String[] args) {
+      ConfigurableApplicationContext context =   //contex类型为ConfigurableApplicationContext，需要start
+      new ClassPathXmlApplicationContext("Beans.xml");
+
+      // Let us raise a start event.
+      context.start();
+
+      HelloWorld obj = (HelloWorld) context.getBean("helloWorld");
+
+      obj.getMessage();
+
+      // Let us raise a stop event.
+      context.stop();
+   }
+}
+```
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <bean id="helloWorld" class="com.tutorialspoint.HelloWorld">
+      <property name="message" value="Hello World!"/>
+   </bean>
+
+   <bean id="cStartEventHandler" 
+         class="com.tutorialspoint.CStartEventHandler"/>
+
+   <bean id="cStopEventHandler" 
+         class="com.tutorialspoint.CStopEventHandler"/>
+
+</beans>
+```
+
+# AOP
+面向方面的编程(Aspect Oriented Programming,AOP)框架
+
+面向方面的编程需要把程序逻辑分解成不同的部分称为所谓的关注点。*跨一个应用程序的多个点的功能被称为横切关注点*，这些横切关注点在概念上独立于应用程序的业务逻辑。有各种各样的常见的很好的方面的例子，如日志记录、审计、声明式事务、安全性和缓存等。
+
+在 OOP 中，关键单元模块度是类，而在 AOP 中单元模块度是方面。
+
+依赖注入帮助你对应用程序对象相互解耦和 AOP 可以帮助你从它们所影响的对象中对横切关注点解耦。
+
+## 术语和通知类型
+
+|项	| 描述|
+|-|-|
+|Aspect|	一个模块具有一组提供横切需求的 APIs。例如，一个日志模块为了记录日志将被 AOP 方面调用。应用程序可以拥有任意数量的方面，这取决于需求。|
+|-|-|
+|Join point	|在你的应用程序中它代表一个点，你可以在插件 AOP 方面。你也能说，它是在实际的应用程序中，其中一个操作将使用 Spring AOP 框架。|
+|-|-|
+|Advice	|这是实际行动之前或之后执行的方法。这是在程序执行期间通过 Spring AOP 框架实际被调用的代码。|
+|-|-|
+|Pointcut	|这是一组一个或多个连接点，通知应该被执行。你可以使用表达式或模式指定切入点正如我们将在 AOP 的例子中看到的。|
+|-|-|
+|Introduction	|引用允许你添加新方法或属性到现有的类中。|
+|-|-|
+|Target object	|被一个或者多个方面所通知的对象，这个对象永远是一个被代理对象。也称为被通知对象。|
+|-|-|
+|Weaving	|Weaving 把方面连接到其它的应用程序类型或者对象上，并创建一个被通知的对象。这些可以在编译时，类加载时和运行时完成。|
+
+|通知	|描述|
+|-|-|
+|前置通知	|在一个方法执行之前，执行通知。|
+|-|-|
+|后置通知	|在一个方法执行之后，不考虑其结果，执行通知。|
+|-|-|
+|返回后通知	|在一个方法执行之后，只有在方法成功完成时，才能执行通知。|
+|-|-|
+|抛出异常后通知	|在一个方法执行之后，只有在方法退出抛出异常时，才能执行通知。|
+|-|-|
+|环绕通知	|在建议方法调用之前和之后，执行通知。|
+
+## 基于AOP的XML框架
+**导入spring-aop 框架**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+    http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd ">
+
+   <!-- bean definition & AOP specific configuration -->
+
+</beans>
+```
 
 
+**声明一个aspect**
+
+```xml
+<aop:config>
+   <aop:aspect id="myAspect" ref="aBean">
+   ...
+   </aop:aspect>
+</aop:config>
+<bean id="aBean" class="...">
+...
+</bean>
+```
+
+**声明一个切入点**
+
+指定某一些使用AOP的方法
+
+```xml
+<aop:config>
+   <aop:aspect id="myAspect" ref="aBean">
+   <aop:pointcut id="businessService"  <!-- 一组或者多个连接点 -->
+      expression="execution(* com.xyz.myapp.service.*.*(..))"/>
+   ...
+   </aop:aspect>
+</aop:config>
+<bean id="aBean" class="...">
+...
+</bean>
+```
+
+**声明建议**
+
+使用 \<aop:{ADVICE NAME}\> 元素在一个 中声明五个建议（也就是前置通知、后置通知……的处理函数）中的任何一个
+
+```
+<aop:config>
+   <aop:aspect id="myAspect" ref="aBean">
+      <aop:pointcut id="businessService"
+         expression="execution(* com.xyz.myapp.service.*.*(..))"/>
+      <!-- a before advice definition -->
+      <aop:before pointcut-ref="businessService" 
+         method="doRequiredTask"/>
+      <!-- an after advice definition -->
+      <aop:after pointcut-ref="businessService" 
+         method="doRequiredTask"/>
+      <!-- an after-returning advice definition -->
+      <!--The doRequiredTask method must have parameter named retVal -->
+      <aop:after-returning pointcut-ref="businessService"
+         returning="retVal"
+         method="doRequiredTask"/>
+      <!-- an after-throwing advice definition -->
+      <!--The doRequiredTask method must have parameter named ex -->
+      <aop:after-throwing pointcut-ref="businessService"
+         throwing="ex"
+         method="doRequiredTask"/>
+      <!-- an around advice definition -->
+      <aop:around pointcut-ref="businessService" 
+         method="doRequiredTask"/>
+   ...
+   </aop:aspect>
+</aop:config>
+<bean id="aBean" class="...">
+...
+</bean>
+```
+
+**基于AOP的XML架构示例——AOP实现日志**
+
+```java
+//Loggin.java 日志输出文件
+package com.tutorialspoint;
+public class Logging {
+   /** 
+    * This is the method which I would like to execute
+    * before a selected method execution.
+    */
+   public void beforeAdvice(){
+      System.out.println("Going to setup student profile.");
+   }
+   /** 
+    * This is the method which I would like to execute
+    * after a selected method execution.
+    */
+   public void afterAdvice(){
+      System.out.println("Student profile has been setup.");
+   }
+   /** 
+    * This is the method which I would like to execute
+    * when any method returns.
+    */
+   public void afterReturningAdvice(Object retVal){
+      System.out.println("Returning:" + retVal.toString() );
+   }
+   /**
+    * This is the method which I would like to execute
+    * if there is an exception raised.
+    */
+   public void AfterThrowingAdvice(IllegalArgumentException ex){
+      System.out.println("There has been an exception: " + ex.toString());   
+   }  
+}
+```
+
+```java
+//Student.java
+package com.tutorialspoint;
+public class Student {
+   private Integer age;
+   private String name;
+   public void setAge(Integer age) {
+      this.age = age;
+   }
+   public Integer getAge() {
+      System.out.println("Age : " + age );
+      return age;
+   }
+   public void setName(String name) {
+      this.name = name;
+   }
+   public String getName() {
+      System.out.println("Name : " + name );
+      return name;
+   }  
+   public void printThrowException(){
+       System.out.println("Exception raised");
+       throw new IllegalArgumentException();
+   }
+}
+```
+
+```java
+//MainApp.java
+package com.tutorialspoint;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = 
+             new ClassPathXmlApplicationContext("Beans.xml");
+      Student student = (Student) context.getBean("student");
+      student.getName();
+      student.getAge();      
+      student.printThrowException();
+   }
+}
+```
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+    http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd ">
+
+   <aop:config>
+      <aop:aspect id="log" ref="logging">
+         <aop:pointcut id="selectAll" 
+         expression="execution(* com.tutorialspoint.*.*(..))"/>
+         <aop:before pointcut-ref="selectAll" method="beforeAdvice"/>
+         <aop:after pointcut-ref="selectAll" method="afterAdvice"/>
+         <aop:after-returning pointcut-ref="selectAll" 
+                              returning="retVal"
+                              method="afterReturningAdvice"/>
+         <aop:after-throwing pointcut-ref="selectAll" 
+                             throwing="ex"
+                             method="AfterThrowingAdvice"/>
+      </aop:aspect>
+   </aop:config>
+
+   <!-- Definition for student bean -->
+   <bean id="student" class="com.tutorialspoint.Student">
+      <property name="name"  value="Zara" />
+      <property name="age"  value="11"/>      
+   </bean>
+
+   <!-- Definition for logging aspect -->
+   <bean id="logging" class="com.tutorialspoint.Logging"/> 
+
+</beans>
+```
+
+```
+输出
+Going to setup student profile.    备注：beforeAdvice
+Name : Zara       备注：由getName输出
+Student profile has been setup.
+Returning:Zara    备注：由afterReturningAdvice输出（getName返回了name）
+Going to setup student profile.
+Age : 11          备注：由getAge输出
+Student profile has been setup.
+Returning:11      备注：由afterReturningAdvice输出（getAge返回了age）
+Going to setup student profile.
+Exception raised
+Student profile has been setup.
+There has been an exception: java.lang.IllegalArgumentException
+.....
+other exception content
+
+```
