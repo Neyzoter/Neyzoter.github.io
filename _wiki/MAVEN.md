@@ -29,6 +29,7 @@ mvn install:install-file -Dfile=jar包的位置(参数一) -DgroupId=groupId(参
 
 eg.
 
+
 ```
 mvn install:install-file -Dfile="/home/songchaochao/Dev/repository/mongo-java-drive-3.8.1.jar" -DgroupId=org.mongodb -DartifactId=mongo-java-drive -Dversion=3.8.1 -Dpackaging=jar
 ```
@@ -47,7 +48,7 @@ maven安装包的setting.xml中加入
 
 如果本地没有的话，也可以通过这个pom.xml中的语句来安装jar包。
 
-```
+```xml
 <dependencies>
     <dependency>
         <groupId>org.mongodb</groupId>
@@ -64,7 +65,7 @@ maven安装包的setting.xml中加入
 
 setting.xml中添加
 
-```
+```xml
 <profile>    
     <id>jdk-1.8</id>    
      <activation>    
@@ -92,7 +93,7 @@ mvn clean compile
 
 在pom.xml中加入jar的信息
 
-```
+```xml
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -114,13 +115,13 @@ mvn clean compile
 
 生成jar（target目录中），但是这个包只能被引用，不能运行。这个jar没有带有main方法的类信息。
 
-```
+```xml
 mvn clean package  
 ```
 
 如果想要运行还需要在pom.xml中配置maven-shade-plugin，添加main方法的类信息。
 
-```
+```xml
   <build>
   <plugins>
   <plugin>  
