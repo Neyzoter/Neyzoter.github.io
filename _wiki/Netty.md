@@ -18,7 +18,7 @@ Netty 内部使用回调处理事件时。一旦这样的回调被触发，事�
 
 当建立一个连接时，调用channelActive方法。
 
-```Java
+```java
 public class ConnectHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {   //1
@@ -36,7 +36,7 @@ ChannelFuture 提供多个附件方法来允许一个或者多个 ChannelFutureL
 
 每个 Netty 的 outbound I/O 操作都会返回一个 ChannelFuture;这样就不会阻塞。这就是 Netty 所谓的“自底向上的异步和事件驱动”。
 
-```Java
+```java
 Channel channel = ...;
 //不会阻塞
 ChannelFuture future = channel.connect(
@@ -45,7 +45,7 @@ ChannelFuture future = channel.connect(
 ```
 
 
-```Java
+```java
 Channel channel = ...;
 //不会阻塞
 ChannelFuture future = channel.connect(            //1
@@ -199,7 +199,7 @@ I/O 线程一定不能完全阻塞，因此禁止任何直接阻塞操作在你�
 
 下面是阻塞IO
 
-```Java
+```java
 public class NettyOioServer {
 
     public void server(int port) throws Exception {
@@ -250,7 +250,7 @@ public class NettyOioServer {
 
 下面是非阻塞IO
 
-```Java
+```java
 public class NettyOioServer {
 
     public void server(int port) throws Exception {
@@ -323,7 +323,7 @@ public class NettyOioServer {
 
 通过Channel写数据到远程已连接客户端
 
-```Java
+```java
 Channel channel = ...; // 获取channel的引用
 ByteBuf buf = Unpooled.copiedBuffer("your data", CharsetUtil.UTF_8);            //1
 ChannelFuture cf = channel.writeAndFlush(buf); //2
@@ -354,7 +354,7 @@ cf.addListener(new ChannelFutureListener() {    //3
 
 Channel 是线程安全(thread-safe)的，它可以被多个不同的线程安全的操作，在多线程环境下，所有的方法都是安全的。
 
-```Java
+```java
 final Channel channel = ...; // 获取channel的引用
 final ByteBuf buf = Unpooled.copiedBuffer("your data",
         CharsetUtil.UTF_8).retain();    //1
@@ -497,7 +497,7 @@ Bytebuf的分配见   [1.4.5 Bytebuf分配](### 1.4.5 Bytebuf分配)
 
 最常用的模式是 ByteBuf 将数据存储在 JVM 的堆空间。通过 ByteBuf.array() 来获取 byte[]数据。 
 
-```Java
+```java
 ByteBuf heapBuf = ...;
 if (heapBuf.hasArray()) {                //1
     byte[] array = heapBuf.array();        //2
@@ -529,7 +529,7 @@ if (heapBuf.hasArray()) {                //1
 
 如果要将数据传递给遗留代码处理，因为数据不是在堆上，可能不得不作出一个副本。如下：
 
-```Java
+```java
 ByteBuf directBuf = ...    //这是一个存放在物理内存直接缓存区的Bytebuf
 if (!directBuf.hasArray()) {            //1
     int length = directBuf.readableBytes();//2
@@ -580,7 +580,7 @@ Netty 提供了 ByteBuf 的子类 CompositeByteBuf 类来处理复合缓冲区�
 
 实现：
 
-```Java
+```java
 CompositeByteBuf messageBuf = ...;   //这是一个复合缓存区
 ByteBuf headerBuf = ...; // 可以支持或直接
 ByteBuf bodyBuf = ...; // 可以支持或直接
@@ -601,7 +601,7 @@ for (int i = 0; i < messageBuf.numComponents(); i++) {                        //
 
 下面时处理数据：
 
-```Java
+```java
 CompositeByteBuf compBuf = ...;
 int length = compBuf.readableBytes();    //1
 byte[] array = new byte[length];        //2
@@ -652,7 +652,7 @@ bytebuf.forEachByte(ByteBufProcessor.FIND_CR)：找到"\r"
 
 若需要操作某段数据，使用 slice(int, int)
 
-```Java
+```java
 Charset utf8 = Charset.forName("UTF-8");
 ByteBuf buf = Unpooled.copiedBuffer("Netty in Action rocks!", utf8); //1
 
@@ -712,7 +712,7 @@ read()/write() 操作从给定的索引开始，与字节访问的数量来适�
 |-|-|
 |setShort(int, int) |  在指定的索引位置设置 short 值|
 
-```Java
+```java
 Charset utf8 = Charset.forName("UTF-8");
 ByteBuf buf = Unpooled.copiedBuffer("Netty in Action rocks!", utf8);    //1创建一个新的 ByteBuf 给指定 String 保存字节
 System.out.println((char)buf.getByte(0));                    //2
@@ -759,7 +759,7 @@ assert writerIndex ==  buf.writerIndex();
 |-|-|
 |writeBytes(int，...） |　Transfers the bytes on the current writerIndex from given resources.|
 
-```Java
+```java
 Charset utf8 = Charset.forName("UTF-8");
 ByteBuf buf = Unpooled.copiedBuffer("Netty in Action rocks!", utf8);    //1
 System.out.println((char)buf.readByte());                    //2
@@ -822,7 +822,7 @@ Netty 默认使用 PooledByteBufAllocator，我们可以通过 ChannelConfig 或
 |-|-|
 |ioBuffer() | Return a ByteBuf that will be used for I/O operations on a socket.|
 
-```Java
+```java
 Channel channel = ...;
 ByteBufAllocator allocator = channel.alloc(); //1从 channel 获得 ByteBufAllocator
 ....
@@ -859,7 +859,7 @@ hexDump() 方法，这个方法返回指定 ByteBuf 中可读字节的十六进�
 ### 1.4.6 Netty引用计数器
 在Netty 4中为 ByteBuf 和 ByteBufHolder（两者都实现了 ReferenceCounted 接口）引入了引用计数器。
 
-```Java
+```java
 Channel channel = ...;
 ByteBufAllocator allocator = channel.alloc(); //1从 channel 获取 ByteBufAllocator
 ....
@@ -871,7 +871,7 @@ assert buffer.refCnt() == 1; //3检查引用计数器是否是 1
 
 
 
-```Java
+```java
 ByteBuf buffer = ...;
 boolean released = buffer.release(); //1  release（）将会递减对象引用的数目。当这个引用计数达到0时，对象已被释放，并且该方法返回 true。
 ...
@@ -941,7 +941,7 @@ OutOfMemoryError) or can resume writes when the Channel becomes writable again.C
 
 ChannelInboundHandler 实现覆盖了 channelRead() 方法处理进来的数据用来响应释放资源。Netty 在 ByteBuf 上使用了资源池，所以当执行释放资源时可以减少内存的消耗。
 
-```Java
+```java
 @ChannelHandler.Sharable
 public class DiscardHandler extends ChannelInboundHandlerAdapter {        //1扩展 ChannelInboundHandlerAdapter
 
@@ -956,7 +956,7 @@ public class DiscardHandler extends ChannelInboundHandlerAdapter {        //1扩
 
 由于手工管理资源会很繁琐,您可以通过使用 SimpleChannelInboundHandler 简化问题。
 
-```Java
+```java
 @ChannelHandler.Sharable
 public class SimpleDiscardHandler extends SimpleChannelInboundHandler<Object> {  //1扩展 SimpleChannelInboundHandler
 
@@ -1018,7 +1018,7 @@ Netty 使用引用计数器来处理池化的 ByteBuf。所以当 ByteBuf 完全
 
 修改检测等级的方法：
 
-```Java
+```java
 # java -Dio.netty.leakDetectionLevel=paranoid //我们就能在 ChannelInboundHandler.channelRead(...) 和 ChannelOutboundHandler.write(...) 避免泄漏。
 ```
 
@@ -1026,7 +1026,7 @@ Netty 使用引用计数器来处理池化的 ByteBuf。所以当 ByteBuf 完全
 处理 channelRead(...) 操作，并在消费消息(不是通过 ChannelHandlerContext.fireChannelRead(...) 来传递它到下个 ChannelInboundHandler) 时，要释放它。如下：
 
 
-```Java
+```java
 @ChannelHandler.Sharable
 public class DiscardInboundHandler extends ChannelInboundHandlerAdapter {  //1
 
@@ -1041,7 +1041,7 @@ public class DiscardInboundHandler extends ChannelInboundHandlerAdapter {  //1
 
 当你在处理写操作，并丢弃消息时，你需要释放它。如下。
 
-```Java
+```java
 @ChannelHandler.Sharable 
 public class DiscardOutboundHandler extends ChannelOutboundHandlerAdapter { //1
 @Override
@@ -1076,7 +1076,7 @@ public void write(ChannelHandlerContext ctx,
 |-|-|
 |Replace | 在 ChannelPipeline 替换另外一个 ChannelHandler|
 
-```Java
+```java
 ChannelPipeline pipeline = null; // get reference to pipeline;
 FirstHandler firstHandler = new FirstHandler(); //1
 pipeline.addLast("handler1", firstHandler); //2
@@ -1212,7 +1212,7 @@ ChannelHandlerContext 中包含了有许多方法，其中一些方法也出现�
 
 从 ChannelHandlerContext 获取到 Channel 的引用，通过调用 Channel 上的 write() 方法来触发一个 写事件到通过管道的的流中。如下code1。
 
-```Java
+```java
 //code1
 ChannelHandlerContext ctx = context;
 Channel channel = ctx.channel();  //1得到与 ChannelHandlerContext 关联的 Channel 的引用
@@ -1222,7 +1222,7 @@ channel.write(Unpooled.copiedBuffer("Netty in Action",
 
  从 ChannelHandlerContext 获取到 ChannelPipeline。如下。
 
-```Java
+```java
 //code2
 ChannelHandlerContext ctx = context;
 ChannelPipeline pipeline = ctx.pipeline(); //1得到与 ChannelHandlerContext 关联的 ChannelPipeline 的引用
@@ -1242,7 +1242,7 @@ pipeline.write(Unpooled.copiedBuffer("Netty in Action", CharsetUtil.UTF_8));  //
 
 **实现绕过ChannelPipeline前面的ChannelHandler，直接进入后面的ChannelHandler**
 
-```Java
+```java
 ChannelHandlerContext ctx = context;   //可以通过ChannelPipeline接口的context()获取特定ChannelHandler的context，也可以在handlerAdded()进入的时候保存
 ctx.write(Unpooled.copiedBuffer("Netty in Action",CharsetUtil.UTF_8));
 ```
@@ -1257,7 +1257,7 @@ ctx.write(Unpooled.copiedBuffer("Netty in Action",CharsetUtil.UTF_8));
 
 3、经过最后一个ChannelHandler后，事件从 ChannelPipeline 移除
 
-```Java
+```java
 public class WriteHandler extends ChannelHandlerAdapter {
 
     private ChannelHandlerContext ctx;
@@ -1277,7 +1277,7 @@ public class WriteHandler extends ChannelHandlerAdapter {
 
 **因为 ChannelHandler 可以属于多个 ChannelPipeline ,它可以绑定多个 ChannelHandlerContext 实例。**然而,ChannelHandler 用于这种用法必须添加 @Sharable 注解。否则,试图将它添加到多个 ChannelPipeline 将引发一个异常。此外,它必须既是线程安全的又能安全地使用多个同时的通道(比如,连接)。下面的SharableHandler并不持有任何状态（对比下面）。
 
-```Java
+```java
 
 @ChannelHandler.Sharable            //1添加 @Sharable 注解
 public class SharableHandler extends ChannelInboundHandlerAdapter {
@@ -1293,7 +1293,7 @@ public class SharableHandler extends ChannelInboundHandlerAdapter {
 
 下面代码的问题是它持有状态:一个实例变量保持了方法调用的计数。将这个类的一个实例添加到 ChannelPipeline 并发访问通道时很可能产生错误。(当然,这个简单的例子中可以通过在 channelRead() 上添加 synchronized 来纠正 )
 
-```Java
+```java
 @ChannelHandler.Sharable  //1
 public class NotSharableHandler extends ChannelInboundHandlerAdapter {
     private int count;
@@ -1327,7 +1327,7 @@ echo服务器需要：
 
 1、handler
 
-```Java
+```java
 @Sharable                                        //@Sharable 标识这类的实例之间可以在 channel 里面共享
 public class EchoServerHandler extends
         ChannelInboundHandlerAdapter {
@@ -1369,7 +1369,7 @@ ChannelHandler 是给不同类型的事件调用
 
 配置 Channel 来通知一个关于入站消息的 EchoServerHandler 实例
 
-```Java
+```java
 public class EchoServer {
 
     private final int port;
@@ -1438,7 +1438,7 @@ echo服务器包括handler处理和引导服务器
 
 ## 2.2 echo客户端
 
-```Java
+```java
 @Sharable                                //1
 public class EchoClientHandler extends
         SimpleChannelInboundHandler<ByteBuf> {
@@ -1471,7 +1471,7 @@ channelRead0()：这种方法会在接收到数据时被调用。注意，由服
 
 何时用这两个要看具体业务的需要。在客户端，当 channelRead0() 完成，我们已经拿到的入站的信息。**当方法返回时，SimpleChannelInboundHandler 会小心的释放对 ByteBuf（保存信息） 的引用**(在channelRead0()中，不需要程序员自行调用释放资源的函数)。而在 EchoServerHandler,我们需要将入站的信息返回给发送者，由于 write() 是异步的，在 channelRead() 返回时，可能还没有完成。所以，我们使用 ChannelInboundHandlerAdapter,无需释放信息。最后在 channelReadComplete() 我们调用 ctxWriteAndFlush() 来释放信息。
 
-```Java
+```java
 public class EchoClient {
 
     private final String host;
