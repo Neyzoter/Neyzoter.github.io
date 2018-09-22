@@ -116,6 +116,7 @@ ApplicationContext 容器包括 BeanFactory 容器的所有功能
 ```
 
 ## Bean定义
+
 |属性| 描述|
 |-|-|
 |class| 这个属性是强制性的，并且指定用来创建 bean 的 bean 类。|
@@ -124,17 +125,17 @@ ApplicationContext 容器包括 BeanFactory 容器的所有功能
 |-|-|
 |scope| 这个属性指定由特定的 bean 定义创建的对象的作用域，它将会在 bean 作用域的章节中进行讨论。|
 |-|-|
-|constructor-arg |	它是用来注入依赖关系的，并会在接下来的章节中进行讨论。|
+|constructor\-arg |	它是用来注入依赖关系的，并会在接下来的章节中进行讨论。|
 |-|-|
 |properties	| 它是用来注入依赖关系的，并会在接下来的章节中进行讨论。|
 |-|-|
 |autowiring mode| 它是用来注入依赖关系的，并会在接下来的章节中进行讨论。|
 |-|-|
-|lazy-initialization mode| 延迟初始化的 bean 告诉 IoC 容器在它第一次被请求时，而不是在启动时去创建一个 bean 实例。|
+|lazy\-initialization mode| 延迟初始化的 bean 告诉 IoC 容器在它第一次被请求时，而不是在启动时去创建一个 bean 实例。|
 |-|-|
-|initialization 方法| 在 bean 的所有必需的属性被容器设置之后，调用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
+|initialization方法| 在 bean 的所有必需的属性被容器设置之后，调用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
 |-|-|
-|destruction 方法|  当包含该 bean 的容器被销毁时，使用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
+|destruction方法|  当包含该 bean 的容器被销毁时，使用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
 
 ## Bean作用域
 **scope属性**
