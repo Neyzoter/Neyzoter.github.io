@@ -465,7 +465,23 @@ $ sudo ./bin/startup.sh
 $ sudo ./bin/shutdown.sh
 ```
 
+## 在eclipse配置tomcat
 
+1、右键，run as \-\> run on server
+
+2、第一次需要添加tomcat
+
+Apcache \-\> 选中tomcat版本。**eclipse pyoton只支持tomcat v8.0及以下**。
+
+3、解决conf无法读取的问题
+
+改变tomcat安装目录下的conf文件夹权限。
+
+```
+$ chmod -R 777 conf
+```
+
+4、再次添加tomcat即可使用
 # Linux下配置Eclipse+CPP+MySQL
 
 想要在C++中调用mysql库函数，需要```#include <mysql.h>```
