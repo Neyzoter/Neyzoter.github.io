@@ -1343,7 +1343,27 @@ public class MainApp {
 |环绕通知	|在建议方法调用之前和之后，执行通知。|
 
 ## 基于AOP的XML框架
-**导入spring-aop 框架**
+**使用注意点**
+
+* getBean()时调用set函数设置参数时，不会调用AOP的通知方法。
+
+* 在目标方法**成功执行**后时，会调用返回通知（After-rturning）
+
+也就是说，就算方法没有return什么东西，也会抛出返回通知。需要针对不同的返回值或者没有返回值的方法进行不同的处理。比如打印返回值，如果没有返回值，要单独设置一下，避免出现NullPointer异常。
+
+* 需要的jar包：
+
+```
+aspectjrt.jar
+
+aspectjweaver.jar
+
+aspectj.jar
+
+aopalliance.jar
+```
+
+*导入spring-aop 框架*
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1361,7 +1381,7 @@ public class MainApp {
 ```
 
 
-**声明一个aspect**
+*声明一个aspect*
 
 ```xml
 <aop:config>
@@ -1374,7 +1394,7 @@ public class MainApp {
 </bean>
 ```
 
-**声明一个切入点**
+*声明一个切入点*
 
 指定某一些使用AOP的方法
 
@@ -1391,7 +1411,7 @@ public class MainApp {
 </bean>
 ```
 
-**声明建议**
+*声明建议*
 
 使用 \<aop:{ADVICE NAME}\> 元素在一个 中声明五个建议（也就是前置通知、后置通知……的处理函数）中的任何一个
 
@@ -1427,7 +1447,7 @@ public class MainApp {
 </bean>
 ```
 
-**基于AOP的XML架构示例——AOP实现日志**
+*基于AOP的XML架构示例——AOP实现日志*
 
 ```java
 //Loggin.java 日志输出文件
@@ -1546,10 +1566,12 @@ public class MainApp {
 ```
 
 ```
+说明：getBean获取bean时调用了set方法，但是不会有前置、后置、返回、环绕通知。
+如果java程序直接调用set方法，则会有通知。
 输出
-Going to setup student profile.    备注：beforeAdvice
+Going to setup student profile.    备注：beforeAdvice输出（在getName之前执行）
 Name : Zara       备注：由getName输出
-Student profile has been setup.
+Student profile has been setup.     北周：afterAdvice输出（在getName之前执行）
 Returning:Zara    备注：由afterReturningAdvice输出（getName返回了name）
 Going to setup student profile.
 Age : 11          备注：由getAge输出
@@ -1562,4 +1584,829 @@ There has been an exception: java.lang.IllegalArgumentException
 .....
 other exception content
 
+```
+
+## 基于AOP的@AspectJ
+
+在java程序中用注解，需要声明
+
+```xml
+<aop:aspectj-autoproxy/>
+```
+
+需要的jar包：
+
+```
+aspectjrt.jar
+
+aspectjweaver.jar
+
+aspectj.jar
+
+aopalliance.jar
+```
+
+*例子*
+
+```java
+package com.tutorialspoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
+@Aspect
+public class Logging {
+   /** Following is the definition for a pointcut to select
+    *  all the methods available. So advice will be called
+    *  for all the methods.
+    */
+	//声明一个执行对象为* com.tutorialspoint.*.*(..))的方法
+   @Pointcut("execution(* com.tutorialspoint.*.*(..))")
+   private void selectAll(){}
+   /** 
+    * This is the method which I would like to execute
+    * 
+    * before a selected method execution.
+    */
+   @Before("selectAll()")
+   public void beforeAdvice(){
+      System.out.println("Going to setup student profile.");
+   }
+   /** 
+    * This is the method which I would like to execute
+    * after a selected method execution.
+    */
+   @After("selectAll()")
+   public void afterAdvice(){
+      System.out.println("Student profile has been setup.");
+   }
+   /** 
+    * This is the method which I would like to execute
+    * when any method returns.
+    */
+   @AfterReturning(pointcut = "selectAll()", returning="retVal")
+   public void afterReturningAdvice(Object retVal){
+      System.out.println("Returning:" + retVal.toString() );
+   }
+   /**
+    * This is the method which I would like to execute
+    * if there is an exception raised by any method.
+    */
+   @AfterThrowing(pointcut = "selectAll()", throwing = "ex")
+   public void AfterThrowingAdvice(IllegalArgumentException ex){
+      System.out.println("There has been an exception: " + ex.toString());   
+   }  
+}
+```
+
+```java
+package com.tutorialspoint;
+public class Student {
+   private Integer age;
+   private String name;
+   public void setAge(Integer age) {
+      this.age = age;
+   }
+   public Integer getAge() {
+      System.out.println("Age : " + age );
+      return age;
+   }
+   public void setName(String name) {
+      this.name = name;
+   }
+   public String getName() {
+      System.out.println("Name : " + name );
+      return name;
+   }
+   public void printThrowException(){
+      System.out.println("Exception raised");
+      throw new IllegalArgumentException();
+   }
+}
+```
+
+```java
+package com.tutorialspoint;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = 
+             new ClassPathXmlApplicationContext("Beans.xml");
+      Student student = (Student) context.getBean("student");
+      student.getName();
+      student.getAge();     
+      student.printThrowException();
+   }
+}
+```
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+    http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd ">
+
+    <aop:aspectj-autoproxy/>     <!-- 声明使用aspectj -->
+
+   <!-- Definition for student bean -->
+   <bean id="student" class="com.tutorialspoint.Student">
+      <property name="name"  value="Zara" />
+      <property name="age"  value="11"/>      
+   </bean>
+
+   <!-- Definition for logging aspect -->
+   <bean id="logging" class="com.tutorialspoint.Logging"/> 
+
+</beans>
+```
+
+# Spring 的JDBC框架
+在使用普通的 JDBC 数据库时，就会很麻烦的写不必要的代码来处理异常，打开和关闭数据库连接等。但 Spring JDBC 框架负责所有的低层细节，从开始打开连接，准备和执行 SQL 语句，处理异常，处理事务，到最后关闭连接。
+
+*数据源的配置*
+
+```xml
+<bean id="dataSource"
+class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+   <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+   <property name="url" value="jdbc:mysql://localhost:3306/TEST"/>
+   <property name="username" value="root"/>
+   <property name="password" value="password"/>
+</bean>
+```
+
+*例子*
+
+实现mysql
+
+```sql
+CREATE TABLE Student(
+   ID   INT NOT NULL AUTO_INCREMENT,
+   NAME VARCHAR(20) NOT NULL,
+   AGE  INT NOT NULL,
+   PRIMARY KEY (ID)
+);
+```
+
+具体函数：
+
+```java
+//数据访问对象接口文件 StudentDAO.java 
+package com.tutorialspoint;
+import java.util.List;
+import javax.sql.DataSource;
+public interface StudentDAO {
+   /** 
+    * This is the method to be used to initialize
+    * database resources ie. connection.
+    */
+   public void setDataSource(DataSource ds);
+   /** 
+    * This is the method to be used to create
+    * a record in the Student table.
+    */
+   public void create(String name, Integer age);
+   /** 
+    * This is the method to be used to list down
+    * a record from the Student table corresponding
+    * to a passed student id.
+    */
+   public Student getStudent(Integer id);
+   /** 
+    * This is the method to be used to list down
+    * all the records from the Student table.
+    */
+   public List<Student> listStudents();
+   /** 
+    * This is the method to be used to delete
+    * a record from the Student table corresponding
+    * to a passed student id.
+    */
+   public void delete(Integer id);
+   /** 
+    * This is the method to be used to update
+    * a record into the Student table.
+    */
+   public void update(Integer id, Integer age);
+}
+```
+
+```java
+package com.tutorialspoint;
+public class Student {
+   private Integer age;
+   private String name;
+   private Integer id;
+   public void setAge(Integer age) {
+      this.age = age;
+   }
+   public Integer getAge() {
+      return age;
+   }
+   public void setName(String name) {
+      this.name = name;
+   }
+   public String getName() {
+      return name;
+   }
+   public void setId(Integer id) {
+      this.id = id;
+   }
+   public Integer getId() {
+      return id;
+   }
+}
+```
+
+```java
+//StudentMapper.java
+package com.tutorialspoint;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import org.springframework.jdbc.core.RowMapper;
+public class StudentMapper implements RowMapper<Student> {
+	//输入采集到的数据
+   public Student mapRow(ResultSet rs, int rowNum) throws SQLException {
+      Student student = new Student();
+      student.setId(rs.getInt("id"));
+      student.setName(rs.getString("name"));
+      student.setAge(rs.getInt("age"));
+      return student;
+   }
+}
+```
+
+```java
+//DAO 接口 StudentDAO 的实现类文件 StudentJDBCTemplate.java
+package com.tutorialspoint;
+import java.util.List;
+import javax.sql.DataSource;
+import org.springframework.jdbc.core.JdbcTemplate;
+public class StudentJDBCTemplate implements StudentDAO {
+   private DataSource dataSource;
+   private JdbcTemplate jdbcTemplateObject; 
+   public void setDataSource(DataSource dataSource) {
+      this.dataSource = dataSource;
+      this.jdbcTemplateObject = new JdbcTemplate(dataSource);
+   }
+   public void create(String name, Integer age) {
+      String SQL = "insert into Student (name, age) values (?, ?)";     
+      jdbcTemplateObject.update( SQL, name, age);
+      System.out.println("Created Record Name = " + name + " Age = " + age);
+      return;
+   }
+   public Student getStudent(Integer id) {
+      String SQL = "select * from Student where id = ?";
+      Student student = jdbcTemplateObject.queryForObject(SQL, 
+                        new Object[]{id}, new StudentMapper());
+      return student;
+   }
+   public List<Student> listStudents() {
+      String SQL = "select * from Student";
+      List <Student> students = jdbcTemplateObject.query(SQL, 
+                                new StudentMapper());
+      return students;
+   }
+   public void delete(Integer id){
+      String SQL = "delete from Student where id = ?";
+      jdbcTemplateObject.update(SQL, id);
+      System.out.println("Deleted Record with ID = " + id );
+      return;
+   }
+   public void update(Integer id, Integer age){
+      String SQL = "update Student set age = ? where id = ?";
+      jdbcTemplateObject.update(SQL, age, id);
+      System.out.println("Updated Record with ID = " + id );
+      return;
+   }
+}
+```
+
+```java
+package com.tutorialspoint;
+import java.util.List;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import com.tutorialspoint.StudentJDBCTemplate;
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = 
+             new ClassPathXmlApplicationContext("Beans.xml");
+      StudentJDBCTemplate studentJDBCTemplate = 
+      (StudentJDBCTemplate)context.getBean("studentJDBCTemplate");    
+      System.out.println("------Records Creation--------" );
+      studentJDBCTemplate.create("Zara", 11);
+      studentJDBCTemplate.create("Nuha", 2);
+      studentJDBCTemplate.create("Ayan", 15);
+      System.out.println("------Listing Multiple Records--------" );
+      List<Student> students = studentJDBCTemplate.listStudents();
+      for (Student record : students) {
+         System.out.print("ID : " + record.getId() );
+         System.out.print(", Name : " + record.getName() );
+         System.out.println(", Age : " + record.getAge());
+      }
+      System.out.println("----Updating Record with ID = 2 -----" );
+      studentJDBCTemplate.update(2, 20);
+      System.out.println("----Listing Record with ID = 2 -----" );
+      Student student = studentJDBCTemplate.getStudent(2);
+      System.out.print("ID : " + student.getId() );
+      System.out.print(", Name : " + student.getName() );
+      System.out.println(", Age : " + student.getAge());      
+   }
+}
+```
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd ">
+
+   <!-- Initialization for data source -->
+   <bean id="dataSource" 
+      class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+      <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+      <property name="url" value="jdbc:mysql://localhost:3306/TEST"/>
+      <property name="username" value="root"/>
+      <property name="password" value="password"/>
+   </bean>
+
+   <!-- Definition for studentJDBCTemplate bean -->
+   <bean id="studentJDBCTemplate" 
+      class="com.tutorialspoint.StudentJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />    
+   </bean>
+
+</beans>
+
+```
+
+```
+输出
+------Records Creation--------
+Created Record Name = Zara Age = 11
+Created Record Name = Nuha Age = 2
+Created Record Name = Ayan Age = 15
+------Listing Multiple Records--------
+ID : 1, Name : Zara, Age : 11
+ID : 2, Name : Nuha, Age : 2
+ID : 3, Name : Ayan, Age : 15
+----Updating Record with ID = 2 -----
+Updated Record with ID = 2
+----Listing Record with ID = 2 -----
+ID : 2, Name : Nuha, Age : 20
+
+```
+
+# Spring事务管理
+## 相关概念
+*事务的概念可表述为四个关键属性ACID*
+
+* **原子性**：事务应该当作一个单独单元的操作，这意味着整个序列操作要么是成功，要么是失败的。
+
+* **一致性**：这表示数据库的引用完整性的一致性，表中唯一的主键等。
+
+* **隔离性**：可能同时处理很多有相同的数据集的事务，每个事务应该与其他事务隔离，以防止数据损坏。
+
+* **持久性**：一个事务一旦完成全部操作后，这个事务的结果必须是永久性的，不能因系统故障而从数据库中删除。
+
+*SQL发布到数据库中的简单视图*
+
+* 使用 begin transaction 命令开始事务。
+
+* 使用 SQL 查询语句执行各种删除、更新或插入操作。
+
+* 如果所有的操作都成功，则执行提交操作，否则回滚所有操作。
+
+*局部事务VS全局事务*
+
+1.局部事务：
+
+* 特定于一个单一的事务资源，如一个 JDBC 连接。
+
+* 在一个集中的计算环境中是有用，该计算环境中应用程序组件和资源位于一个单位点。
+
+* 相比于全局事务更加容易实现。
+
+2.全局事务
+
+* 可以跨多个事务资源事务，如在一个分布式系统中的事务。
+
+* 只涉及到一个运行在一个单一机器中的本地数据管理器。
+
+* 相比于局部事务更加困难。
+
+*编程式事务管理VS声明式事务管理*
+
+1.编程式
+
+这意味着你在编程的帮助下有管理事务，极大的灵活性，但却很难维护。
+
+2.声明式
+
+这意味着你从业务代码中分离事务管理，仅仅使用注释或 XML 配置来管理事务。
+
+*Spring事务抽象*
+
+```java
+//Spring 事务抽象的关键
+public interface PlatformTransactionManager {
+	//根据指定的传播行为，该方法返回当前活动事务或创建一个新的事务。
+   TransactionStatus getTransaction(TransactionDefinition definition);
+   throws TransactionException;
+	//该方法提交给定的事务和关于它的状态
+   void commit(TransactionStatus status) throws TransactionException;
+	//该方法执行一个给定事务的回滚
+   void rollback(TransactionStatus status) throws TransactionException;
+}
+```
+
+```java
+//Spring 中事务支持的核心接口
+public interface TransactionDefinition {
+	//该方法返回传播行为。Spring 提供了与 EJB CMT 类似的所有的事务传播选项。
+   int getPropagationBehavior();
+	//该方法返回该事务独立于其他事务的工作的程度。
+   int getIsolationLevel();
+	//该方法返回该事务的名称
+   String getName();
+	//该方法返回以秒为单位的时间间隔，事务必须在该时间间隔内完成。
+   int getTimeout();
+   //该方法返回该事务是否是只读的
+   boolean isReadOnly();
+}
+```
+
+传播类型的可能值：
+
+|序号	| 传播 \& 描述|
+|-|-|
+|1	|**TransactionDefinition.PROPAGATION_MANDATORY**
+支持当前事务；如果不存在当前事务，则抛出一个异常。|
+|-|-|
+|2	|**TransactionDefinition.PROPAGATION_NESTED**
+如果存在当前事务，则在一个嵌套的事务中执行。|
+|-|-|
+|3	|**TransactionDefinition.PROPAGATION_NEVER**
+不支持当前事务；如果存在当前事务，则抛出一个异常。|
+|-|-|
+|4	|**TransactionDefinition.PROPAGATION_NOT_SUPPORTED**
+不支持当前事务；而总是执行非事务性。|
+|-|-|
+|5	|**TransactionDefinition.PROPAGATION_REQUIRED**
+支持当前事务；如果不存在事务，则创建一个新的事务。|
+|-|-|
+|6	|**TransactionDefinition.PROPAGATION_REQUIRES_NEW**
+创建一个新事务，如果存在一个事务，则把当前事务挂起。|
+|-|-|
+|7	|**TransactionDefinition.PROPAGATION_SUPPORTS**
+支持当前事务；如果不存在，则执行非事务性。|
+|-|-|
+|8	|**TransactionDefinition.TIMEOUT_DEFAULT**
+使用默认超时的底层事务系统，或者如果不支持超时则没有。|
+
+隔离级别的可能值：
+
+|序号	| 隔离 \& 描述|
+|-|-|
+|1	|**TransactionDefinition.ISOLATION_DEFAULT**
+这是默认的隔离级别。|
+|-|-|
+|2	|**TransactionDefinition.ISOLATION_READ_COMMITTED**
+表明能够阻止误读；可以发生不可重复读和虚读。|
+|-|-|
+|3	|**TransactionDefinition.ISOLATION_READ_UNCOMMITTED**
+表明可以发生误读、不可重复读和虚读。|
+|-|-|
+|4	|**TransactionDefinition.ISOLATION_REPEATABLE_READ**
+表明能够阻止误读和不可重复读；可以发生虚读。|
+|-|-|
+|5	|**TransactionDefinition.ISOLATION_SERIALIZABLE**
+表明能够阻止误读、不可重复读和虚读。|
+
+```java
+//TransactionStatus 接口为事务代码提供了一个简单的方法来控制事务的执行和查询事务状态
+public interface TransactionStatus extends SavepointManager {
+//在当前事务时新的情况下，该方法返回 true
+   boolean isNewTransaction();
+//该方法返回该事务内部是否有一个保存点，也就是说，基于一个保存点已经创建了嵌套事务
+   boolean hasSavepoint();
+//该方法设置该事务为 rollback-only 标记。
+   void setRollbackOnly();
+//该方法返回该事务是否已标记为 rollback-only。
+   boolean isRollbackOnly();
+//该方法返回该事务是否完成，也就是说，它是否已经提交或回滚。
+   boolean isCompleted();
+}
+```
+
+## 编程式事务管理
+至少要有两个数据库表，在事务的帮助下我们可以执行多种 CRUD 操作。
+
+```sql
+CREATE TABLE Student(
+   ID   INT NOT NULL AUTO_INCREMENT,
+   NAME VARCHAR(20) NOT NULL,
+   AGE  INT NOT NULL,
+   PRIMARY KEY (ID)
+);
+```
+
+Marks用来存储基于年份的学生的标记。这里 SID 是 Student 表的外键。
+
+```sql
+CREATE TABLE Marks(
+   SID INT NOT NULL,
+   MARKS  INT NOT NULL,
+   YEAR   INT NOT NULL
+);
+```
+
+*使用PlatformTransactionManager 来实现编程式方法从而实现事务*
+
+1.创建TransactionDefinition 
+
+2.调用getTransaction() 方法来开始你的事务，返回一个实例
+
+3.TransactionStatus 对象**帮助追踪当前的事务状态**，并且最终，如果一切运行顺利，你可以使用 PlatformTransactionManager 的 commit() 方法来提交这个事务，否则的话，你可以使用 rollback() 方法来回滚整个操作。
+
+```java
+package com.tutorialspoint;
+import java.util.List;
+import javax.sql.DataSource;
+public interface StudentDAO {
+   /** 
+    * This is the method to be used to initialize
+    * database resources ie. connection.
+    */
+   public void setDataSource(DataSource ds);
+   /** 
+    * This is the method to be used to create
+    * a record in the Student and Marks tables.
+    */
+   public void create(String name, Integer age, Integer marks, Integer year);
+   /** 
+    * This is the method to be used to list down
+    * all the records from the Student and Marks tables.
+    */
+   public List<StudentMarks> listStudents();
+}
+```
+
+```java
+package com.tutorialspoint;
+public class StudentMarks {
+   private Integer age;
+   private String name;
+   private Integer id;
+   private Integer marks;
+   private Integer year;
+   private Integer sid;
+   public void setAge(Integer age) {
+      this.age = age;
+   }
+   public Integer getAge() {
+      return age;
+   }
+   public void setName(String name) {
+      this.name = name;
+   }
+   public String getName() {
+      return name;
+   }
+   public void setId(Integer id) {
+      this.id = id;
+   }
+   public Integer getId() {
+      return id;
+   }
+   public void setMarks(Integer marks) {
+      this.marks = marks;
+   }
+   public Integer getMarks() {
+      return marks;
+   }
+   public void setYear(Integer year) {
+      this.year = year;
+   }
+   public Integer getYear() {
+      return year;
+   }
+   public void setSid(Integer sid) {
+      this.sid = sid;
+   }
+   public Integer getSid() {
+      return sid;
+   }
+}
+```
+
+```java
+package com.tutorialspoint;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import org.springframework.jdbc.core.RowMapper;
+public class StudentMarksMapper implements RowMapper<StudentMarks> {
+   public StudentMarks mapRow(ResultSet rs, int rowNum) throws SQLException {
+      StudentMarks studentMarks = new StudentMarks();
+      studentMarks.setId(rs.getInt("id"));
+      studentMarks.setName(rs.getString("name"));
+      studentMarks.setAge(rs.getInt("age"));
+      studentMarks.setSid(rs.getInt("sid"));
+      studentMarks.setMarks(rs.getInt("marks"));
+      studentMarks.setYear(rs.getInt("year"));
+      return studentMarks;
+   }
+}
+```
+
+```java
+package com.tutorialspoint;
+import java.util.List;
+import javax.sql.DataSource;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+public class StudentJDBCTemplate implements StudentDAO {
+   private DataSource dataSource;
+   private JdbcTemplate jdbcTemplateObject;
+   private PlatformTransactionManager transactionManager;
+   public void setDataSource(DataSource dataSource) {
+      this.dataSource = dataSource;
+      this.jdbcTemplateObject = new JdbcTemplate(dataSource);
+   }
+   public void setTransactionManager(
+      PlatformTransactionManager transactionManager) {
+      this.transactionManager = transactionManager;
+   }
+   public void create(String name, Integer age, Integer marks, Integer year){
+      TransactionDefinition def = new DefaultTransactionDefinition();
+      TransactionStatus status = transactionManager.getTransaction(def);
+      try {
+         String SQL1 = "insert into Student (name, age) values (?, ?)";
+         jdbcTemplateObject.update( SQL1, name, age);
+         // Get the latest student id to be used in Marks table
+         String SQL2 = "select max(id) from Student";
+         int sid = jdbcTemplateObject.queryForInt( SQL2 );
+         String SQL3 = "insert into Marks(sid, marks, year) " + 
+                       "values (?, ?, ?)";
+         jdbcTemplateObject.update( SQL3, sid, marks, year);
+         System.out.println("Created Name = " + name + ", Age = " + age);
+         transactionManager.commit(status);
+      } catch (DataAccessException e) {
+         System.out.println("Error in creating record, rolling back");
+         transactionManager.rollback(status);
+         throw e;
+      }
+      return;
+   }
+   public List<StudentMarks> listStudents() {
+      String SQL = "select * from Student, Marks where Student.id=Marks.sid";
+      List <StudentMarks> studentMarks = jdbcTemplateObject.query(SQL, 
+                                         new StudentMarksMapper());
+      return studentMarks;
+   }
+}
+```
+
+```java
+package com.tutorialspoint;
+import java.util.List;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import com.tutorialspoint.StudentJDBCTemplate;
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = 
+             new ClassPathXmlApplicationContext("Beans.xml");
+      StudentJDBCTemplate studentJDBCTemplate = 
+      (StudentJDBCTemplate)context.getBean("studentJDBCTemplate");     
+      System.out.println("------Records creation--------" );
+      studentJDBCTemplate.create("Zara", 11, 99, 2010);
+      studentJDBCTemplate.create("Nuha", 20, 97, 2010);
+      studentJDBCTemplate.create("Ayan", 25, 100, 2011);
+      System.out.println("------Listing all the records--------" );
+      List<StudentMarks> studentMarks = studentJDBCTemplate.listStudents();
+      for (StudentMarks record : studentMarks) {
+         System.out.print("ID : " + record.getId() );
+         System.out.print(", Name : " + record.getName() );
+         System.out.print(", Marks : " + record.getMarks());
+         System.out.print(", Year : " + record.getYear());
+         System.out.println(", Age : " + record.getAge());
+      }
+   }
+}
+```
+
+```java
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd ">
+
+   <!-- Initialization for data source -->
+   <bean id="dataSource" 
+      class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+      <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+      <property name="url" value="jdbc:mysql://localhost:3306/TEST"/>
+      <property name="username" value="root"/>
+      <property name="password" value="password"/>
+   </bean>
+
+   <!-- Initialization for TransactionManager事务管理 -->
+   <bean id="transactionManager" 
+      class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+      <property name="dataSource"  ref="dataSource" />    
+   </bean>
+
+   <!-- Definition for studentJDBCTemplate bean -->
+   <bean id="studentJDBCTemplate"
+      class="com.tutorialspoint.StudentJDBCTemplate">
+      <property name="dataSource"  ref="dataSource" />
+      <property name="transactionManager"  ref="transactionManager" />    
+   </bean>
+
+</beans>
+```
+
+```sql
+------Records creation--------
+Created Name = Zara, Age = 11
+Created Name = Nuha, Age = 20
+Created Name = Ayan, Age = 25
+------Listing all the records--------
+ID : 1, Name : Zara, Marks : 99, Year : 2010, Age : 11
+ID : 2, Name : Nuha, Marks : 97, Year : 2010, Age : 20
+ID : 3, Name : Ayan, Marks : 100, Year : 2011, Age : 25
+```
+
+# Spring Web MVC框架
+## 基本概念
+**MVC框架**
+
+MVC 框架提供了模型-视图-控制的体系结构和可以用来开发灵活、松散耦合的 web 应用程序的组件。MVC 模式导致了应用程序的不同方面(输入逻辑、业务逻辑和 UI 逻辑)的分离，同时提供了在这些元素之间的松散耦合。
+
+* **模型**封装了应用程序数据，并且通常它们由 POJO 组成。
+
+* **视图**主要用于呈现模型数据，并且通常它生成客户端的浏览器可以解释的 HTML 输出。
+
+* **控制器**主要用于处理用户请求，并且构建合适的模型并将其传递到视图呈现。
+
+Spring Web 模型-视图-控制（MVC）框架是围绕 DispatcherServlet 设计的
+
+<img src="/images/wiki/Spring/MVC_DispatcherServlet.png" width="400" alt="MVC_DispatcherServlet" />
+
+HandlerMapping、Controller 和 ViewResolver 是 WebApplicationContext 的一部分，而 WebApplicationContext 是带有一些对 web 应用程序必要的额外特性的 ApplicationContext 的扩展。
+
+DispatcherServlet 传入 HTTP 请求的*事件序列*如下
+
+* 收到一个 HTTP 请求后，DispatcherServlet 根据 HandlerMapping 来选择并且调用适当的控制器。
+
+* 控制器接受请求，并基于使用的 GET 或 POST 方法来调用适当的 service 方法。Service 方法将设置基于定义的业务逻辑的模型数据，并返回视图名称到 DispatcherServlet 中。
+
+* DispatcherServlet 会从 ViewResolver 获取帮助，为请求检取定义视图。
+
+* 一旦确定视图，DispatcherServlet 将把模型数据传递给视图，最后呈现在浏览器中。
+
+**需求的配置**
+
+映射你想让 DispatcherServlet 处理的请求，通过使用在 web.xml 文件中的一个 URL 映射。
+
+web.xml 文件将被保留在你的应用程序的 WebContent/WEB-INF 目录下。
+
+例子，
+
+```xml
+<web-app id="WebApp_ID" version="2.4"
+    xmlns="http://java.sun.com/xml/ns/j2ee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
+    http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <display-name>Spring MVC Application</display-name>
+   <servlet>
+      <servlet-name>HelloWeb</servlet-name>
+      <servlet-class>
+         org.springframework.web.servlet.DispatcherServlet
+      </servlet-class>
+      <load-on-startup>1</load-on-startup>
+   </servlet>
+	<!-- 映射到HelloWeb.jsp 这个文件-->
+   <servlet-mapping>
+      <servlet-name>HelloWeb</servlet-name>
+      <url-pattern>*.jsp</url-pattern>
+   </servlet-mapping>
+</web-app>
 ```
