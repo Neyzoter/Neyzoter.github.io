@@ -380,11 +380,91 @@ axel是Linux命令行界面的多线程下载工具，比wget的好处就是可�
 $ sudo apt-get install axel
 ```
 
-# shadowsocks安装
+# Ubuntu安装tomcat9
+## 下载tomcat
+[tomcat官方下载地址]("https://tomcat.apache.org/download-90.cgi" "tomcat官方下载地址")
 
-1、安装python和pip
+## tomcat的tar.gz文件移动到/opt/tomcat中
 
-2、
+## 解压tar.gz文件
+
+```
+$ sudo tar -zvxf 文件名
+```
+
+## 全局环境
+
+```
+$ sudo vi /etc/profile
+```
+
+添加tomcat环境变量。如果java没有安装的话，需要安装java，添加java环境。
+
+```
+#Java 
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+export JRE_HOME=${JAVA_HOME}/jre
+export CLASSPATH=.:${JRE_HOME}/lib/rt.jar:${JAVA_HOME}/lib/dt.jar:${JAVA_HOME}/lib/tools.jar
+export PATH=${JAVA_HOME}/bin:${JRE_HOME}/bin:$PATH
+
+#tomcat environment
+export CATALINA_HOME=/opt/tomcat/apache-tomcat-9.0.12
+export CLASSPATH=.:${JRE_HOME}/lib:${JAVA_HOME}/lib:${CATALINA_HOME}/lib
+export PATH=${CATALINA_HOME}/bin:$PATH
+```
+
+注：```${CATALINA_HOME}/bin:$PATH```表示不覆盖PATH，而是在原来的基础上加```${CATALINA_HOME}/bin```
+
+## 给startup.sh文件添加环境
+
+startup.sh用于启动tomcat。
+
+1、打开tomcat文件夹中的startup.sh文件
+
+```
+$ sudo vi ./bin/startup.sh
+```
+
+2、添加环境
+
+**注意**：
+
+* 在文件的```exec "$PRGDIR"/"$EXECUTABLE" start "$@"```**之前**添加一下内容
+
+* JAVA_HOME、JRE_HOME等java的环境变量根据电脑情况填写相应地址。
+
+ps：我这里的时用apt安装的java，java环境在```/usr/lib/jvm```中
+
+* tomcat环境也要加入，具体地址根据tomcat位置确定
+
+```
+#Java
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+export JRE_HOME=${JAVA_HOME}/jre
+export PATH=${JAVA_HOME}/bin:${JRE_HOME}:$PATH
+export CLASSPATH=.:${JRE_HOME}/lib/rt.jar:${JAVA_HOME}/lib/dt.jar:${JAVA_HOME}/lib/tools.jar
+
+#tomcat
+export TOMCAT_HOME=/opt/tomcat/apache-tomcat-9.0.12
+```
+
+## 给shutdown.sh文件添加环境
+shutdown.sh用于关闭tomcat。
+
+添加环境同startup.sh。
+
+## 重启电脑
+
+## 开启和关闭tomcat
+1、进入tomcat安装包，即之前的/opt/tomcat/apache-tomcat-9.0.12
+
+2、开启和关闭tomcat
+
+```
+$ sudo ./bin/startup.sh
+$ sudo ./bin/shutdown.sh
+```
+
 
 # Linux下配置Eclipse+CPP+MySQL
 
