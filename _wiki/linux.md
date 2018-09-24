@@ -468,19 +468,21 @@ $ sudo ./bin/shutdown.sh
 
 # Linux下配置Eclipse+CPP+MySQL
 
-想要在C++中调用mysql库函数，需要#include <mysql.h>
+想要在C++中调用mysql库函数，需要```#include <mysql.h>```
 
 所以需要在eclipse中加上对mysql.h的路径
 
 项目->属性->C/C++Build -> settings -> gcc c++ complier -> includes -> include paths 
 
-添加两个路径：/usr/lib/mysql；/usr/include/mysql
+添加两个路径：```/usr/lib/mysql```；```/usr/include/mysql```
 
 对于64位的mysql：/usr/lib64/mysql ； /usr/include/mysql
 
 要让eclipse工具能正确实现编译指令：
 
+```
 g++ -o test test.c -lmysqlclient -lm -I/usr/include/msqyl -L/usr/lib64/mysql
+```
 
 还需要添加对 -lmysqlclient -lm两个参数：
 
