@@ -382,7 +382,7 @@ $ sudo apt-get install axel
 
 # Ubuntu安装tomcat9
 ## 下载tomcat
-[tomcat官方下载地址]("https://tomcat.apache.org/download-90.cgi")
+[tomcat官方下载地址](https://tomcat.apache.org/download-90.cgi)
 
 ## tomcat的tar.gz文件移动到/opt/tomcat中
 
