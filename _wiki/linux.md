@@ -22,12 +22,16 @@ $ ssh <username>@<hostname or ip_address> -p <port>
 
 Ctrl+D
 
-## 1.2 scp上传文件
+## 1.2 scp上传/下载文件
 ```
 scp 本地文件地址+文件名  远程用户名@IP地址:+服务器内存放文件的地址。（这里用户名用root）
 ```
 
 例如：scp /home/wj/桌面/aa.txt root@111.231.1.101:/home/aa.txt
+
+```
+scp -r 远程用户名@IP地址:+服务器内存放文件的地址 本地文件地址
+```
 
 ## 1.2 发送udp包
 
