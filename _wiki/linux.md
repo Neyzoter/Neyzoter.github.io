@@ -623,6 +623,24 @@ $sudo chmod 777 -R /data
 
 开两个ssh，一个打开mongod，一个测试mongo。
 
+# Linux shell的编写与使用
+
+## 1.最简单的应用
+
+编写run.sh，用于编译和运行java程序
+
+```shell
+#！./bin/bash
+javac test.java
+java test
+```
+
+运行sh，从而编译和运行java程序
+
+```
+$ source run.sh
+```
+
 
 
 
