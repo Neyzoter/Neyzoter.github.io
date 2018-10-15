@@ -623,6 +623,30 @@ $sudo chmod 777 -R /data
 
 开两个ssh，一个打开mongod，一个测试mongo。
 
+## 8、打开远程连接
+
+* 服务器端
+
+1、打开27017防火墙
+
+```
+$ sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 27017 -j ACCEPT
+```
+
+2、打开mongod并对所有ip开放
+
+```
+$ mongod --bind_ip 0.0.0.0
+```
+
+* 客户端
+
+连接
+
+```
+$ mongo <远程IP>
+```
+
 # Linux shell的编写与使用
 
 ## 1.最简单的应用
