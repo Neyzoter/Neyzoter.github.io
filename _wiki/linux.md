@@ -629,7 +629,7 @@ $sudo chmod 777 -R /data
 
 编写run.sh，用于编译和运行java程序
 
-```shell
+```
 #！./bin/bash
 javac test.java
 java test
