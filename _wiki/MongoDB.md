@@ -1,9 +1,9 @@
 ---
 layout: wiki
-title: mongodb
-categories: mongodb
-description: mongodb的用法
-keywords: mongodb
+title: MongoDB
+categories: MongoDB
+description: MongoDB的用法
+keywords: MongoDB
 ---
 
 # 1、命令
