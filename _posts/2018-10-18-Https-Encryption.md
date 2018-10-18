@@ -70,8 +70,9 @@ keywords: https,对称加密,非对称加密
 
 <img src="/images/posts/2018-10-18-Https-Encryption/cmp.webp" width="700" alt="对比连个信息摘要" />
 
-思考：数字签名的私钥会不会被调包？
+**思考**：数字签名的私钥会不会被调包？
 
+我的想法：使用一个USB存储和运输数字签名，用专门的CA软件来获取USB中的数字签名。
 
 
 
