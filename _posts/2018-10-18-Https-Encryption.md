@@ -35,7 +35,7 @@ keywords: https,对称加密,非对称加密
 
 不安全性：容易被中间人截获（中继攻击）
 
-<img src="/images/posts/2018-10-18-Https-Encryption/relay.webp" width="600" alt="中继攻击" />
+<img src="/images/posts/2018-10-18-Https-Encryption/relay.webp" width="700" alt="中继攻击" />
 
 ## 2.3 对称和非对称加密结合
 对称加密用来传输数据，非对称加密用来传输对称加密的密钥。
@@ -48,7 +48,33 @@ keywords: https,对称加密,非对称加密
 3、服务器和客户端使用对称加密传输数据
 
 ## 2.4 数字签名
-为了保证公钥是服务器的。
+为了保证公钥是服务器的，通过一个认证中心（CA）来认证。CA提供给服务器**私钥**。
+
+1、服务器对服务器信息和服务器要发送的公钥进行hash算法生成信息摘要，并用CA给的**私钥**加密
+
+<img src="/images/posts/2018-10-18-Https-Encryption/hash.webp" width="700" alt="hash算法生成信息摘要" />
+
+<img src="/images/posts/2018-10-18-Https-Encryption/info_encryption.webp" width="700" alt="私钥加密" />
+
+2、加密后，所得到的叫数字签名
+
+3、合并服务器信息、公钥和数字签名
+
+<img src="/images/posts/2018-10-18-Https-Encryption/cat.webp" width="700" alt="合并" />
+
+4、服务器将合并后的信息发送给客户端
+
+5、客户端使用CA所给的**公钥**解密所得到的信息摘要，用hash算法计算服务器信息和公钥得到一个自己计算出来的信息摘要
+
+6、对比这两个信息摘要是否相同
+
+<img src="/images/posts/2018-10-18-Https-Encryption/cmp.webp" width="700" alt="对比连个信息摘要" />
+
+思考：数字签名的私钥会不会被调包？
+
+
+
+
 
 
 
