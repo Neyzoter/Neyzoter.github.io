@@ -235,6 +235,36 @@ firefox-locale-en
 $ sudo apt-get purge firefox firefox-locale-en
 ```
 
+## 进程的状态
+
+```
+ps -auxf
+```
+
+ps：表示process status，进程状态
+
+参数：
+
+A ：所有的进程均显示出来，与 -e 具有同样的效用；
+
+-a ： 显示现行终端机下的所有进程，包括其他用户的进程；
+
+-u ：以用户为主的进程状态 ；
+
+x ：通常与 a 这个参数一起使用，可列出较完整信息。
+
+输出格式规划：
+
+l ：较长、较详细的将该 PID 的的信息列出；
+
+j ：工作的格式 (jobs format)
+
+-f ：做一个更为完整的输出。
+
+## 文件连锁
+cat = concatenate,连锁
+
+
 ## vim使用
 ```
 vm <file>
