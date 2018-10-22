@@ -294,6 +294,40 @@ lsof -c Vim
 
 注意程序名区分大小写。
 
+### 读取文件的不同方式
+
+1、cat和tac
+
+```
+cat/tac myfile
+```
+
+cat：从前往后读取该文件。
+
+tac：从后往前读取该文件。
+
+注：全部读取出来，然后指令自动结束。
+
+```
+cat -n myfile  #n表示输出n行
+```
+
+输出前n行
+
+2、less
+
+```
+less myfile
+```
+
+注：读取出来后，可以一行一行翻。通过Ctrl+c退出less。
+
+3、head/tail
+
+```
+head/tail -n 2 myfile  # 输出文件头部/末尾2行
+```
+
 # 3、ubuntu目录
 1、/    这是根目录，一个Ubuntu系统下只有一个根目录。
 
