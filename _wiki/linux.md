@@ -358,6 +358,7 @@ less myfile
 head/tail -n 2 myfile  # 输出文件头部/末尾2行
 ```
 
+
 # 3、ubuntu目录
 1、/    这是根目录，一个Ubuntu系统下只有一个根目录。
 
@@ -729,8 +730,19 @@ java test
 $ source run.sh
 ```
 
+## 2、给shell传递参数
 
+例子
 
+```
+#!/bin/bash
+# 提取第一个参数，表示从后往前读取n行catalina.out这个文件
+n=$1
+
+tail -n ${n} /opt/tomcat/apache-tomcat-8.0.53/logs/catalina.out
+```
+
+其中\$1表示提取第一个按数，而第0个参数是“当前脚本文件名”
 
 
 
