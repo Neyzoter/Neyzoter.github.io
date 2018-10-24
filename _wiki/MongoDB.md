@@ -739,6 +739,30 @@ mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][
 
 **?options** 是连接选项。如果不使用/database，则前面需要加上/。所有连接选项都是键值对name=value，键值对之间通过&或;（分号）隔开
 
+* 打开远程连接
+
+*服务器端*
+
+1、打开27017防火墙
+
+```
+$ sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 27017 -j ACCEPT
+```
+
+2、打开mongod并对所有ip开放
+
+```
+$ mongod --bind_ip 0.0.0.0
+```
+
+*客户端*
+
+连接
+
+```
+$ mongo <远程IP>
+```
+
 #### MongoDB连接命令
 
 使用用户名和密码连接到 MongoDB 服务器，你必须使用 'username:password@hostname/dbname' 格式，'username'为用户名，'password' 为密码。
