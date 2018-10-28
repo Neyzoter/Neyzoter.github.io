@@ -386,13 +386,13 @@ head/tail -n 2 myfile  # 输出文件头部/末尾2行
 
 12、/usr/local 存放那些手动安装的软件，即不是通过“新立得”或apt-get安装的软件。它和/usr目录具有相类似      的目录结构。让软件包管理器来管理/usr目录，而把自定义的脚本（scripts）放到/usr/local目录下面。
 
-# 问题解决
+# 4、问题解决
 ## Ubuntu 16.04 python升级后terminal终端无法打开
 ```
 $ sudo rm /usr/bin/python3
 $ sudo ln -s python3.5 /usr/bin/python3
 ```
-# ubuntu安装java8和java9
+# 5、ubuntu安装java8和java9
 ## 导入Webupd8 PPA
 
 说明：安装java9的时候，这里的webupd8team不用改成9
@@ -417,7 +417,7 @@ sudo apt-get install oracle-java8-installer
 sudo apt install oracle-java8-set-default
 ```
 
-# ubuntu安装C++
+# 6、ubuntu安装C++
 ## 1、安装
 ```
 $ sudo apt-get install g++ build-essential
@@ -437,19 +437,19 @@ $ g++ <CPP文件名(如helloworld.cpp)> -o <输出.out文件名(如helloworld.ou
 $ ./<.out文件名>
 ```
 
-# git安装
+# 7、git安装
 ```
 $ sudo apt install git
 ```
 
-# axel安装
+# 8、axel安装
 axel是Linux命令行界面的多线程下载工具，比wget的好处就是可以指定多个线程同时在命令行终端里
 
 ```
 $ sudo apt-get install axel
 ```
 
-# Ubuntu安装tomcat9
+# 9、Ubuntu安装tomcat9
 ## 下载tomcat
 [tomcat官方下载地址](https://tomcat.apache.org/download-90.cgi)
 
@@ -551,7 +551,7 @@ $ chmod -R 777 conf
 ```
 
 4、再次添加tomcat即可使用
-# Linux下配置Eclipse+CPP+MySQL
+# 10、Linux下配置Eclipse+CPP+MySQL
 
 想要在C++中调用mysql库函数，需要```#include <mysql.h>```
 
@@ -582,7 +582,7 @@ g++ -o test test.c -lmysqlclient -lm -I/usr/include/msqyl -L/usr/lib64/mysql
 
 到这个地址去找libmysqlclient.a这个文件。
 
-# 云端服务器安装Mongodb
+# 11、云端服务器安装Mongodb
 
 ## 1、下载到自己的电脑
 
@@ -712,9 +712,9 @@ $ mongod --bind_ip 0.0.0.0
 $ mongo <远程IP>
 ```
 
-# Linux shell的编写与使用
+# 12、Linux shell的编写与使用
 
-## 1.最简单的应用
+## 1、最简单的应用
 
 编写run.sh，用于编译和运行java程序
 
