@@ -394,7 +394,7 @@ $ sudo ln -s python3.5 /usr/bin/python3
 ```
 
 # 5、安装教程
-# 5.1 ubuntu安装java8和java9
+## 5.1 ubuntu安装java8和java9
 * 导入Webupd8 PPA
 
 说明：安装java9的时候，这里的webupd8team不用改成9
