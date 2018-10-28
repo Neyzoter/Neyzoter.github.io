@@ -392,8 +392,10 @@ head/tail -n 2 myfile  # 输出文件头部/末尾2行
 $ sudo rm /usr/bin/python3
 $ sudo ln -s python3.5 /usr/bin/python3
 ```
-# 5、ubuntu安装java8和java9
-## 导入Webupd8 PPA
+
+# 5、安装教程
+# 5.1 ubuntu安装java8和java9
+* 导入Webupd8 PPA
 
 说明：安装java9的时候，这里的webupd8team不用改成9
 ```
@@ -404,64 +406,65 @@ sudo add-apt-repository ppa:webupd8team/java
 sudo apt-get update
 ```
 
-## 安装
+* 安装
 
 说明：安装java9的话，把8改成9
 ```
 sudo apt-get install oracle-java8-installer
 ```
 
-## 设置为默认jdk
+* 设置为默认jdk
 说明：安装java9的话，把8改成9
 ```
 sudo apt install oracle-java8-set-default
 ```
 
-# 6、ubuntu安装C++
-## 1、安装
+## 5.2 ubuntu安装C++
+* 安装
+
 ```
 $ sudo apt-get install g++ build-essential
 ```
 
-## 2、gedit编写C++
+* gedit编写C++
 
-## 3、编译
+* 编译
 
 ```
 $ g++ <CPP文件名(如helloworld.cpp)> -o <输出.out文件名(如helloworld.out)>
 ```
 
-## 4、运行
+* 运行
 
 ```
 $ ./<.out文件名>
 ```
 
-# 7、git安装
+## 5.3 git安装
 ```
 $ sudo apt install git
 ```
 
-# 8、axel安装
+## 5.4 axel安装
 axel是Linux命令行界面的多线程下载工具，比wget的好处就是可以指定多个线程同时在命令行终端里
 
 ```
 $ sudo apt-get install axel
 ```
 
-# 9、Ubuntu安装tomcat9
-## 下载tomcat
+## 5.5 Ubuntu安装tomcat9
+* 下载tomcat
 [tomcat官方下载地址](https://tomcat.apache.org/download-90.cgi)
 
-## tomcat的tar.gz文件移动到/opt/tomcat中
+* tomcat的tar.gz文件移动到/opt/tomcat中
 
-## 解压tar.gz文件
+* 解压tar.gz文件
 
 ```
 $ sudo tar -zvxf 文件名
 ```
 
-## 全局环境
+* 全局环境
 
 ```
 $ sudo vi /etc/profile
@@ -484,7 +487,7 @@ export PATH=${CATALINA_HOME}/bin:$PATH
 
 注：```${CATALINA_HOME}/bin:$PATH```表示不覆盖PATH，而是在原来的基础上加```${CATALINA_HOME}/bin```
 
-## 给startup.sh文件添加环境
+* 给startup.sh文件添加环境
 
 startup.sh用于启动tomcat。
 
@@ -494,17 +497,17 @@ startup.sh用于启动tomcat。
 $ sudo vi ./bin/startup.sh
 ```
 
-2、添加环境
+* 添加环境
 
 **注意**：
 
-* 在文件的```exec "$PRGDIR"/"$EXECUTABLE" start "$@"```**之前**添加一下内容
+ 1.在文件的```exec "$PRGDIR"/"$EXECUTABLE" start "$@"```**之前**添加一下内容
 
-* JAVA_HOME、JRE_HOME等java的环境变量根据电脑情况填写相应地址。
+ 2.JAVA_HOME、JRE_HOME等java的环境变量根据电脑情况填写相应地址。
 
 ps：我这里的时用apt安装的java，java环境在```/usr/lib/jvm```中
 
-* tomcat环境也要加入，具体地址根据tomcat位置确定
+ 3.tomcat环境也要加入，具体地址根据tomcat位置确定
 
 ```
 #Java
@@ -517,14 +520,14 @@ export CLASSPATH=.:${JRE_HOME}/lib/rt.jar:${JAVA_HOME}/lib/dt.jar:${JAVA_HOME}/l
 export TOMCAT_HOME=/opt/tomcat/apache-tomcat-9.0.12
 ```
 
-## 给shutdown.sh文件添加环境
+* 给shutdown.sh文件添加环境
 shutdown.sh用于关闭tomcat。
 
 添加环境同startup.sh。
 
-## 重启电脑
+* 重启电脑
 
-## 开启和关闭tomcat
+* 开启和关闭tomcat
 1、进入tomcat安装包，即之前的/opt/tomcat/apache-tomcat-9.0.12
 
 2、开启和关闭tomcat
@@ -534,7 +537,7 @@ $ sudo ./bin/startup.sh
 $ sudo ./bin/shutdown.sh
 ```
 
-## 在eclipse配置tomcat
+* 在eclipse配置tomcat
 
 1、右键，run as \-\> run on server
 
@@ -551,7 +554,7 @@ $ chmod -R 777 conf
 ```
 
 4、再次添加tomcat即可使用
-# 10、Linux下配置Eclipse+CPP+MySQL
+## 5.6 Linux下配置Eclipse+CPP+MySQL
 
 想要在C++中调用mysql库函数，需要```#include <mysql.h>```
 
@@ -582,9 +585,9 @@ g++ -o test test.c -lmysqlclient -lm -I/usr/include/msqyl -L/usr/lib64/mysql
 
 到这个地址去找libmysqlclient.a这个文件。
 
-# 11、云端服务器安装Mongodb
+## 5.7 云端服务器安装Mongodb
 
-## 1、下载到自己的电脑
+* 下载到自己的电脑
 
 找到mongdb对应的版本。
 
@@ -598,20 +601,21 @@ $ wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.0.2.tg
 
 也可以网页下载。
 
-## 2、scp发送到云端服务器
+* scp发送到云端服务器
 
-## 3、解压安装包
+* 解压安装包
 
 ```
 $ tar -xvf mongodb-linux-x86_64-ubuntu1604-4.0.2.tgz
 ```
 
-## 4、解压包拷贝到/usr/local/mongodb
+* 解压包拷贝到/usr/local/mongodb
+
 ```
 $ sudo mv mongodb-linux-x86_64-ubuntu1604-4.0.2 /usr/local/mongodb
 ```
 
-## 5、设置环境变量
+* 设置环境变量
 1、vi开始编辑
 
 ```
@@ -638,7 +642,7 @@ Ctrl+C：退出inster模式
 $ source ~/.bashrc
 ```
 
-## 6、创建MongoDB数据库目录
+* 创建MongoDB数据库目录
 
 MongoDB的数据存储在Data目录的db目录下，但这些目录不会自动创建，需要手动创建/data/db目录，现在根目录(/)下创建data/db目录。
 
@@ -648,7 +652,7 @@ $ sudo mkdir -p /data/db
 
 注：若用户在其他位置创建data/db目录，需要启动mongod 服务时用--dbpath=xxxx来制定数据库的存储目录。/data/db这里是默认的路径，所以不需要设置。
 
-## 7、测试安装情况
+* 测试安装情况
 Question1:
 
 ```
@@ -688,9 +692,9 @@ $sudo chmod 777 -R /data
 
 开两个ssh，一个打开mongod，一个测试mongo。
 
-## 8、打开远程连接
+* 打开远程连接
 
-* 服务器端
+**服务器端**
 
 1、打开27017防火墙
 
@@ -704,7 +708,7 @@ $ sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 27017 -j ACC
 $ mongod --bind_ip 0.0.0.0
 ```
 
-* 客户端
+**客户端**
 
 连接
 
@@ -712,9 +716,9 @@ $ mongod --bind_ip 0.0.0.0
 $ mongo <远程IP>
 ```
 
-# 12、Linux shell的编写与使用
+# 6、Linux shell的编写与使用
 
-## 1、最简单的应用
+## 6.1 最简单的应用
 
 编写run.sh，用于编译和运行java程序
 
@@ -730,7 +734,7 @@ java test
 $ source run.sh
 ```
 
-## 2、给shell传递参数
+## 6.2 给shell传递参数
 
 例子
 
@@ -744,7 +748,7 @@ tail -n ${n} /opt/tomcat/apache-tomcat-8.0.53/logs/catalina.out
 
 其中\$1表示提取第一个按数，而第0个参数是“当前脚本文件名”
 
-## 3、shell变量
+## 6.3 shell变量
 
 ```bash
 # “=”前后不能有空格
@@ -760,7 +764,7 @@ echo myText
 
 注：变量赋值，“=”前后不能有空格
 
-## 4、四则运算
+## 6.4 四则运算
 ```bash
 #!/bin/bash
 echo "Hello World !"
@@ -781,7 +785,7 @@ echo "Total value : $val"
 
 **注**：定义变量的时候“=”前后是不能有空格的，但是进行四则运算的时候运算符号前后一定要有空格，乘法的时候需要进行转义。
 
-## 5、关系运算符
+## 6.5 关系运算符
 
 ```bash
 a=3
@@ -872,7 +876,7 @@ fi
 
 ```
 
-## 6、字符串运算符
+## 6.6 字符串运算符
 
 |运算符	|含义|
 |-|-|
@@ -928,7 +932,7 @@ echo $length
 
 同C语言
 
-## 7、判断语句
+## 6.7 判断语句
 ```bash
 #!/bin/sh
 a=10
@@ -961,7 +965,7 @@ else
 fi
 ```
 
-## 8、test
+## 6.8 test
 ```bash
 test $[num1] -eq $[num2]  #判断两个变量是否相等
 test num1=num2  #判断两个数字是否相等
@@ -981,7 +985,7 @@ test num1=num2  #判断两个数字是否相等
 |-|-|
 |\-d file	|文件目录存在则返回真|
 
-## 9、for循环
+## 6.9 for循环
 
 ```bash
 #!/bin/sh
@@ -1005,7 +1009,7 @@ do
 done
 ```
 
-## 10、while循环
+## 6.10 while循环
 ```
 #!/bin/sh
 
@@ -1026,14 +1030,14 @@ do
 done
 ```
 
-## 11、跳出循环
+## 6.11 跳出循环
 ```bash
 break  #跳出所有循环
 break n  #跳出第n层f循环
 continue  #跳出当前循环
 ```
 
-## 12、函数
+## 6.12 函数
 ```
 #!/bin/sh
 
@@ -1078,7 +1082,7 @@ cc
 aa bb cc
 ```
 
-## 13、重定向
+## 6.13 重定向
 
 ```
 $echo result > file  #将结果写入文件，结果不会在控制台展示，而是在文件中，覆盖写
@@ -1086,7 +1090,7 @@ $echo result >> file  #将结果写入文件，结果不会在控制台展示，
 echo input < file  #获取输入流
 ```
 
-## 14、github自动push脚本
+## 6.14 github自动push脚本
 
 ```bash
 #!/bin/bash
