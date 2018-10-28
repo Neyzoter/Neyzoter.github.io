@@ -718,7 +718,7 @@ $ mongo <远程IP>
 
 编写run.sh，用于编译和运行java程序
 
-```
+```bash
 #！./bin/bash
 javac test.java
 java test
@@ -726,7 +726,7 @@ java test
 
 运行sh，从而编译和运行java程序
 
-```
+```bash
 $ source run.sh
 ```
 
@@ -734,7 +734,7 @@ $ source run.sh
 
 例子
 
-```
+```bash
 #!/bin/bash
 # 提取第一个参数，表示从后往前读取n行catalina.out这个文件
 n=$1
@@ -744,7 +744,359 @@ tail -n ${n} /opt/tomcat/apache-tomcat-8.0.53/logs/catalina.out
 
 其中\$1表示提取第一个按数，而第0个参数是“当前脚本文件名”
 
+## 3、shell变量
 
+```bash
+# “=”前后不能有空格
+myText="hello world"
+myNum=100
+
+# $访问变量
+## 输出hello world
+echo $myText
+## 输出myText
+echo myText
+```
+
+注：变量赋值，“=”前后不能有空格
+
+## 4、四则运算
+```bash
+#!/bin/bash
+echo "Hello World !"
+a=3
+b=5
+val=`expr $a + $b`
+echo "Total value : $val"
+
+val=`expr $a - $b`
+echo "Total value : $val"
+
+val=`expr $a * $b`
+echo "Total value : $val"
+
+val=`expr $a / $b`
+echo "Total value : $val"
+```
+
+**注**：定义变量的时候“=”前后是不能有空格的，但是进行四则运算的时候运算符号前后一定要有空格，乘法的时候需要进行转义。
+
+## 5、关系运算符
+
+```bash
+a=3
+b=5
+val=`expr $a / $b`
+echo "Total value : $val"
+
+# 取余
+val=`expr $a % $b`
+echo "Total value : $val"
+
+# 判断语句
+if [ $a == $b ]
+then
+   echo "a is equal to b"
+fi
+if [ $a != $b ]
+then
+   echo "a is not equal to b"
+fi
+```
+
+|运算符	|含义|高级语言中的对应符号|
+|-|-|-|
+|\-eq	|两个数相等返回true|\=\=|
+|-|-|-|
+|\-ne	|两个数不相等返回true|\!\=|
+|-|-|-|
+|\-gt	|左侧数大于右侧数返回true|\>|
+|-|-|-|
+|\-lt	|左侧数小于右侧数返回true|\<|
+|-|-|-|
+|\-ge	|左侧数大于等于右侧数返回true|\>\=|
+|-|-|-|
+|\-le	|左侧数小于等于右侧数返回true|\<\=|
+
+```bash
+#!/bin/sh
+a=10
+b=20
+# 相等
+if [ $a -eq $b ]
+then
+   echo "true"
+else
+   echo "false"
+fi
+
+# 不相等
+if [ $a -ne $b ]
+then
+   echo "true"
+else
+   echo "false"
+fi
+
+# >
+if [ $a -gt $b ]
+then
+   echo "true"
+else
+   echo "false"
+fi
+
+# <
+if [ $a -lt $b ]
+then
+   echo "true"
+else
+   echo "false"
+fi
+
+# >=
+if [ $a -ge $b ]
+then
+   echo "true"
+else
+   echo "false"
+fi
+
+# <=
+if [ $a -le $b ]
+then
+   echo "true"
+else
+   echo "false"
+fi
+
+```
+
+## 6、字符串运算符
+
+|运算符	|含义|
+|-|-|
+|\=	|两个字符串相等返回true|
+|-|-|
+|\!\=	|两个字符串不相等返回true|
+|-|-|
+|\-z	|字符串长度为0返回true|
+|-|-|
+|\-n	|字符串长度不为0返回true|
+
+|运算符	|含义|
+|-|-|
+|\-d file	|检测文件是否是目录，如果是，则返回 true|
+|-|-|
+|\-r file	|检测文件是否可读，如果是，则返回 true|
+|-|-|
+|\-w file	|检测文件是否可写，如果是，则返回 true|
+|-|-|
+|\-x file	|检测文件是否可执行，如果是，则返回 true|
+|-|-|
+|\-s file	|检测文件是否为空（文件大小是否大于0，不为空返回 true|
+|-|-|
+|\-e file	|检测文件（包括目录）是否存在，如果是，则返回 true|
+
+**字符串**
+
+```bash
+#!/bin/sh
+mtext="hello"  #定义字符串
+mtext2="world"
+mtext3=$mtext" "$mtext2  #字符串的拼接
+echo $mtext3  #输出字符串
+echo ${#mtext3}  #输出字符串长度
+echo ${mtext3:1:4}  #截取字符串
+```
+
+**字符串**
+
+```bash
+#!/bin/sh
+array=(1 2 3 4 5)  #定义数组
+array2=(aa bb cc dd ee)  #定义数组
+value=${array[3]}  #找到某一个下标的数，然后赋值
+echo $value  #打印
+value2=${array2[3]}  #找到某一个下标的数，然后赋值
+echo $value2  #打印
+length=${#array[*]}  #获取数组长度
+echo $length
+```
+
+**printf**
+
+同C语言
+
+## 7、判断语句
+```bash
+#!/bin/sh
+a=10
+b=20
+if [ $a == $b ]
+then
+   echo "true"
+fi
+
+
+if [ $a == $b ]
+then
+   echo "true"
+else
+   echo "false"
+fi
+
+
+if [ $a == $b ]
+then
+   echo "a is equal to b"
+elif [ $a -gt $b ]
+then
+   echo "a is greater than b"
+elif [ $a -lt $b ]
+then
+   echo "a is less than b"
+else
+   echo "None of the condition met"
+fi
+```
+
+## 8、test
+```bash
+test $[num1] -eq $[num2]  #判断两个变量是否相等
+test num1=num2  #判断两个数字是否相等
+```
+
+|参数	|含义|
+|-|-|
+|\-e file	|文件存在则返回真|
+|-|-|
+|\-r file	|文件存在并且可读则返回真|
+|-|-|
+|\-w file	|文件存在并且可写则返回真|
+|-|-|
+|\-x file	|文件存在并且可执行则返回真|
+|-|-|
+|\-s file	|文件存在并且内容不为空则返回真|
+|-|-|
+|\-d file	|文件目录存在则返回真|
+
+## 9、for循环
+
+```bash
+#!/bin/sh
+
+# 1,2,3,4,5
+for i in {1..5}
+do
+    echo $i
+done
+
+# 6,7,8,9
+for i in 6 7 8 9
+do
+    echo $i
+done
+
+# 查找文件以.bash开头
+for FILE in $HOME/.bash*
+do
+   echo $FILE
+done
+```
+
+## 10、while循环
+```
+#!/bin/sh
+
+# 执行循环，然后每次都把控制的数加1
+COUNTER=0
+while [ $COUNTER -lt 5 ]
+do
+    COUNTER=`expr $COUNTER + 1`
+    echo $COUNTER
+done
+
+# 用户从键盘数据，然后把用户输入的文字输出出来。
+echo '请输入。。。'
+echo 'ctrl + d 即可停止该程序'
+while read FILM
+do
+    echo "Yeah! great film the $FILM"
+done
+```
+
+## 11、跳出循环
+```bash
+break  #跳出所有循环
+break n  #跳出第n层f循环
+continue  #跳出当前循环
+```
+
+## 12、函数
+```
+#!/bin/sh
+
+test(){
+
+    aNum=3
+    anotherNum=5
+    return $(($aNum+$anotherNum))
+}
+test
+result=$?
+echo $result
+```
+
+输出：
+
+```
+8
+```
+
+```bash
+#!/bin/sh
+
+test(){
+    echo $1  #接收第一个参数
+    echo $2  #接收第二个参数
+    echo $3  #接收第三个参数
+    echo $#  #接收到参数的个数
+    echo $*  #接收到的所有参数
+}
+
+test aa bb cc
+```
+
+输出：
+
+```
+aa
+bb
+cc
+3
+aa bb cc
+```
+
+## 13、重定向
+
+```
+$echo result > file  #将结果写入文件，结果不会在控制台展示，而是在文件中，覆盖写
+$echo result >> file  #将结果写入文件，结果不会在控制台展示，而是在文件中，追加写
+echo input < file  #获取输入流
+```
+
+## 14、github自动push脚本
+
+```bash
+#!/bin/bash
+echo "-------Begin-------"
+git add .
+git commit -m $1
+echo $1
+git push origin master
+echo "--------End--------"
+```
 
 
 
