@@ -26,11 +26,11 @@ RS9113.NBZ.WC.GEN.OSI.1.6.6\host（包含at、binary和sapis三个文件夹）�
 
 第3步，添加文件
 
-WLAN_CORE中添加 \RS9113.NBZ.WC.GEN.OSI.1.6.8\host\binary\apis\wlan\core\src中所有c文件
+WLAN_CORE中添加 \\RS9113.NBZ.WC.GEN.OSI.1.6.8\\host\\binary\\apis\\wlan\\core\\src中所有c文件
 
-WLAN_HAL中添加 \RS9113.NBZ.WC.GEN.OSI.1.6.8\host\binary\apis\intf\spi\src中的文件（用于SPI相关）和 \FreeRTOS_F4_Demo\host\binary\apis\hal\src中所有文件。
+WLAN_HAL中添加 \\RS9113.NBZ.WC.GEN.OSI.1.6.8\\host\\binary\\apis\\intf\\spi\\src中的文件（用于SPI相关）和 \FreeRTOS_F4_Demo\host\binary\apis\hal\src中所有文件。
 
-WLAN_APP 中添加 \RS9113.NBZ.WC.GEN.OSI.1.6.8\host\binary\apis\wlan\ref_apps\src中**除了**rsi_wifi_state_mc.c的所有文件。
+WLAN_APP 中添加 \\RS9113.NBZ.WC.GEN.OSI.1.6.8\\host\\binary\\apis\\wlan\\ref_apps\\src中**除了**rsi_wifi_state_mc.c的所有文件。
 
 第4步，添加路径。
 
@@ -47,7 +47,7 @@ WLAN_APP 中添加 \RS9113.NBZ.WC.GEN.OSI.1.6.8\host\binary\apis\wlan\ref_apps\s
 
 第5步，添加宏定义
 
-rsi_global.h中添加
+rsi_global\.h中添加
 
 ``` #define WLAN_ENABLE 1```
 
@@ -63,7 +63,7 @@ rsi_api.h中添加SPI接口宏（默认就有，如果没有就添加一下）
 
 第二行是正确的。
 
-```
+```cpp
 void rsi_interrupt_handler();
 void rsi_interrupt_handler(void);
 ```
@@ -72,7 +72,7 @@ void rsi_interrupt_handler(void);
 
 屏蔽掉函数内的处理。
 
-```
+```cpp
 void rsi_interrupt_handler(void)
 {
 	//中断不在这里处理
@@ -110,7 +110,7 @@ rsi_app_cb.pkt_pending = 1;//RSI_TRUE;
 
 WIFI_BOOT()
 
-```C
+```cpp
 
 char WIFI_BOOT(void)
 {

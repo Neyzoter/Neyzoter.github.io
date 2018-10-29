@@ -19,27 +19,27 @@ keywords: STM32L1, 运行模式, 电源, 时钟
 
 1.8V（Brown Out Reset,BOR）~3.6V
 
-* V_CORE
+* V\_CORE
 
 1.2V~1.8V，用于数字外围设备，SRAM，Flash Memory
 
 由内部电压转化电路提供
 
-* V_DDA 、V_SSA
+* V\_DDA 、V\_SSA
 
 1.8V（BOR）~3.6V
 
 V_DDA 是为ADC、DAC复位模块、RC振荡器和PLL。
 
-* V_REF+、V_REF-
+* V\_REF+、V\_REF-
 
 输入参考电压。
 
-* V_LCD
+* V\_LCD
 
 2.5V~3.6V，LCD（液晶显示）控制器可以由V_LCD引脚（STM32L1是引脚PIN_1）或者内部升压器产生
 
-如果LCD电源基于内部升压电路，那么PIN_1应该连接一个电容
+如果LCD电源基于内部升压电路，那么PIN\_1应该连接一个电容
 
 # 2、内部稳压器
 内部稳压器为所有的数字电路提供电源（除了备用电路standby circuitry）
@@ -52,23 +52,23 @@ V_DDA 是为ADC、DAC复位模块、RC振荡器和PLL。
 
 * 运行模式
 
-采用MR模式的内部稳压器为V_CORE供电
+采用MR模式的内部稳压器为V\_CORE供电
 
 * 低功耗运行模式
 
-采用LPR模式的内部稳压器为V_CORE供电
+采用LPR模式的内部稳压器为V\_CORE供电
 
 * 睡眠模式
 
-采用MR模式的内部稳压器为V_CORE供电
+采用MR模式的内部稳压器为V\_CORE供电
 
 * 低功耗睡眠模式
 
-采用LPR模式的内部稳压器为V_CORE供电
+采用LPR模式的内部稳压器为V\_CORE供电
 
 * 停止模式
 
-采用LPR模式的内部稳压器为V_CORE供电，保存寄存器和内部SRAM的内容。
+采用LPR模式的内部稳压器为V\_CORE供电，保存寄存器和内部SRAM的内容。
 
 * 待机模式
 
@@ -78,17 +78,17 @@ V_DDA 是为ADC、DAC复位模块、RC振荡器和PLL。
 
 * RANGE1
 
-高性能模式，V_CORE电压为1.8V
+高性能模式，V\_CORE电压为1.8V
 
 * RANGE2
 
-中等性能，V_CORE电压为1.5V，闪存仍然工作，但是以中速的存取时间。此时，在闪存上编程或者擦除操作仍然是可行的。
+中等性能，V\_CORE电压为1.5V，闪存仍然工作，但是以中速的存取时间。此时，在闪存上编程或者擦除操作仍然是可行的。
 
 * RANGE3
 
-低性能，V_CORE电压为1.2V，闪存仍然工作，但是以低速的存取时间。此时，在闪存上编程或者擦除操作是不可行的。
+低性能，V\_CORE电压为1.2V，闪存仍然工作，但是以低速的存取时间。此时，在闪存上编程或者擦除操作是不可行的。
 
-下面是不同的RANGE对应不同的 V_DD 和 V_CORE：
+下面是不同的RANGE对应不同的 V\_DD 和 V\_CORE：
 
 <img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/PerformanceVersusVDDandVCORERange.png" width="700" alt="不同的RANGE对应不同的V_DD和V_CORE" />
 
@@ -106,7 +106,7 @@ V_DDA 是为ADC、DAC复位模块、RC振荡器和PLL。
 
 1、数字 IP 时钟管理
 
-用RCC_APBxENR或者RCC_AHBENR打开或者关闭。
+用RCC\_APBxENR或者RCC\_AHBENR打开或者关闭。
 
 2、系统时钟SYSCLK
 
@@ -156,7 +156,7 @@ WFE：事件（Event）出现时，退出睡眠模式。
 
 闪存停止使用，内存保持可用。
 
-系统频率不能超过MSI的range1频率，V_CORE是RANGE2。
+系统频率不能超过MSI的range1频率，V\_CORE是RANGE2。
 
 如果APB1时钟频率小于RTC时钟的7倍，需要软件读取两次RTC寄存器。如果两次读取结果不同，则需要读第三次。
 
@@ -166,7 +166,7 @@ WFE：事件（Event）出现时，退出睡眠模式。
 
 1、关闭闪存
 
-采用FLASH_ACR寄存器中的SLEEP_PD位
+采用FLASH\_ACR寄存器中的SLEEP\_PD位
 
 <img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/FLASH_ACR.png" width="800" alt="FLASH_ACR寄存器" />
 
@@ -332,14 +332,14 @@ RTC闹钟事件、RTC唤醒事件、篡改事件（tamper event）、时间戳�
 
 1：CPU深度睡眠时进入待机模式
 
-该寄存器我们只关心 bit1 和 bit2 这两个位，这里我们通过设置PWR_CR的PDDS位，使CPU进入深度睡眠时进入待机模式，同时我们通过CWUF位，清除之前的唤醒位。
+该寄存器我们只关心 bit1 和 bit2 这两个位，这里我们通过设置PWR\_CR的PDDS位，使CPU进入深度睡眠时进入待机模式，同时我们通过CWUF位，清除之前的唤醒位。
 
 ### 3.7.2 电源控制/状态寄存器PWR_CSR介绍
 <img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/PWR_CSR.png" width="600" alt="PWR_CSR寄存器" />
 
 <img src="/images/posts/2018-2-16-PWR-Mode-of-STM32L1/WUF.png" width="600" alt="PWR_CSR寄存器的WUF" />
 
-WUF位是唤醒标志位，由硬件置1，系统复位或者CWUF位（PWR_CR寄存器中）置1来清除。
+WUF位是唤醒标志位，由硬件置1，系统复位或者CWUF位（PWR\_CR寄存器中）置1来清除。
 
 0：没有唤醒时间发生
 

@@ -12,7 +12,7 @@ keywords: FreeRTOS, 调度器
 
 # 1、任务创建函数
 
-```C
+```cpp
 BaseType_t xTaskCreate(	TaskFunction_t pxTaskCode,
 						const char * const pcName,		/*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 						const configSTACK_DEPTH_TYPE usStackDepth,
@@ -112,7 +112,7 @@ BaseType_t xReturn;
 # 2、任务调度器开启函数
 
 ## 2.1 任务调度开启
-```C
+```cpp
 void vTaskStartScheduler( void )
 {
 BaseType_t xReturn;
@@ -241,7 +241,7 @@ BaseType_t xReturn;
 
 ## 2.2 初始化调度器启动相关的硬件
 xPortStartScheduler在任务开启函数vTaskStartScheduler中调用。
-```C
+```cpp
 BaseType_t xPortStartScheduler( void )
 {
 	//编译代码
@@ -337,7 +337,7 @@ BaseType_t xPortStartScheduler( void )
 
 开启第一个任务：
 
-```C
+```cpp
 __asm void prvStartFirstTask( void )
 {
 	PRESERVE8
@@ -365,13 +365,13 @@ __asm void prvStartFirstTask( void )
 
 SVC中断被重定义了
 
-```C
+```cpp
 #define vPortSVCHandler    SVC_Handler
 ```
 
 SVC中断服务函数
 
-```C
+```cpp
 __asm void vPortSVCHandler( void )
 {
 	PRESERVE8

@@ -13,7 +13,7 @@ keywords: FreeRTOS, Tickless
 # 简介
 在FreeRTOS操作系统进入Tickless模式后，系统的滴答时钟不再计数。FreeRTOS采用的技术是，预测进入低功耗等待的时间，在退出低功耗后把时间加上。这个预测时间是xExpectedIdleTime，如果按照预测时间退出低功耗，那么真实等待时间就是xExpectedIdleTime。
 
-```
+```cpp
 /* As the pending tick will be processed as soon as this
 function exits, the tick value maintained by the tick is stepped
 forward by one less than the time spent waiting. */
@@ -22,7 +22,7 @@ ulCompleteTickPeriods = xExpectedIdleTime - 1UL;
 
 但是虽然FreeRTOS关闭了较低优先级的中断，比如滴答定时器中断。但是其他的高优先级中断会使得系统提前退出低功耗。这个时间就通过NVIC的时间来计算得到。
 
-```
+```cpp
 ulCompletedSysTickDecrements = ( xExpectedIdleTime * ulTimerCountsForOneTick ) - portNVIC_SYSTICK_CURRENT_VALUE_REG;
 
 /* How many complete tick periods passed while the processor
@@ -39,7 +39,7 @@ ulCompleteTickPeriods对于超时判断有着非常好用的作用。比如一�
 
 预编译
 
-```
+```cpp
 #ifndef configREAL_WAITINGTIME_PROCESSING
 	#define configREAL_WAITINGTIME_PROCESSING( x )
 #endif
@@ -48,7 +48,8 @@ ulCompleteTickPeriods对于超时判断有着非常好用的作用。比如一�
 2、FreeRTOSConfig.h
 
 声明函数
-```
+
+```cpp
 extern void RealWaitingTimeProcessing(uint32_t ulCompleteTickPeriods);
 #define configREAL_WAITINGTIME_PROCESSING		RealWaitingTimeProcessing	
 ```
@@ -57,7 +58,7 @@ extern void RealWaitingTimeProcessing(uint32_t ulCompleteTickPeriods);
 
 在退出低功耗后调用该函数——configREAL_WAITINGTIME_PROCESSING(ulCompleteTickPeriods);
 
-```
+```cpp
 …………
 portNVIC_SYSTICK_CURRENT_VALUE_REG = 0UL;
 portNVIC_SYSTICK_CTRL_REG |= portNVIC_SYSTICK_ENABLE_BIT;
@@ -77,7 +78,7 @@ __enable_irq();
 
 eg.
 
-```
+```cpp
 void RealWaitingTimeProcessing(uint32_t ulCompleteTickPeriods)
 {
 	if(usart.WAIT_START)	

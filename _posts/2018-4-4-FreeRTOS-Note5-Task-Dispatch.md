@@ -87,7 +87,7 @@ RTOS调度器：确保当一个任务开始执行的时候上下文环境（寄�
 
 * 创建任务函数
 
-```
+```cpp
 //自动分配堆栈的创建任务函数
 BaseType_t xTaskCreate(	TaskFunction_t pxTaskCode,
 		const char * const pcName,		/*lint !e971 Unqualified char types are allowed for strings and single characters only. */
@@ -97,7 +97,7 @@ BaseType_t xTaskCreate(	TaskFunction_t pxTaskCode,
 		TaskHandle_t * const pxCreatedTask )
 ```
 
-```
+```cpp
 //用户分配堆栈的创建任务函数
 TaskHandle_t xTaskCreateStatic(	TaskFunction_t pxTaskCode,
 		const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
@@ -111,7 +111,7 @@ TaskHandle_t xTaskCreateStatic(	TaskFunction_t pxTaskCode,
 
 * 任务函数模板
 
-```
+```cpp
 //任务函数模板
 //任务函数的返回值一定要是void类型，也就是无返回值而且任务的参数也是void指针类型
 void vATaskFunction(void * pvParameters)
@@ -131,7 +131,7 @@ void vATaskFunction(void * pvParameters)
 ```
 
 # 6.任务控制块
-```
+```cpp
 typedef struct tskTaskControlBlock
 {
 	volatile StackType_t	*pxTopOfStack;	/*<指向任务堆栈栈顶（最近一个任务last item），必须是TCB结构体的第一个成员*/

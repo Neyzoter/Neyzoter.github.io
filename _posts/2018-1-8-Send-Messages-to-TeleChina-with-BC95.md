@@ -20,6 +20,7 @@ keywords: NB-IoT,物联网,电信,华为
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/telechinaWechat.png" width="300" alt="天翼电信物联网平台" />
 
 ### 3、收到电信的邮件
+
 <img src="/images/posts/2018-1-8-Send-Messages-to-TeleChina-with-BC95/letterTelechina.png" width = "900"  alt="天翼电信邮件" />
 
 第一个红框是图形界面搭建profile和编解码插件的平台，可在上面进行可视化的平台配置。
@@ -224,7 +225,6 @@ keywords: NB-IoT,物联网,电信,华为
 [http://developer.huawei.com/ict/cn/site-oceanconnect_doc?id=12&resourceType=3&curPage=1&pageNum=12](http://developer.huawei.com/ict/cn/site-oceanconnect_doc?id=12&resourceType=3&curPage=1&pageNum=12)
 
 本文档在此基础上加入了硬件的配置。
-
 
 >宋超超  
 >[http://neyzoter.github.io](http://neyzoter.github.io "我的Github主页")

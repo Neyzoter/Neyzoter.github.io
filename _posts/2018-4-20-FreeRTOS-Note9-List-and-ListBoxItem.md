@@ -34,7 +34,7 @@ keywords: FreeRTOS, 列表, 列表项
 >总结：列表->某一个列表项（通过链表遍历到其他的列表项）->任务控制块<-当前任务
 
 ## 1.1 列表
-```
+```cpp
 typedef struct xLIST
 {
 	listFIRST_LIST_INTEGRITY_CHECK_VALUE				/*< 如果 configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES设置为1，则给该变量赋值一个值，用于检查列表完整性. */
@@ -53,7 +53,7 @@ typedef struct xLIST
 
 列表项即存放在列表中的项目，分为列表项和迷你列表项。
 
-```
+```cpp
 struct xLIST_ITEM
 {
 	listFIRST_LIST_ITEM_INTEGRITY_CHECK_VALUE			
@@ -73,7 +73,7 @@ typedef struct xLIST_ITEM ListItem_t;
 
 ## 1.3 迷你列表项
 
-```
+```cpp
 struct xMINI_LIST_ITEM
 {
 	listFIRST_LIST_ITEM_INTEGRITY_CHECK_VALUE			
@@ -91,7 +91,7 @@ typedef struct xMINI_LIST_ITEM MiniListItem_t;
 # 2、列表和列表项初始化
 
 ## 2.1 列表初始化
-```
+```cpp
 void vListInitialise( List_t * const pxList )
 {
 
@@ -118,7 +118,7 @@ void vListInitialise( List_t * const pxList )
 
 ## 2.2 列表项初始化
 
-```
+```cpp
 void vListInitialiseItem( ListItem_t * const pxItem )
 {
 	/* 初始化pvContainer为NULL. */
@@ -132,7 +132,7 @@ void vListInitialiseItem( ListItem_t * const pxItem )
 
 # 3、列表项插入
 
-```
+```cpp
 void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem )
 {
 	ListItem_t *pxIterator;
@@ -186,7 +186,7 @@ void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem )
 
 不使用列表项的数值来决定列表的先后顺序。
 
-```
+```cpp
 void vListInsertEnd( List_t * const pxList, ListItem_t * const pxNewListItem )
 {
 	ListItem_t * const pxIndex = pxList->pxIndex;
@@ -223,7 +223,8 @@ void vListInsertEnd( List_t * const pxList, ListItem_t * const pxNewListItem )
 <img src="/images/posts/2018-4-20-FreeRTOS-Note9-List-and-ListBoxItem/insertEndItem3.png" width="600" alt="插入前两个列表项" />
 
 # 5、列表项的删除
-```
+
+```cpp
 UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove )
 {
 /* The list item knows which list it is in.  Obtain the list from the list
@@ -255,7 +256,7 @@ List_t * const pxList = ( List_t * ) pxItemToRemove->pvContainer;
 ```
 
 # 6、列表的遍历
-```
+```cpp
 //pxTCB用于保存pxIndex所指向的列表项的pvOwner变量值，即列表属于谁。通常是一个任务的任务控制块。
 //pxList表示要遍历的列表
 #define listGET_OWNER_OF_NEXT_ENTRY( pxTCB, pxList )							

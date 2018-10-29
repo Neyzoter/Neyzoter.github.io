@@ -44,14 +44,14 @@ python ./yad2k.py yolov2.cfg yolov2.weights model_data/yolo.h5
 
 ## 2.5 测试
 
-用./images中的图片测试一下keras模型
+用\./images中的图片测试一下keras模型
 
 ```
 python ./test_yolo.py model_data/yolo.h5 # output in images/out/
 ```
 
 ## 2.6 keras调用
-```
+```python
 yolo_model = keras.models.load_model("model_data/yolo.h5") 
 ```
 

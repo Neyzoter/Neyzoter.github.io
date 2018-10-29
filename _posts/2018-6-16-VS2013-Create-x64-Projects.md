@@ -128,7 +128,7 @@ opencv_videostab340d.lib
 
 六、测试
 
-```CPP
+```cpp
 #include<iostream>
 #include<opencv2/core/core.hpp>
 #include<opencv2/highgui/highgui.hpp>

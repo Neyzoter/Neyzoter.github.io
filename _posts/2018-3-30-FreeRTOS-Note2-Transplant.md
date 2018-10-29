@@ -11,7 +11,7 @@ keywords: FreeRTOS, 移植, Keil, STM32
 > 转载请注明出处，侵权必究。
 
 # 1、前期准备
-1、进入源码，FreeRTOS  ->  Source。
+1、进入源码，FreeRTOS  \->  Source。
 
 2、删除portable中不需要的文件。
 
@@ -32,19 +32,19 @@ RVDS和keil的文件相同，所以keil需要的文件只要从RVDS中复制即�
 
 <img src="/images/posts/2018-3-30-FreeRTOS-Note2-Transplant/Add-RreeRTOS-Into-Keil.png" width="250" alt="在keil工程中添加FreeRTOS和PORTABLE" />
 
-注：采用heap_x.c是几种不同的内存管理方法，这里选择4。
+注：采用heap\_x.c是几种不同的内存管理方法，这里选择4。
 
 ## 2.3 添加头文件路径
 
 ## 2.4 添加FreeRTOSConfig.h到文件夹
-将官方的FreeRTOSConfig.h（例程中有）添加到任意一个工程文件即可，只要使得Keil工程找得到。这里放到了FreeRTOS->include文件夹中。
+将官方的FreeRTOSConfig.h（例程中有）添加到任意一个工程文件即可，只要使得Keil工程找得到。这里放到了FreeRTOS\->include文件夹中。
 
 ## 2.5 编译发现定义问题
 >A1586E: Bad operand types (UnDefOT, Constant) for operator (
 
 是因为将5和4U进行了计算，在main.h中加入
 
-```
+```cpp
 //强制把__NVIC_PRIO_BITS定义为4，而不是4U
 #if 1
 #ifdef __NVIC_PRIO_BITS
@@ -68,7 +68,7 @@ RVDS和keil的文件相同，所以keil需要的文件只要从RVDS中复制即�
 
 * sys.h文件
 
-```
+```cpp
 #define SYSTEM_SUPPORT_OS		1		//定义系统文件夹是否支持OS
 ```
 
@@ -76,7 +76,7 @@ RVDS和keil的文件相同，所以keil需要的文件只要从RVDS中复制即�
 
 1、添加FreeRTOS的h文件
 
-```
+```cpp
 #if SYSTEM_SUPPORT_OS
 #include "includes.h"					//os 使用	 
 #include "FreeRTOS.h"//FreeRTOS
@@ -87,14 +87,14 @@ RVDS和keil的文件相同，所以keil需要的文件只要从RVDS中复制即�
 
 USARTx_IRQHandler中，以下的两段代码删除。
 
-```
+```cpp
 #if SYSTEM_SUPPORT_OS	 	//使用OS
 	OSIntEnter();    
 #endif
 
 ```
 
-```
+```cpp
 #if SYSTEM_SUPPORT_OS	 	//使用OS
 	OSIntExit();
 #endif
@@ -106,7 +106,8 @@ USARTx_IRQHandler中，以下的两段代码删除。
 配置FreeRTOS的系统时钟。FreeRTOS的心跳由滴答时钟产生。
 
 stm32l1xx_it.c文件
-```
+
+```cpp
 
 #ifdef SYSTEM_SUPPORT_OS
 	#include "FreeRTOS.h"
@@ -129,7 +130,8 @@ void SysTick_Handler(void)
 2、系统时钟配置
 
 sys.c文件中的SystemClock_Config函数：
-```
+
+```cpp
 /**配置SysTick系统滴答时钟中断时间 
  */
 HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/configTICK_RATE_HZ);
@@ -140,7 +142,7 @@ configTICK_RATE_HZ这里原来是数字1000，表示以1000hz的频率中断。c
 ## 2.9 例程代码测试
 main.c
 
-```
+```cpp
 #include "main.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -277,7 +279,7 @@ int main(void)
 
 前提：芯片自带FPU，浮点计算单元，比如STM32F4。而STM32L1系列没有。
 
-```
+```cpp
 float_num+=0.01f;
 ```
 

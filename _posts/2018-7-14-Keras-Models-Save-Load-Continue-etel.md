@@ -11,7 +11,7 @@ keywords: Python, keras
 > 转载请注明出处，侵权必究
 
 # 1、Keras神经网络模型方法的介绍
-1、model.save(filepath, overwrite=True, include_optimizer=True)
+1、model.save(filepath, overwrite=True, include\_optimizer=True)
 
 保存模型到h5文件，包括模型的结构、权重、训练配置（损失函数、优化器等）、优化器的状态（以便从上次训练中断的地方开始）。
 
@@ -27,8 +27,8 @@ from keras.models import load_model
 model.save('my_model.h5')  # 保存模型
 del model  # 删掉存在的模型
 
-# 返回一个编译好的模型
-# 与删掉的模型相同
+#返回一个编译好的模型
+#与删掉的模型相同
 model = load_model('my_model.h5')
 ```
 

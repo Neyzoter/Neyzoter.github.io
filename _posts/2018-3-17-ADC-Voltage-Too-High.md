@@ -3,7 +3,7 @@ layout: post
 title: ADC过压保护电压的思考
 categories: HARDWARE
 description: ADC过压保护电压的思考
-keywords: 
+keywords: ADC,过压保护
 ---
 
 # 一、问题
@@ -12,6 +12,7 @@ STM32的ADC输入电压过高会烧坏引脚，需要添加过压保护。
 # 二、解决方法
 ## 1、电阻分压
 以下来自于[网友chunyang](http://bbs.eeworld.com.cn/thread-460529-1-1.html)
+
 >看ADC的输入阻抗和信号源的驱动能力。信号源驱动能力够且ADC的输入阻抗够高可用合适的电阻直接分压。如果信号源内阻较高、驱动能力很差，则先用运放缓冲后再分压。如果信号源电压远远超过系统供电电压，那么只能先分压。
 
 ## 2、钳位电压

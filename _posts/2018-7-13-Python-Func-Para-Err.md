@@ -36,3 +36,4 @@ X = identity_block(X, 3, [64, 64, 256], stage=2, block='b')
 ```python
 X = identity_block(X, f = 3, filters = [64, 64, 256], stage=2, block='b')
 ```
+

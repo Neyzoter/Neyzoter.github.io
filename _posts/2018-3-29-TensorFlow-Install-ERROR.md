@@ -21,7 +21,7 @@ CondaHTTPError: HTTP None None for url blabla...
 1）查看情况
 
 ```
-$ conda config –-show
+$ conda config --show
 ```
 
 2）查看.condarc的地址

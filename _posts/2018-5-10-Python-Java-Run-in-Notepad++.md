@@ -73,7 +73,7 @@ cmd /k F:\Program\Anaconda\python.exe "$(FULL_CURRENT_PATH)" & PAUSE & EXIT
 
 <img src="/images/posts/2018-5-10-Python-Java-Run-in-Notepad++/copyPaste.png" width="400" alt="执行NppExec" />
 
-```
+```bash
 javac "$(FULL_CURRENT_PATH)"
 echo
 echo ===========编译成功后开始运行===========

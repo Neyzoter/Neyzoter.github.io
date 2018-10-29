@@ -59,7 +59,7 @@ MSI来自于内部RC振荡器。可设置为65.536 kHz, 131.072 kHz, 262.144 kHz
 
 3、RTC和LCD时钟来自于LSE、LSI或者1MHz的HSE_RTC（HSE被程序分频）
 
-4、独立看门狗（independent watch dog，IWDG）时钟总是来自于LSI
+4、独立看门狗（Independent Watch DoG，IWDG）时钟总是来自于LSI
 
 #### 2 系统时钟频率
 应该高于或者等于RTC/LCD的时钟频率
@@ -79,3 +79,5 @@ AHB时钟：HCLK
 APB时钟：PCLK
 
 内核定时器：Core System Timer
+
+

@@ -34,11 +34,11 @@ FreeRTOS在处理器处理空闲任务的时候将处理器设置为低功耗模
 我们可以知道下一个任务到来的时间，只需要另外再开一个定时器，定时器的定时周期设置为这个时间即可。如果没有低功耗的定时器完成这个唤醒功能，滴答定时器也可以，下面有讲解。FreeRTOS具有得知下一个任务到来的时间的功能。
 
 # 2.Tickless具体实现
-**1.configUSE_TICKLESS_IDLE**
+**1.configUSE\_TICKLESS\_IDLE**
 
 1：使用Tickless模式，FreeRTOS提供了现成的portSUPPRESS_TICKS_AND_SLEEP函数。2：使用Tickless，并且用户自行编写进入Tickless低功耗的portSUPPRESS_TICKS_AND_SLEEP函数。该宏默认为0。
 
-**2.portSUPPRESS_TICKS_AND_SLEEP()**
+**2.portSUPPRESS\_TICKS\_AND\_SLEEP()**
 
 使能Tickless模式后，且出现以下两种情况：
 
@@ -50,14 +50,14 @@ portSUPPRESS_TICKS_AND_SLEEP( xExpectedIdleTime )这里有一个参数xExpectedI
 
 portSUPPRESS_TICKS_AND_SLEEP在文件protmacro.h中定义，
 
-```
+```cpp
 #ifndef portSUPPRESS_TICKS_AND_SLEEP
 	extern void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime );
 	#define portSUPPRESS_TICKS_AND_SLEEP( xExpectedIdleTime ) vPortSuppressTicksAndSleep( xExpectedIdleTime )
 #endif
 ```
 
-```
+```cpp
 __weak void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
 {
 uint32_t ulReloadValue, ulCompleteTickPeriods, ulCompletedSysTickDecrements;
@@ -224,7 +224,7 @@ TickType_t xModifiableIdleTime;
 
 **xMaximumPossibleSuppressedTicks**
 
-```
+```cpp
 ulTimerCountsForOneTick = ( configSYSTICK_CLOCK_HZ / configTICK_RATE_HZ );
 xMaximumPossibleSuppressedTicks = portMAX_24_BIT_NUMBER / ulTimerCountsForOneTick;
 
@@ -235,7 +235,7 @@ xMaximumPossibleSuppressedTicks = portMAX_24_BIT_NUMBER / ulTimerCountsForOneTic
 
 **ulStoppedTimerCompensation**
 
-```
+```cpp
 #define portMISSED_COUNTS_FACTOR			( 45UL )
 ulStoppedTimerCompensation = portMISSED_COUNTS_FACTOR / ( configCPU_CLOCK_HZ / configSYSTICK_CLOCK_HZ );
 ```
@@ -249,7 +249,7 @@ portMISSED_COUNTS_FACTOR可以自行修改，但是由于代码的优化程度�
 
 在FreeRTOSconfig.h中定义：
 
-```
+```cpp
 extern void PreSleepProcessing(uint32_t ulExpectedTime);
 extern void PostSleepProcessing(uint32_t ulExpectedTime);
 	

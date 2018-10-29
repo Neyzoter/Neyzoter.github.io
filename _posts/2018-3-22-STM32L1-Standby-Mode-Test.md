@@ -51,7 +51,7 @@ WUF位是唤醒标志位，由硬件置1，系统复位或者CWUF位（PWR_CR寄
 
 2， 清零对应中断标志位。
 
-3， 清除 PWR 唤醒(WUF)标志（通过设置 PWR_CR 的 CWUF 位实现）。
+3， 清除 PWR 唤醒(WUF)标志（通过设置 PWR\_CR 的 CWUF 位实现）。
 
 4， 重新使能 RTC 对应中断。
 
@@ -67,20 +67,20 @@ STM32L152RET6的wakeup引脚：PA0（WKUP1）、PC13（KUP2）
 
 1)使能pwr时钟
 
-```
+```cpp
 __HAL_RCC_PWR_CLK_ENABLE();
 ```
 
 2)设置WKUP为唤醒源,并清除唤醒标志位
 
-```
+```c
 HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN2);//这里是PC13，看是按键连接什么
 SET_BIT(PWR->CR, PWR_CR_CWUF);//唤醒标志位清除
 ```
 
 3)设置SLEEPDEEP位、PDDS位，执行WFI指令，进入待机模式
 
-```
+```cpp
 HAL_PWR_EnterSTANDBYMode();
 ```
 
@@ -96,7 +96,7 @@ WFE：MCU在事件发生时立即退出低功耗模式
 
 example.
 
-```
+```cpp
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	int i=0;
@@ -136,13 +136,13 @@ hrtc.Init.AsynchPrediv和hrtc.Init.SynchPrediv分别是两个分频器，这两�
 
 具体步骤和WAKEUP类似，只需要在正常运行时关闭RTC：
 
-```
+```cpp
 __HAL_RCC_RTC_DISABLE();
 ```
 
 在要进入待机模式时，打开RTC：
 
-```
+```cpp
 __HAL_RCC_RTC_ENABLE();
 ```
 
@@ -157,13 +157,13 @@ __HAL_RCC_RTC_ENABLE();
 3)待机模式下，除了配置了的WKUP引脚，都是高阻态。
 
 4)RTC寄存器修改时一定要DISABLE写保护。
-```
+```cpp
 __HAL_RTC_WRITEPROTECTION_DISABLE(&hrtc);
 
 ```
 
 修改完后，就要使能写保护。
-```
+```cpp
 __HAL_RTC_WRITEPROTECTION_ENABLE(&hrtc);
 ```
 

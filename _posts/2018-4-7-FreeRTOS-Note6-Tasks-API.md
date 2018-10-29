@@ -18,7 +18,7 @@ keywords: FreeRTOS, API, 任务
 
 * 原型
 
-```
+```cpp
 BaseType_t xTaskCreate(	TaskFunction_t pxTaskCode,	/*<任务函数*/
 	const char * const pcName,	/*<任务名字，用于追踪和调试，长度不能超过configMAX_TASK_NAME_LEN*/
 	const configSTACK_DEPTH_TYPE usStackDepth,/*<任务堆栈的大小，是usStackDepth的4倍，空闲任务为configMINIMAL_STACK_SIZE>/
@@ -32,16 +32,16 @@ BaseType_t xTaskCreate(	TaskFunction_t pxTaskCode,	/*<任务函数*/
 
 pdPASS：任务创建成功
 
-errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY：任务创建失败，因为堆内存不足
+errCOULD\_NOT\_ALLOCATE\_REQUIRED\_MEMORY：任务创建失败，因为堆内存不足
 
 ## 1.2 xTaskCreateStatic()
 * 功能
 
-使用静态的方式（用户分配堆栈空间）创建一个任务，需要定义configSUPPORT_STATIC_ALLOCATION为1。
+使用静态的方式（用户分配堆栈空间）创建一个任务，需要定义configSUPPORT\_STATIC\_ALLOCATION为1。
 
 * 原型
 
-```
+```cpp
 TaskHandle_t xTaskCreateStatic(	TaskFunction_t pxTaskCode,	/*<任务函数*/
 	const char * const pcName,	/*<任务名字，用于追踪和调试，长度不能超过configMAX_TASK_NAME_LEN*/
 	const uint32_t ulStackDepth,/*<任务堆栈的大小，一般由用户给出>/
@@ -65,7 +65,7 @@ NULL：任务创建失败。puxStackBuffer或者pxTaskBuffer为NULL的时候会�
 
 * 原型
 
-```
+```cpp
 BaseType_t xTaskCreateRestrictedStatic( 
 const TaskParameters_t * const pxTaskDefinition, /*<指向一个结构体TaskParameters_t，描述了任务的任务函数、堆栈大小、优先级等，该结构体在task.h中定义。*/
  TaskHandle_t *pxCreatedTask /*<任务句柄*/
@@ -93,7 +93,7 @@ pdPASS：任务创建成功。
 
 * 原型
 
-```
+```cpp
 void vTaskSuspend( TaskHandle_t xTaskToSuspend );
 ```
 

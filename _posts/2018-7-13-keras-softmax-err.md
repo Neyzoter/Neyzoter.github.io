@@ -13,7 +13,7 @@ keywords: Python, keras, softmax, tensorflow
 # 1、问题描述
 调用函数
 
-```
+```python
 Dense(classes, activation='softmax', name='fc' + str(classes), kernel_initializer = glorot_uniform(seed=0))(X)
 ```
 
@@ -31,7 +31,7 @@ softmax() got an unexpected keyword argument 'axis'
 
 将里面的
 
-```
+```python
 def softmax(x, axis=-1):
     """Softmax of a tensor.
 

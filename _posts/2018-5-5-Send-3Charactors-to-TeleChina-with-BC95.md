@@ -25,17 +25,17 @@ profile文件（zip文件）命名格式为设备类型_厂商ID_设备名称.zi
 
 StressMonitorUnion_ZJU_Union001.zip
 
-\|----  profile（设备的profile文件夹）
+\|\-\-\-\-  profile（设备的profile文件夹）
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \|-----devicetype-capability.json（设备类型能力json）
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \|\-\-\-\-\-devicetype-capability.json（设备类型能力json）
 
-\|----  service（服务文件夹）
+\|\-\-\-\-  service（服务文件夹）
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \|-----  Stress（压力服务文件夹）
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \|\-\-\-\-\-  Stress（压力服务文件夹）
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\|-----  profile（压力服务profile文件夹）
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\|\-\-\-\-\-  profile（压力服务profile文件夹）
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \|-----   servicetype-capability.json（压力服务类型能力json）
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \|\-\-\-\-\-   servicetype-capability.json（压力服务类型能力json）
 
 <img src="/images/posts/2018-5-5-Send-3Charactors-to-TeleChina-with-BC95/files.png" width = "300"  alt="文件夹"  />
 
@@ -47,7 +47,7 @@ StressMonitorUnion_ZJU_Union001.zip
 
 设备的能力描述文件包括一个服务：压力服务。
 
-```
+```json
 {
     "devices": [
         {
@@ -72,7 +72,7 @@ StressMonitorUnion_ZJU_Union001.zip
 
 服务类型包含三个属性：压力中值（长度6）、压力最小值（长度6）、压力最大值（长度6）。
 
-```
+```json
 {
     "services": [
         {

@@ -28,7 +28,7 @@ keywords: Ubuntu, Windows, 双系统
 
 4、输入管理员密码
 
-5、打开grub文件后，看到“GRUB_DEFAULT=0”，修改为win的启动项
+5、打开grub文件后，看到“GRUB\_DEFAULT=0”，修改为win的启动项
 
 从**1、查看启动项**可以知道，我的win启动项是2。所以我这里改成“GRUB_DEFAULT=2”
 
@@ -36,7 +36,7 @@ keywords: Ubuntu, Windows, 双系统
 
 7、再次回车确认
 
-8、输入“sudo update-grub”更新
+8、输入“sudo update\-grub”更新
 
 9、下次启动的时候，就是默认win启动了
 

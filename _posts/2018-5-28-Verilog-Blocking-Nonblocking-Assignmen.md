@@ -28,7 +28,7 @@ keywords: FPGA, Verilog, 阻塞赋值, 非阻塞赋值
 # 2、例子
 ## 2.1 阻塞式赋值例子
 
-```Verilog
+```verilog
 module fbosc1(y1,y2,clk,rst);
 	output y1,y2;
 	input clk,rst;
@@ -58,7 +58,7 @@ endmodule
 
 ## 2.2 非阻塞式赋值例子
 
-```Verilog
+```verilog
 module fbosc1(y1,y2,clk,rst);
 	output y1,y2;
 	input clk,rst;

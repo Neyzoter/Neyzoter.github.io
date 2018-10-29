@@ -3,7 +3,7 @@ layout: post
 title: FreeRTOS学习笔记(7)FreeRTOS使用过程中的教训
 categories: RTOS
 description: FreeRTOS学习笔记(7)FreeRTOS使用过程中的教训
-keywords: FreeRTOS, 经验
+keywords: FreeRTOS
 ---
 
 > 原创

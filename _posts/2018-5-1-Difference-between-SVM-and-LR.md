@@ -14,6 +14,7 @@ keywords: 支持向量机, 逻辑回归
 ## 1.1 SVM
 
 ## 1.2 LR
+
 损失函数：
 
 <img src="/images/posts/2018-5-1-Difference-between-SVM-and-LR/LR_Loss.png" width="300" alt="LR的损失函数" />

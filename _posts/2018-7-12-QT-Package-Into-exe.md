@@ -26,7 +26,7 @@ keywords: QT, C++
 <img src="/images/posts/2018-7-12-QT-Package-Into-exe/releaseFile.png" width="600" alt="release编译文件" />
 
 ## 2.2 拷贝exe文件
-找到release编译文件夹中的exe文件，我的地址是C:\Users\Thinkpad\Desktop\Socket-Test-QT\build-Socket-Test-Desktop_Qt_5_3_MSVC2013_OpenGL_32bit-Release\release。
+找到release编译文件夹中的exe文件，我的地址是C:\\Users\\Thinkpad\\Desktop\\Socket\-Test\-QT\\build-Socket-Test-Desktop\_Qt\_5\_3\_MSVC2013\_OpenGL_32bit\-Release\\release。
 
 运行该exe文件，发现出错，因为没有QT相关的库文件。
 

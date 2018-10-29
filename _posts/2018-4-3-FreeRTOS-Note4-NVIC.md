@@ -40,7 +40,7 @@ FreeRTOS没有处理亚优先级，所以配置STM32的优先级为组4，全部
 
 可以用CPS（修改处理器状态）指令来修改寄存器的数值。
 
-```
+```cpp
 //使能中断（清除PRIMASK）
 CPSIE I;
 
@@ -50,7 +50,7 @@ CPSID I;
 
 也可以通过MRS和MSR：
 
-```
+```cpp
 MOVS R0,#1;
 
 MSR PRIMASK ,R0;//1写入PRIMASK
@@ -61,7 +61,7 @@ MSR PRIMASK ,R0;//1写入PRIMASK
 
 除了NMI之外的所有异常和中断都屏蔽掉。
 
-```
+```cpp
 //使能中断（清除FAULTMASk）
 CPSIE F;
 
@@ -92,7 +92,7 @@ CPSID F;
 
 配置内核中断优先级。代码如下
 
-```
+```cpp
 #define configKERNEL_INTERRUPT_PRIORITY 		( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 ```
 
@@ -100,7 +100,7 @@ CPSID F;
 
 configKERNEL_INTERRUPT_PRIORITY用来设置PendSV和滴答时钟的中断优先级，定义如下。
 
-```
+```cpp
 #define portNVIC_PENDSV_PRI		( ( ( uint32_t ) configKERNEL_INTERRUPT_PRIORITY ) << 16UL )
 #define portNVIC_SYSTICK_PRI	( ( ( uint32_t ) configKERNEL_INTERRUPT_PRIORITY ) << 24UL )
 ```
@@ -109,7 +109,7 @@ configKERNEL_INTERRUPT_PRIORITY用来设置PendSV和滴答时钟的中断优先�
 
 在函数xPortStartScheduler中定义了这两者的优先级：
 
-```
+```cpp
 //portNVIC_SYSPRI2_REG寄存器包含了0xE000_ED20之后32位的寄存器
 //其中从低到高分别是调试监视器（0xE000_ED20）、--（0xE000_ED21）、PendSV（0xE000_ED22）和SysTick（0xE000_ED23）
 portNVIC_SYSPRI2_REG |= portNVIC_PENDSV_PRI;
@@ -124,7 +124,7 @@ portNVIC_SYSPRI2_REG |= portNVIC_SYSTICK_PRI;
 
 将该值给BASEPRI寄存器赋值。FreeRTOS的开关中断通过操作BASEPRI寄存器实现的。关闭优先级小于该值的中断，打开大于该值的中断。
 
-```
+```cpp
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 	( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 ```
 
@@ -132,7 +132,7 @@ portNVIC_SYSPRI2_REG |= portNVIC_SYSTICK_PRI;
 
 该宏由configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY左移4位得到，道理同configKERNEL_INTERRUPT_PRIORITY。
 
-```
+```cpp
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 	( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 ```
 
@@ -152,19 +152,19 @@ portNVIC_SYSPRI2_REG |= portNVIC_SYSTICK_PRI;
 
 
 ## 3.1 任务级临界区代码保护
-```
+```cpp
 #define taskENTER_CRITICAL()		portENTER_CRITICAL()
 #define taskEXIT_CRITICAL()			portEXIT_CRITICAL()
 ```
 
-```
+```cpp
 #define portENTER_CRITICAL()					vPortEnterCritical()
 #define portEXIT_CRITICAL()						vPortExitCritical()
 ```
 
 portENTER_CRITICAL和portEXIT_CRITICAL具体代码：
 
-```
+```cpp
 void vPortEnterCritical( void )
 {
 	portDISABLE_INTERRUPTS();//关闭中断<首先给BASEPRI赋值（configMAX_SYSCALL_INTERRUPT_PRIORITY），然后关闭优先级数值比该值高的中断>
@@ -182,7 +182,7 @@ void vPortEnterCritical( void )
 }
 ```
 
-```
+```cpp
 void vPortExitCritical( void )
 {
 	configASSERT( uxCriticalNesting );
@@ -207,19 +207,19 @@ void vPortExitCritical( void )
 注：临界区代码需要精简，否则由于执行临界区代码过程中导致优先级低于configMAX_SYSCALL_INTERRUPT_PRIORITY的中断（已经被关闭）可不到及时响应。
 ## 3.2 中断级临界区代码保护
 
-```
+```cpp
 #define taskENTER_CRITICAL_FROM_ISR() portSET_INTERRUPT_MASK_FROM_ISR()
 #define taskEXIT_CRITICAL_FROM_ISR( x ) portCLEAR_INTERRUPT_MASK_FROM_ISR( x )
 ```
 
-```
+```cpp
 #define portSET_INTERRUPT_MASK_FROM_ISR()		ulPortRaiseBASEPRI()
 #define portCLEAR_INTERRUPT_MASK_FROM_ISR(x)	vPortSetBASEPRI(x)
 ```
 
 ulPortRaiseBASEPRI和vPortSetBASEPRI具体代码：
 
-```
+```cpp
 static portFORCE_INLINE uint32_t ulPortRaiseBASEPRI( void )
 {
 uint32_t ulReturn, ulNewBASEPRI = configMAX_SYSCALL_INTERRUPT_PRIORITY;
@@ -238,7 +238,7 @@ uint32_t ulReturn, ulNewBASEPRI = configMAX_SYSCALL_INTERRUPT_PRIORITY;
 }
 ```
 
-```
+```cpp
 static portFORCE_INLINE void vPortSetBASEPRI( uint32_t ulBASEPRI )
 {
 	__asm

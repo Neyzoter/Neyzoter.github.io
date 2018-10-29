@@ -15,7 +15,7 @@ keywords: Keil, Debug
 
 # 二、SP追踪错误
 ## 1.1 描述
-硬件出现了非法的存储器访问（访问0地址、写只读寄存器、堆栈溢出）和非法的程序行为（除以0等）会出现进入HardFault_Handler
+硬件出现了非法的存储器访问（访问0地址、写只读寄存器、堆栈溢出）和非法的程序行为（除以0等）会出现进入HardFault\_Handler
 
 ## 1.2 SP追踪错误
 1、将SP的数值复制到memory的Address
@@ -40,6 +40,6 @@ keywords: Keil, Debug
 
 # 四、根据RCC_CSR判断上次复位的方式
 
-Debug时，peripheral ---》  寄存器状态，可以一边更新RCC寄存器的数值一边Debug。
+Debug时，peripheral \-\-\-》  寄存器状态，可以一边更新RCC寄存器的数值一边Debug。
 
 具体的复位方式对应什么位可以参考STM32的芯片参考手册。

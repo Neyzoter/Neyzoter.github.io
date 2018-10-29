@@ -3,7 +3,7 @@ layout: post
 title: 生活大实惠：O2O优惠券使用预测
 categories: AIA
 description: 生活大实惠：O2O优惠券使用预测
-keywords: Python, Alibaba, Prediction
+keywords: Python, 阿里巴巴, 数据分析
 ---
 
 > 原创

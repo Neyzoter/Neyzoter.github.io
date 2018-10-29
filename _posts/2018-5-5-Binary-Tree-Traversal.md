@@ -13,7 +13,7 @@ keywords: C, 二叉树
 
 # 1、前序遍历
 ## 1.1 递归模式
-```C
+```cpp
 void PreOrder(BiTree bt)
 {	
 	 /*先序遍历二叉树bt*/
@@ -26,7 +26,7 @@ void PreOrder(BiTree bt)
 ```
 
 ## 1.2 非递归模式
-```C
+```cpp
 Status PreOrder(BiTree T,Status (*Visit)(TElemType e))
 {
     //使用前先初始化栈
@@ -53,7 +53,7 @@ Status PreOrder(BiTree T,Status (*Visit)(TElemType e))
 # 2、中序遍历
 ## 2.1 递归模式
 
-```C
+```cpp
 void InOrder(BiTree bt)
 { 
 	/*中序遍历二叉树bt*/
@@ -66,7 +66,7 @@ void InOrder(BiTree bt)
 ```
 
 ## 2.2 非递归模式
-```C
+```cpp
 Status InOrder(BiTree T,Status (*Visit)(TElemType e))
 {
     //使用前先初始化栈
@@ -91,7 +91,7 @@ Status InOrder(BiTree T,Status (*Visit)(TElemType e))
 ```
 # 3、后续遍历
 ## 3.1 递归模式
-```C
+```cpp
 void PostOrder(BiTree bt)
 { 
 	/*后序遍历二叉树bt*/

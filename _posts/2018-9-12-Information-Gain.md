@@ -47,6 +47,7 @@ keywords: 信息增益,决策树
 可见，某个特征取值越多，<img src="http://chart.googleapis.com/chart?cht=tx&chl= H_{A}(D)" style="border:none;"> 越大，起到了矫正的作用。
 
 # 2、代码实现
+
 ```python
 """
 信息增益算法，信息增益比算法

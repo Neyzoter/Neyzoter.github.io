@@ -53,7 +53,7 @@ pipeline见下图。
 
 在调用initChannel的时候，需要对应添加handler。每次进入一个handler的read方法，都会带有一个context对象。调用context的fireChannelRead()就会发送给下一个handler。
 
-channel-pipeline-context的工作结构如下所示。
+channel\-pipeline\-context的工作结构如下所示。
 
 <img src="/images/posts/2018-9-7-Netty-EventLoopGroup-EventLoop-Channel-Channle-ChannlePipeline-et/ChannelhandlercontextWork.jpg" width="700" alt="Channel、Pipeline和ChannelContext的工作结构 " />
 

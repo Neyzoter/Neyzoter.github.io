@@ -41,11 +41,13 @@ PIE编码符号有4个，分别是数据0、数据1、数据帧开始SOF和数�
 <img src="/images/posts/2018-4-24-BasiAlgorithm-Encoder-and-Decoder-of-IoT/face2.png" width="600" alt="效果2" />
 
 ```python
+
 import numpy as np
 from PIL import Image
 import sys
 
 # 异常
+
 class StringError(Exception):
     def __init__(self,err):
         Exception.__init__(self)
