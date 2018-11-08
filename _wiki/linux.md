@@ -193,6 +193,44 @@ https://cloud.tencent.com/document/product/213/2936
 
 
 # 2、 实用命令
+## 系统状态
+* uptime
+
+查看系统运行时间
+
+输出：
+
+```
+当前时间、已运行时间、用户登录数、1分钟、5分钟和15分钟内系统的平均负载
+```
+
+* who -a
+
+查看系统已登录用户
+
+输出：
+哪些用户通过哪个ip登录到了这台主机
+
+* uname -a
+
+查看系统信息
+
+输出：
+
+```
+Linux VM-0-11-ubuntu 4.4.0-134-generic #160-Ubuntu SMP Wed Aug 15 14:58:00 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+```
+
+* export
+
+当前环境变量
+
+* df -h
+
+各个挂载点空间
+
+* netstat
+
 
 ## 删除文件/文件夹
 
