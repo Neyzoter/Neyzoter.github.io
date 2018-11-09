@@ -231,6 +231,28 @@ Linux VM-0-11-ubuntu 4.4.0-134-generic #160-Ubuntu SMP Wed Aug 15 14:58:00 UTC 2
 
 * netstat
 
+网络状态
+
+* pstree
+
+进程间关系
+
+```
+pstree
+systemd─┬─ModemManager─┬─{gdbus}
+        │              └─{gmain}
+        ├─NetworkManager─┬─dhclient
+        │                ├─dnsmasq
+        │                ├─{gdbus}
+        │                └─{gmain}
+        ├─accounts-daemon─┬─{gdbus}
+        │                 └─{gmain}
+        ├─acpid
+        ├─atd
+        ├─avahi-daemon───avahi-daemon
+        ├─bluetoothd
+
+```
 
 ## 删除文件/文件夹
 
