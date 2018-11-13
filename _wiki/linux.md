@@ -12,7 +12,7 @@ keywords: Linux
 ## 1.1 登录远程服务器
 1、登录远程服务器
 
-```
+```bash
 $ ssh <username>@<hostname or ip_address> -p <port>
 ```
 
@@ -23,25 +23,25 @@ $ ssh <username>@<hostname or ip_address> -p <port>
 Ctrl+D
 
 ## 1.2 scp上传/下载文件
-```
-scp 本地文件地址+文件名  远程用户名@IP地址:+服务器内存放文件的地址。（这里用户名用root）
+```bash
+$ scp 本地文件地址+文件名  远程用户名@IP地址:+服务器内存放文件的地址。（这里用户名用root）
 ```
 
 例如：scp /home/wj/桌面/aa.txt root@111.231.1.101:/home/aa.txt
 
-```
-scp -r 远程用户名@IP地址:+服务器内存放文件的地址 本地文件地址
+```bash
+$ scp -r 远程用户名@IP地址:+服务器内存放文件的地址 本地文件地址
 ```
 
 ## 1.2 发送udp包
 
-```
+```bash
 $ echo "hello" |socat - udp4-datagram:115.159.154.xxx:8080
 ```
 
 ## 1.3 关掉某个端口的进程
 
-```
+```bash
 $ netstat -tlnp   # 查看正在监听的端口
 $ sudo lsof -i:端口号    # 查看某个端口号 的PID
 $ sudo kill -9 端口的PID    # 根据端口的PID来关闭端口监听
@@ -50,7 +50,7 @@ $ sudo kill -9 端口的PID    # 根据端口的PID来关闭端口监听
 ## 1.x 安装java
 1、查看有java包
 
-```
+```bash
 $ java
 ```
 腾讯提供的一些包——
@@ -64,7 +64,7 @@ openjdk-9-jre-headless
 
 2、安装java8
 
-```
+```bash
 sudo apt-get install openjdk-8-jre-headless
 ```
 
@@ -76,7 +76,7 @@ $ java -version
 
 ## 1.x 安装mysql-server
 1、apt安装
-```
+```bash
 $ sudo apt-get install mysql-server
 ```
 
@@ -84,13 +84,13 @@ $ sudo apt-get install mysql-server
 
 2、登录MySQL并更改用户授权
 
-```
+```bash
 $ mysql -u root -p
 ```
 
 输入密码。
 
-```
+```bash
 $ use mysql
 ```
 
@@ -113,8 +113,8 @@ exit退出。
 
 首先，修改配置文件：
 
-```
-vi /etc/mysql/mysql.conf.d/mysqld.cnf
+```bash
+$ vi /etc/mysql/mysql.conf.d/mysqld.cnf
 ```
 
 首先输入上面的的命令打开文本文件，输入 i 进入编辑状态。
@@ -127,13 +127,13 @@ vi /etc/mysql/mysql.conf.d/mysqld.cnf
 
 重启：
 
-```
+```bash
 $ service mysql restart
 ```
 
 查看状态：
 
-```
+```bash
 $ systemctl status mysql.service
 ```
 
@@ -147,7 +147,7 @@ $ systemctl status mysql.service
 
 1、查看磁盘
 
-```
+```bash
 $ fdisk -l
 ```
 
@@ -166,21 +166,21 @@ $ fdisk -l
 
 格式化分区，ext1、ext2、ext3均可。
 
-```
+```bash
 $ mkfs.ext3 /dev/vdb1
 ```
 
 
 挂载分区。
 
-```
+```bash
 $ mkdir /mydata
 $ mount /dev/vdb1 /mydata
 ```
 
 使用命令查看挂载。
 
-```
+```bash
 $ df -h
 ```
 
@@ -254,26 +254,68 @@ systemd─┬─ModemManager─┬─{gdbus}
 
 ```
 
+## awk指令
+awk其实不仅仅是工具软件，还是一种编程语言。
+
+1、基本用法
+
+```bash
+$ awk 动作 文件名
+```
+
+实例：
+
+```bash
+# $0表示当前行，print打印出当前行，结果是将每一行都打印出来（自动光标移动）
+$ awk '{print $0}' demo.txt
+```
+
+```bash
+# 输出  this is a test
+$ echo 'this is a test' | awk '{print $0}'
+
+# 输出第3个字段——a
+$ echo 'this is a test' | awk '{print $3}'
+```
+
+```bash
+# 以:为分隔符，得到每一行的第1个字段
+$ awk -F ':' '{ print $1 }' demo.txt
+```
+
+2、变量
+
+变量NF表示当前行有多少个字段，因此$NF就代表最后一个字段。$(NF-1)代表倒数第二个字段。
+
+```bash
+# 输出最后一个字段——test
+$ echo 'this is a test' | awk '{print $NF}'
+```
+
+```bash
+# NR表示当前处理的第几行
+$ awk -F ':' '{print NR ") " $1}' demo.txt
+```
 ## 删除文件/文件夹
 
-```
+```bash
 $ sudo rm -r 文件夹名
 ```
 
-```
+```bash
 $ sudo rm 文件名
 ```
 
 ## 修改/移动文件
 修改文件名：
 
-```
+```bash
 $ rm 旧文件名 新文件名
 ```
 
 移动文件：
 
-```
+```bash
 $ rm 文件 目标文件
 ```
 ## 卸载程序
@@ -281,7 +323,7 @@ sudo apt-get purge <程序名>
 
 eg，卸载firefox。
 
-```
+```bash
 $ dpkg --get-selections |grep firefox
 ```
 
@@ -291,13 +333,13 @@ firefox-locale-en
 
 ...
 
-```
+```bash
 $ sudo apt-get purge firefox firefox-locale-en
 ```
 
 ## 进程的状态
 
-```
+```bash
 ps -auxf
 ```
 
@@ -326,8 +368,8 @@ cat = concatenate,连锁
 
 
 ## vim使用
-```
-vm <file>
+```bash
+$ vi <file>
 ```
 
 首先输入上面的的命令打开文本文件，输入 i 进入编辑状态，编辑完成后按ESC键退出编辑，然后输入 :wq 敲回车保存退出
@@ -336,8 +378,8 @@ vm <file>
 
 查看文件被谁占用。
 
-```sh
-fuser -u .linux.md.swp
+```bash
+$ fuser -u .linux.md.swp
 ```
 
 ## id
@@ -352,34 +394,34 @@ fuser -u .linux.md.swp
 
 ### 查看网络相关的文件占用
 
-```sh
-lsof -i
+```bash
+$ lsof -i
 ```
 
 ### 查看端口占用
 
-```sh
-lsof -i tcp:5037
+```bash
+$ lsof -i tcp:5037
 ```
 
 ### 查看某个文件被谁占用
 
-```sh
-lsof .linux.md.swp
+```bash
+$ lsof .linux.md.swp
 ```
 
 ### 查看某个用户占用的文件信息
 
-```sh
-lsof -u mazhuang
+```bash
+$ lsof -u mazhuang
 ```
 
 `-u` 后面可以跟 uid 或 login name。
 
 ### 查看某个程序占用的文件信息
 
-```sh
-lsof -c Vim
+```bash
+$ lsof -c Vim
 ```
 
 注意程序名区分大小写。
@@ -388,8 +430,8 @@ lsof -c Vim
 
 1、cat和tac
 
-```
-cat/tac myfile
+```bash
+$ cat/tac myfile
 ```
 
 cat：从前往后读取该文件。
@@ -398,24 +440,24 @@ tac：从后往前读取该文件。
 
 注：全部读取出来，然后指令自动结束。
 
-```
-cat -n myfile  #n表示输出n行
+```bash
+$ cat -n myfile  #n表示输出n行
 ```
 
 输出前n行
 
 2、less
 
-```
-less myfile
+```bash
+$ less myfile
 ```
 
 注：读取出来后，可以一行一行翻。通过Ctrl+c退出less。
 
 3、head/tail
 
-```
-head/tail -n 2 myfile  # 输出文件头部/末尾2行
+```bash
+$ head/tail -n 2 myfile  # 输出文件头部/末尾2行
 ```
 
 
@@ -448,7 +490,7 @@ head/tail -n 2 myfile  # 输出文件头部/末尾2行
 
 # 4、问题解决
 ## Ubuntu 16.04 python升级后terminal终端无法打开
-```
+```bash
 $ sudo rm /usr/bin/python3
 $ sudo ln -s python3.5 /usr/bin/python3
 ```
@@ -458,12 +500,12 @@ $ sudo ln -s python3.5 /usr/bin/python3
 * 导入Webupd8 PPA
 
 说明：安装java9的时候，这里的webupd8team不用改成9
-```
-sudo add-apt-repository ppa:webupd8team/java
+```bash
+$ sudo add-apt-repository ppa:webupd8team/java
 ```
 
-```
-sudo apt-get update
+```bash
+$ sudo apt-get update
 ```
 
 * 安装
@@ -475,14 +517,14 @@ sudo apt-get install oracle-java8-installer
 
 * 设置为默认jdk
 说明：安装java9的话，把8改成9
-```
-sudo apt install oracle-java8-set-default
+```bash
+$ sudo apt install oracle-java8-set-default
 ```
 
 ## 5.2 ubuntu安装C++
 * 安装
 
-```
+```bash
 $ sudo apt-get install g++ build-essential
 ```
 
@@ -490,25 +532,25 @@ $ sudo apt-get install g++ build-essential
 
 * 编译
 
-```
+```bash
 $ g++ <CPP文件名(如helloworld.cpp)> -o <输出.out文件名(如helloworld.out)>
 ```
 
 * 运行
 
-```
+```bash
 $ ./<.out文件名>
 ```
 
 ## 5.3 git安装
-```
+```bash
 $ sudo apt install git
 ```
 
 ## 5.4 axel安装
 axel是Linux命令行界面的多线程下载工具，比wget的好处就是可以指定多个线程同时在命令行终端里
 
-```
+```bash
 $ sudo apt-get install axel
 ```
 
@@ -526,13 +568,13 @@ $ sudo tar -zvxf 文件名
 
 * 全局环境
 
-```
+```bash
 $ sudo vi /etc/profile
 ```
 
 添加tomcat环境变量。如果java没有安装的话，需要安装java，添加java环境。
 
-```
+```bash
 #Java 
 export JAVA_HOME=/usr/lib/jvm/java-8-oracle
 export JRE_HOME=${JAVA_HOME}/jre
@@ -569,7 +611,7 @@ ps：我这里的时用apt安装的java，java环境在```/usr/lib/jvm```中
 
  3.tomcat环境也要加入，具体地址根据tomcat位置确定
 
-```
+```bash
 #Java
 export JAVA_HOME=/usr/lib/jvm/java-8-oracle
 export JRE_HOME=${JAVA_HOME}/jre
@@ -592,7 +634,7 @@ shutdown.sh用于关闭tomcat。
 
 2、开启和关闭tomcat
 
-```
+```bash
 $ sudo ./bin/startup.sh
 $ sudo ./bin/shutdown.sh
 ```
@@ -609,7 +651,7 @@ Apcache \-\> 选中tomcat版本。**eclipse pyoton只支持tomcat v8.0及以下*
 
 改变tomcat安装目录下的conf文件夹权限。
 
-```
+```bash
 $ chmod -R 777 conf
 ```
 
@@ -628,7 +670,7 @@ $ chmod -R 777 conf
 
 要让eclipse工具能正确实现编译指令：
 
-```
+```bash
 g++ -o test test.c -lmysqlclient -lm -I/usr/include/msqyl -L/usr/lib64/mysql
 ```
 
@@ -655,7 +697,7 @@ g++ -o test test.c -lmysqlclient -lm -I/usr/include/msqyl -L/usr/lib64/mysql
 
 eg
 
-```
+```bash
 $ wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.0.2.tgz
 ```
 
@@ -665,20 +707,20 @@ $ wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.0.2.tg
 
 * 解压安装包
 
-```
+```bash
 $ tar -xvf mongodb-linux-x86_64-ubuntu1604-4.0.2.tgz
 ```
 
 * 解压包拷贝到/usr/local/mongodb
 
-```
+```bash
 $ sudo mv mongodb-linux-x86_64-ubuntu1604-4.0.2 /usr/local/mongodb
 ```
 
 * 设置环境变量
 1、vi开始编辑
 
-```
+```bash
 $ vi ~/.bashrc
 ```
 
@@ -686,7 +728,7 @@ $ vi ~/.bashrc
 
 按下按键"i"，开始插入到文件末尾。
 
-```
+```bash
 export PATH=/usr/local/mongodb/bin:$PATH
 ```
 
@@ -698,7 +740,7 @@ Ctrl+C：退出inster模式
 
 4、刷新环境变量
 
-```
+```bash
 $ source ~/.bashrc
 ```
 
@@ -706,7 +748,7 @@ $ source ~/.bashrc
 
 MongoDB的数据存储在Data目录的db目录下，但这些目录不会自动创建，需要手动创建/data/db目录，现在根目录(/)下创建data/db目录。
 
-```
+```bash
 $ sudo mkdir -p /data/db
 ```
 
@@ -715,7 +757,7 @@ $ sudo mkdir -p /data/db
 * 测试安装情况
 Question1:
 
-```
+```bash
 $ mongod
 
 >>mongod: error while loading shared libraries: libcurl.so.4: cannot open shared object file: No such file or directory
@@ -723,14 +765,14 @@ $ mongod
 
 Solve1:
 
-```
+```bash
 $ sudo apt-get install libcurl4-openssl-dev
 >>
 ```
 
 Question2:
 
-```
+```bash
 $ mongod
 
 >>......
@@ -743,8 +785,8 @@ Solve2:
 
 出现的原因是因为 /data/db的权限不足导致的。
 
-```
-$sudo chmod 777 -R /data
+```bash
+$ sudo chmod 777 -R /data
 ```
 
 
@@ -758,13 +800,13 @@ $sudo chmod 777 -R /data
 
 1、打开27017防火墙
 
-```
+```bash
 $ sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 27017 -j ACCEPT
 ```
 
 2、打开mongod并对所有ip开放
 
-```
+```bash
 $ mongod --bind_ip 0.0.0.0
 ```
 
@@ -772,7 +814,7 @@ $ mongod --bind_ip 0.0.0.0
 
 连接
 
-```
+```bash
 $ mongo <远程IP>
 ```
 
@@ -1070,7 +1112,7 @@ done
 ```
 
 ## 6.10 while循环
-```
+```bash
 #!/bin/sh
 
 # 执行循环，然后每次都把控制的数加1
@@ -1098,7 +1140,7 @@ continue  #跳出当前循环
 ```
 
 ## 6.12 函数
-```
+```bash
 #!/bin/sh
 
 test(){
@@ -1144,7 +1186,7 @@ aa bb cc
 
 ## 6.13 重定向
 
-```
+```bash
 $echo result > file  #将结果写入文件，结果不会在控制台展示，而是在文件中，覆盖写
 $echo result >> file  #将结果写入文件，结果不会在控制台展示，而是在文件中，追加写
 echo input < file  #获取输入流
