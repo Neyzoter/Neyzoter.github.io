@@ -696,8 +696,13 @@ g++ -o test test.c -lmysqlclient -lm -I/usr/include/msqyl -L/usr/lib64/mysql
 1 这个目录下面的子目录将自动被部署为应用。 
 2 这个目录下面的.war文件将被自动解压缩并部署为应用----
 -->
-<Host name="nesctech.com"  appBase=""
-      unpackWARs="true" autoDeploy="true" xmlValidation="false" xmlNamespaceAware="false">
+<!--
+autoDeploy 则两次部署，
+第一次因server.xml中的Context配置而被部署(因为deployOnStartup="true")
+第二次因为autoDeploy="true"而发生自动部署(默认情况下，在没有显示Context的这些属性时，它们的默认值都是true)
+-->
+<Host name="localhost"  appBase=""
+      unpackWARs="true" autoDeploy="false" deployOnStartup="false" xmlValidation="false" xmlNamespaceAware="false">
 
   <!-- SingleSignOn valve, share authentication between web applications
        Documentation at: /docs/config/valve.html -->
