@@ -694,14 +694,17 @@ g++ -o test test.c -lmysqlclient -lm -I/usr/include/msqyl -L/usr/lib64/mysql
 <!--appBase 是项目所在目录-->
 <!-- appBase
 1 这个目录下面的子目录将自动被部署为应用。 
-2 这个目录下面的.war文件将被自动解压缩并部署为应用----
+2 这个目录下面的.war文件将被自动解压缩并部署为应用
+-->
+<!--
+unpackWARs:是否解压appBase中的war包
 -->
 <!--
 autoDeploy 则两次部署，
 第一次因server.xml中的Context配置而被部署(因为deployOnStartup="true")
 第二次因为autoDeploy="true"而发生自动部署(默认情况下，在没有显示Context的这些属性时，它们的默认值都是true)
 -->
-<Host name="localhost"  appBase=""
+<Host name="localhost"  appBase="/home/ubuntu/"
       unpackWARs="true" autoDeploy="false" deployOnStartup="false" xmlValidation="false" xmlNamespaceAware="false">
 
   <!-- SingleSignOn valve, share authentication between web applications
@@ -720,7 +723,11 @@ autoDeploy 则两次部署，
   <!--用户自己的设置默认的欢迎界面-->
   <!--NettySpringWebServer 项目名-->
   <!--docBase只是指向了你某个应用的目录，这个可以和appBase没有任何关系-->
-  <Context path="" docBase="/home/ubuntu/NettySpringWebServer" debug="0" reloadable="true"></Context>
+  <!--
+  reloadable：Tomcat服务器在运行状态下会监视在WEB-INF/classes和WEB-INF/lib目录下class文件的改动，如果监测到有class文件被更新的，服务器会自动重新加载Web应用。
+  reloadable="True"会加重服务器运行负荷
+  -->
+  <Context path="" docBase="/home/ubuntu/NettySpringWebServer" debug="0" reloadable="false"></Context>
 
 </Host>
 
