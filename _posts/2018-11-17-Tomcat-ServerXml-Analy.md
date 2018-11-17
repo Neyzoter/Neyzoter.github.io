@@ -281,8 +281,11 @@ Realm域提供了一种用户密码与web应用的映射关系。
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd"
               version="1.0">
-  <role rolename="manager"/>
-  <user username="songchaochao" password="121212121" roles="manager"/>
+    <role rolename="manager-gui"/>
+    <role rolename="manager-script"/>
+    <role rolename="manager-jmx"/>
+    <role rolename="manager-status"/>
+    <user username="songchaochao" password="123456" roles="manager-gui,manager-script,manager-jmx,manager-status"/>
 </tomcat-users>
 ```
 
@@ -344,7 +347,16 @@ Realm域提供了一种用户密码与web应用的映射关系。
     <role-name>manager</role-name>
   </security-role>
 ```
+4、配置./conf/Catalina/localhost
 
+加入manager.xml
+
+```xml
+<Context privileged="true" antiResourceLocking="false"
+         docBase="${catalina_home}/webapps/manager"><!--catalina_home是tomcat的目录-->
+    <Valve className="org.apache.catalina.valves.RemoteAddrValve" allow="^.*$" />
+</Context>
+```
 
 
 # 6.参考
