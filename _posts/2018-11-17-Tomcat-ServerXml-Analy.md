@@ -305,6 +305,7 @@ Realm域提供了一种用户密码与web应用的映射关系。
 
 ```xml
 <login-config>
+	<!--DIGEST：加密；BASIC：不加密-->
 	<auth-method>DIGEST</auth-method>
 	<realm-name>Tomcat Manager Application</realm-name>
 </login-config>
