@@ -301,52 +301,16 @@ Realm域提供了一种用户密码与web应用的映射关系。
       </Realm>
 ```
 
-3、配置访问角色以及安全限制的内容(./conf/web.xml)
+3、配置访问角色以及安全限制的内容(../manager/WEB-INF/web.xml)
 
 ```xml
-<security-constraint>
-    <web-resource-collection>
-      <web-resource-name>HTMLManger and Manager command</web-resource-name>
-      <!--限制访问的资源-->
-      <url-pattern>/jmxproxy/*</url-pattern>
-      <url-pattern>/html/*</url-pattern>
-      <url-pattern>/list</url-pattern>
-      <url-pattern>/sessions</url-pattern>
-      <url-pattern>/start</url-pattern>
-      <url-pattern>/stop</url-pattern>
-      <url-pattern>/install</url-pattern>
-      <url-pattern>/remove</url-pattern>
-      <url-pattern>/deploy</url-pattern>
-      <url-pattern>/undeploy</url-pattern>
-      <url-pattern>/reload</url-pattern>
-      <url-pattern>/save</url-pattern>
-      <url-pattern>/serverinfo</url-pattern>
-      <url-pattern>/status/*</url-pattern>
-      <url-pattern>/roles</url-pattern>
-      <url-pattern>/resources</url-pattern>
-    </web-resource-collection>
-    <auth-constraint>
-       <!-- NOTE:  This role is not present in the default users file -->
-       <!--role-name就定义了可以访问的角色。-->
-       <role-name>manager</role-name>
-    </auth-constraint>
-  </security-constraint>
+<login-config>
+	<auth-method>DIGEST</auth-method>
+	<realm-name>Tomcat Manager Application</realm-name>
+</login-config>
 
-  <!-- Define the Login Configuration for this Application -->
-  <login-config>
-  <!--BASIC就是基本的弹出对话框输入用户名密码。还是DIGEST方式，这种方式会对网络中的传输信息进行加密，更安全。-->
-    <auth-method>BASIC</auth-method>
-    <realm-name>Tomcat Manager Application</realm-name>
-  </login-config>
-
-  <!-- Security roles referenced by this web application -->
-  <security-role>
-    <description>
-      The role that is required to log in to the Manager Application
-    </description>
-    <role-name>manager</role-name>
-  </security-role>
 ```
+
 4、配置./conf/Catalina/localhost
 
 加入manager.xml
