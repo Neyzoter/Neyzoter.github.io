@@ -16,8 +16,11 @@ f(x) = \frac{exp(-x^2/2)}{\sqrt{2\pi}}
 $$
 
 **lognorm**
-
 $$
-f(x,s) = \frac{1}{sx\sqrt(2\pi)}exp(-\frac{(log)^2(x)}{2s^2})
+f(x,s) = \frac{1}{sx\sqrt{2\pi}}exp(-\frac{{log}^2(x)}{2s^2})
 $$
 
+**johnsonsu**
+$$
+f(x,a,b)=\frac{b}{\sqrt{x^2+1}}\phi(a+blog(x+\sqrt{x^2+1}))
+$$
