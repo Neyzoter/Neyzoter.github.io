@@ -11,16 +11,12 @@ keywords: Python, SciPy
 
 **norm**
 
-$$
-f(x) = \frac{exp(-x^2/2)}{\sqrt{2\pi}}
-$$
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= f(x) = \frac{exp(-x^2/2)}{\sqrt{2\pi}}" style="border:none;">
 
 **lognorm**
-$$
-f(x,s) = \frac{1}{sx\sqrt{2\pi}}exp(-\frac{{log}^2(x)}{2s^2})
-$$
+
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= f(x,s) = \frac{1}{sx\sqrt{2\pi}}exp(-\frac{{log}^2(x)}{2s^2})" style="border:none;">
 
 **johnsonsu**
-$$
-f(x,a,b)=\frac{b}{\sqrt{x^2+1}}\phi(a+blog(x+\sqrt{x^2+1}))
-$$
+
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= f(x,a,b)=\frac{b}{\sqrt{{x^2}+1}}\phi(a+blog(x+\sqrt{x^2+1}))" style="border:none;">
