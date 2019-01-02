@@ -15,7 +15,7 @@ keywords: Python, SciPy
 
 **lognorm**
 
-<img src="http://chart.googleapis.com/chart?cht=tx&chl= f(x,s) = \frac{1}{sx\sqrt{2\pi}}exp(-\frac{{log}^2(x)}{2s^2})" style="border:none;">
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= f(x,s) = \frac{1}{sx\sqrt{2\pi}}exp(-\frac{log^2(x)}{2s^2})" style="border:none;">
 
 **johnsonsu**
 
