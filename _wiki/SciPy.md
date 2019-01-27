@@ -11,7 +11,7 @@ keywords: Python, SciPy
 
 **norm**
 
-<img src="http://chart.googleapis.com/chart?cht=tx&chl= f(x) = \frac{exp(-x^2/2)}{\sqrt{2\pi}}" style="border:none;">
+<img src="http://chart.googleapis.com/chart?cht=tx&chl= f(x) = \frac{exp(-x^2/2)}{\sqrt{2\pi} }" style="border:none;">
 
 **lognorm**
 
