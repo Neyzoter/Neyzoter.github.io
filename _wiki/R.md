@@ -131,3 +131,24 @@ print(list1)
 [[3]]
 function (x)  .Primitive("sin")
 ```
+
+# 2、R语言常用函数
+* lm
+
+线性模型
+
+```r
+modle = lm(tempdub~month.)
+```
+
+* rstudent
+
+残差
+
+```r
+plot(y=rstudent(model3),x=as.vector(time(tempdub)),xlab='Time',ylab='Standardized Residuals',type='o')
+```
+
+* as.vector
+
+生成一个向量
