@@ -10,15 +10,15 @@
       - C/C++
       - Python
       - Java
-	  - R
-	  - Matlab
+      - R
+      - Matlab
 
 - name: Framework Skills
   keywords:
       - Spring
       - Netty
       - MongoDB-Java
-	  - Tensorflow
+      - Tensorflow
 	  
 - name: Artificial Intelligent
   keywords:
