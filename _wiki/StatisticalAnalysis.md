@@ -1,9 +1,9 @@
 ---
 layout: wiki
 title: 统计和信息处理知识
-categories: 统计学、数字信号处理、时间序列分析
+categories: Stachastic
 description: 统计学的一些用法
-keywords: 统计, 数字信号处理,时间序列分析
+keywords: Stachastic,Information Analysis
 ---
 
 # 1、简介
