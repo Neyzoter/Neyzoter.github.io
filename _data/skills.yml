@@ -12,9 +12,17 @@
       - Java
       - R
       - Matlab
-	  
+      
+- name: Framework Skills
+  keywords:
+      - Spring
+      - Netty
+      - MongoDB-Java
+      - Tensorflow
+      
 - name: Artificial Intelligent
   keywords:
       - Machine Learning
       - Deep Learning
       - Big Data
+      
