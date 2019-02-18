@@ -7,9 +7,9 @@
       
 - name: Computer Language
   keywords:
-      - C/C++
-      - Python
       - Java
+      - Python
+      - C/C++
       - R
       - Matlab
       
