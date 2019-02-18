@@ -11,6 +11,31 @@ keywords: Big Data; Hadoop; Spark
 
 # 2、Hadoop
 ## 2.1 介绍
+**目的**
+
+提高处理速度。
+
+**方法**
+
+把数据分到多块硬盘，然后同时读取。代码向数据迁移，避免大规模数据时，造成大量数据迁移的情况，尽量让一段数据的计算发生在同一台机器上。
+
+**关键技术**
+
+1.数据分布在多台机器
+
+可靠性：每个数据块都复制到多个节点
+
+性能：多个节点同时处理数据
+
+2.计算随数据走
+
+网络IO速度 << 本地磁盘IO速度，大数据系统会尽量地将任务分配到离数据最近的机器上运行（程序运行时，将程序及其依赖包都复制到数据所在的机器运行）
+
+代码向数据迁移，避免大规模数据时，造成大量数据迁移的情况，尽量让一段数据的计算发生在同一台机器上
+
+3.串行IO取代随机IO
+
+传输时间 << 寻道时间，一般数据写入后不再修改
 
 **适合场景**
 
@@ -78,18 +103,20 @@ Hadoop Distributed File System，分布式文件系统
 
 ## 2.3 YARN
 <img src="/images/wiki/BigdataFramework/yarn.jpg" width="700" alt="yarn框架" />
+
+<img src="/images/wiki/BigdataFramework/yarn-block.jpg" width="700" alt="yarn的方框图" />
 ### 2.3.1 组件
 * ResourceManager
 
-全局资源管理和任务调度
+全局资源管理和任务调度——提供了计算资源的分配和管理
 
 * NodeManager
 
-单个节点的资源管理和监控
+单个节点的资源管理和监控——提供了计算资源的分配和管理
 
 * ApplicationMaster
 
-单个作业的资源管理和任务监控
+单个作业的资源管理和任务监控——完成应用程序的运行
 
 * Container
 
@@ -122,3 +149,9 @@ ApplicationMaster根据ResourceManager的分配情况，在对应的NodeManager�
 **6. Job completion**
 
 Client定时检查整个作业是否完成 作业完成后，会清空临时文件、目录等
+
+## 2.4 MapReduce
+一种分布式的计算方式指定一个Map（映射）函数，用来把一组键值对映射成一组新的键值对，指定并发的Reduce（归约）函数，用来保证所有映射的键值对中的每一个共享相同的键组。
+
+<img src="/images/wiki/BigdataFramework/mapreduce-pattern.png" width="700" alt="MapReduce模式" />
+trend_coef  trend_intercept  abs_trend_coef  abs_trend_intercept
