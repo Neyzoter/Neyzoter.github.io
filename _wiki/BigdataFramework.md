@@ -55,11 +55,11 @@ keywords: Big Data; Hadoop; Spark
 
 **hadoop框架**
 
-<img src="/images/wiki/BigdataFramework/architecture.png" width="700" alt="hadoop框架" />
+<img src="/images/wiki/BigdataFramework/architecture.png" width="500" alt="hadoop框架" />
 
-* HDFS: 分布式文件存储
-* YARN: 分布式资源管理
-* MapReduce: 分布式计算
+* HDFS: 分布式文件存储——提供对应用程序数据的高吞吐量访问
+* YARN: 分布式资源管理——用于作业调度和集群资源管理的框架
+* MapReduce: 分布式计算——基于YARN的用于并行处理大数据集的系统
 * Others: 利用YARN的资源管理功能实现其他的数据处理方式
 
 ## 2.2 HDFS
@@ -102,9 +102,9 @@ Hadoop Distributed File System，分布式文件系统
 4、DataNode之间会进行通信，复制数据块，保证数据的冗余性
 
 ## 2.3 YARN
-<img src="/images/wiki/BigdataFramework/yarn.jpg" width="700" alt="yarn框架" />
+<img src="/images/wiki/BigdataFramework/yarn.jpg" width="500" alt="yarn框架" />
 
-<img src="/images/wiki/BigdataFramework/yarn-block.jpg" width="700" alt="yarn的方框图" />
+<img src="/images/wiki/BigdataFramework/yarn-block.jpg" width="500" alt="yarn的方框图" />
 ### 2.3.1 组件
 * ResourceManager
 
@@ -153,5 +153,177 @@ Client定时检查整个作业是否完成 作业完成后，会清空临时文�
 ## 2.4 MapReduce
 一种分布式的计算方式指定一个Map（映射）函数，用来把一组键值对映射成一组新的键值对，指定并发的Reduce（归约）函数，用来保证所有映射的键值对中的每一个共享相同的键组。
 
-<img src="/images/wiki/BigdataFramework/mapreduce-pattern.png" width="700" alt="MapReduce模式" />
-trend_coef  trend_intercept  abs_trend_coef  abs_trend_intercept
+<img src="/images/wiki/BigdataFramework/mapreduce-pattern.png" width="500" alt="MapReduce模式" />
+
+### 2.4.1 MapReduce读取数据
+**流程**：通过InputFormat决定读取的数据的类型，然后拆分成一个个InputSplit（作用：代表一个个逻辑分片，并没有真正存储数据，只是提供了一个如何将数据分片的方法，包含分片数据的位置、split的大小等信息），每个InputSplit对应一个Map处理，RecordReader（作用：将InputSplit拆分成一个个<key,value>对给Map处理，也是实际的文件读取分隔对象</key,value>）读取InputSplit的内容给Map
+
+**InputFormat功能**
+
+1.验证作业输入的正确性，如格式等
+
+2.将输入文件切割成逻辑分片(InputSplit)，一个InputSplit将会被分配给一个独立的Map任务
+
+3.提供RecordReader实现，读取InputSplit中的"K-V对"供Mapper使用
+
+**类结构**
+
+<img src="/images/wiki/BigdataFramework/mapreduce-inputformat.png" width="500" alt="MapReduce的输入格式类结构" />
+
+*List getSplits()*：获取由输入文件计算出输入分片(InputSplit)，解决数据或文件分割成片问题
+
+*RecordReader <k,v>createRecordReader()*：</k,v> 创建RecordReader，从InputSplit中读取数据，解决读取分片中数据问题
+
+**数据类型**
+
+1.TextInputFormat: 输入文件中的每一行就是一个记录，Key是这一行的byte offset，而value是这一行的内容
+
+2.KeyValueTextInputFormat: 输入文件中每一行就是一个记录，第一个分隔符字符切分每行。在分隔符字符之前的内容为Key，在之后的为Value。分隔符变量通过key.value.separator.in.input.line变量设置，默认为(\t)字符。
+
+3.NLineInputFormat: 与TextInputFormat一样，但每个数据块必须保证有且只有Ｎ行，mapred.line.input.format.linespermap属性，默认为１
+
+4.SequenceFileInputFormat: 一个用来读取字符流数据的InputFormat，<key,value>为用户自定义的。字符流数据是Hadoop自定义的压缩的二进制数据格式。它用来优化从一个MapReduce任务的输出到另一个MapReduce任务的输入之间的数据传输过程。</key,value>
+
+**问题**
+
+1.*大量小文件如何处理？*
+
+CombineFileInputFormat可以将若干个Split打包成一个，目的是避免过多的Map任务
+
+2.*怎么计算split的？*
+
+* 分割方法
+
+（1）通常一个split就是一个block（FileInputFormat仅仅拆分比block大的文件）
+
+这样做的好处是使得Map可以在存储有当前数据的节点上运行本地的任务，而不需要通过网络进行跨节点的任务调度
+ 
+（2）通过mapred.min.split.size， mapred.max.split.size, block.size来控制拆分的大小
+
+如果mapred.min.split.size大于block size，则会将两个block合成到一个split，这样有部分block数据需要通过网络读取
+
+如果mapred.max.split.size小于block size，则会将一个block拆成多个split，增加了Map任务数（Map对split进行计算且上报结果，关闭当前计算打开新的split均需要耗费资源）
+
+* 具体流程
+
+先获取文件在HDFS上的路径和Block信息，然后根据splitSize对文件进行切分（ splitSize = computeSplitSize(blockSize, minSize, maxSize) ），默认splitSize 就等于blockSize的默认值（64m）
+
+3.*分片间的数据如何处理？*
+
+split是根据文件大小分割的，而一般处理是根据分隔符进行分割的，这样势必存在一条记录横跨两个split。
+
+<img src="/images/wiki/BigdataFramework/mapreduce-split.png" width="700" alt="MapReduce的文件分割" />
+
+**解决办法**是只要不是第一个split，都会远程读取一条记录，作为最后一个数据，并忽略到第一条记录
+
+### 2.4.2 MapReduce Mapper
+主要是读取InputSplit的每一个Key,Value对并进行处理
+
+```python
+public class Mapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
+    /**
+     * 预处理，仅在map task启动时运行一次
+     */
+    protected void setup(Context context) throws  IOException, InterruptedException {
+    }
+
+    /**
+     * 对于InputSplit中的每一对<key, value>都会运行一次
+     */
+    @SuppressWarnings("unchecked")
+    protected void map(KEYIN key, VALUEIN value, Context context) throws IOException, InterruptedException {
+        context.write((KEYOUT) key, (VALUEOUT) value);
+    }
+
+    /**
+     * 扫尾工作，比如关闭流等
+     */
+    protected void cleanup(Context context) throws IOException, InterruptedException {
+    }
+
+    /**
+     * map task的驱动器
+     */
+    public void run(Context context) throws IOException, InterruptedException {
+        setup(context);
+        while (context.nextKeyValue()) {
+            map(context.getCurrentKey(), context.getCurrentValue(), context);
+        }
+        cleanup(context);
+    }
+}
+
+public class MapContext<KEYIN, VALUEIN, KEYOUT, VALUEOUT> extends TaskInputOutputContext<KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
+    private RecordReader<KEYIN, VALUEIN> reader;
+    private InputSplit split;
+
+    /**
+     * Get the input split for this map.
+     */
+    public InputSplit getInputSplit() {
+        return split;
+    }
+
+    @Override
+    public KEYIN getCurrentKey() throws IOException, InterruptedException {
+        return reader.getCurrentKey();
+    }
+
+    @Override
+    public VALUEIN getCurrentValue() throws IOException, InterruptedException {
+        return reader.getCurrentValue();
+    }
+
+    @Override
+    public boolean nextKeyValue() throws IOException, InterruptedException {
+        return reader.nextKeyValue();
+    }
+}
+```
+
+### 2.4.3 MapReduce Shuffle
+**作用**：对Map的结果进行排序并传输到Reduce进行处理。
+
+Map的结果并不直接存放到硬盘,而是利用缓存做一些预排序处理。Map会调用Combiner，压缩，按key进行分区、排序等，尽量减少结果的大小。每个Map完成后都会通知Task，然后Reduce就可以进行处理。
+
+<img src="/images/wiki/BigdataFramework/mapreduce-process.png" width="700" alt="MapReduce的数据处理过程" />
+
+**Map端**
+
+当Map程序开始产生结果的时候，并不是直接写到文件的，而是利用缓存做一些排序方面的预处理操作
+
+每个Map任务都有一个循环内存缓冲区（默认100MB），当缓存的内容达到80%时，后台线程开始将内容写到文件，此时Map任务可以继续输出结果，但如果缓冲区满了，Map任务则需要等待
+
+写文件使用round-robin方式。在写入文件之前，先将数据按照Reduce进行分区。对于每一个分区，都会在内存中根据key进行排序，如果配置了Combiner，则排序后执行Combiner（Combine之后可以减少写入文件和传输的数据）
+
+每次结果达到缓冲区的阀值时，都会创建一个文件，在Map结束时，可能会产生大量的文件。在Map完成前，会将这些文件进行合并和排序。如果文件的数量超过3个，则并后会再次运行Combiner（1、2个文件就没有必要了）
+
+如果配置了压缩，则最终写入的文件会先进行压缩，这样可以减少写入和传输的数据
+
+一旦Map完成，则通知任务管理器，此时Reduce就可以开始复制结果数据
+
+**Reduce端**
+
+Map的结果文件都存放到运行Map任务的机器的本地硬盘中
+
+如果Map的结果很少，则直接放到内存，否则写入文件中
+
+同时后台线程将这些文件进行合并和排序到一个更大的文件中（如果文件是压缩的则需要先解压）
+
+当所有的Map结果都被复制和合并后，就会调用Reduce方法
+
+Reduce结果会写入到HDFS中
+
+**调优**
+
+一般的原则是给shuffle分配尽可能多的内存，但前提是要保证Map、Reduce任务有足够的内存
+
+对于Map，主要就是避免把文件写入磁盘，例如使用Combiner，增大io.sort.mb的值
+
+对于Reduce，主要是把Map的结果尽可能地保存到内存中，同样也是要避免把中间结果写入磁盘。默认情况下，所有的内存都是分配给Reduce方法的，如果Reduce方法不怎么消耗内存，可以mapred.inmem.merge.threshold设成0，mapred.job.reduce.input.buffer.percent设成1.0
+
+在任务监控中可通过Spilled records counter来监控写入磁盘的数，但这个值是包括map和reduce的
+
+对于IO方面，可以Map的结果可以使用压缩，同时增大buffer size（io.file.buffer.size，默认4kb）
+
+<img src="/images/wiki/BigdataFramework/MapReduceSet.png" width="700" alt="MapReduce的处理设置" />
