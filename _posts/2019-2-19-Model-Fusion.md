@@ -38,7 +38,7 @@ Bagging就是采用有放回的方式进行抽样，用抽样的样本建立子�
 
 Bagging算法可以并行处理，而Boosting的思想是一种迭代的方法，**每一次训练的时候都更加关心分类错误的样例**，给这些分类错误的样例增加更大的权重，下一次迭代的目标就是能够更容易辨别出上一轮分类错误的样例。最终将这些弱分类器进行加权相加。
 
-<img src="/images/post/2019-2-19-Model-Fusion/boosting.webp" width="700" alt="MapReduce的输入格式类结构" />
+<img src="/images/posts/2019-2-19-Model-Fusion/boosting.webp" width="700" alt="boosting过程" />
 
 **实例**
 
