@@ -168,7 +168,7 @@ Client定时检查整个作业是否完成 作业完成后，会清空临时文�
 
 **类结构**
 
-<img src="/images/wiki/BigdataFramework/mapreduce-inputformat.png" width="500" alt="MapReduce的输入格式类结构" />
+<img src="/images/wiki/BigdataFramework/mapreduce-inputformat.png" width="700" alt="MapReduce的输入格式类结构" />
 
 *List getSplits()*：获取由输入文件计算出输入分片(InputSplit)，解决数据或文件分割成片问题
 
