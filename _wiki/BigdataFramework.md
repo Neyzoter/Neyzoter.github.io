@@ -327,3 +327,154 @@ Reduce结果会写入到HDFS中
 对于IO方面，可以Map的结果可以使用压缩，同时增大buffer size（io.file.buffer.size，默认4kb）
 
 <img src="/images/wiki/BigdataFramework/MapReduceSet.png" width="700" alt="MapReduce的处理设置" />
+
+## 2.5 安装和使用
+### 2.5.1 前期准备
+* 
+
+*单节点安装*
+
+所有服务运行在一个JVM中，适合调试、单元测试
+
+*伪集群*
+
+所有服务运行在一台机器中，每个服务都在独立的JVM中，适合做简单、抽样测试
+
+*多节点集群*
+
+服务运行在不同的机器中，适合生产环境
+
+配置公共帐号
+
+方便主与从进行无密钥通信，主要是使用公钥/私钥机制 所有节点的帐号都一样 在主节点上执行 ssh-keygen -t rsa生成密钥对 复制公钥到每台目标节点中
+
+* 版本说明
+
+>Apache Hadoop 3.x now support only Java 8
+Apache Hadoop from 2.7.x to 2.x support Java 7 and 8
+
+[Hadoop Java Versions](https://cwiki.apache.org/confluence/display/HADOOP/Hadoop+Java+Versions "Hadoop Java Versions")
+
+* 必备Linux软件
+
+ssl和rsync
+
+```bash
+$ sudo apt-get install ssh
+$ sudo apt-get install rsync
+```
+
+* Hadoop下载
+
+http://www.apache.org/dyn/closer.cgi/hadoop/common/
+
+比如下载Hadoop3.1.2.tar.gz
+
+* 解压hadoop
+
+```bash
+tar -zxvf hadoop文件名称.tar.gz
+```
+
+并移动到某一个目录下，如/opt
+
+### 2.5.2 安装
+1.添加路径
+
+"/opt/hadoop-3.1.2/"可修改。
+
+```bash
+export HADOOP_HOME=/opt/hadoop-3.1.2/
+export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
+```
+
+使该路径生效
+
+```bash
+source ~/.bashrc
+```
+
+2.配置Hadoop(伪集群安装模式)
+
+*其他安装模式*：[hadoop安装](http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html#Prerequisites "hadoop安装")
+
+*目录*：/etc/hadoop
+
+*文件*：
+
+(1)core-site.xml
+
+```xml
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9000</value>
+    </property>
+</configuration>
+```
+
+(2)hdfs-site.xml
+
+```xml
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+</configuration>
+```
+
+(3)hadoop-env.sh
+
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
+2.配置ssh
+
+验证不需要ssh不需要密码
+
+```bash
+$ ssh localhost
+```
+
+如果以上不可以的话，进行
+
+```bash
+$ ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+$ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+$ chmod 0600 ~/.ssh/authorized_keys
+```
+
+### 2.5.3 测试
+1.进入hadoop安装目录
+
+这里以/opt/hadoop-3.1.2为例
+
+
+```bash
+cd /opt/hadoop-3.1.2
+```
+
+2.运行测试指令
+
+(1)输出使用文档
+
+```bash
+$ bin/hadoop
+```
+
+(2)格式化文件系统
+
+```bash
+$ bin/hdfs namenode -format
+```
+
+(3)启动NameNode和DataNode守护进程
+
+```bash
+$ sbin/start-dfs.sh
+```
+
+
+
+
+
