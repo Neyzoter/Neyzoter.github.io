@@ -397,7 +397,7 @@ source ~/.bashrc
 
 *其他安装模式*：[hadoop安装](http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html#Prerequisites "hadoop安装")
 
-*目录*：hadoop目录/etc/hadoop（非操作系统的/etc）
+*目录*：```$HADOOP_HOME/etc/hadoop```（非操作系统的/etc）
 
 *文件*：
 
@@ -448,10 +448,7 @@ $ chmod 0600 ~/.ssh/authorized_keys
 ```
 
 ### 2.5.3 测试
-1.进入hadoop安装目录($HADOOP_HOME)
-
-这里以/opt/hadoop-3.1.2为例
-
+1.进入hadoop安装目录(```$HADOOP_HOME```)
 
 ```bash
 cd /opt/hadoop-3.1.2
