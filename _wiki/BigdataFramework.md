@@ -376,8 +376,7 @@ http://www.apache.org/dyn/closer.cgi/hadoop/common/
 tar -zxvf hadoop文件名称.tar.gz
 ```
 
-并移动到某一个目录下，如/opt
-
+并移动到某一个目录下，如/opt。该目录即为hadoop的安装目录```$HADOOP_HOME```
 ### 2.5.2 安装
 1.添加路径
 
@@ -398,11 +397,11 @@ source ~/.bashrc
 
 *其他安装模式*：[hadoop安装](http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html#Prerequisites "hadoop安装")
 
-*目录*：/etc/hadoop
+*目录*：hadoop目录/etc/hadoop（非操作系统的/etc）
 
 *文件*：
 
-(1)core-site.xml
+(1)etc/hadoop/core-site.xml
 
 ```xml
 <configuration>
@@ -413,7 +412,7 @@ source ~/.bashrc
 </configuration>
 ```
 
-(2)hdfs-site.xml
+(2)etc/hadoop/hdfs-site.xml
 
 ```xml
 <configuration>
@@ -424,9 +423,13 @@ source ~/.bashrc
 </configuration>
 ```
 
-(3)hadoop-env.sh
+(3)etc/hadoop/hadoop-env.sh
 
+java的路径，需要根据自己的机器而定
+
+```bash
 export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+```
 
 2.配置ssh
 
@@ -445,7 +448,7 @@ $ chmod 0600 ~/.ssh/authorized_keys
 ```
 
 ### 2.5.3 测试
-1.进入hadoop安装目录
+1.进入hadoop安装目录($HADOOP_HOME)
 
 这里以/opt/hadoop-3.1.2为例
 
@@ -473,6 +476,8 @@ $ bin/hdfs namenode -format
 ```bash
 $ sbin/start-dfs.sh
 ```
+
+日志默认在```$HADOOP_HOME/logs```
 
 
 
