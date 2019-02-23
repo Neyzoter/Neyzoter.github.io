@@ -476,7 +476,26 @@ $ sbin/start-dfs.sh
 
 日志默认在```$HADOOP_HOME/logs```
 
+(4)浏览器查看Hadoop情况
 
+也许不同的版本的端口```9870```不一样
+
+```bash
+$ http://localhost:9870/
+```
+
+(5)HDFS内构建目录
+
+```bash
+$ bin/hdfs dfs -mkdir /user
+$ bin/hdfs dfs -mkdir /user/<username>
+```
+
+(6)复制要输入的文件到分布式系统中
+
+```bash
+$ bin/hdfs dfs -put etc/hadoop <inputfile>
+```
 
 
 
