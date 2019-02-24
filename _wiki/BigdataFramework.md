@@ -494,7 +494,26 @@ $ bin/hdfs dfs -mkdir /user/<username>
 (6)复制要输入的文件到分布式系统中
 
 ```bash
-$ bin/hdfs dfs -put etc/hadoop <inputfile>
+$ bin/hdfs dfs -mkdir input
+$ bin/hdfs dfs -put etc/hadoop/*.xml input
+```
+
+(7)运行给出的例子
+
+```bash
+$ bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-3.1.2.jar grep input output 'dfs[a-z.]+'
+```
+
+(8)从分布式系统中输出文件到本地文件系统
+
+```bash
+$ bin/hdfs dfs -get output output  #生成一个output文件夹
+$ cat output/*  # 列出文件
+```
+
+(9)关闭进程
+```bash
+sbin/stop-dfs.sh
 ```
 
 
