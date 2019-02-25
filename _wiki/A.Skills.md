@@ -14,6 +14,7 @@ keywords: skills
 * Python
 * Matlab
 * R
+
 ### 编程技能
 * Linux
 * Git
@@ -26,6 +27,11 @@ keywords: skills
 ## 算法
 ### 机器学习
 * XGBOOST
+
+### 信息安全
+* MD5
+* RSA
+* HTTPS(数字签名)
 
 ## 硬件
 
