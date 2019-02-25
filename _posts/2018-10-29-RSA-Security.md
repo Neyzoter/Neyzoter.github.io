@@ -1,7 +1,7 @@
 ---
 layout: post
 title: RSA算法的实现
-categories: BasicAlgorithm
+categories: Security
 description: RSA算法的实现
 keywords: RSA, 信息安全
 ---
