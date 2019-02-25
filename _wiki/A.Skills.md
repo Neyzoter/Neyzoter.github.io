@@ -6,8 +6,30 @@ description: 我历年来的技能树
 keywords: skills
 ---
 
-## 技能树
+# 总技能树
+## 软件
+### 编程语言
+* Java
+* C/C++
+* Python
+* Matlab
+* R
+### 编程技能
+* Linux
+* Git
 
+### 框架
+* Spring
+* Netty
+* MongoDB
+
+## 算法
+### 机器学习
+* XGBOOST
+
+## 硬件
+
+# 历年技能总结
 ## 2019年技能树
 
 ## 2018年技能树
