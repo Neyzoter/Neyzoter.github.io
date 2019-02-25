@@ -34,6 +34,19 @@ keywords: skills
 * HTTPS(数字签名)
 
 ## 硬件
+### MCU
+* STM32
+* C51
+
+### RTOS
+* FreeRTOS
+
+### 传感网络
+* OceanConnect
+* NBIoT
+* WiFi
+* BlueTooth
+
 
 # 历年技能总结
 ## 2019年技能树
