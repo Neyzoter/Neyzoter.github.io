@@ -75,7 +75,7 @@ QUIC （Quick UDP Internet Connections）是 Google 推出的一个项目，旨�
 
 <img src="/images/posts/2019-3-5-HTTP-Version/pics.webp" width="700" alt="几个HTTP版本的比较" />
 
-## HTTPS
+## 2、HTTPS
 HTTPS是Hypertext Transfer Protocol Secure的缩写，翻译为超文本传输安全协议。HTTPS经由HTTP进行通信，但利用SSL/TLS来加密数据包。
 
 HTTP的URL是由“http://”起始与默认使用端口80，而HTTPS的URL则是由“https://”起始与默认使用端口443。

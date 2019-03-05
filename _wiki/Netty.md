@@ -1541,6 +1541,228 @@ public class EchoClient {
 
 与以前一样，在这里使用了 NIO 传输。请注意，您可以在 客户端和服务器 使用不同的传输 ，例如 NIO 在服务器端和 OIO 客户端。在第四章中，我们将研究一些具体的因素和情况，这将导致 您可以选择一种传输，而不是另一种。
 
+# 3、Netty使用问题
+## 3.1 内存泄露
+### 3.1.1 消息读取时的内存泄露
+* **问题描述**
+
+Netty 的消息读取并不存在消息队列，但是如果消息解码策略不当，则可能会发生内存泄漏，主要有如下几点：
+
+1.畸形码流攻击：如果客户端按照协议规范，将消息长度值故意伪造的非常大，可能会导致接收方内存溢出。
+
+2.代码 BUG：错误的将消息长度字段设置或者编码成一个非常大的值，可能会导致对方内存溢出。
+
+3.高并发场景：单个消息长度比较大，例如几十 M 的小视频，同时并发接入的客户端过多，会导致所有 Channel 持有的消息接收 ByteBuf 内存总和达到上限，发生 OOM。
+
+* **问题解决**
+
+无论采用哪种解码器实现，都对消息的最大长度做限制，当超过限制之后，抛出解码失败异常，用户可以选择忽略当前已经读取的消息，或者直接关闭链接。
+
+
+```java
+//以基于分隔符的解码器为例
+//指定一个比较合理的消息最大长度限制
+public DelimiterBasedFrameDecoder(
+	int maxFrameLength, boolean stripDelimiter, ByteBuf delimiter) {
+		this(maxFrameLength, stripDelimiter, true, delimiter);
+}
+```
+
+需要根据单个 Netty 服务端可以支持的最大客户端并发连接数、消息的最大长度限制以及当前 JVM 配置的最大内存进行计算，并结合业务场景，合理设置 maxFrameLength 的取值。
+
+### 3.1.2 ChannelHandler的并发执行
+* **问题提出**
+Netty 的 ChannelHandler 支持串行和异步并发执行两种策略，在将 ChannelHandler 加入到 ChannelPipeline 时，如果指定了 EventExecutorGroup，则 ChannelHandler 将由 EventExecutorGroup 中的 EventExecutor 异步执行。这样的好处是可以实现 Netty I/O 线程与业务 ChannelHandler 逻辑执行的分离，防止 ChannelHandler 中耗时业务逻辑的执行阻塞 I/O 线程。
+
+<img src="/images/wiki/Netty/NettyNIO.webp" width="600" alt="Netty异步执行" />
+
+如果业务 ChannelHandler 中执行的业务逻辑耗时较长，消息的读取速度又比较快，很容易发生消息在 EventExecutor 中积压的问题，如果创建 EventExecutor 时没有通过 io.netty.eventexecutor.maxPendingTasks 参数指定积压的最大消息个数，则默认取值为 0x7fffffff，长时间的积压将导致内存溢出，相关代码如下所示（异步执行 ChannelHandler，将消息封装成 Task 加入到 taskQueue 中）：
+
+```java
+public void execute(Runnable task) {
+	if (task == null) {
+		throw new NullPointerException("task");
+	}
+	boolean inEventLoop = inEventLoop();
+	if (inEventLoop) {
+		addTask(task);
+	} else {
+		startThread();
+		addTask(task);
+	}
+	if (isShutdown() && removeTask(task)) {
+		reject();
+	}
+}
+```
+
+* **问题解决**
+
+对 EventExecutor 中任务队列的容量做限制，可以通过 io.netty.eventexecutor.maxPendingTasks 参数做全局设置，也可以通过构造方法传参设置。结合 EventExecutorGroup 中 EventExecutor 的个数来计算 taskQueue 的个数，根据 taskQueue \* N \* 任务队列平均大小 \* maxPendingTasks < 系数K（0 < K < 1）\* 总内存的公式来进行计算和评估。
+
+### 3.1.3 高并发引发的消息发送队列积压
+* **问题提出**
+
+为了防止高并发场景下，由于对方处理慢导致自身消息积压，除了服务端做流控之外，客户端也需要做并发保护，防止自身发生消息积压。
+
+* **问题解决**
+
+利用 Netty 提供的高低水位机制，可以实现客户端更精准的流控。
+
+```java
+ChannelConfig setWriteBufferHighWaterMark(int writeBufferHighWaterMark);
+```
+
+当发送队列待发送的字节数组达到高水位上限时，对应的 Channel 就变为不可写状态。由于高水位并不影响业务线程调用 write 方法并把消息加入到待发送队列中，因此，必须要在消息发送时对 Channel 的状态进行判断：当到达高水位时，Channel 的状态被设置为不可写，通过对 Channel 的可写状态进行判断来决定是否发送消息。
+
+具体方法：
+
+```java
+public void channelActive(final ChannelHandlerContext ctx) {
+	//设置水位
+	ctx.channel().config().setWriteBufferHighWaterMark(10 \* 1024 * 1024);
+	loadRunner = new Runnable() {
+		@Override
+		public void run() {
+			try {
+				TimeUnit.SECONDS.sleep(30);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			ByteBuf msg = null;
+			while (true) {
+				//检查这个通道是否到达水位，即是否可写
+				if (ctx.channel().isWritable()) {
+					msg = Unpooled.wrappedBuffer("Netty OOM Example".getBytes());
+					ctx.writeAndFlush(msg);
+				} else {
+					LOG.warning("The write queue is busy : " + ctx.channel().unsafe().outboundBuffer().nioBufferSize());
+				}
+			}//endof while
+		}//endof run
+	};//endof runnable
+	new Thread(loadRunner, "LoadRunner-Thread").start();
+}
+```
+
+我的代码：
+
+```java
+//通道开启时设置水位
+public void channelActive(ChannelHandlerContext ctx) throws Exception {
+	//设置消息队列流量水位，不能太多，否则会造成积压
+	ctx.channel().config().setWriteBufferHighWaterMark(10 * 1024 * 1024);//10MB
+	System.out.println("PC "+ctx.channel().remoteAddress()+" connected!");
+	//通道数太多了
+	if(RunPcServer.getChMap().size()>ChannelAttributes.MAX_CHANNEL_NUM) {
+		TCP_ServerHandler4PC.ctxCloseFuture(ctx);
+		return;
+	}
+	//加入该通道
+	RunPcServer.getChMap().put(ctx.channel().remoteAddress().toString(), new ChannelAttributes(ctx));
+	String salt = RunPcServer.getChMap().get(ctx.channel().remoteAddress().toString()).getSalt();
+	TCP_ServerHandler4PC.writeFlushFuture(ctx,"RandStr"+TCP_ServerHandler4PC.SEG_CMD_DONE_SIGNAL+salt);	System.out.println("RandStr"+TCP_ServerHandler4PC.SEG_CMD_DONE_SIGNAL+salt);//打印salt
+    ctx.fireChannelActive();
+}//end of channelActive
+
+//封装writeAndFlush，实现判断channel是否可写
+public static void writeFlushFuture(ChannelHandlerContext ctx,ByteBuf msg) {
+	//如果这个channel没有到达水位的话，还可以写入
+	//水位在active时设置
+	if(ctx.channel().isWritable()) {
+	ChannelFuture future = ctx.writeAndFlush(msg);
+    	//发送完毕会返回一个信息
+    	future.addListener(new ChannelFutureListener(){
+			@Override
+			public void operationComplete(ChannelFuture f) {
+				if(!f.isSuccess()) {
+					f.cause().printStackTrace();
+				}
+			}
+		});
+	}
+}
+```
+
+### 3.1.4 其他原因导致消息发送队列积压
+* **问题提出**
+
+1.网络瓶颈，发送速率超过网络链接处理能力时，会导致发送队列积压。
+
+2.对端读取速度小于己方发送速度，导致自身 TCP 发送缓冲区满，频繁发生 write 0 字节时，待发送消息会在 Netty 发送队列排队。
+
+## 3.2 ByteBuf 的释放策略
+有一种说法认为 Netty 框架分配的 ByteBuf 框架会自动释放，业务不需要释放；业务创建的 ByteBuf 则需要自己释放，Netty 框架不会释放。
+
+事实上，这种观点是错误的，即便 ByteBuf 是 Netty 创建的，如果使用不当仍然会发生内存泄漏。在实际项目中如何更好的管理 ByteBuf，下面我们分四种场景进行说明。
+
+### 3.2.1 基于内存池的请求 ByteBuf
+* **问题提出**
+主要包括 PooledDirectByteBuf 和 PooledHeapByteBuf，它由 Netty 的 NioEventLoop 线程在处理 Channel 的读操作时分配，需要在业务 ChannelInboundHandler 处理完请求消息之后释放（通常是解码之后）。
+
+* **问题解决**
+
+*策略1*
+
+ChannelInboundHandler 继承自 SimpleChannelInboundHandler，实现它的抽象方法 channelRead0(ChannelHandlerContext ctx, I msg)，ByteBuf 的释放业务不用关心，由 SimpleChannelInboundHandler 负责释放，相关代码如下所示（SimpleChannelInboundHandler）
+
+```java
+@Override
+public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+	boolean release = true;
+	try {
+		if (acceptInboundMessage(msg)) {
+		I imsg = (I) msg;
+		channelRead0(ctx, imsg);
+		} else {
+			release = false;
+			ctx.fireChannelRead(msg);
+		}
+	} finally {
+		if (autoRelease && release) {
+			ReferenceCountUtil.release(msg);
+		}
+	}
+}
+```
+
+如果当前业务 ChannelInboundHandler 需要执行，则调用完 channelRead0 之后执行 ReferenceCountUtil.release(msg) 释放当前请求消息。如果没有匹配上需要继续执行后续的 ChannelInboundHandler，则不释放当前请求消息，调用 ctx.fireChannelRead(msg) 驱动 ChannelPipeline 继续执行。
+
+```java
+//继承自 SimpleChannelInboundHandler，即便业务不释放请求 ByteBuf 对象，依然不会发生内存泄漏，相关示例代码如下所示：
+public class RouterServerHandlerV2 **extends SimpleChannelInboundHandler<ByteBuf>** {
+// 代码省略...
+	@Override
+	public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
+		byte [] body = new byte[msg.readableBytes()];
+		executorService.execute(()->
+		{
+		// 解析请求消息，做路由转发，代码省略...
+		// 转发成功，返回响应给客户端
+		ByteBuf respMsg = allocator.heapBuffer(body.length);
+		respMsg.writeBytes(body);// 作为示例，简化处理，将请求返回
+		ctx.writeAndFlush(respMsg);
+	});
+}
+```
+
+*策略2*
+
+在业务 ChannelInboundHandler 中调用 ctx.fireChannelRead(msg) 方法，让请求消息继续向后执行，直到调用到 DefaultChannelPipeline 的内部类 TailContext，由它来负责释放请求消息，代码如下所示（TailContext）
+
+```java
+protected void onUnhandledInboundMessage(Object msg) {
+	try {
+		logger.debug(
+			"Discarded inbound message {} that reached at the tail of the pipeline. " +
+			"Please check your pipeline configuration.", msg);
+		} finally {
+			ReferenceCountUtil.release(msg);
+	}
+}
+```
+# X.参考文献
+[1.Netty防止内存泄漏措施](https://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651013961&idx=2&sn=91b202f2df224e2b3ddc652b5b0c69cb&chksm=bdbebb1a8ac9320c3249217d01d927f7fe003560f110b97079767da114a9eadd367e963f55d9&mpshare=1&scene=1&srcid=&key=0cc0a803134ec623278dd87e0df5faffcd6813a41434e7eba02eaed37a08d419484bcf0c4f780450ff26bd2cb2c350388e149b82a17dc9521cc8185e6471be4c996a81aedd14793648062407cfc773be&ascene=1&uin=Mjk2MTQyNjcwNA%3D%3D&devicetype=Windows+10&version=62060728&lang=zh_CN&pass_ticket=tfRDLvAV4pVmH9C40TehCveAy85%2F%2BHx5b2StWrTjEhg8NvwsIGyCvzZT3JMW6Sz3 'Netty防止内存泄露的措施')
 
 
 
