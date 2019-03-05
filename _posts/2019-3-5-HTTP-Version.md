@@ -1,9 +1,9 @@
 ---
 layout: post
-title: 时间序列分析的一般流程
-categories: AIA
-description: 时间序列分析的一般流程
-keywords: AI,Time Series
+title: HTTP和HTTPS的基本技术介绍
+categories: IoT
+description: HTTP和HTTPS的基本介绍
+keywords: HTTP, HTTPS, Network
 ---
 
 ## 1、HTTP
