@@ -51,10 +51,6 @@ keywords: AI,Time Series
 
 （1）IsolationForest
 
-```mermaid
-A[直角边] -->B(圆边)
-
-```
 
 （2）随机森林
 
