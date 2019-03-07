@@ -85,7 +85,7 @@ $TOMCAT_HOME/conf目录下
 
 **1、Server**
 
-Server元素在最顶层，代表整个Tomcat容器，因此它必须是server.xml中唯一一个最外层的元素。一个Server元素中可以有一个或多个Service元素。
+Server元素在最顶层，代表整个Tomcat容器，因此它必须是server.xml中**唯一一个最外层的元素**。**一个Server元素中可以有一个或多个Service元素**。
 
 作用：Server提供一个接口让客户端能够访问到这个Service集合，同时维护它所包含的所有的Service的声明周期，包括如何初始化、如何结束服务、如何找到客户端要访问的Service。
 
@@ -96,6 +96,8 @@ Server元素在最顶层，代表整个Tomcat容器，因此它必须是server.x
 **3、Connector**
 
 作用：接收连接请求，创建Request和Response对象用于和请求端交换数据；然后分配线程让Engine来处理这个请求，并把产生的Request和Response对象传给Engine。
+
+**注**：访问服务器，默认访问80端口，即url不带端口时默认80端口。
 
 两个Connector（HTTP和AJP），如下
 
