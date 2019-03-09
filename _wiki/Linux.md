@@ -603,7 +603,7 @@ $ sudo vi ./bin/startup.sh
 
 **注意**：
 
- 1.在文件的```exec "$PRGDIR"/"$EXECUTABLE" start "$@"```**之前**添加一下内容
+ 1.在文件的```exec "$PRGDIR"/"$EXECUTABLE" start "$@"```**之前**添加以下内容
 
  2.JAVA_HOME、JRE_HOME等java的环境变量根据电脑情况填写相应地址。
 

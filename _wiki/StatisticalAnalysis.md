@@ -1,6 +1,6 @@
 ---
 layout: wiki
-title: 统计和信息处理知识
+title: Statistic and Information
 categories: Stachastic
 description: 统计学的一些用法
 keywords: Stachastic,Information Analysis
