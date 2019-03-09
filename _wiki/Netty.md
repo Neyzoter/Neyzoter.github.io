@@ -1684,7 +1684,7 @@ public static void writeFlushFuture(ChannelHandlerContext ctx,ByteBuf msg) {
 }
 ```
 
-### 3.1.4 其他原因导致消息发送队列积压
+### 3.1.4  其他原因导致消息发送队列积压
 * **问题提出**
 
 1.网络瓶颈，发送速率超过网络链接处理能力时，会导致发送队列积压。
@@ -1694,17 +1694,17 @@ public static void writeFlushFuture(ChannelHandlerContext ctx,ByteBuf msg) {
 ## 3.2 ByteBuf 的释放策略
 有一种说法认为 Netty 框架分配的 ByteBuf 框架会自动释放，业务不需要释放；业务创建的 ByteBuf 则需要自己释放，Netty 框架不会释放。
 
-事实上，这种观点是错误的，即便 ByteBuf 是 Netty 创建的，如果使用不当仍然会发生内存泄漏。在实际项目中如何更好的管理 ByteBuf，下面我们分四种场景进行说明。
+事实上，这种观点是错误的，即便 ```ByteBuf ```是 Netty 创建的，如果使用不当仍然会发生内存泄漏。在实际项目中如何更好的管理 ```ByteBuf```，下面我们分四种场景进行说明——内存池（```PooledDirectByteBuf``` 和``` PooledHeapByteBuf```）、请求（外界发消息到本机）；非内存池（```Unpooled...```）、请求；内存池、响应（本机发送消息）；非内存池、响应
 
-### 3.2.1 基于内存池的请求 ByteBuf
+### 3.2.1 基于*内存池*的*请求* ByteBuf
 * **问题提出**
-主要包括 PooledDirectByteBuf 和 PooledHeapByteBuf，它由 Netty 的 NioEventLoop 线程在处理 Channel 的读操作时分配，需要在业务 ChannelInboundHandler 处理完请求消息之后释放（通常是解码之后）。
+主要包括 ```PooledDirectByteBuf``` 和``` PooledHeapByteBuf```，它由 Netty 的 ```NioEventLoop ```线程在处理 Channel 的读操作时分配，需要在业务 ```ChannelInboundHandler ```处理完请求消息之后释放（通常是解码之后）。
 
 * **问题解决**
 
 *策略1*
 
-ChannelInboundHandler 继承自 SimpleChannelInboundHandler，实现它的抽象方法 channelRead0(ChannelHandlerContext ctx, I msg)，ByteBuf 的释放业务不用关心，由 SimpleChannelInboundHandler 负责释放，相关代码如下所示（SimpleChannelInboundHandler）
+```ChannelInboundHandler ```继承自 ```SimpleChannelInboundHandler```，实现它的抽象方法 ```channelRead0(ChannelHandlerContext ctx, I msg)```，ByteBuf 的释放业务不用关心，由 ```SimpleChannelInboundHandler ```负责释放，相关代码如下所示（```SimpleChannelInboundHandler```）
 
 ```java
 @Override
@@ -1726,11 +1726,11 @@ public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception 
 }
 ```
 
-如果当前业务 ChannelInboundHandler 需要执行，则调用完 channelRead0 之后执行 ReferenceCountUtil.release(msg) 释放当前请求消息。如果没有匹配上需要继续执行后续的 ChannelInboundHandler，则不释放当前请求消息，调用 ctx.fireChannelRead(msg) 驱动 ChannelPipeline 继续执行。
+如果当前业务 ```ChannelInboundHandler ```需要执行，则调用完``` channelRead0``` 之后执行 ```ReferenceCountUtil.release(msg) ```释放当前请求消息。如果没有匹配上需要继续执行后续的 ```ChannelInboundHandler```，则不释放当前请求消息，调用 ```ctx.fireChannelRead(msg) ```驱动 ```ChannelPipeline ```继续执行。
 
 ```java
 //继承自 SimpleChannelInboundHandler，即便业务不释放请求 ByteBuf 对象，依然不会发生内存泄漏，相关示例代码如下所示：
-public class RouterServerHandlerV2 **extends SimpleChannelInboundHandler<ByteBuf>** {
+public class RouterServerHandlerV2 extends SimpleChannelInboundHandler<ByteBuf> {
 // 代码省略...
 	@Override
 	public void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
@@ -1748,7 +1748,7 @@ public class RouterServerHandlerV2 **extends SimpleChannelInboundHandler<ByteBuf
 
 *策略2*
 
-在业务 ChannelInboundHandler 中调用 ctx.fireChannelRead(msg) 方法，让请求消息继续向后执行，直到调用到 DefaultChannelPipeline 的内部类 TailContext，由它来负责释放请求消息，代码如下所示（TailContext）
+在业务 ```ChannelInboundHandler ```中调用``` ctx.fireChannelRead(msg) ```方法，让请求消息继续向后执行，直到调用到 ```DefaultChannelPipeline ```的内部类``` TailContext```，由它来负责释放请求消息，代码如下所示（```TailContext```）
 
 ```java
 protected void onUnhandledInboundMessage(Object msg) {
@@ -1761,6 +1761,38 @@ protected void onUnhandledInboundMessage(Object msg) {
 	}
 }
 ```
+
+### 3.2.2 基于*非内存池*的*请求* ByteBuf
+如果业务使用非内存池模式覆盖 Netty 默认的内存池模式创建请求 ```ByteBuf```，也需要按照内存池的方式去释放内存。例如在Netty初始化一个通过如下代码修改内存申请策略为```Unpooled```：
+
+```java
+// 代码省略... 
+.childHandler(new ChannelInitializer<SocketChannel>() {
+    @Override
+    public void initChannel(SocketChannel ch) throws Exception {
+        ChannelPipeline p = ch.pipeline(); 								         	               ch.config().setAllocator(UnpooledByteBufAllocator.DEFAULT);
+        p.addLast(new RouterServerHandler());
+    }
+    }); 
+}
+```
+
+### 3.2.3 基于*内存池*的*响应* ByteBuf
+只要调用了``` writeAndFlush``` 或者 ```flush```方法，在消息发送完成之后都会由 Netty 框架进行内存释放，业务不需要主动释放内存。
+
+(1)如果是堆内存（```PooledHeapByteBuf```），则将 ```HeapByteBuffer``` 转换成 ```DirectByteBuffer```，并释放 ```PooledHeapByteBuf``` 到内存池
+
+(2)如果是 ```DirectByteBuffer```，则不需要转换，当消息发送完成之后，由 ```ChannelOutboundBuffer``` 的``` remove() ```负责释放。
+
+### 3.2.4 基于*非内存池*的*响应* ByteBuf
+无论是基于内存池还是非内存池分配的 ```ByteBuf```，如果是堆内存，则将堆内存转换成堆外内存，然后释放 ```HeapByteBuffer```，待消息发送完成之后，再释放转换后的 ```DirectByteBuf```；如果是 ```DirectByteBuffer```，则无需转换，待消息发送完成之后释放。因此对于需要发送的响应 ```ByteBuf```，由业务创建，但是不需要业务来释放。
+
+## 3.3 Netty 服务端高并发保护
+
+### 3.3.1 高并发场景下的 OOM (Out-Of-Memory)问题
+
+
+
 # X.参考文献
 [1.Netty防止内存泄漏措施](https://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651013961&idx=2&sn=91b202f2df224e2b3ddc652b5b0c69cb&chksm=bdbebb1a8ac9320c3249217d01d927f7fe003560f110b97079767da114a9eadd367e963f55d9&mpshare=1&scene=1&srcid=&key=0cc0a803134ec623278dd87e0df5faffcd6813a41434e7eba02eaed37a08d419484bcf0c4f780450ff26bd2cb2c350388e149b82a17dc9521cc8185e6471be4c996a81aedd14793648062407cfc773be&ascene=1&uin=Mjk2MTQyNjcwNA%3D%3D&devicetype=Windows+10&version=62060728&lang=zh_CN&pass_ticket=tfRDLvAV4pVmH9C40TehCveAy85%2F%2BHx5b2StWrTjEhg8NvwsIGyCvzZT3JMW6Sz3 'Netty防止内存泄露的措施')
 
