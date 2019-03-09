@@ -1791,9 +1791,44 @@ protected void onUnhandledInboundMessage(Object msg) {
 
 ### 3.3.1 高并发场景下的 OOM (Out-Of-Memory)问题
 
+在 RPC 调用时，如果客户端并发连接数过多，服务端又没有针对并发连接数的流控机制，一旦服务端处理慢，就很容易发生批量超时和断连重连问题。
+
+以 Netty HTTPS 服务端为例，典型的业务组网示例如下所示：
+
+<img src="/images/wiki/Netty/NettyHTTPSRPC.webp" width="700" alt="Netty 的HTTPS业务组" />
+
+* **OOM过程**
+
+客户端采用 HTTP 连接池的方式与服务端进行 RPC 调用，单个客户端连接池上限为 200，客户端部署了 30 个实例，而服务端只部署了 3 个实例。在业务高峰期，每个服务端需要处理 6000 个 HTTP 连接，当服务端时延增大之后，会导致客户端批量超时，超时之后客户端会关闭连接重新发起 connect 操作，在某个瞬间，几千个 HTTPS 连接同时发起 SSL 握手操作，由于服务端此时也处于高负荷运行状态，就会导致部分连接 SSL 握手失败或者超时，超时之后客户端会继续重连，进一步加重服务端的处理压力，最终导致服务端来不及释放客户端 close 的连接，引起 ```NioSocketChannel ```大量积压，最终 OOM。
+
+* **解决方法**：限制一台服务器的连接数，Netty 的pipeline机制对SSL握手、链接关闭作切面拦截（```channelActive(ChannelHandlerContext ctx)```即为连接时调用的函数）。
+
+<img src="/images/wiki/Netty/NettyConCtrl.webp" width="560" alt="Netty 的pipeline机制对SSL握手、链接关闭作切面拦截" />
+
+**服务器流控算法**：
+
+1.获取流控阈值。
+
+2.从全局上下文中获取当前的并发连接数，与流控阈值对比，如果小于流控阈值，则对当前的计数器做原子自增，允许客户端连接接入。
+
+3.如果等于或者大于流控阈值，则抛出流控异常给客户端。
+
+4.SSL 连接关闭时，获取上下文中的并发连接数，做原子自减。
+
+**注意点**：
+
+1.流控的``` ChannelHandler ```声明为 ```@ChannelHandler.Sharable```，这样全局创建一个流控实例，就可以在所有的 SSL 连接中共享。
+
+2.通过 ```userEventTriggered ```方法拦截 ```SslHandshakeCompletionEvent ```和 ```SslCloseCompletionEvent ```事件，在 SSL 握手成功和 SSL 连接关闭时更新流控计数器。
+
+3.流控并不是单针对 ESTABLISHED 状态的 HTTP 连接，而是针对所有状态的连接，因为客户端关闭连接，并不意味着服务端也同时关闭了连接，只有 ```SslCloseCompletionEvent ```事件触发时，服务端才真正的关闭了 ```NioSocketChannel```，GC 才会回收连接关联的内存。
+
+4.流控 ```ChannelHandler ```会被多个 ```NioEventLoop ```线程调用，因此对于相关的计数器更新等操作，要保证并发安全性，避免使用全局锁，可以通过原子类等提升性能。
+
 
 
 # X.参考文献
+
 [1.Netty防止内存泄漏措施](https://mp.weixin.qq.com/s?__biz=MjM5MDE0Mjc4MA==&mid=2651013961&idx=2&sn=91b202f2df224e2b3ddc652b5b0c69cb&chksm=bdbebb1a8ac9320c3249217d01d927f7fe003560f110b97079767da114a9eadd367e963f55d9&mpshare=1&scene=1&srcid=&key=0cc0a803134ec623278dd87e0df5faffcd6813a41434e7eba02eaed37a08d419484bcf0c4f780450ff26bd2cb2c350388e149b82a17dc9521cc8185e6471be4c996a81aedd14793648062407cfc773be&ascene=1&uin=Mjk2MTQyNjcwNA%3D%3D&devicetype=Windows+10&version=62060728&lang=zh_CN&pass_ticket=tfRDLvAV4pVmH9C40TehCveAy85%2F%2BHx5b2StWrTjEhg8NvwsIGyCvzZT3JMW6Sz3 'Netty防止内存泄露的措施')
 
 
