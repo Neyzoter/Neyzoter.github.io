@@ -38,27 +38,90 @@ Docker 使用客户端-服务器 (C/S) 架构模式，使用远程API来管理�
 
 # 2.Docker安装
 ## 2.1 Ubuntu下安装
+
+英文安装导航：[Ubuntu下安装Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/ "Ubuntu下安装Docker")
+
 * 前提
 
 Ubuntu内核版本高于3.10
 
+```bash
+$ uname -r
+```
+
 * 脚本安装
 
-1.更新到最新软件
+1.卸载旧版本
 
-```shell
+Docker的旧版本名称为:docker、docker-engine或者docker-io
+
+如果安装过旧版本则需要先卸载。
+
+```bash
+$ sudo apt-get remove docker docker-engine docker.io containerd runc
+```
+
+2.安装https相关的软件包
+
+docker安装需要使用https，所以需要使 apt 支持 https 的拉取方式。
+
+```bash
+$ sudo apt-get update # 先更新一下软件源库信息
+
+$ sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+```
+
+3、设置apt仓库地址
+
+有多个来源，比如国外源、阿里源等。
+
+**国外源（可能不稳定）**
+
+```bash
+# 添加 Docker 官方的 GPG 密钥（为了确认所下载软件包的合法性，需要添加软件源的 GPG 密钥）
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+# 设置稳定版本的apt仓库地址
+$ sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+```
+
+**阿里源**
+
+```bash
+$ curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+
+$ sudo add-apt-repository \
+     "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu \
+     $(lsb_release -cs) \
+     stable"
+```
+
+4.	安装Docker
+
+```bash
 $ sudo apt-get update
+
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io # 安装最新版的docker
+或者
+$ sudo apt-get install docker-ce
 ```
 
-2.	安装Docker
+5.docker版本
 
-```shell
-$ sudo apt-get install -y docker.io
+```bash
+$ docker --version
 ```
 
-3.启动Docker
+6.启动Docker
 
-```shell
+```bash
 $ sudo service docker start
 ```
 
@@ -67,7 +130,68 @@ $ sudo service docker start
 [CentOs安装Docker](https://www.w3cschool.cn/docker/centos-docker-install.html)
 
 ## 2.3 Win下安装
+[Win安装Docker](https://www.w3cschool.cn/docker/windows-docker-install.html)
 
+# 3.Docker使用
 
+**注意**：shell都基于ubuntu bash
 
+## 3.1 hello world
+
+```bash
+sudo docker run hello-world
+```
+
+输出
+
+```
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+1b930d010525: Pull complete 
+Digest: sha256:2557e3c07ed1e38f26e389462d03ed943586f744621577a99efb77324b0fe535
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+```
+
+## 3.1 以非ROOT方式管理Docker
+
+1.创建一个docker group
+
+````bash
+$ sudo groupadd docker
+````
+
+2.添加用户到docker group中
+
+```bash
+$ sudo usermod -aG docker $USER
+```
+
+3.重启
+
+4.验证（不使用sudo）
+
+```bash
+$ docker run hello-world
+```
 
