@@ -9,19 +9,26 @@ keywords: skills
 # 总技能树
 
 ## 软件
+
 |编程语言|编程技能|框架|
 |-|-|-|
 |Java、C/C++、Python、Matlab、R |Linux、 Git| Spring、Tomcat、 Netty、 MongoDB、 Docker|
+
 ## 算法
+
 |机器学习|信息安全|备用|
 |-|-|-|
 |XGBOOST |MD5、 RSA、HTTPS(数字签名)||
+
 ## 硬件
+
 |MCU|RTOS|传感网络|
 |-|-|-|
 |STM32、C51 |FreeRTOS|OceanConnect、NBIoT、WiFi、BlueTooth|
+
 # 历年技能总结
 ## 2019年技能树
+
 * 软件
 
 |编程语言|编程技能|框架|
@@ -39,6 +46,7 @@ keywords: skills
 |MCU|RTOS|传感网络|
 |-|-|-|
 ||||
+
 ## 2018年技能树
 * 软件
 
