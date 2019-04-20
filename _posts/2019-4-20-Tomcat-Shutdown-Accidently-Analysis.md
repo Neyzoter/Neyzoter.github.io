@@ -66,6 +66,7 @@ tail -f /opt/tomcat/apache-tomcat-8.0.53/logs/catalina.out
 注释：
 
 >ID  标志      作用
+>
 >01 SIGHUP 挂起（hangup）
 >
 >本信号在用户终端连接(正常或非正常)结束时发出, 通常是在终端的控制进程结束时, 通知同一session内的各个作业, 这时它们与控制终端不再关联。
