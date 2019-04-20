@@ -18,7 +18,7 @@ keywords: skills
 
 |机器学习|信息安全|备用|
 |-|-|-|
-|XGBOOST |MD5、 RSA、HTTPS(数字签名)||
+|XGBOOST |MD5、 RSA、HTTPS||
 
 ## 硬件
 
