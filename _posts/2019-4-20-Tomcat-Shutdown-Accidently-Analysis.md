@@ -158,5 +158,5 @@ sshd把`SIGHUP`传递给bash进程后，bash会把`SIGHUP`传递给它的子进�
 
 ## 4.参考文献
 
-1.[写点什么，有关jvm,scala与后端架构](<http://hongjiang.info/why-kill-2-cannot-stop-tomcat/>)
+1.[tomcat进程意外退出的问题分析](<http://hongjiang.info/why-kill-2-cannot-stop-tomcat/>)
 
