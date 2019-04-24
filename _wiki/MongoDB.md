@@ -205,7 +205,7 @@ db.col.deleteMany({ status : "A" })
 db.col.deleteOne( { status: "D" } )
 
 * remove
- 
+
 已经过时。
 
 ```
@@ -850,19 +850,19 @@ mongodb://example1.com:27017,example2.com:27017
 文档是一组键值(key-value)对(即BSON)。
 
 
- | RDBMS | MongoDB | 
- |-  |    -  |
- | 数据库 | 数据库 | 
- |-  |    -  |
- | 表格 | 集合 |
- |-  |    -  | 
- | 行 | 文档 | 
- |-  |    -  |
- | 列 | 字段 | 
- |-  |    -  |
- | 表联合 | 嵌入文档 | 
- |-  |    -  |
- | 主键 | 主键 (MongoDB 提供了 key 为 _id ) | 
+| RDBMS | MongoDB |
+|-|-|
+| 数据库 | 数据库 |
+|-|-|
+| 表格 | 集合 |
+|-|-|
+| 行 | 文档 |
+|-|-|
+| 列 | 字段 |
+|-|-|
+| 表联合 | 嵌入文档 |
+|-|-|
+| 主键 | 主键 (MongoDB 提供了 key 为 _id ) |
 
 ### MongoDB的数据类型
 
@@ -923,7 +923,26 @@ BSON有一个特殊的时间戳类型用于 MongoDB 内部使用，与普通的 
 
 64bits：[0:31]，time_t，与Unix新纪元相差的秒数;[32:63],某秒中操作的一个递增的序数。
 
+### 连接池
 
+关系型数据库（如MySQL）中，我们做连接池无非就是事先建立好N个连接（connection），并构建成一个连接池（connection pool），提供去连接和归还连接等操作。
+
+MongoDB实例其实已经是一个现成的连接池了，而且线程安全。这个内置的连接池默认初始了10个连接，每一个操作（增删改查等）都会获取一个连接，执行操作后释放连接。
+
+**MongoDB的连接池参数**
+
+- connectionsPerHost：每个主机的连接数
+- threadsAllowedToBlockForConnectionMultiplier：线程队列数，它以上面connectionsPerHost值相乘的结果就是线程队列最大值。如果连接线程排满了队列就会抛出“Out of semaphores to get db”错误。
+- maxWaitTime:最大等待连接的线程阻塞时间
+- connectTimeout：连接超时的毫秒。0是默认和无限
+- socketTimeout：socket超时。0是默认和无限
+- autoConnectRetry：这个控制是否在一个连接时，系统会自动重试
+
+```java
+MongoOptions opt = mongo.getMongoOptions();
+opt.connectionsPerHost = 10 ;//poolsize
+opt.threadsAllowedToBlockForConnectionMultiplier = 10;
+```
 
 
 
