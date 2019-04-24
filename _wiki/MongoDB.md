@@ -903,11 +903,5 @@ opt.connectionsPerHost = 10 ;//poolsize
 opt.threadsAllowedToBlockForConnectionMultiplier = 10;
 ```
 
-BasicDBObject filter = new BasicDBObject();
-            			filter.put(TCP_ServerHandler4PC.TESTINFOMONGODB_KEY_TESTNAME, testName);
-            			testInfoMongdb.collection.find(filter).first(new SingleResultCallback<Document>() {
-	    					@Override
-	    					public void onResult(Document result, Throwable t) {	    						
-	    					}	
-	                	});
+
 
