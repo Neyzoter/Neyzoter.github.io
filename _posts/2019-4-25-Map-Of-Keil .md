@@ -123,7 +123,7 @@ Execution Region RW_IRAM1
 | ------------ | -------- | ------------------------------------------------------------ |
 | Base Addr    | 存储地址 | 0x0800xxxxFLASH地址和0x2000xxxx内存RAM地址。                 |
 | Size         | 存储大小 |                                                              |
-| Type         | 类型     | Data：数据类型；Code：代码类型；Zero：未初始化变量类型；PAD：补充类型（ARM处理器是32位的，如果定义一个8位或者16位变量就会剩余一部分，这里就是指的“补充”的那部分） |
+| Type         | 类型     | Data：数据类型；Code：代码类型；Zero：未初始化变量类型；PAD(padding)：补白类型（ARM处理器是32位的，如果定义一个8位或者16位变量就会剩余一部分，这里就是指的“补充”的那部分） |
 | Attr         | 属性     | RO：存储与ROM中的段；RW：存储与RAM中的段                     |
 | Section Name | 段名     | “Section Cross References”指的模块、段一样，RESET、.ARM、 .text、 i、 .data、 .bss、 HEAP、 STACK等 |
 | Object       | 目标     |                                                              |
