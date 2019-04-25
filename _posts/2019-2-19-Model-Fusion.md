@@ -105,7 +105,7 @@ P1的得到是有问题的，用整个训练集训练的模型反过来去预测
 
 <img src="/images/posts/2019-2-19-Model-Fusion/base2.webp" width="700" alt="代码2" />
 
-<img src="/images/posts/2019-2-19-Model-Fusion/result.webp" width="700" alt="结果" />
+<img src="/images/posts/2019-2-19-Model-Fusion/base_result.webp" width="700" alt="结果" />
 
 **使用第一层基本分类器产生的类别概率值作为meta-classfier的输入**
 

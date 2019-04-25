@@ -83,7 +83,7 @@ main模块(main.o)中的System_Initializes函数(i.System_Initializes)，引用�
 >**system**：命令列参数和环境变量
 >system 区段用于存储一些命令列参数和环境变量，和系统有关。
 
-符号映射表分为局部符号（Local Symbol）和全局符号（Global Symbol）两部分。
+符号映射表分为**局部符号（Local Symbol）**和**全局符号（Global Symbol）**两部分。
 
 每个符号都会输出以下主要内容：
 
@@ -144,7 +144,9 @@ Execution Region RW_IRAM1
 
 ## 3、内存移除排查方法
 
-保证方法调用不要太深，不然诸多方法的局部变量会堆积在栈中；
+查看`Image Symbol Table`的局部符号`Local Symbol`使用情况。
 
-根据需要设定局部变量空间。
+1.保证方法调用不要太深，不然诸多方法的局部变量会堆积在栈中；
+
+2.根据需要设定局部变量空间。
 
