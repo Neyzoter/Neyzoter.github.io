@@ -6,6 +6,10 @@ description: Wi-Fi中的时钟同步协议
 keywords: IoT;Wi-Fi;时钟同步
 ---
 
+> 原创
+>
+> 转载请注明出处，侵权必究
+
 # 1.802.11AS介绍
 
 

@@ -6,7 +6,12 @@ description: HTTP和HTTPS的基本介绍
 keywords: HTTP, HTTPS, Network
 ---
 
+> 原创
+>
+> 转载请注明出处，侵权必究
+
 ## 1、HTTP
+
 HTTP目前（截止到2019年3月5日）主要有三个版本，即HTTP/1.0、HTTP/1.1、HTTP/2，HTTP-over-QUIC有望成为HTTP/3。
 
 ### 1.1 HTTP一般流程 

@@ -6,7 +6,12 @@ description: Tomcat的server.xml配置文件分析
 keywords: Tomcat, Web, Java
 ---
 
+> 原创
+>
+> 转载请注明出处，侵权必究
+
 # 1.Tomcat的server.xml介绍
+
 * 作用
 
 server.xml是Tomcat中最重要的配置文件，server.xml的每一个元素都对应了Tomcat中的一个组件；通过对xml文件中元素的配置，可以实现对Tomcat中各个组件的控制。

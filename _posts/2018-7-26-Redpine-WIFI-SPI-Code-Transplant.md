@@ -5,7 +5,12 @@ categories: MCU
 description: Redpine Signals RS9113的SPI程序移植
 keywords: WIFI, 5G,Keil
 ---
+> 原创
+>
+> 转载请注明出处，侵权必究
+
 # 1、RS9113简介
+
 RS9113-N00-D1C是Redpine Signals推出的一款支持2.4/5GHz的WIFI模组。
 
 <img src="/images/posts/2018-7-26-Redpine-WIFI-SPI-Code-Transplant/RS.png" width="600" alt="RS有内部天线的模组内部结构" />

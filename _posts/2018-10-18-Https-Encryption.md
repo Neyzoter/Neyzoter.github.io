@@ -6,7 +6,12 @@ description: https加密的知识
 keywords: https,对称加密,非对称加密
 ---
 
+> 原创
+>
+> 转载请注明出处，侵权必究
+
 # 1、http
+
 明文传输数据
 
 # 2、https

@@ -6,7 +6,12 @@ description: Tomcat意外停止的问题分析
 keywords: Tomcat, ssh
 ---
 
+> 原创
+>
+> 转载请注明出处，侵权必究
+
 ## 1、问题描述
+
 测试时发现Tomcat会在后台运行时意外停止。后来查阅了[相关资料和类似问题](<http://hongjiang.info/why-kill-2-cannot-stop-tomcat/>)，找到了原因。
 
 日志输出：

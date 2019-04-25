@@ -6,7 +6,12 @@ description: 我对于Netty的组件——Channel、Pipeline、EventLoop等的�
 keywords: Java, Netty, Java框架
 ---
 
+> 原创
+>
+> 转载请注明出处，侵权必究
+
 # 1、介绍
+
 ## 1.1 Channel
 Channel是Java NIO的一个基本构造：
 
