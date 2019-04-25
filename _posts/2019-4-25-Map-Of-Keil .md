@@ -23,7 +23,7 @@ keywords: STM32, keil, map
 
 map文件生成格式可以配置（Project \-\> Options for Target \-\> Listing）
 
-<img src="/images/posts/2019-4-25-Map-Of-Keil/mapSet.png" width="600" alt="map文件配置" />
+<img src="/images/posts/2019-4-25-Map-of-Keil/mapSet.png" width="600" alt="map文件配置" />
 
 ## 2、map文件解析
 
@@ -55,11 +55,11 @@ main模块(main.o)中的System_Initializes函数(i.System_Initializes)，引用�
 
 映射符号表，需要勾上Listing的Symbols才能输出到map文件。
 
-<img src="/images/posts/2019-4-25-Map-Of-Keil/imageSymbols.jpg" width="600" alt="Image Symbol Table" />
+<img src="/images/posts/2019-4-25-Map-of-Keil/imageSymbols.jpg" width="600" alt="Image Symbol Table" />
 
 > C语言存储结构补充
 
-<img src="/images/posts/2019-4-25-Map-Of-Keil/TextDataBssStackHeapSystem.png" width="600" alt="C语言存储结构" />
+<img src="/images/posts/2019-4-25-Map-of-Keil/TextDataBssStackHeapSystem.png" width="600" alt="C语言存储结构" />
 
 >**text**：程序
 >文字区段（text segment）也称为程序段（code segment），存放可执行命令（instructions）。
@@ -101,7 +101,7 @@ main模块(main.o)中的System_Initializes函数(i.System_Initializes)，引用�
 
 内存（映射）分布，需要勾上Listing的Memory Map才能输出到map文件。
 
-<img src="/images/posts/2019-4-25-Map-Of-Keil/MMOI.bmp" width="600" alt="Memory Map of the image" />
+<img src="/images/posts/2019-4-25-Map-of-Keil/MMOI.bmp" width="600" alt="Memory Map of the image" />
 
 **Image Entry point : 0x08000131**：指映射入口地址。
 
@@ -115,7 +115,7 @@ Execution Region ER_IROM1
 
 Execution Region RW_IRAM1
 
-<img src="/images/posts/2019-4-25-Map-Of-Keil/T.png" width="600" alt="Target" />
+<img src="/images/posts/2019-4-25-Map-of-Keil/T.png" width="600" alt="Target" />
 
 **执行区域ER_IROM1/RW_IRAM1主要内容：**（分成ER_IROM1和RW_IRAM1两部分）
 
@@ -132,7 +132,7 @@ Execution Region RW_IRAM1
 
 存储组成大小，需要勾上Listing的Size Info才能输出到map文件。
 
-<img src="/images/posts/2019-4-25-Map-Of-Keil/Image component sizes.bmp" width="600" alt="存储组成大小" />
+<img src="/images/posts/2019-4-25-Map-of-Keil/Image component sizes.bmp" width="600" alt="存储组成大小" />
 
 **Code**：指代码的大小；
 
