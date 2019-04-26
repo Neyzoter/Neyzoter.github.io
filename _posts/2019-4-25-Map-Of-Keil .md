@@ -95,7 +95,7 @@ main模块(main.o)中的System_Initializes函数(i.System_Initializes)，引用�
 | Size            | 存储大小       | 我们怀疑内存溢出，可以查看代码存储大小来分析。               |
 | Object(Section) | 段目标         | 一般指所在模块（所在源文件）                                 |
 
-
+**我对OvType的理解**：Number指没有占用内存空间的一些符号（`ABSOLUTE`），比如`#programa _printf_a `中的`_printf_a`；Section包括.bss（未初始化变量）、.data（初始化的变量）、.text（程序）；Thumb Code大度表示静态函数（static function()）表示只能在本文件中可见；Data中一般包含static变量或者const变量。
 
 ### 2.4 Memory Map of the image
 
