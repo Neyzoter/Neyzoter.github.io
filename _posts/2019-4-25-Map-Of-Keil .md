@@ -85,6 +85,21 @@ main模块(main.o)中的System_Initializes函数(i.System_Initializes)，引用�
 
 符号映射表分为**局部符号（Local Symbol）**和**全局符号（Global Symbol）**两部分。
 
+**注意**：局部符号不代表局部变量，static变量也是局部符号，但是不是局部变量。
+
+>* Global symbols（模块内部定义的全局符号）
+>
+>由模块m定义并能被其他模块引用的符号。例如，非static C函数和非static C全局变量
+>
+>* External symbols（外部定义的全局符号）
+>
+>由其他模块定义并被模块m引用的全局符号
+>
+>* Local symbols（本模块的局部符号）
+>
+>仅由模块m定义和引用的本地符号。例如，在模块m中定义的带static的C函数和全局变量
+> 注意：链接器的局部符号不是指程序中的局部变量（分配在栈中的临时性变量），链接器不关心这种局部变量
+
 每个符号都会输出以下主要内容：
 
 | 符号            | 意义           | 说明                                                         |
@@ -95,7 +110,7 @@ main模块(main.o)中的System_Initializes函数(i.System_Initializes)，引用�
 | Size            | 存储大小       | 我们怀疑内存溢出，可以查看代码存储大小来分析。               |
 | Object(Section) | 段目标         | 一般指所在模块（所在源文件）                                 |
 
-**我对OvType的理解**：Number指没有占用内存空间的一些符号（`ABSOLUTE`），比如`#programa _printf_a `中的`_printf_a`；Section包括.bss（未初始化变量）、.data（初始化的变量）、.text（程序）；Thumb Code大度表示静态函数（static function()）表示只能在本文件中可见；Data中一般包含static变量或者const变量。
+**我对OvType的理解**：Number指没有占用内存空间的一些符号（`ABSOLUTE`），比如`#programa _printf_a `中的`_printf_a`；Section包括.bss（未初始化变量）、.data（初始化的变量）、.text（程序）；Thumb Code大度表示静态函数（static function()）表示只能在本文件中可见，*static修饰的变量是局部符号，但是不是局部变量*；Data中一般包含static变量或者const变量。
 
 ### 2.4 Memory Map of the image
 
@@ -144,9 +159,15 @@ Execution Region RW_IRAM1
 
 ## 3、内存移除排查方法
 
-查看`Image Symbol Table`的局部符号`Local Symbol`使用情况。
+查看`Image Symbol Table`的局部符号`Local Symbol`使用情况。`static`修饰的局部符号会单独标出来，而不是以`.data`或者`.bss`形式标出来。以下图为例，
+
+<img src="/images/posts/2019-4-25-Map-of-Keil/LocalSymbol.png" width="600" alt="局部符号" />
+
+`wifi_user_main.o`文件内包含`.bss`和`.data`变量外还有两个`static const`修饰的变量`oid_list`和`oid_type`。`oid_list`和`oid_type`是局部符号，但是不是局部变量，并不会压入栈空间。`STACK`表示启动文件中设置的栈空间大小。
+
+具体操作：
 
 1.保证方法调用不要太深，不然诸多方法的局部变量会堆积在栈中；
 
-2.根据需要设定局部变量空间。
+2.根据**局部变量**（而不是局部符号）需要设定栈空间。
 
