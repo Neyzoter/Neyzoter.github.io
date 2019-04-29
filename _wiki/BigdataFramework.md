@@ -219,7 +219,7 @@ split是根据文件大小分割的，而一般处理是根据分隔符进行分
 ### 2.4.2 MapReduce Mapper
 主要是读取InputSplit的每一个Key,Value对并进行处理
 
-```python
+```java
 public class Mapper<KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
     /**
      * 预处理，仅在map task启动时运行一次
@@ -326,11 +326,25 @@ Reduce结果会写入到HDFS中
 
 对于IO方面，可以Map的结果可以使用压缩，同时增大buffer size（io.file.buffer.size，默认4kb）
 
-<img src="/images/wiki/BigdataFramework/MapReduceSet.png" width="700" alt="MapReduce的处理设置" />
+| 属性                                    | 默认值       | 描述                                                         |
+| --------------------------------------- | ------------ | ------------------------------------------------------------ |
+| io.sort.mb                              | 100          | 映射输出分类时所使用缓冲区的大小.                            |
+| io.sort.record.percent                  | 0.05         | 剩余空间用于映射输出自身记录.在1.X发布后去除此属性.随机代码用于使用映射所有内存并记录信息. |
+| io.sort.spill.percent                   | 0.80         | 针对映射输出内存缓冲和记录索引的阈值使用比例.                |
+| io.sort.factor                          | 10           | 文件分类时合并流的最大数量。此属性也用于reduce。通常把数字设为100. |
+| min.num.spills.for.combine              | 3            | 组合运行所需最小溢出文件数目.                                |
+| mapred.compress.map.output              | false        | 压缩映射输出.                                                |
+| mapred.map.output.compression.codec     | DefaultCodec | 映射输出所需的压缩解编码器.                                  |
+| mapred.reduce.parallel.copies           | 5            | 用于向reducer传送映射输出的线程数目.                         |
+| mapred.reduce.copy.backoff              | 300          | 时间的最大数量，以秒为单位，这段时间内若reducer失败则会反复尝试传输 |
+| io.sort.factor                          | 10           | 组合运行所需最大溢出文件数目.                                |
+| mapred.job.shuffle.input.buffer.percent | 0.70         | 随机复制阶段映射输出缓冲器的堆栈大小比例                     |
+| mapred.job.shuffle.merge.percent        | 0.66         | 用于启动合并输出进程和磁盘传输的映射输出缓冲器的阀值使用比例 |
+| mapred.inmem.merge.threshold            | 1000         | 用于启动合并输出和磁盘传输进程的映射输出的阀值数目。小于等于0意味着没有门槛，而溢出行为由 mapred.job.shuffle.merge.percent单独管理. |
+| mapred.job.reduce.input.buffer.percent  | 0.0          | 用于减少内存映射输出的堆栈大小比例，内存中映射大小不得超出此值。若reducer需要较少内存则可以提高该值. |
 
 ## 2.5 安装和使用
 ### 2.5.1 前期准备
-* 
 
 *单节点安装*
 
@@ -362,6 +376,7 @@ ssl和rsync
 ```bash
 $ sudo apt-get install ssh
 $ sudo apt-get install rsync
+$ sudo apt-get install pdsh
 ```
 
 * Hadoop下载
@@ -401,7 +416,7 @@ source ~/.bashrc
 
 *文件*：
 
-(1)etc/hadoop/core-site.xml
+(1)`etc/hadoop/core-site.xml`
 
 ```xml
 <configuration>
@@ -412,7 +427,7 @@ source ~/.bashrc
 </configuration>
 ```
 
-(2)etc/hadoop/hdfs-site.xml
+(2)`etc/hadoop/hdfs-site.xml`
 
 ```xml
 <configuration>
@@ -423,7 +438,7 @@ source ~/.bashrc
 </configuration>
 ```
 
-(3)etc/hadoop/hadoop-env.sh
+(3)`etc/hadoop/hadoop-env.sh`
 
 java的路径，需要根据自己的机器而定
 
