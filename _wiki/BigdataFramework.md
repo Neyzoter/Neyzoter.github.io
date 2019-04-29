@@ -9,7 +9,7 @@ keywords: Big Data; Hadoop; Spark
 # 1、介绍
 本笔记包含大数据框架——hadoop、spark等。
 
-# 2、Hadoop
+# 2、Hadoop基础
 ## 2.1 介绍
 **目的**
 
@@ -343,7 +343,73 @@ Reduce结果会写入到HDFS中
 | mapred.inmem.merge.threshold            | 1000         | 用于启动合并输出和磁盘传输进程的映射输出的阀值数目。小于等于0意味着没有门槛，而溢出行为由 mapred.job.shuffle.merge.percent单独管理. |
 | mapred.job.reduce.input.buffer.percent  | 0.0          | 用于减少内存映射输出的堆栈大小比例，内存中映射大小不得超出此值。若reducer需要较少内存则可以提高该值. |
 
+### 2.4.4 MapReduce实例
+
+<img src="/images/wiki/BigdataFramework/MapReduceExample.png" width="700" alt="MapReduce的例子" />
+
+**Map**阶段的key/value对的格式是由输入的格式所决定的，如果是默认的TextInputFormat，则每行作为一个记录进程处理，其中key为此行的开头相对于文件的起始位置，value就是此行的字符文本，Map阶段的输出的key/value对的格式必须同Reduce阶段的输入key/value对的格式相对应。Map输入：
+
+```
+(0 ,0067011990999991950051507+0000+) 
+(1 ,0043011990999991950051512+0022+) 
+(2 ,0043011990999991950051518-0011+) 
+(3 ,0043012650999991949032412+0111+) 
+(4 ,0043012650999991949032418+0078+) 
+(5 ,0067011990999991937051507+0001+) 
+(6 ,0043011990999991937051512-0002+) 
+(7 ,0043011990999991945051518+0001+) 
+(8 ,0043012650999991945032412+0002+) 
+(9 ,0043012650999991945032418+0078+) 
+```
+
+将上面的数据作为用户编写的map函数的输入，通过对每一行字符串的解析，得到年/温度的key/value对作为输出
+
+```
+(1950, 0) 
+(1950, 22) 
+(1950, -11) 
+(1949, 111) 
+(1949, 78) 
+(1937, 1) 
+(1937, -2) 
+(1945, 1) 
+(1945, 2) 
+(1945, 78) 
+```
+
+**shuffle**过程，将map过程中的输出，按照相同的key将value放到同一个列表中作为用户写的reduce函数的输入 
+
+```
+(1950, [0, 22, –11]) 
+(1949, [111, 78]) 
+(1937, [1, -2]) 
+(1945, [1, 2, 78]) 
+```
+
+**Reduce**过程中，在列表中选择出最大的温度，将年/最大温度的key/value作为输出
+
+```
+(1950, 22) 
+(1949, 111) 
+(1937, 1) 
+(1945, 78) 
+```
+
+
+
 ## 2.5 安装和使用
+
+**单机模式（standalone）**
+
+单机模式是Hadoop的默认模式。当首次解压Hadoop的源码包时，Hadoop无法了解硬件安装环境，便保守地选择了最小配置。在这种默认模式下所有3个XML文件均为空。当配置文件为空时，Hadoop会完全运行在本地。因为不需要与其他节点交互，单机模式就不使用HDFS，也不加载任何Hadoop的守护进程。该模式主要用于开发调试MapReduce程序的应用逻辑。
+
+**伪分布模式（Pseudo-Distributed Mode）**
+
+伪分布模式在“单节点集群”上运行Hadoop，其中所有的守护进程都运行在同一台机器上。该模式在单机模式之上增加了代码调试功能，允许你检查内存使用情况，HDFS输入输出，以及其他的守护进程交互。
+
+**全分布模式（Fully Distributed Mode）**
+
+Hadoop守护进程运行在一个集群上。
 ### 2.5.1 前期准备
 
 *单节点安装*
@@ -371,19 +437,62 @@ Apache Hadoop from 2.7.x to 2.x support Java 7 and 8
 
 * 必备Linux软件
 
-ssl和rsync
-
 ```bash
 $ sudo apt-get install ssh
-$ sudo apt-get install rsync
 $ sudo apt-get install pdsh
+```
+
+**ssh安装失败的问题解决**
+
+如果出现`ssh`安装失败，
+
+```
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ ssh : Depends: openssh-server (>= 1:7.2p2-4)
+E: Unable to correct problems, you have held broken packages.
+```
+
+则需要先安装`openssh-server`，安装时出现问题，
+
+```
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+ openssh-server : Depends: openssh-client (= 1:7.2p2-4)
+                  Depends: openssh-sftp-server but it is not going to be installed
+                  Recommends: ssh-import-id but it is not going to be installed
+E: Unable to correct problems, you have held broken packages.
+```
+
+则需要先安装openssh-client=1:7.2p2-4。
+
+```bash
+sudo apt-get install openssh-client=1:7.2p2-4
+sudo apt-get install openssh-server
+sudo apt-get install ssh
 ```
 
 * Hadoop下载
 
 http://www.apache.org/dyn/closer.cgi/hadoop/common/
 
-比如下载Hadoop3.1.2.tar.gz
+比如下载Hadoop3.2.0.tar.gz
 
 * 解压hadoop
 
@@ -395,10 +504,10 @@ tar -zxvf hadoop文件名称.tar.gz
 ### 2.5.2 安装
 1.添加路径
 
-"/opt/hadoop-3.1.2/"可修改。
+"/opt/hadoop-3.2.0/"可修改。
 
 ```bash
-export HADOOP_HOME=/opt/hadoop-3.1.2/
+export HADOOP_HOME=/opt/hadoop-3.2.0/
 export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
 ```
 
@@ -446,6 +555,12 @@ java的路径，需要根据自己的机器而定
 export JAVA_HOME=/usr/lib/jvm/java-8-oracle
 ```
 
+查看hadoop的使用文档：
+
+```bash
+$ bin/hadoop
+```
+
 2.配置ssh
 
 验证不需要ssh不需要密码
@@ -466,7 +581,7 @@ $ chmod 0600 ~/.ssh/authorized_keys
 1.进入hadoop安装目录(```$HADOOP_HOME```)
 
 ```bash
-cd /opt/hadoop-3.1.2
+cd /opt/hadoop-3.2.0
 ```
 
 2.运行测试指令
@@ -495,9 +610,7 @@ $ sbin/start-dfs.sh
 
 也许不同的版本的端口```9870```不一样
 
-```bash
-$ http://localhost:9870/
-```
+地址：[localhost:9870](http://localhost:9870/)
 
 (5)HDFS内构建目录
 
@@ -505,6 +618,8 @@ $ http://localhost:9870/
 $ bin/hdfs dfs -mkdir /user
 $ bin/hdfs dfs -mkdir /user/<username>
 ```
+
+`<username>`：表示用户名
 
 (6)复制要输入的文件到分布式系统中
 
@@ -516,7 +631,7 @@ $ bin/hdfs dfs -put etc/hadoop/*.xml input
 (7)运行给出的例子
 
 ```bash
-$ bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-3.1.2.jar grep input output 'dfs[a-z.]+'
+$ bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-3.2.0.jar grep input output 'dfs[a-z.]+'
 ```
 
 (8)从分布式系统中输出文件到本地文件系统
@@ -531,10 +646,72 @@ $ cat output/*  # 列出文件
 sbin/stop-dfs.sh
 ```
 
-### 2.5.4 YARN
+### 2.5.4 在单个node上的YARN
 
-1.etc/hadoop/mapred-site.xml配置
+本小结基于，上面的**运行测试指令**的(1)-(5)步已经完成，即
 
-2.
+```bash
+$ bin/hadoop
+# 格式化文件系统
+$ bin/hdfs namenode -format
+# 启动hdfs
+$ sbin/start-dfs.sh
+# 建立目录
+$ bin/hdfs dfs -mkdir /user
+$ bin/hdfs dfs -mkdir /user/<username>
+```
 
+**1.配置文件**
+
+**均为hadoop安装目录**下的文件，
+
+（1）`etc/hadoop/mapred-site.xml`
+
+这里`<configuration>   </configuration>`为根目录，只能有一个。[官方的Hadoop3.2.0安装过程](https://hadoop.apache.org/docs/r3.2.0/hadoop-project-dist/hadoop-common/SingleCluster.html)中该文件实例有误。
+
+```xml
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+    <property>
+        <name>mapreduce.application.classpath</name>
+        <value>$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*:$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*</value>
+    </property>
+</configuration>
+```
+
+（2）`etc/hadoop/yarn-site.xml`
+
+```xml
+<configuration>
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.env-whitelist</name>
+        <value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value>
+    </property>
+</configuration>
+```
+
+**2.开始ResourceManager进程和NodeManager进程**
+
+```bash
+$ sbin/start-yarn.sh
+```
+
+**3.通过web查看ResourceManager**
+
+[localhost:8088](http://localhost:8088/)
+
+**4.运行一个Mapeduce任务**
+
+**5.停止进程**
+
+```bash
+$ sbin/stop-yarn.sh
+```
 
