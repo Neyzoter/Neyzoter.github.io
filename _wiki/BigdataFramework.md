@@ -105,6 +105,13 @@ Hadoop Distributed File System，分布式文件系统
 <img src="/images/wiki/BigdataFramework/yarn.jpg" width="500" alt="yarn框架" />
 
 <img src="/images/wiki/BigdataFramework/yarn-block.jpg" width="500" alt="yarn的方框图" />
+
+Hadoop1（JobTracker）和Hadoop2（YARN）的区别。YARN就是将JobTracker的职责进行拆分，将资源管理和任务调度监控拆分成独立的进程
+
+<img src="/images/wiki/BigdataFramework/diffYarn2Jobtracker.jpg" width="500" alt="yarn和Job/TackTracker的区别" />
+
+
+
 ### 2.3.1 组件
 * ResourceManager
 
