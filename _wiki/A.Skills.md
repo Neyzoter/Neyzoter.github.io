@@ -12,7 +12,7 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |-|-|-|
-|Java、C/C++、Python、Matlab、R |Linux、 Git| Spring、Tomcat、 Netty、 MongoDB、 Docker|
+|Java、C/C++、Python、Matlab、R |Linux、 Git| Spring、Tomcat、 Netty、 MongoDB、 Docker、Hadoop、Ngnix |
 
 ## 算法
 
@@ -24,7 +24,7 @@ keywords: skills
 
 |MCU|RTOS|传感网络|
 |-|-|-|
-|STM32、C51 |FreeRTOS|OceanConnect、NBIoT、WiFi、BlueTooth|
+|STM32、C51 |FreeRTOS|NBIoT、WiFi、BlueTooth、CAN|
 
 # 历年技能总结
 ## 2019年技能树
@@ -33,7 +33,7 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |-|-|-|
-|[R](http://neyzoter.cn/wiki/R/)||[Docker](http://neyzoter.cn/wiki/Docker/)|
+|[R](http://neyzoter.cn/wiki/R/)||[Docker](http://neyzoter.cn/wiki/Docker/)、[Hadoop](http://neyzoter.cn/wiki/Hadoop/)、[Ngnix](http://neyzoter.cn/wiki/Ngnix/)|
 
 * 算法
 
@@ -45,7 +45,7 @@ keywords: skills
 
 |MCU|RTOS|传感网络|
 |-|-|-|
-||||
+|||CAN|
 
 ## 2018年技能树
 * 软件

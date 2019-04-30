@@ -1,13 +1,13 @@
 ---
 layout: wiki
-title: 大数据框架
-categories: Bigdata
-description: 大数据框架笔记
-keywords: Big Data; Hadoop; Spark
+title: Hadoop
+categories: Hadoop
+description: Hadoop笔记
+keywords: Big Data; Hadoop
 ---
 
 # 1、介绍
-本笔记包含大数据框架——hadoop、spark等。
+本笔记包含大数据框架——hadoop。
 
 # 2、Hadoop基础
 ## 2.1 介绍
@@ -89,7 +89,7 @@ Hadoop Distributed File System，分布式文件系统
 
 ### 2.2.3 Secondary NameNode
 
-定时与NameNode进行同步（定期合并文件系统镜像和编辑日&#x#x5FD7;，然后把合并后的传给NameNode，替换其镜像，并清空编辑日志，类似于CheckPoint机制），但NameNode失效后仍需要手工将其设置成主机
+定时与NameNode进行同步（定期合并文件系统镜像和编辑日志，然后把合并后的传给NameNode，替换其镜像，并清空编辑日志，类似于CheckPoint机制），但NameNode失效后仍需要手工将其设置成主机
 
 ### 2.2.4 DataNode
 
@@ -101,18 +101,38 @@ Hadoop Distributed File System，分布式文件系统
 
 4、DataNode之间会进行通信，复制数据块，保证数据的冗余性
 
+### 2.2.5 Rack
+
+Rack表示机架，一个机架内的计算机通信速率一般大于跨越不同机架的计算机通信。
+
 ## 2.3 YARN
+
+### 2.3.1 旧的MapReduce架构
+
+**组件**
+
+- **JobTracker:** 负责资源管理，跟踪资源消耗和可用性，作业生命周期管理（调度作业任务，跟踪进度，为任务提供容错）
+- **TaskTracker:** 加载或关闭任务，定时报告认为状态
+
+<img src="/images/wiki/BigdataFramework/JobTrackerandTaskTracker.jpg" width="500" alt="旧的MapReduce架构" />
+
+**旧的MapReduce架构问题**（**单点问题**和**资源利用率问题**）：
+
+1. JobTracker是MapReduce的集中处理点，存在单点故障
+2. JobTracker完成了太多的任务，造成了过多的资源消耗，当MapReduce job 非常多的时候，会造成很大的内存开销。这也是业界普遍总结出老Hadoop的MapReduce只能支持4000 节点主机的上限
+3. 在TaskTracker端，以map/reduce task的数目作为资&##x6E90;的表示过于简单，没有考虑到cpu/ 内存的占用情况，如果两个大内存消耗的task被调度到了一块，很容易出现OOM
+4. 在TaskTracker端，把资源强制划分为map task slot和reduce task slot, 如果当系统中只有map task或者只有reduce task的时候，会造成资源的浪费，也就集群资源利用的问题
+
+### 2.3.2 YARN组件
+
+**YARN就是将JobTracker的职责进行拆分，将资源管理(ResourceManager)和任务调度监控(Application Master)拆分成独立的进程。**
+
 <img src="/images/wiki/BigdataFramework/yarn.jpg" width="500" alt="yarn框架" />
+
+YARN架构下形成了一个通用的资源管理平台(Platform)和一个通用的应用计算平台(Application Framework)，避免了旧架构的单点问题和资源利用率问题，同时也让在其上运行的应用不再局限于MapReduce形式
 
 <img src="/images/wiki/BigdataFramework/yarn-block.jpg" width="500" alt="yarn的方框图" />
 
-Hadoop1（JobTracker）和Hadoop2（YARN）的区别。YARN就是将JobTracker的职责进行拆分，将资源管理和任务调度监控拆分成独立的进程
-
-<img src="/images/wiki/BigdataFramework/diffYarn2Jobtracker.jpg" width="500" alt="yarn和Job/TackTracker的区别" />
-
-
-
-### 2.3.1 组件
 * ResourceManager
 
 全局资源管理和任务调度——提供了计算资源的分配和管理
@@ -129,7 +149,11 @@ Hadoop1（JobTracker）和Hadoop2（YARN）的区别。YARN就是将JobTracker�
 
 资源申请的单位和任务运行的容器
 
-### 2.3.2 yarn处理流程
+Hadoop1（JobTracker）和Hadoop2（YARN）的区别。
+
+<img src="/images/wiki/BigdataFramework/diffYarn2Jobtracker.jpg" width="500" alt="yarn和Job/TackTracker的区别" />
+
+### 2.3.3 YARN处理流程
 
 <img src="/images/wiki/BigdataFramework/yarn-processing.jpg" width="700" alt="yarn处理流程" />
 
@@ -721,4 +745,6 @@ $ sbin/start-yarn.sh
 ```bash
 $ sbin/stop-yarn.sh
 ```
+
+
 
