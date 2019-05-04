@@ -26,7 +26,7 @@ tables：所有的表
 
 
 # X.MySQL安装
-服务器端的安装见，wiki->Linux说明。
+服务器端的安装见，wiki\-\>Linux说明。
 
 ## X.1 安装
 

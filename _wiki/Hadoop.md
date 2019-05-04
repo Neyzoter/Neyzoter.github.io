@@ -746,5 +746,7 @@ $ sbin/start-yarn.sh
 $ sbin/stop-yarn.sh
 ```
 
+### 2.5.5 建立和安装Cluster
 
+见《Hadoop实战》的“Hadoop安装与配置”小节。
 
