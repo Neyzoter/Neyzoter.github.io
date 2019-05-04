@@ -1,6 +1,6 @@
 ---
 layout: wiki
-title: A.技能树
+title: A技能树
 categories: skills
 description: 我历年来的技能树
 keywords: skills
@@ -12,7 +12,7 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |-|-|-|
-|Java、C/C++、Python、Matlab、R |Linux、 Git| Spring、Tomcat、 Netty、 MongoDB、 Docker、Hadoop、Ngnix |
+|Java、C/C++、Python、Matlab、R |Linux、 Git、Maven| Spring、Tomcat、 Netty、 MongoDB、 Docker、Hadoop、Ngnix、HBase |
 
 ## 算法
 
@@ -33,7 +33,7 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |-|-|-|
-|[R](http://neyzoter.cn/wiki/R/)||[Docker](http://neyzoter.cn/wiki/Docker/)、[Hadoop](http://neyzoter.cn/wiki/Hadoop/)、[Ngnix](http://neyzoter.cn/wiki/Ngnix/)|
+|[R](http://neyzoter.cn/wiki/R/)||[Docker](http://neyzoter.cn/wiki/Docker/)、[Hadoop](http://neyzoter.cn/wiki/Hadoop/)、[Ngnix](http://neyzoter.cn/wiki/Ngnix/)、[Log4j](http://neyzoter.cn/wiki/log4j/)、[Mybatis](http://neyzoter.cn/wiki/MyBatis/)、[HBase](http://neyzoter.cn/wiki/Hbase/)|
 
 * 算法
 
@@ -52,7 +52,7 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |-|-|-|
-|[Java](http://neyzoter.cn/wiki/http://neyzoter.cn/wiki/Java/ /)|[Linux](http://neyzoter.cn/wiki/Linux/)、 [Git](http://neyzoter.cn/wiki/git/)|[Spring](http://neyzoter.cn/wiki/Spring/)、[MongoDB](http://neyzoter.cn/wiki/MongoDB/ )、[Netty](http://neyzoter.cn/wiki/Netty/)、[Tomcat](http://neyzoter.cn/2018/11/17/Tomcat-ServerXml-Analy/)|
+|[Java](http://neyzoter.cn/wiki/http://neyzoter.cn/wiki/Java/ /)|[Linux](http://neyzoter.cn/wiki/Linux/)、 [Git](http://neyzoter.cn/wiki/git/)、[Maven](http://neyzoter.cn/wiki/Maven/)|[Spring](http://neyzoter.cn/wiki/Spring/)、[MongoDB](http://neyzoter.cn/wiki/MongoDB/ )、[Netty](http://neyzoter.cn/wiki/Netty/)、[Tomcat](http://neyzoter.cn/2018/11/17/Tomcat-ServerXml-Analy/)|
 
 * 算法
 
