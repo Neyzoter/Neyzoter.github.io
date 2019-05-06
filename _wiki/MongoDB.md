@@ -381,7 +381,34 @@ db.COLLECTION_NAME.find().skip(NUMBER1).limit(NUMBER1)
 
 说明：**当查询时同时使用sort,skip,limit，无论位置先后，最先执行顺序 sort再skip再limit**
 
+* distinct
+
+查找文档中的不同内容。
+
+eg.
+
+```
+{ "_id": 1, "dept": "A", "item": { "sku": "111", "color": "red" }, "sizes": [ "S", "M" ] }
+{ "_id": 2, "dept": "A", "item": { "sku": "111", "color": "blue" }, "sizes": [ "M", "L" ] }
+{ "_id": 3, "dept": "B", "item": { "sku": "222", "color": "blue" }, "sizes": "S" }
+{ "_id": 4, "dept": "A", "item": { "sku": "333", "color": "black" }, "sizes": [ "S" ] }
+```
+
+```bash
+# 查询满足dept: "A"，的不同内容的sku
+db.inventory.distinct( "item.sku", { dept: "A" } )
+```
+
+结果
+
+```
+[ "111", "333" ]
+```
+
+
+
 ## 1.5 数据处理
+
 ### 插入数据
 db是一个目录，用于存放所有数据库。
 
@@ -458,25 +485,25 @@ MongoDB的聚合管道将MongoDB文档在一个管道处理完毕后将结果传
 
 **表达式：处理输入文档并输出。表达式是无状态的，只能用于计算当前聚合管道的文档，不能处理其它的文档。**
 
-**$project**：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。
+**`$project`**：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。
 
-**$match**：用于过滤数据，只输出符合条件的文档。$match使用MongoDB的标准查询操作。
+**`$match`**：用于过滤数据，只输出符合条件的文档。$match使用MongoDB的标准查询操作。
 
-**$limit**：用来限制MongoDB聚合管道返回的文档数。
+**`$limit`**：用来限制MongoDB聚合管道返回的文档数。
 
-**$skip**：在聚合管道中跳过指定数量的文档，并返回余下的文档。
+**`$skip`**：在聚合管道中跳过指定数量的文档，并返回余下的文档。
 
-**$unwind**：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。
+**`$unwind`**：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。
 
-**$group**：将集合中的文档分组，可用于统计结果。
+**`$group`**：将集合中的文档分组，可用于统计结果。
 
-**$sort**：将输入文档排序后输出。
+**`$sort`**：将输入文档排序后输出。
 
-**$geoNear**：输出接近某一地理位置的有序文档。
+**`$geoNear`**：输出接近某一地理位置的有序文档。
 
 管道实例:
 
-$project只留下_id、title和author：
+`$project`只留下_id、title和author：
 
 ```
 db.article.aggregate(
@@ -487,7 +514,7 @@ db.article.aggregate(
  );
 ```
 
-$match过滤数据：
+`$match`过滤数据：
 
 获取分数大于70小于或等于90记录，然后**将符合条件的记录送到下一阶段$group管道操作符进行处理**
 
@@ -498,7 +525,7 @@ db.articles.aggregate( [
                        ] );
 ```
 
-$skip跳过文档
+`$skip`跳过文档
 
 跳过前五个。
 
@@ -521,6 +548,7 @@ db.article.aggregate(
 |$last |	根据资源文档的排序获取最后一个文档数据|	db.mycol.aggregate([{$group : {_id : "$by_user", last_url : {$last : "$url"}}}])|
 
 ## 1.6 MongoDB复制
+
 MongoDB复制是将数据同步在多个服务器的过程。
 
 1、关闭正在运行的MongoDB服务器

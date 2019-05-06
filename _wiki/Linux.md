@@ -193,7 +193,7 @@ https://cloud.tencent.com/document/product/213/2936
 
 
 # 2、 实用命令
-## 系统状态
+## 2.1 系统状态
 * uptime
 
 查看系统运行时间
@@ -254,7 +254,7 @@ systemd─┬─ModemManager─┬─{gdbus}
 
 ```
 
-## awk指令
+## 2.2 awk指令
 awk其实不仅仅是工具软件，还是一种编程语言。
 
 1、基本用法
@@ -296,7 +296,7 @@ $ echo 'this is a test' | awk '{print $NF}'
 # NR表示当前处理的第几行
 $ awk -F ':' '{print NR ") " $1}' demo.txt
 ```
-## 删除文件/文件夹
+## 2.3 删除文件/文件夹
 
 ```bash
 $ sudo rm -r 文件夹名
@@ -306,7 +306,7 @@ $ sudo rm -r 文件夹名
 $ sudo rm 文件名
 ```
 
-## 修改/移动文件
+## 2.4 修改/移动文件
 修改文件名：
 
 ```bash
@@ -318,8 +318,8 @@ $ rm 旧文件名 新文件名
 ```bash
 $ rm 文件 目标文件
 ```
-## 卸载程序
-sudo apt-get purge <程序名>
+## 2.5 卸载程序
+`sudo apt-get purge <程序名>`
 
 eg，卸载firefox。
 
@@ -337,7 +337,7 @@ firefox-locale-en
 $ sudo apt-get purge firefox firefox-locale-en
 ```
 
-## 进程的状态
+## 2.6 进程的状态
 
 ```bash
 ps -auxf
@@ -363,18 +363,18 @@ j ：工作的格式 (jobs format)
 
 -f ：做一个更为完整的输出。
 
-## 文件连锁
+## 2.7 文件连锁
 cat = concatenate,连锁
 
 
-## vim使用
+## 2.8 vim使用
 ```bash
 $ vi <file>
 ```
 
 首先输入上面的的命令打开文本文件，输入 i 进入编辑状态，编辑完成后按ESC键退出编辑，然后输入 :wq 敲回车保存退出
 
-## fuser
+## 2.9 fuser
 
 查看文件被谁占用。
 
@@ -382,11 +382,11 @@ $ vi <file>
 $ fuser -u .linux.md.swp
 ```
 
-## id
+## 2.10 id
 
 查看当前用户、组 id。
 
-## lsof
+## 2.11 lsof
 
 查看打开的文件列表。
 
@@ -1248,6 +1248,10 @@ echo $1
 git push origin master
 echo "--------End--------"
 ```
+
+# 7、make编译
+
+
 
 
 
