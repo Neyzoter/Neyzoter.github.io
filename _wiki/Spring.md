@@ -1209,13 +1209,9 @@ context的类型为ConfigurableApplicationContext 。
 |序号 |	Spring 内置事件 & 描述|
 |-|-|
 |1	|**ContextRefreshedEvent**ApplicationContext 被初始化或刷新时，该事件被发布。这也可以在 ConfigurableApplicationContext 接口中使用 refresh() 方法来发生。|
-|-|-|
 |2	|**ContextStartedEvent**当使用 ConfigurableApplicationContext 接口中的 start() 方法启动 ApplicationContext 时，该事件被发布。你可以调查你的数据库，或者你可以在接受到这个事件后重启任何停止的应用程序。|
-|-|-|
 |3	|**ContextStoppedEvent**当使用 ConfigurableApplicationContext 接口中的 stop() 方法停止 ApplicationContext 时，发布这个事件。你可以在接受到这个事件后做必要的清理的工作。|
-|-|-|
 |4	| **ContextClosedEvent**当使用 ConfigurableApplicationContext 接口中的 close() 方法关闭 ApplicationContext 时，该事件被发布。一个已关闭的上下文到达生命周期末端；它不能被刷新或重启。|
-|-|-|
 |5	|**RequestHandledEvent**这是一个 web-specific 事件，告诉所有 bean HTTP 请求已经被服务。|
 
 ```java
@@ -1303,7 +1299,80 @@ public class MainApp {
 </beans>
 ```
 
+## 定时任务
+
+**1.配置`beans.xml`**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    <!-- 其他内容 -->
+
+	<!-- task的schema -->
+    xmlns:task="http://www.springframework.org/schema/task"
+    xsi:schemaLocation="
+	<!-- 其他内容 -->
+
+	<!-- task的schemaLocation -->
+    http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-4.1.xsd"> 
+
+	<context:annotation-config/>  <!-- 基于注解的配置 -->
+
+   	<context:component-scan base-package="com.sorl.backend" />  <!-- 开启扫描定时任务包 -->
+   	<task:annotation-driven /> 
+
+	<!--如果定时任务很多，可以配置executor线程池，这里executor的含义和java.util.concurrent.Executor是一样的，pool-size的大小官方推荐为5~10。scheduler的pool-size是ScheduledExecutorService线程池  -->
+   	<task:scheduler id="scheduler" pool-size="5" />
+	<task:annotation-driven executor="executor" scheduler="scheduler" />
+    
+
+	  <!-- 其他内容 -->
+</beans>
+```
+
+**2.编写任务**
+
+```java
+package com.sorl.backend;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import org.apache.log4j.Logger;
+
+
+/**
+* 
+* MongoDB的历史数据清空指令，通过quartz每天调用
+*
+* @author  nesc420
+* @Date    2019-5-7
+* @version 0.1.0
+*/
+@Component("taskJob")
+public class TaskJob{
+	private final static Logger logger = Logger.getLogger(TestTools.class);
+	
+	//配置任务的执行时间，可以配置多个
+	@Scheduled(cron="* * 4 * * ?")  //每天凌晨四点进行mgdClear任务
+	public void mgdClear() {
+		//mongodb数据库清除工作
+	}
+
+	@Scheduled(cron="5/5 * * * * ?") //5s后，每隔5s进行dispJob任务
+	public void dispJob() {
+		logger.info("disp Job ok");
+	}
+	
+}
+
+```
+
 # AOP
+
 面向方面的编程(Aspect Oriented Programming,AOP)框架
 
 面向方面的编程需要把程序逻辑分解成不同的部分称为所谓的关注点。*跨一个应用程序的多个点的功能被称为横切关注点*，这些横切关注点在概念上独立于应用程序的业务逻辑。有各种各样的常见的很好的方面的例子，如日志记录、审计、声明式事务、安全性和缓存等。

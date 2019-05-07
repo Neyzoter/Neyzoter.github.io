@@ -460,8 +460,68 @@ $ less myfile
 $ head/tail -n 2 myfile  # 输出文件头部/末尾2行
 ```
 
+## 2.12 crontab
+
+周期性有规律地执行某项任务。
+
+**crontab格式**
+
+```
+# 分钟  小时(*/3表示每3分钟执行一次)  日(-表示2至4日)  月(,表示或)  星期(*表示没有指定) 运行命令
+50 */3 2-4 1,3 * RUN_CMD
+```
+
+注意：“分”字段必须有数值，绝对不能为空或者\*号；而“日”和“星期”字段不能同时使用，否则会发生冲突。
+
+**创建和编辑计划任务**
+
+```bash
+# 创建和编辑计划任务
+crontab -e
+# 查看当前计划任务的命令
+crontab -l
+# 删除某条计划任务
+crontab -r
+```
+
+**一个定时删除数据库历史数据的样例**
+
+`mongo_swepper.sh`
+
+```bash
+#!/bash/bin
+
+#删除创建时间在30天前的数据
+MIN_DATE_NANO=`date -d \`date -d '30 days ago' +%Y%m%d\` +%s%N`;
+MIN_DATE_MILL=`expr $MIN_DATE_NANO / 1000000`
+
+echo "[`date '+%Y-%m-%d %H:%M:%S'`] start............................................."  >> ~/shell/mongo_swepper.log
+
+mongo mongo_server_ip:27017<<EOF 
+use admin;
+db.auth("user","password");
+db.dbIndicators.find({"CREATE_TIME":{\$lt:$MIN_DATE_MILL}},{"_id":1}).forEach(function(item){db.dbIndicators.remove({"_id":item._id});});
+exit;
+EOF
+
+echo "[`date '+%Y-%m-%d %H:%M:%S'`] end............................................."  >> /root/cron_config/mongo_sweeper/mongo_swepper.log
+```
+
+启动crontab
+
+```bash
+crontab -e
+
+# 添加一行
+# 每天凌晨两点执行
+#input>>>>>>>>>>>>>
+0 2 * * * sh ~/shell/mongo_swepper.sh >> ~/shell/mongo_swepper.log
+#input>>>>>>>>>>>>>
+# OK
+```
 
 # 3、ubuntu目录
+
 1、/    这是根目录，一个Ubuntu系统下只有一个根目录。
 
 2、/root  系统管理员的目录
