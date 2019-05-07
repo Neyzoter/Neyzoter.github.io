@@ -407,7 +407,112 @@ db.inventory.distinct( "item.sku", { dept: "A" } )
 
 
 
-## 1.5 数据处理
+## 1.4 索引
+
+### 介绍
+
+当你往某各个集合插入多个文档后，每个文档在经过底层的存储引擎持久化后，会有一个位置信息，通过这个位置信息pos，就能从存储引擎里读出该文档。如下面的person文档，
+
+| 位置信息 | 文档                           |
+| -------- | ------------------------------ |
+| pos1     | {“name” : “jack”, “age” : 19 } |
+| pos2     | {“name” : “rose”, “age” : 20 } |
+| pos3     | {“name” : “jack”, “age” : 18 } |
+| pos4     | {“name” : “tony”, “age” : 21}  |
+| pos5     | {“name” : “adam”, “age” : 18}  |
+
+假设现在有个查询 `db.person.find( {age: 18} )`, 查询所有年龄为18岁的人，这时需要遍历所有的文档（『全表扫描』），根据位置信息读出文档，对比age字段是否为18。如果想加速 `db.person.find( {age: 18} ）`，就可以考虑对person表的age字段建立索引。
+
+```bash
+# 按age字段创建升序索引
+$ db.person.createIndex( {age: 1} )  
+```
+
+建立索引后，MongoDB会**额外存储一份按age字段升序排序的索引数据**，索引结构类似如下，索引通常采用类似`btree`的结构持久化存储，以保证从索引里快速（`O(logN)的时间复杂度`）找出某个age值对应的位置信息，然后根据位置信息就能读取出对应的文档。
+
+| AGE  | 位置信息 |
+| ---- | -------- |
+| 18   | pos3     |
+| 18   | pos5     |
+| 19   | pos1     |
+| 20   | pos2     |
+| 21   | pos4     |
+
+众所周知，MongoDB默认会为插入的文档生成_id字段（如果应用本身没有指定该字段），\_id是文档唯一的标识，为了保证能根据文档id快递查询文档，MongoDB默认会为集合创建\_id字段的索引。
+
+```
+mongo-9552:PRIMARY&gt; db.person.getIndexes() // 查询集合的索引信息
+[
+    {
+        "ns" : "test.person",  // 集合名
+        "v" : 1,               // 索引版本
+        "key" : {              // 索引的字段及排序方向
+            "_id" : 1           // 根据_id字段升序索引
+        },
+        "name" : "_id_"        // 索引的名称
+    }
+]
+```
+
+### 索引类型
+
+**1.单字段索引 （Single Field Index）**
+
+```bash
+$ db.person.createIndex( {age: 1} )
+```
+
+ `{age: 1} `代表升序索引，也可以通过`{age: -1}`来指定降序索引，对于单字段索引，升序/降序效果是一样的。
+
+*java实现*
+
+```java
+if(this.getIndexName().equals("")) {
+				collection.createIndex(Indexes.descending(this.indexName), new SingleResultCallback<String>() {
+					@Override
+					public void onResult(String result, Throwable t) {
+						logger.info(String.format("db.col create index by \"%s\"(indexName_-1)", result));
+					}
+				});
+			}
+```
+
+
+
+**2.复合索引 (Compound Index)**
+
+```bash
+$ db.person.createIndex( {age: 1, name: 1} )
+```
+
+当age字段相同时，在根据name字段进行排序。
+
+**3.多key索引 （Multikey Index）**
+
+当索引的字段为数组时，创建出的索引称为多key索引，多key索引会为数组的每个元素建立一条索引，比如person表加入一个habbit字段（数组）用于描述兴趣爱好，需要查询有相同兴趣爱好的人就可以利用habbit字段的多key索引。
+
+```bash
+{"name" : "jack", "age" : 19, habbit: ["football, runnning"]}
+db.person.createIndex( {habbit: 1} )  // 自动创建多key索引
+db.person.find( {habbit: "football"} )
+```
+
+**4.其他索引**
+
+[哈希索引（Hashed Index）](https://docs.mongodb.com/manual/core/index-hashed/)是指按照某个字段的hash值来建立索引，目前主要用于MongoDB Sharded Cluster的Hash分片，hash索引只能满足字段完全匹配的查询，不能满足范围查询等。
+
+[地理位置索引（Geospatial Index）](https://docs.mongodb.com/manual/core/2d/)能很好的解决O2O的应用场景，比如『查找附近的美食』、『查找某个区域内的车站』等。
+
+[文本索引（Text Index）](https://docs.mongodb.org/manual/core/index-text/)能解决快速文本查找的需求，比如有一个博客文章集合，需要根据博客的内容来快速查找，则可以针对博客内容建立文本索引。
+
+### 索引属性
+
+- [唯一索引 (unique index)](https://docs.mongodb.org/v3.0/tutorial/create-a-unique-index/)：保证索引对应的字段不会出现相同的值，比如_id索引就是唯一索引
+- [TTL索引](https://docs.mongodb.org/manual/core/index-ttl/)：可以针对某个时间字段，指定文档的过期时间（经过指定时间后过期 或 在某个时间点过期）
+- [部分索引 (partial index)](https://docs.mongodb.org/manual/core/index-partial/): 只针对符合某个特定条件的文档建立索引，3.2版本才支持该特性
+- [稀疏索引(sparse index)](https://docs.mongodb.org/manual/core/index-sparse/): 只针对存在索引字段的文档建立索引，可看做是部分索引的一种特殊情况
+
+## 1.6 数据处理
 
 ### 插入数据
 db是一个目录，用于存放所有数据库。
@@ -547,7 +652,7 @@ db.article.aggregate(
 |$first	| 根据资源文档的排序获取第一个文档数据。|	db.mycol.aggregate([{$group : {_id : "$by_user", first_url : {$first : "$url"}}}])|
 |$last |	根据资源文档的排序获取最后一个文档数据|	db.mycol.aggregate([{$group : {_id : "$by_user", last_url : {$last : "$url"}}}])|
 
-## 1.6 MongoDB复制
+## 1.7 MongoDB复制
 
 MongoDB复制是将数据同步在多个服务器的过程。
 
@@ -803,7 +908,27 @@ mongodb://admin:123456@localhost/test
 mongodb://example1.com:27017,example2.com:27017
 ```
 
-# 6、概念
+# 6、MongoDB性能优化
+
+**（1）文档中的\_id键推荐使用默认值，禁止向\_id中保存自定义的值。**
+
+MongoDB文档中都会有一个“\_id”键，默认是个ObjectID对象（标识符中包含时间戳、机器ID、进程ID和计数器）。MongoDB在指定_id与不指定_id插入时 速度相差很大，指定_id会减慢插入的速率。
+
+**（2）推荐使用短字段名**
+
+与关系型数据库不同，MongoDB集合中的每一个文档都需要存储字段名，长字段名会需要更多的存储空间。
+
+**（3）MongoDB索引可以提高文档的查询、更新、删除、排序操作，所以结合业务需求，适当创建索引。**
+
+```bash
+# 按age字段创建升序索引
+$ db.person.createIndex( {age: 1} )  
+```
+
+**（4）每个索引都会占用一些空间，并且导致插入操作的资源消耗，因此，建议每个集合的索引数尽量控制在5个以内。**
+
+# X、概念
+
 ### SQL和MongoDB
 
 |SQL术语/概念 | MongoDB术语/概念 | 解释/说明|
