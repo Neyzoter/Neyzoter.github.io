@@ -20,7 +20,7 @@ $ ssh <username>@<hostname or ip_address> -p <port>
 
 2、退出远程服务器
 
-Ctrl+D
+`Ctrl+D`
 
 ## 1.2 scp上传/下载文件
 ```bash
