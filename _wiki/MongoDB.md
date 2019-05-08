@@ -454,25 +454,36 @@ mongo-9552:PRIMARY&gt; db.person.getIndexes() // 查询集合的索引信息
 **1.单字段索引 （Single Field Index）**
 
 ```bash
+# 创建一个"age"字段的索引
 $ db.person.createIndex( {age: 1} )
+# 删除指定索引
+$ db.person.dropIndex("age")
+# 删除所有索引
+$ db.person.dropIndexes()
+# 查看总索引记录大小
+$ db.userInfo.totalIndexSize()
+# 读取当前集合的所有index信息
+$ db.users.reIndex()
 ```
 
  `{age: 1} `代表升序索引，也可以通过`{age: -1}`来指定降序索引，对于单字段索引，升序/降序效果是一样的。
+
+**注意**
+
+`_id`是默认的索引，不能删除。
 
 *java实现*
 
 ```java
 if(this.getIndexName().equals("")) {
-				collection.createIndex(Indexes.descending(this.indexName), new SingleResultCallback<String>() {
-					@Override
-					public void onResult(String result, Throwable t) {
-						logger.info(String.format("db.col create index by \"%s\"(indexName_-1)", result));
-					}
-				});
-			}
+    collection.createIndex(Indexes.descending(this.indexName), new SingleResultCallback<String>() {
+        @Override
+        public void onResult(String result, Throwable t) {
+            logger.info(String.format("db.col create index by \"%s\"(indexName_-1)", result));
+        }
+    });
+}
 ```
-
-
 
 **2.复合索引 (Compound Index)**
 
@@ -1007,9 +1018,434 @@ db.test.find({c:”666”}) // 7
 
 **（18）集合中文档的数据量会影响查询性能，为保持适量，需要定期归档。**
 
+# 7、MongoDB数据库Java异步驱动指南
+
+来自于[MongoDB Async Driver Quick Tour ](http://mongodb.github.io/mongo-java-driver/3.3/driver-async/getting-started/quick-tour/)
+
+`mongodb-java-driver` 从3.0版本开始同时支持同步、异步方式（分别是不同的驱动应用）。异步的好处，众所周知，就是支持快速、非阻塞式的IO操作，可以提高处理速度。
+
+注：`MongoDB` 异步驱动需要依赖`Netty` 或 `Java 7`。
+
+## 7.1 执行异步回调
+
+MongoDB异步驱动利用Netty或Java7的`AsynchronousSocketChannel` 来提供一个支持异步的API，以支持快速的、非阻塞式的IO操作。
+
+该API形式和MongoDB同步驱动的新API保持一致，但是任何会导致网络IO的方法都会有一个`SingleResponseCallback`并且会立即返回，其中`T`是响应对于该文档的类型的任何方法。
+
+`SingleResponseCallback`  回调接口需要实现一个简单方法`onResult(T result, Throwable t)` ，这个方法在操作完成时被调用。其中，如果操作成功， `result`参数包含着操作结果；如果操作失败，`t`中包含着抛出的异常信息。
+
+## 7.2 创建一个连接
+
+```java
+// 直接连接默认服务host和端口，即 localhost:27017
+MongoClient mongoClient = MongoClients.create();
+
+// 使用一个字符串
+MongoClient mongoClient = MongoClients.create("mongodb://localhost");
+
+// 使用一个ConnectionString
+MongoClient mongoClient = MongoClients.create(new ConnectionString("mongodb://localhost"));
 
 
+// 使用MongoClientSettings
+ClusterSettings clusterSettings = ClusterSettings.builder().hosts(asList(new ServerAddress("localhost"))).build();
+MongoClientSettings settings = MongoClientSettings.builder().clusterSettings(clusterSettings).build();
+MongoClient mongoClient = MongoClients.create(settings);
+// database 对象是一个MongoDB 服务器中指定数据库的连接。
+MongoDatabase database = mongoClient.getDatabase("mydb");
+```
 
+**注意：**`getDatabase("mydb")` 方法并没有回调，因为它没有涉及网络IO操作。一个 `MongoDatabase` 实例提供了与数据库进行交互的方法，若数据库不存在，它会在插入数据时创建一个新的数据库。例如，创建一个 collection 或插入 document（这些确实需要回调，因为需要涉及网络IO）。
+
+**MongoClient**：`MongoClient` 实例实际上代表了一个数据库的连接池；即使要并发执行异步操作，你也仅仅需要一个 `MongoClient` 实例。
+
+**重要**：
+
+一般情况下，在一个指定的数据库集群中仅需要创建一个`MongoClient`实例，并通过你的应用使用它。
+
+当创建多个实例时：
+
+- 所有的资源使用限制（例如最大连接数）适用于每个`MongoClient`实例
+- 销毁实例时，请确保调用 `MongoClient.close()` 清理资源
+
+## 7.3 获得一个collection
+
+```java
+// 指定collection名称
+MongoCollection<Document> collection = database.getCollection("test");
+```
+
+## 7.4 插入document
+
+**插入单个document**
+
+比如插入如下的文档内容，
+
+```json
+{
+   "name" : "MongoDB",
+   "type" : "database",
+   "count" : 1,
+   "info" : {
+               x : 203,
+               y : 102
+             }
+}
+```
+
+需要创建一个`Document`类，
+
+```java
+Document doc = new Document("name", "MongoDB")
+               .append("type", "database")
+               .append("count", 1)
+               .append("info", new Document("x", 203).append("y", 102));
+```
+
+插入到数据库，
+
+```java
+collection.insertOne(doc, new SingleResultCallback<Void>() {
+    @Override
+    public void onResult(final Void result, final Throwable t) {
+        System.out.println("Inserted!");
+    }
+});
+```
+
+`SingleResponseCallback `是一个 函数式接口 并且它可以以`lambda`方式实现（前提是你的`APP`工作在`JDK8`）：
+
+```java
+collection.insertOne(doc, (Void result, final Throwable t) -> System.out.println("Inserted!"));
+```
+
+一旦document成功插入，`onResult` 回调方法会被调用并打印“Inserted!”。记住，在一个普通应用中，你应该总是检查 `t` 变量中是否有错误信息。
+
+**添加多个document**
+
+要添加多个 documents，你可以使用 `insertMany()` 方法。
+
+首先，循环创建多个`Document`
+
+```java
+List<Document> documents = new ArrayList<Document>();
+for (int i = 0; i < 100; i++) {
+    documents.add(new Document("i", i));
+}
+```
+
+要插入多个 document 到 collection，传递 documents 列表到 `insertMany()` 方法.
+
+```java
+collection.insertMany(documents, new SingleResultCallback<Void>() {
+    @Override
+    public void onResult(final Void result, final Throwable t) {
+        System.out.println("Documents inserted!");
+    }
+});
+```
+
+## 7.5 document计数
+
+```java
+collection.count(
+  new SingleResultCallback<Long>() {
+      @Override
+      public void onResult(final Long count, final Throwable t) {
+          System.out.println(count);
+      }
+  });
+```
+
+## 7.6 document查询
+
+使用 `find()` 方法来查询 collection。
+
+**查询第一个document**
+
+```java
+collection.find().first(new SingleResultCallback<Document>() {
+    @Override
+    public void onResult(final Document document, final Throwable t) {
+        System.out.println(document.toJson());
+    }
+});
+```
+
+**注意：**“\_” 和 “\$”开头的域是MongoDB 预留给内部使用的。
+
+**查询所有document**
+
+```java
+Block<Document> printDocumentBlock = new Block<Document>() {
+    @Override
+    public void apply(final Document document) {
+        System.out.println(document.toJson());
+    }
+};
+SingleResultCallback<Void> callbackWhenFinished = new SingleResultCallback<Void>() {
+    @Override
+    public void onResult(final Void result, final Throwable t) {
+        System.out.println("Operation Finished!");
+    }
+};
+
+collection.find().forEach(printDocumentBlock, callbackWhenFinished);
+```
+
+**条件查询**
+
+```java
+import static com.mongodb.client.model.Filters.*;
+
+collection.find(eq("i", 71)).first(printDocument);
+```
+
+**重要**：
+
+使用 [`Filters`](http://mongodb.github.io/mongo-java-driver/3.3/builders/filters/)、[`Sorts`](http://mongodb.github.io/mongo-java-driver/3.3/builders/sorts/)、[`Projections`](http://mongodb.github.io/mongo-java-driver/3.3/builders/projections/) 和 [`Updates`](http://mongodb.github.io/mongo-java-driver/3.3/builders/updates/) API手册来找到简单、清晰的方法构建查询。
+
+**查询一组document**
+
+```java
+import static com.mongodb.client.model.Filters.*;
+// 使用范围查询获取子集
+// 如果我们想获得所有 key 为“i”，value 大于50 的 document 
+collection.find(gt("i", 50)).forEach(printDocumentBlock, callbackWhenFinished);
+
+//50 < i <= 100
+collection.find(and(gt("i", 50), lte("i", 100))).forEach(printDocumentBlock, callbackWhenFinished);
+```
+
+**document排序**
+
+通过在 `FindIterable` 上调用 `sort()` 方法，我们可以在一个查询上进行一次排序。
+
+使用  `exists()`  和 降序排序` descending("i") `来为我们的 document 排序。
+
+```java
+// FindIterable的sort方法
+collection.find(exists("i")).sort(descending("i")).first(printDocument);
+```
+
+**投射域**
+
+有时我们不需要将所有的数据都存在一个 document 中。Projections 可以用来为查询操作构建投射参数并限制返回的字段。
+
+下面的例子中，我们会对collection进行排序，排除  `_id` 字段，并输出第一个匹配的 document。
+
+```java
+// projection设置，需要包含"i"字段，不包含"_id"
+BasicDBObject projections = new BasicDBObject();
+						projections.append("i", 1).append("_id", 0);
+FindIterable<Document> findIter = collection.find().projection(projections);
+```
+
+**聚合**
+
+有时，我们需要将存储在 MongoDB 中的数据聚合。` Aggregate `支持对每种类型的聚合阶段进行构建。
+
+下面的例子，我们执行一个两步骤的转换来计算  `i * 10` 的值。首先我们使用 `Aggregates.match `查找所有`  i > 0  `的document 。接着，我们使用 `Aggregates.project `结合  `$multiply ` 操作来计算 `“i  * 10” `的值。
+
+```java
+collection.aggregate(asList(
+    match(gt("i", 0)),
+    project(Document.parse("{ITimes10: {$multiply: ['$i', 10]}}")))
+).forEach(printDocumentBlock, callbackWhenFinished);
+```
+
+**注意**：
+
+当前，还没有专门用于 聚合表达式 的工具类。可以使用 `Document.parse()` 来快速构建来自于`JSON`的聚合表达式。
+
+对于 `$group` 操作使用 `Accumulators`  来处理任何 累加操作 。
+
+下面的例子中，我们使用 `Aggregates.group ` 结合` Accumulators.sum` 来累加所有 i 的和。
+
+```java
+collection.aggregate(singletonList(group(null, sum("total", "$i")))).first(printDocument);
+```
+
+## 7.7 更新document
+
+**更新一个document**
+
+```java
+import static com.mongodb.client.model.Filters.*;
+//字段"i"的数值为10的document，设置"i"字段的数值为110
+collection.updateOne(eq("i", 10), set("i", 110),
+    new SingleResultCallback<UpdateResult>() {
+        @Override
+        public void onResult(final UpdateResult result, final Throwable t) {
+            System.out.println(result.getModifiedCount());
+        }
+    });
+```
+
+**更新多个document**
+
+```java
+import static com.mongodb.client.model.Filters.*;
+// 使用 Updates.inc 来为所有 i 小于 100 的document 增加 100 。
+collection.updateMany(lt("i", 100), inc("i", 100),
+    // UpdateResult 对象中包含了操作的信息（被修改的 document 的数量）
+    new SingleResultCallback<UpdateResult>() {
+        @Override
+        public void onResult(final UpdateResult result, final Throwable t) {
+            System.out.println(result.getModifiedCount());
+        }
+    });
+```
+
+## 7.8 删除document
+
+**删除一个document**
+
+```java
+// eq：等于
+collection.deleteOne(eq("i", 110), new SingleResultCallback<DeleteResult>() {
+    @Override
+    public void onResult(final DeleteResult result, final Throwable t) {
+        System.out.println(result.getDeletedCount());
+    }
+});
+```
+
+**删除多个document**
+
+```java
+// gte：大于等于
+collection.deleteMany(gte("i", 100), new SingleResultCallback<DeleteResult>() {
+    // DeleteResult对象包含了操作的信息（被删除的 document 的数量）
+    @Override
+    public void onResult(final DeleteResult result, final Throwable t) {
+        System.out.println(result.getDeletedCount());
+    }
+});
+```
+
+## 7.9 批量操作
+
+批量操作允许批量的执行 插入、更新、删除操作。
+
+```java
+SingleResultCallback<BulkWriteResult> printBatchResult = new SingleResultCallback<BulkWriteResult>() {
+    @Override
+    public void onResult(final BulkWriteResult result, final Throwable t) {
+        System.out.println(result);
+    }
+};
+```
+
+1.有序的批量操作
+
+有序的执行所有操作并在第一个写操作的错误处报告错误。
+
+```java
+// 有序批量操作
+collection.bulkWrite(
+  Arrays.asList(new InsertOneModel<>(new Document("_id", 4)),
+                new InsertOneModel<>(new Document("_id", 5)),
+                new InsertOneModel<>(new Document("_id", 6)),
+                new UpdateOneModel<>(new Document("_id", 1),
+                                     new Document("$set", new Document("x", 2))),
+                new DeleteOneModel<>(new Document("_id", 2)),
+                new ReplaceOneModel<>(new Document("_id", 3),
+                                      new Document("_id", 3).append("x", 4))),
+  printBatchResult
+);
+```
+
+2.无序的批量操作
+
+执行所有的操作并报告任何错误。无序的批量操作不保证执行顺序。
+
+```java
+// 无序批量操作
+collection.bulkWrite(
+  Arrays.asList(new InsertOneModel<>(new Document("_id", 4)),
+                new InsertOneModel<>(new Document("_id", 5)),
+                new InsertOneModel<>(new Document("_id", 6)),
+                new UpdateOneModel<>(new Document("_id", 1),
+                                     new Document("$set", new Document("x", 2))),
+                new DeleteOneModel<>(new Document("_id", 2)),
+                new ReplaceOneModel<>(new Document("_id", 3),
+                                      new Document("_id", 3).append("x", 4))),
+    //无序设置
+    new BulkWriteOptions().ordered(false),
+  printBatchResult
+);
+```
+
+**重要**：
+
+不推荐在`pre-2.6`的MongoDB 服务器上使用` bulkWrite` 方法。因为这是第一个支持批量写操作（插入、更新、删除）的服务器版本，它允许驱动去实现 `BulkWriteResult `和 `BulkWriteException `的语义。这个方法虽然仍然可以在`pre-2.6`服务器上工作，但是性能不好，一次只能执行一个写操作
+
+## 7.10 事务操作
+
+从MongoDB 4.0开始支持事务操作。**只支持集群和分片模式**
+
+**同步**
+
+```java
+try (ClientSession session = client.startSession()) {
+    //start
+    session.startTransaction();
+    try {
+        //操作
+        collection.insertOne(session, documentOne);
+        collection.insertOne(session, documentTwo);
+        //commit
+        session.commitTransaction();
+    } catch (Exception e) {
+        //抛弃该session
+        session.abortTransaction();
+    }
+}
+```
+
+**异步(待测试)**
+
+```java
+//开始一个session，会异步得到一个ClientSession
+generalMgdInterface.getClient().startSession(new SingleResultCallback<ClientSession>() {
+	@Override
+	public void onResult(final ClientSession sess, final Throwable t) {
+		if(t != null) {
+			logger.warn("StartSession Throwable is not null",t);
+		}
+		//如果支持事务，则不开启
+		if(sess != null) {
+            //start
+			sess.startTransaction();
+		}
+		try {
+			//数据库操作
+            //.....
+            
+            //commit
+            if(sess != null) {
+                sess.commitTransaction(new SingleResultCallback<Void>() {
+                    @Override
+                    public void onResult(final Void result, final Throwable t) {
+                    }	
+                });
+            }
+        }catch(Exception e) {
+            logger.error("",e);
+            if(sess != null) {
+                //抛弃 该 session
+                sess.abortTransaction(new SingleResultCallback<Void>() {
+                    @Override
+                    public void onResult(final Void result, final Throwable t) {
+                    }	
+                });
+            }
+        }
+    }	
+});
+        
+```
 
 # X、概念
 

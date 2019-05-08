@@ -16,7 +16,7 @@ keywords: Linux
 $ ssh <username>@<hostname or ip_address> -p <port>
 ```
 
-我的IP是：115.159.154.***,域名是neyzoter.cn,(-p port 可以省略，表示端口)
+我的IP是：`115.159.154.***`,域名是`neyzoter.cn`,(`-p port` 可以省略，表示端口)
 
 2、退出远程服务器
 
