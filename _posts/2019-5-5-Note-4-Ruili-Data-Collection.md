@@ -65,6 +65,36 @@ if(this.getIndexName().equals("")) {
 			}
 ```
 
+**进一步改进（返回doc中需要的信息，节省流量）**
+
+MongoDB的映射（Projection）可以实现只返回我们需要的内容。以查询ADC/CAN数据为例，
+
+```java
+projections = new BasicDBObject();
+//只返回裸数据，不需要_id
+projections.append(DataProcessor.MONGODB_KEY_RAW_DATA, 1).append("_id", 0);
+FindIterable<Document> docIter = mongodb.collection.find(filterDocs).projection(projections) ;
+docIter.forEach(new Block<Document>() {
+    @Override
+    public void apply(final Document document) {//每个doc所做的操作
+        try {
+                                                                           ctx.write(Unpooled.copiedBuffer(TCP_ServerHandler4PC.MONGODB_FIND_DOCS+":",CharsetUtil.UTF_8));//加入抬头
+            Binary rawDataBin = (Binary)document.get(DataProcessor.MONGODB_KEY_RAW_DATA); 
+            byte[] rawDataByte = rawDataBin.getData();            TCP_ServerHandler4PC.writeFlushFuture(ctx,Unpooled.wrappedBuffer(rawDataByte));//发给上位机原始数据
+        }catch(Exception e) {
+            logger.error("",e);
+        }						    	
+    }}, new SingleResultCallback<Void>() {//所有操作完成后的工作 	
+    @Override
+    public void onResult(final Void result, final Throwable t) {
+        TCP_ServerHandler4PC.writeFlushFuture(ctx,TCP_ServerHandler4PC.MONGODB_FIND_DOCS+
+                                              TCP_ServerHandler4PC.SEG_CMD_DONE_SIGNAL+TCP_ServerHandler4PC.DONE_SIGNAL_OVER);        logger.debug(TCP_ServerHandler4PC.MONGODB_FIND_DOCS+TCP_ServerHandler4PC.SEG_CMD_DONE_SIGNAL+TCP_ServerHandler4PC.DONE_SIGNAL_OVER);
+    }			    	
+});
+```
+
+
+
 ### 2.2.2 历史数据自动清空
 
 **方案1**
@@ -129,6 +159,30 @@ Spring自带有定时任务，实现`linux`中类似`crontab`的功能（语法�
 测试人员名称使用明文传输；
 
 密码使用MD5加密后，结合服务器发送过来的随机码，再次进行MD5加密。
+
+## 2.5 Netty数据发送方式
+
+**问题**：
+
+需要发送好多个`byte[]`，但是writeAndFlush不支持发送`byte[]`
+
+**方案1**：
+
+零拷贝方式`Unpooled.wrappedBuffer`
+
+```java
+public static ByteBuf wrappedBuffer(byte[] arrays)
+```
+
+**方案2**：
+
+深度拷贝方式`Unpooled.copiedBuffer()`
+
+```java
+public static ByteBuf copiedBuffer(byte[] arrays)
+```
+
+方案1的零拷贝不需要从一个区域搬运到另外一个区域，速度根更快。
 
 # 3、硬件难点
 
