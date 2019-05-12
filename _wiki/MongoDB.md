@@ -230,6 +230,9 @@ DBQuery.shellBatchSize
 * find
 
 ```
+# 查询带数字的集合
+db["COLNAME"].find()
+# 查询（不带数字）
 db.collection.find(query, projection)
 ```
 
