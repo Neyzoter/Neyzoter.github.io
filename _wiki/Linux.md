@@ -731,38 +731,8 @@ $ chmod -R 777 conf
 ```
 
 4、再次添加tomcat即可使用
-## 5.6 Linux下配置Eclipse+CPP+MySQL
 
-想要在C++中调用mysql库函数，需要```#include <mysql.h>```
-
-所以需要在eclipse中加上对mysql.h的路径
-
-项目->属性->C/C++Build -> settings -> gcc c++ complier -> includes -> include paths 
-
-添加两个路径：```/usr/lib/mysql```；```/usr/include/mysql```
-
-对于64位的mysql：/usr/lib64/mysql ； /usr/include/mysql
-
-要让eclipse工具能正确实现编译指令：
-
-```bash
-g++ -o test test.c -lmysqlclient -lm -I/usr/include/msqyl -L/usr/lib64/mysql
-```
-
-还需要添加对 -lmysqlclient -lm两个参数：
-
-项目->属性->C/C++Build -> settings -> gcc c++ linker-> libraries 
-
-在libraries(l) 中添加两个参数mysqlclient和m
-
-从这里可以看出gcc l参数的作用。其中m是包含了数学方法 。
-
-
-在libraryies search path (L)中添加/usr/lib/mysql
-
-到这个地址去找libmysqlclient.a这个文件。
-
-* tomcat的server.xml
+- tomcat的server.xml
 
 ```bash
 <!--name 是主机名-->
@@ -807,7 +777,39 @@ autoDeploy 则两次部署，
 </Host>
 
 ```
-## 5.7 云端服务器安装Mongodb
+
+## 5.6 Linux下配置Eclipse+CPP+MySQL
+
+想要在C++中调用mysql库函数，需要```#include <mysql.h>```
+
+所以需要在eclipse中加上对mysql.h的路径
+
+项目->属性->C/C++Build -> settings -> gcc c++ complier -> includes -> include paths 
+
+添加两个路径：```/usr/lib/mysql```；```/usr/include/mysql```
+
+对于64位的mysql：/usr/lib64/mysql ； /usr/include/mysql
+
+要让eclipse工具能正确实现编译指令：
+
+```bash
+g++ -o test test.c -lmysqlclient -lm -I/usr/include/msqyl -L/usr/lib64/mysql
+```
+
+还需要添加对 -lmysqlclient -lm两个参数：
+
+项目->属性->C/C++Build -> settings -> gcc c++ linker-> libraries 
+
+在libraries(l) 中添加两个参数mysqlclient和m
+
+从这里可以看出gcc l参数的作用。其中m是包含了数学方法 。
+
+
+在libraryies search path (L)中添加/usr/lib/mysql
+
+到这个地址去找libmysqlclient.a这个文件。
+
+* 5.7 云端服务器安装Mongodb
 
 * 下载到自己的电脑
 
@@ -1326,7 +1328,13 @@ echo "--------End--------"
 
 # 7、make编译
 
+## 7.1 编译规则
 
+（1）如果工程没有编译过，则所有C文件都要编译并链接
+
+（2）如果工程几个C文件被修改，则只编译被修改的C文件，并链接目标程序
+
+（3）
 
 
 

@@ -6,37 +6,125 @@ description: MySQL的用法
 keywords: MySQL
 ---
 
-# 1、基本语法
-## 登录
 
-```
-$ mysql -u root -p
+
+# 1、MySQL基础
+
+## 1.1 术语
+
+**数据库:** 数据库是一些关联表的集合。.
+
+**数据表:** 表是数据的矩阵。在一个数据库中的表看起来像一个简单的电子表格。
+
+**列:** 一列(数据元素) 包含了相同的数据, 例如邮政编码的数据。
+
+**行：**一行（=元组，或记录）是一组相关的数据，例如一条用户订阅的数据。
+
+**冗余**：存储两倍数据，冗余可以使系统速度更快。
+
+**主键**：主键是唯一的。一个数据表中只能包含一个主键。你可以使用主键来查询数据。
+
+**外键：**外键用于关联两个表。
+
+**复合键**：复合键（组合键）将多个列作为一个索引键，一般用于复合索引。
+
+**索引：**使用索引可快速访问数据库表中的特定信息。索引是对数据库表中一列或多列的值进行排序的一种结构。类似于书籍的目录。
+
+**参照完整性:** 参照的完整性要求关系中不允许引用不存在的实体。与实体完整性是关系模型必须满足的完整性约束条件，目的是保证数据的一致性。
+
+# 2、基本语法
+
+（1）登录
+
+```bash
+# 启动mysql
+$ systemctl start mysql.service
+# 登录
+$ mysql -u root -p;
+# 退出
+$ exit
+# 关闭mysql
+$ systemctl stop mysql.service
 ```
 
-## 显示目录
-```
-$ show <你想要显示的东西>
+（2）显示目录
+```bash
+$ show 你想要显示的东西;
 
 databases：所有数据库
 tables：所有的表
 
 ```
 
-# 2、C语言API
+（3）删库
+
+```bash
+$ drop database 库名;
+```
+
+（4）使用库
+
+```bash
+$ use 库名;
+```
+
+（5）创建表
+
+```bash
+$ create table 表名(
+	字段名 类型(长度) [约束],
+	字段名 类型(长度) [约束],
+	字段名 类型(长度) [约束]
+);
+```
+
+eg.
+
+```bash
+$ mysql> create table config(
+      -> test varchar(64) not null,
+      -> isodate date,
+      -> config varchar(5000)
+      -> );
+```
+
+（6）插入记录
+
+```bash
+$ insert into 表名(列名1,列名2,列名3...) values(val1,val2,val3...)
+```
+
+（7）修改表记录
+
+```bash
+$ update 表名 set 字段名=值,字段名=值,字段名=值...
+$ update 表名 set 字段名=值,字段名=值,字段名=值... where 条件
+```
+
+（8）删除表记录
+
+```bash
+drop 表名 where 条件
+```
+
+
 
 
 # X.MySQL安装
-服务器端的安装见，wiki\-\>Linux说明。
+服务器端的安装见，`wiki->Linux`说明。
 
 ## X.1 安装
 
-```
+```shell
 $ sudo apt-get install mysql-server
+$ sudo apt install mysql-client
+$ sudo apt install libmysqlclient-dev
 ```
 
 系统将提示您在安装过程中创建 root 密码。选择一个安全的密码，并确保你记住它，因为你以后需要它。
 ## X.2 配置
 ```
+# 可以默认
 $ sudo mysql_secure_installation
 ```
 

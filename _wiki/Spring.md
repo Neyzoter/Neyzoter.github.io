@@ -46,7 +46,7 @@ Spring 的AOP和IOC都是为了解决系统代码耦合度过高的问题。使�
 
 不过AOP和IOC并不是spring中特有的，只是spring把他们应用的更灵活方便
 
-<img src="/images/wiki/Spring/AOPStructure.gif" width="800" alt="AOPStructure" />
+<img src="/images/wiki/Spring/AOPStructure.png" width="800" alt="AOPStructure" />
 
 # 体系结构
 <img src="/images/wiki/Spring/SpringArch.png" width="600" alt="Spring体系结构" />
@@ -1386,30 +1386,20 @@ public class TaskJob{
 |项	| 描述|
 |-|-|
 |Aspect|	一个模块具有一组提供横切需求的 APIs。例如，一个日志模块为了记录日志将被 AOP 方面调用。应用程序可以拥有任意数量的方面，这取决于需求。|
-|-|-|
 |Join point	|在你的应用程序中它代表一个点，你可以在插件 AOP 方面。你也能说，它是在实际的应用程序中，其中一个操作将使用 Spring AOP 框架。|
-|-|-|
 |Advice	|这是实际行动之前或之后执行的方法。这是在程序执行期间通过 Spring AOP 框架实际被调用的代码。|
-|-|-|
 |Pointcut	|这是一组一个或多个连接点，通知应该被执行。你可以使用表达式或模式指定切入点正如我们将在 AOP 的例子中看到的。|
-|-|-|
 |Introduction	|引用允许你添加新方法或属性到现有的类中。|
-|-|-|
 |Target object	|被一个或者多个方面所通知的对象，这个对象永远是一个被代理对象。也称为被通知对象。|
-|-|-|
 |Weaving	|Weaving 把方面连接到其它的应用程序类型或者对象上，并创建一个被通知的对象。这些可以在编译时，类加载时和运行时完成。|
 
-|通知	|描述|
-|-|-|
-|前置通知	|在一个方法执行之前，执行通知。|
-|-|-|
-|后置通知	|在一个方法执行之后，不考虑其结果，执行通知。|
-|-|-|
-|返回后通知	|在一个方法执行之后，只有在方法成功完成时，才能执行通知。|
-|-|-|
-|抛出异常后通知	|在一个方法执行之后，只有在方法退出抛出异常时，才能执行通知。|
-|-|-|
-|环绕通知	|在建议方法调用之前和之后，执行通知。|
+|通知	|注解	|描述|
+|-|-|-|
+|前置通知	|@Before	|在一个方法执行之前，执行通知。|
+|后置通知	|@After	|在一个方法执行之后，不考虑其结果，执行通知。|
+|返回后通知	|@AfterReturning	|在一个方法执行之后，只有在方法成功完成时，才能执行通知。|
+|抛出异常后通知	|@AfterThrowing	|在一个方法执行之后，只有在方法退出抛出异常时，才能执行通知。|
+|环绕通知	|@Around	|在建议方法调用之前和之后，执行通知。|
 
 ## 基于AOP的XML框架
 **使用注意点**
@@ -2428,11 +2418,11 @@ ID : 3, Name : Ayan, Marks : 100, Year : 2011, Age : 25
 
 MVC 框架提供了模型-视图-控制的体系结构和可以用来开发灵活、松散耦合的 web 应用程序的组件。MVC 模式导致了应用程序的不同方面(输入逻辑、业务逻辑和 UI 逻辑)的分离，同时提供了在这些元素之间的松散耦合。
 
-* **模型**封装了应用程序数据，并且通常它们由 POJO 组成。
+* **模型(Model)**封装了应用程序数据，并且通常它们由 POJO 组成。
 
-* **视图**主要用于呈现模型数据，并且通常它生成客户端的浏览器可以解释的 HTML 输出。
+* **视图(View)**主要用于呈现模型数据，并且通常它生成客户端的浏览器可以解释的 HTML 输出。
 
-* **控制器**主要用于处理用户请求，并且构建合适的模型并将其传递到视图呈现。
+* **控制器(Controller)**主要用于处理用户请求，并且构建合适的模型并将其传递到视图呈现。
 
 Spring Web 模型-视图-控制（MVC）框架是围绕 DispatcherServlet 设计的
 
@@ -2443,12 +2433,11 @@ HandlerMapping、Controller 和 ViewResolver 是 WebApplicationContext 的一部
 DispatcherServlet 传入 HTTP 请求的*事件序列*如下
 
 * 收到一个 HTTP 请求后，DispatcherServlet 根据 HandlerMapping 来选择并且调用适当的控制器。
-
 * 控制器接受请求，并基于使用的 GET 或 POST 方法来调用适当的 service 方法。Service 方法将设置基于定义的业务逻辑的模型数据，并返回视图名称到 DispatcherServlet 中。
-
 * DispatcherServlet 会从 ViewResolver 获取帮助，为请求检取定义视图。
-
 * 一旦确定视图，DispatcherServlet 将把模型数据传递给视图，最后呈现在浏览器中。
+
+<img src="/images/wiki/Spring/MVC_Structure.png" width="600" alt="MVC_Structure" />
 
 **需求的配置**
 
