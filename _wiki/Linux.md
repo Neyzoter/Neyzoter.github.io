@@ -1383,15 +1383,116 @@ echo "--------End--------"
 
 # 7、make编译
 
-## 7.1 编译规则
+## 7.1 make编译基础
+
+### 7.1.1 编译规则
 
 （1）如果工程没有编译过，则所有C文件都要编译并链接
 
 （2）如果工程几个C文件被修改，则只编译被修改的C文件，并链接目标程序
 
-（3）
+（3）如果工程头文件改变，则需要编译引用几个头文件的C文件，并链接目标程序。
 
+### 7.1.2 Makefile规则格式
 
+```
+# 目标和条件之间的关系：与更新目标，必须首先更新他的所有条件
+# 所有条件中只要有一个更新，目标也必须随之更新
+目标 ... ： 条件集合 ...
+	# 命令列表必须以TAB开头，不能使用空格
+	命令1
+	命令2
+	...
+```
 
+eg.
 
+```bash
+main:main.o getdata.o calc.o putdata.o
+	gcc -o main main.o getdata.o calc.o putdata.o
+main.o:main.c getdata.h calc.h putdata.h define.h
+	gcc -c main.c
+getdata.o:getdata.c getdata.h define.h
+	gcc -c getdata.c
+calc.o:calc.c calc.h
+	gcc -c calc.c
+putdata.o:putdata.c putdata.h
+	gcc -c putdata.c
+clean:
+	rm *.o
+	rm main
+```
+
+### 7.1.3 make如何工作
+
+默认输入`make`
+
+（1）make在当前目录查找名为Makefile或者makefile的文件；
+
+（2）如果找到，则会进一步找到文件中的第一个目标文件，如上面的makefile文件中指明的**`main`文件**，并把该文件作为最终的目标文件；
+
+（3）如果main文件不存在，或者main文件依赖的条件集合，即后面的.o文件修改时间比main文件晚（即生成main文件后，.o文件又进行了修改），则会执行后面所定义的命令来生成main文件；
+
+（4）如果main所依赖的.o文件也存在，则make会在当前文件中查找目标为.o文件的依赖性（依赖于.c和.h文件），如果找到，则再根据规则生成.o文件
+
+（5）如果.c和.h文件存在，make会生成.o文件，然后用.o文件生成make最终的终极任务，即执行文件main
+
+`clean`这种没有被第一个目标，直接或者间接关联，那么它后面所定义的命令不会被自动执行。通过`make clean`，可以来执行——清除目标文件`*.o`和`main`（即所有目标文件）
+
+**说明**：如果main.c修改，根据程序依赖性，目标main.o会被重新编译（`gcc -c main.c`），于是main.o也修改，则main.o文件修改时间晚于main，进而main也重新链接（`gcc -o main main.o getdata.o calc.o putdata.o`）。
+
+### 7.1.4 Makefile中使用变量
+
+```bash
+objects=main.o getdata.o calc.o putdata.o
+main:$(objects)
+	gcc -o main $(objects)
+```
+
+### 7.1.5 make自动推导
+
+GNU的make可以做到自动推导文件以及文件依赖关系后面的命令，于是就没有必要在每个.o文件后面写上类似的命令
+
+```bash
+# 只需要写目标和条件（依赖关系）即可
+objects=main.o getdata.o calc.o putdata.o
+main:$(objects)
+main.o:main.c getdata.h calc.h putdata.h define.h
+getdata.o:getdata.c getdata.h define.h
+calc.o:calc.c calc.h
+putdata.o:putdata.c putdata.h
+clean:
+	rm *.o
+	rm main
+```
+
+### 7.1.6 清空目标文件
+
+一般放在makefile最后，不要放在文件开头，不然会被当作默认目标。`.PHONY`只是在显式请求时执行命令的名字，有两种理由需要使用`PHONY` 目标：避免和同名文件冲突，改善性能。
+
+```bash
+# .PHONY表示clean是一个“伪目标”
+.PHONY:clean
+clean:
+	# -表示不要管某些文件出现的问题，继续执行
+	-rm *.o
+	-rm main
+```
+
+## 7.2 make概述
+
+### 7.2.1 命名
+
+大多数make都支持`makefile`和`Makefile`这两种默认命名方式 。指定`makefile`文件
+
+```bash
+make -f {MAKEFILE_NAME}
+```
+
+### 7.2.2 包含其他makfile文件
+
+```bash
+# 不能以TAB开始，不然会被当作一个命令
+include {MAKEFILE_NAME}
+```
 
