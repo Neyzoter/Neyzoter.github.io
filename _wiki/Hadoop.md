@@ -189,14 +189,6 @@ Client定时检查整个作业是否完成 作业完成后，会清空临时文�
 ### 2.4.1 MapReduce读取数据
 **流程**：通过InputFormat决定读取的数据的类型，然后拆分成一个个InputSplit（作用：代表一个个逻辑分片，并没有真正存储数据，只是提供了一个如何将数据分片的方法，包含分片数据的位置、split的大小等信息），每个InputSplit对应一个Map处理，RecordReader（作用：将InputSplit拆分成一个个<key,value>对给Map处理，也是实际的文件读取分隔对象</key,value>）读取InputSplit的内容给Map
 
-**InputFormat功能**
-
-1.验证作业输入的正确性，如格式等
-
-2.将输入文件切割成逻辑分片(InputSplit)，一个InputSplit将会被分配给一个独立的Map任务
-
-3.提供RecordReader实现，读取InputSplit中的"K-V对"供Mapper使用
-
 **类结构**
 
 <img src="/images/wiki/BigdataFramework/mapreduce-inputformat.png" width="700" alt="MapReduce的输入格式类结构" />
@@ -205,7 +197,29 @@ Client定时检查整个作业是否完成 作业完成后，会清空临时文�
 
 *RecordReader <k,v>createRecordReader()*：</k,v> 创建RecordReader，从InputSplit中读取数据，解决读取分片中数据问题
 
-**数据类型**
+**InputFormat功能**
+
+1.验证作业输入的正确性，如格式等
+
+2.将输入文件切割成逻辑分片(InputSplit)，一个InputSplit将会被分配给一个独立的Map任务
+
+3.提供RecordReader实现，读取InputSplit中的"K-V对"供Mapper使用
+
+**InputFormat类型**
+
+`BaileyBorweinPlouffe.BbInputFormat`
+
+`ComposableInputFormat`
+
+`CompositeInputFormat`
+
+`DBInputFormat`
+
+`DistSum.Machine.AbstractInputFormat`
+
+`FileInputFormat`
+
+**FileInputFormat数据类型**
 
 1.TextInputFormat: 输入文件中的每一行就是一个记录，Key是这一行的byte offset，而value是这一行的内容
 
@@ -214,6 +228,8 @@ Client定时检查整个作业是否完成 作业完成后，会清空临时文�
 3.NLineInputFormat: 与TextInputFormat一样，但每个数据块必须保证有且只有Ｎ行，mapred.line.input.format.linespermap属性，默认为１
 
 4.SequenceFileInputFormat: 一个用来读取字符流数据的InputFormat，<key,value>为用户自定义的。字符流数据是Hadoop自定义的压缩的二进制数据格式。它用来优化从一个MapReduce任务的输出到另一个MapReduce任务的输入之间的数据传输过程。</key,value>
+
+5.
 
 **问题**
 
@@ -749,4 +765,116 @@ $ sbin/stop-yarn.sh
 ### 2.5.5 建立和安装Cluster
 
 见《Hadoop实战》的“Hadoop安装与配置”小节。
+
+# 3、Hadoop实战
+
+## 3.1 计算文本中的单词数
+
+```java
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.*;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+
+/**
+ * 字符计数
+ * @author neyzoter song
+ * @version 1.0.0
+ * @since 2019-05-27
+ */
+public class WordCount {
+    /**
+     * Map 方法
+     */
+    public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
+        private final static IntWritable one = new IntWritable(1);
+        private Text word = new Text();
+
+        public void map(LongWritable key, Text value, OutputCollector<Text,
+                IntWritable> output, Reporter reporter) throws IOException{
+            String line = value.toString();
+            //以"空格\t\n\r\f"分割line
+            StringTokenizer tokenizer = new StringTokenizer(line);
+            while(tokenizer.hasMoreElements()){
+                word.set(tokenizer.nextToken());
+                //输出<word, 1>的格式
+                output.collect(word, one);
+            }
+        }
+    }
+
+    /**
+     * Reduce方法
+     */
+    public static class Reduce extends MapReduceBase implements Reducer<Text, IntWritable, Text, IntWritable>{
+        public void reduce(Text key, Iterator<IntWritable> values, OutputCollector<Text, IntWritable> output, Reporter reporter)
+                throws IOException{
+            int sum = 0;
+            while(values.hasNext()){
+                //get得到values的数目1
+                sum += values.next().get();
+            }
+            //输出<key, 总数目>
+            output.collect(key, new IntWritable(sum));
+        }
+    }
+
+    /**
+     * main
+     */
+    public static void main(String[] args) throws Exception{
+        String path1 = "./aiot-common/src/test/java/com/neyzoter/aiot/common/test/main/file1";
+        String path2 = "./aiot-common/src/test/java/com/neyzoter/aiot/common/test/main/output";
+
+        //设置WordCount
+        JobConf conf = new JobConf(WordCount.class);
+        conf.setJobName(WordCount.class.getName());
+
+        conf.setOutputKeyClass(Text.class);
+        conf.setOutputValueClass(IntWritable.class);
+
+        conf.setMapperClass(Map.class);
+        conf.setReducerClass(Reduce.class);
+        //TextInputFormat的key是每个数据在数据分片中的字节偏移量
+        conf.setInputFormat(TextInputFormat.class);
+        conf.setOutputFormat(TextOutputFormat.class);
+
+        FileInputFormat.setInputPaths(conf, new Path(path1));
+        FileOutputFormat.setOutputPath(conf, new Path(path2));
+
+        JobClient.runJob(conf);
+
+    }
+}
+
+```
+
+**（1）InputFormat()和InputSplit**
+
+`InputSplit`是`Hadoop`定义的用来传送给每个单独的`map`的数据，`InputSplit`存储的并非数据本身，而是一个分片长度和一个记录数据位置的数组。生成`InputSplit`的方法可以通过`InputFormat()`来设置。数据传送给`map`，`map`会将输入分片传输到InputFormat上，InputFormat则调用`getRecodReader()`方法生成`RecodReader`，`RecodReader`再通过`createKey()`和`createValue()`方法创建可供`map`处理的`<key, value>`对，即`<k1, v1>`。
+
+*总结*：`InputFormat()`用于生成可供`map`处理的`<key, value>`对。
+
+**（2）OutputFormat**
+
+输出格式任意。上述代码输出
+
+```
+Hello 1
+World 2
+Bye   2
+```
+
+**（3）map和reduce**
+
+`Map`继承自`MapReduceBase`，并实现了`Mapper`接口，接口定义了`Mapper`的输入`<k1,v1>`和输出`<k2,v2>`。
+
+`Reduce`继承自`MapReduceBase`，并实现了`Reducer`接口，接口定义了`Reducer`的输入`<k2,v2>`和输出`<k3,v4>`。
+
+**（4）运行**
 

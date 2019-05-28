@@ -119,7 +119,7 @@ mvn clean compile
 mvn clean package  
 ```
 
-如果想要运行还需要在pom.xml中配置maven-shade-plugin，添加main方法的类信息。
+1.如果想要运行还需要在pom.xml中配置maven-shade-plugin，添加main方法的类信息。
 
 ```xml
   <build>
@@ -148,6 +148,33 @@ mvn clean package
 ```
 
 "com.nesc.NettyServer.App"需要改成当前项目的住类索引。
+
+2.`spring-boot`工程打包可运行`jar`，在需要操作的工程`pom.xml`中加入，
+
+```xml
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 指定该Main Class为全局的唯一入口 -->
+                    <mainClass>com.neyzoter.aiot.web.BootApplication</mainClass>
+                    <layout>ZIP</layout>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal><!--可以把依赖的包都打包到生成的Jar包中-->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+```
+
+"com.neyzoter.aiot.web.BootApplication"需要改成当前项目的住类索引。
 
 再次生成包，可以得到origin（jar包名字中有origin）和非origin（jar包名字中没有origin）的包。其中非origin的包已经包含了main，可以运行。
 

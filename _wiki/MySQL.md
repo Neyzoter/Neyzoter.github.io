@@ -181,17 +181,6 @@ installation should now be secure.
 Thanks for using MySQL!
 [root@server1 ~]#
 
-## X.3 查看状态
-```
-$ systemctl status mysql.service
-```
-
-可以看到正在运行，如果没有运行，则命令其运行：
-
-```
-$ sudo systemctl mysql start
-```
-
 
 
 
