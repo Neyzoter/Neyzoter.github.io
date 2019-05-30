@@ -1082,6 +1082,39 @@ public class Profile {
 </beans>
 ```
 
+## @Scheduled和@Component
+
+周期性运行一个程序
+
+（1）被调用程序
+
+```java
+package com.neyzoter.tasks
+@Component("taskJob")
+public class TaskJobs {
+    //可作为调度任务
+    //参数表示秒 分 时 日 月 星期
+    //即每个月1号凌晨0点执行
+    @Scheduled(cron="0 0 0 1 * ?")
+    public void task1(){
+        //do something
+    }
+}
+```
+
+（2）调用程序
+
+```java
+package com.neyzoter.app
+//扫描包内的带有@Component注解的类
+@ComponentScan("com.neyzoter.tasks")
+//使能调度
+@EnableScheduling
+public class TaskJobs {
+    
+}
+```
+
 ## JSR-250注释
 
 为了定义一个 bean 的安装和卸载，我们使用 init-method 和/或 destroy-method 参数简单的声明一下 。init-method 属性指定了一个方法，该方法在 bean 的实例化阶段会立即被调用。同样地，destroy-method 指定了一个方法，该方法只在一个 bean 从容器中删除之前被调用。

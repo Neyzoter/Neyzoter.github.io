@@ -1274,11 +1274,9 @@ public class WriteHandler extends ChannelHandlerAdapter {
 
 ```
 
-
-**因为 ChannelHandler 可以属于多个 ChannelPipeline ,它可以绑定多个 ChannelHandlerContext 实例。**然而,ChannelHandler 用于这种用法必须添加 @Sharable 注解。否则,试图将它添加到多个 ChannelPipeline 将引发一个异常。此外,它必须既是线程安全的又能安全地使用多个同时的通道(比如,连接)。下面的SharableHandler并不持有任何状态（对比下面）。
+**因为 ChannelHandler 可以属于多个 ChannelPipeline ,它可以绑定多个 ChannelHandlerContext 实例。然而,ChannelHandler 用于这种用法必须添加 @Sharable 注解。否则,试图将它添加到多个 ChannelPipeline 将引发一个异常。此外,它必须既是线程安全的又能安全地使用多个同时的通道(比如,连接)。下面的SharableHandler并不持有任何状态（对比下面）。**
 
 ```java
-
 @ChannelHandler.Sharable            //1添加 @Sharable 注解
 public class SharableHandler extends ChannelInboundHandlerAdapter {
 
