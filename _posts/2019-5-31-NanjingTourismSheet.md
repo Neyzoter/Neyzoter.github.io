@@ -10,7 +10,6 @@ mermaid: true
 # Day1(6月6日晚)
 
 ```js
-<script src="mermaid.full.min.js"></script>
 <div class="mermaid">
 graph LR
 	南京南21:20--地铁1号线-->双龙大道1号口
