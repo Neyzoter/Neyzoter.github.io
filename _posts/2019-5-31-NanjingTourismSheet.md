@@ -11,8 +11,6 @@ mermaid: true
 
 ```js
 <script src="mermaid.full.min.js"></script>
-Then define your chart like this:
-
 <div class="mermaid">
 graph LR
 	南京南21:20--地铁1号线-->双龙大道1号口
