@@ -103,6 +103,6 @@ gitalk:
     clientID: 41b144134fc5e55f9f9a
     clientSecret: 97df6c1ebfb5ef0db4ed23538f8d3dd2bfb261ad
 # 在使用网易云跟帖时可点击显示 Disqus
-lazy_load_disqus : false
+lazy_load_disqus : true
 	
 theme: jekyll-theme-cayman
