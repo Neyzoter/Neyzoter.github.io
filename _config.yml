@@ -104,11 +104,5 @@ gitalk:
     clientSecret: 97df6c1ebfb5ef0db4ed23538f8d3dd2bfb261ad
 # 在使用网易云跟帖时可点击显示 Disqus
 lazy_load_disqus : false
-
-# ---------------- #
-#    Analytics     #
-# ---------------- #
-google:
-    analytics_id: UA-141208130-1
 	
 theme: jekyll-theme-cayman
