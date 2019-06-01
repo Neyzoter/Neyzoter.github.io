@@ -103,3 +103,8 @@ gitalk:
     clientID: 41b144134fc5e55f9f9a
     clientSecret: 97df6c1ebfb5ef0db4ed23538f8d3dd2bfb261ad
 theme: jekyll-theme-cayman
+# ---------------- #
+#    Analytics     #
+# ---------------- #
+google:
+    analytics_id: UA-141208130-1
