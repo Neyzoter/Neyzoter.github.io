@@ -11,7 +11,7 @@ keywords: Tourism, Nanjing
 
 
 
-<img src="../images/posts/2019-5-31-NanjingTourismSheet/Longpic.jpg" width="800" alt="旅游攻略" />
+<img src="/images/posts/2019-5-31-NanjingTourismSheet/Longpic.jpg" width="800" alt="旅游攻略" />
 
 
 
