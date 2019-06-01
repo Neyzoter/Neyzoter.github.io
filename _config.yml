@@ -109,6 +109,6 @@ lazy_load_disqus : false
 #    Analytics     #
 # ---------------- #
 google:
-    analytics_id: UA-80669434-1
+    analytics_id: UA-141208130-1
 	
 theme: jekyll-theme-cayman
