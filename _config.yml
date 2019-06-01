@@ -9,7 +9,7 @@ subtitle: 科技人生
 description: B.A. of Automation,M.S. of Control sciece and engineering
 keywords: IoT, 控制, 人工智能, Python
 favicon: /favicon.ico
-timezone: Asia/Hangzhou
+timezone: Asia/Shanghai
 encoding: "utf-8"
 side_bar_repo_limit: 5
 
@@ -104,5 +104,13 @@ gitalk:
     clientSecret: 97df6c1ebfb5ef0db4ed23538f8d3dd2bfb261ad
 # 在使用网易云跟帖时可点击显示 Disqus
 lazy_load_disqus : true
+# ---------------- #
+#      Search      #
+# ---------------- #
+simple_jekyll_search:
+    # 是否支持全文搜索
+    fulltext: false
+    # 最多显示多少条搜索结果
+    limit: 10
 	
 theme: jekyll-theme-cayman
