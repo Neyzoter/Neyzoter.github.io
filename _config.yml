@@ -89,4 +89,17 @@ comments_provider: gitalk
 # !!!Important!!! Please modify infos below to yours
 disqus:
     username:	
+# https://imsun.net/posts/gitment-introduction/
+gitment:
+    owner: Neyzoter
+    repo: blog-comments
+    oauth:
+        client_id: 41b144134fc5e55f9f9a
+        client_secret: 97df6c1ebfb5ef0db4ed23538f8d3dd2bfb261ad
+# https://github.com/gitalk/gitalk#install
+gitalk:
+    owner: Neyzoter
+    repo: blog-comments
+    clientID: 41b144134fc5e55f9f9a
+    clientSecret: 97df6c1ebfb5ef0db4ed23538f8d3dd2bfb261ad
 theme: jekyll-theme-cayman
