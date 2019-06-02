@@ -981,51 +981,49 @@ public class Student {
 </beans>
 ```
 
-## @Autowired
-@Autowired 注释对在哪里和如何完成自动连接提供了更多的细微的控制。
+## @Autowired和@Resource
+### @Autowired
 
-@Autowired 注释可以在 setter 方法中被用于自动连接 bean，就像 @Autowired 注释，容器，一个属性或者任意命名的可能带有多个参数的方法。
+@Autowired 注释可以在 setter 方法中被用于自动连接 bean，一个属性或者任意命名的可能带有多个参数的方法，**只按照byType注入**。
 
 ```java
-package com.tutorialspoint;
-import org.springframework.beans.factory.annotation.Autowired;
-public class TextEditor {
-   private SpellChecker spellChecker;
-   @Autowired
-   public void setSpellChecker( SpellChecker spellChecker ){
-      this.spellChecker = spellChecker;
-   }
-   public SpellChecker getSpellChecker( ) {
-      return spellChecker;
-   }
-   public void spellCheck() {
-      spellChecker.checkSpelling();
-   }
+public class TestServiceImpl {
+    // 下面两种@Autowired只要使用一种即可
+    @Autowired
+    private UserDao userDao; // 用于字段上
+    
+    @Autowired
+    public void setUserDao(UserDao userDao) { // 用于属性的方法上
+        this.userDao = userDao;
+    }
 }
 ```
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
+如果按照byName装配，需要结合@Qualifier注解一起使用。
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-    http://www.springframework.org/schema/context
-    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+```java
+public class TestServiceImpl {
+    @Autowired
+    @Qualifier("userDao")
+    private UserDao userDao; 
+}
+```
 
-   <context:annotation-config/>
+### @Resource
 
-   <!-- Definition for textEditor bean without constructor-arg  -->
-   <bean id="textEditor" class="com.tutorialspoint.TextEditor">
-   </bean>
+@Resource，默认按照byName自动注入，并不是Spring的注解，它的包是javax.annotation.Resource，需要导入，但是Spring支持该注解的注入。@Resource有两个重要的属性：name和type，而Spring将@Resource注解的name属性解析为bean的名字，而type属性则解析为bean的类型。
 
-   <!-- Definition for spellChecker bean -->
-   <bean id="spellChecker" class="com.tutorialspoint.SpellChecker">
-   </bean>
-
-</beans>
+```java
+public class TestServiceImpl {
+    // 下面两种@Resource只要使用一种即可
+    @Resource(name="userDao")
+    private UserDao userDao; // 用于字段上
+    
+    @Resource(name="userDao")
+    public void setUserDao(UserDao userDao) { // 用于属性的setter方法上
+        this.userDao = userDao;
+    }
+}
 ```
 
 ## @Qualifier
