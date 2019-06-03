@@ -150,3 +150,31 @@ public class SpringTest {
 }
 ```
 
+## 2.4 自动配置dataSource
+
+以一个测试类为例
+
+```java
+@RunWith(SpringRunner.class)
+//自动配置dataSource不然会出现运行错误
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+@SpringBootTest
+public class RedisApplicationTest {
+    @Test
+    public void contextLoads() {
+        System.out.println("hello web");
+    }
+}
+```
+
+## 2.5 @SpringBootApplication
+
+等同于```@Configuration```, ```@EnableAutoConfiguration``` and ```@ComponentScan```，同时使用。
+
+可以在后面定义一些参数，如
+
+```java
+//自动配置dataSource
+@SpringBootApplication(exclude={DataSourceAutoConfiguration.class})
+```
+
