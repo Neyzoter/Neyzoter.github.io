@@ -575,3 +575,192 @@ redis 127.0.0.1:6379> HGETALL w3ckey
 | 12   | [HSETNX key field value](https://www.w3cschool.cn/redis/hashes-hsetnx.html)  只有在字段 field 不存在时，设置哈希表字段的值。 |
 | 13   | [HVALS key](https://www.w3cschool.cn/redis/hashes-hvals.html)  获取哈希表中所有值 |
 | 14   | HSCAN key cursor \[MATCH pattern\]\[COUNT count\]  迭代哈希表中的键值对。 |
+
+## 3.5 列表(List)
+
+Redis列表是简单的字符串列表，按照插入顺序排序。你可以添加一个元素导列表的头部（左边）或者尾部（右边）
+
+一个列表最多可以包含 232 - 1 个元素 (4294967295, 每个列表超过40亿个元素)。
+
+```bash
+
+redis 127.0.0.1:6379> LPUSH w3ckey redis
+(integer) 1
+redis 127.0.0.1:6379> LPUSH w3ckey mongodb
+(integer) 2
+redis 127.0.0.1:6379> LPUSH w3ckey mysql
+(integer) 3
+# 按照插入顺序输出（和插入顺序相反）
+redis 127.0.0.1:6379> LRANGE w3ckey 0 10
+
+1) "mysql"
+2) "mongodb"
+3) "redis"
+```
+
+| 序号 | 命令及描述                                                   |
+| ---- | ------------------------------------------------------------ |
+| 1    | [BLPOP key1 [key2 ] timeout](https://www.w3cschool.cn/redis/lists-blpop.html)  移出并获取列表的第一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止。 |
+| 2    | [BRPOP key1 [key2 ] timeout](https://www.w3cschool.cn/redis/lists-brpop.html)  移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止。 |
+| 3    | [BRPOPLPUSH source destination timeout](https://www.w3cschool.cn/redis/lists-brpoplpush.html)  从列表中弹出一个值，将弹出的元素插入到另外一个列表中并返回它； 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止。 |
+| 4    | [LINDEX key index](https://www.w3cschool.cn/redis/lists-lindex.html)  通过索引获取列表中的元素 |
+| 5    | [LINSERT key BEFORE\|AFTER pivot value](https://www.w3cschool.cn/redis/lists-linsert.html)  在列表的元素前或者后插入元素 |
+| 6    | [LLEN key](https://www.w3cschool.cn/redis/lists-llen.html)  获取列表长度 |
+| 7    | [LPOP key](https://www.w3cschool.cn/redis/lists-lpop.html)  移出并获取列表的第一个元素 |
+| 8    | [LPUSH key value1 [value2]](https://www.w3cschool.cn/redis/lists-lpush.html)  将一个或多个值插入到列表**头部** |
+| 9    | [LPUSHX key value](https://www.w3cschool.cn/redis/lists-lpushx.html)  将一个或多个值插入到已存在的列表头部 |
+| 10   | [LRANGE key start stop](https://www.w3cschool.cn/redis/lists-lrange.html)  获取列表指定范围内的元素 |
+| 11   | [LREM key count value](https://www.w3cschool.cn/redis/lists-lrem.html)  移除列表元素 |
+| 12   | [LSET key index value](https://www.w3cschool.cn/redis/lists-lset.html)  通过索引设置列表元素的值 |
+| 13   | [LTRIM key start stop](https://www.w3cschool.cn/redis/lists-ltrim.html)  对一个列表进行修剪(trim)，就是说，让列表只保留指定区间内的元素，不在指定区间之内的元素都将被删除。 |
+| 14   | [RPOP key](https://www.w3cschool.cn/redis/lists-rpop.html)  移除并获取列表最后一个元素 |
+| 15   | [RPOPLPUSH source destination](https://www.w3cschool.cn/redis/lists-rpoplpush.html)  移除列表的最后一个元素，并将该元素添加到另一个列表并返回 |
+| 16   | [RPUSH key value1 [value2]](https://www.w3cschool.cn/redis/lists-rpush.html)  在列表中添加一个或多个值 |
+| 17   | [RPUSHX key value](https://www.w3cschool.cn/redis/lists-rpushx.html)  为已存在的列表添加值 |
+
+## 3.6 集合(Set)
+
+Redis的Set是string类型的无序集合。集合成员是唯一的，这就意味着集合中不能出现重复的数据。
+
+Redis 中 集合是**通过哈希表实现**的，所以添加，删除，查找的复杂度都是O(1)。
+
+集合中最大的成员数为 232 - 1 (4294967295, 每个集合可存储40多亿个成员)。
+
+```bash
+redis 127.0.0.1:6379> SADD w3ckey redis
+(integer) 1
+redis 127.0.0.1:6379> SADD w3ckey mongodb
+(integer) 1
+redis 127.0.0.1:6379> SADD w3ckey mysql
+(integer) 1
+redis 127.0.0.1:6379> SADD w3ckey mysql
+(integer) 0
+# 返回所有成员
+redis 127.0.0.1:6379> SMEMBERS w3ckey
+
+1) "mysql"
+2) "mongodb"
+3) "redis"
+```
+
+| 序号 | 命令及描述                                                   |
+| ---- | ------------------------------------------------------------ |
+| 1    | [SADD key member1 [member2]](https://www.w3cschool.cn/redis/sets-sadd.html)  向集合添加一个或多个成员 |
+| 2    | [SCARD key](https://www.w3cschool.cn/redis/sets-scard.html)  获取集合的成员数 |
+| 3    | [SDIFF key1 [key2]](https://www.w3cschool.cn/redis/sets-sdiff.html)  返回给定所有集合的差集 |
+| 4    | [SDIFFSTORE destination key1 [key2]](https://www.w3cschool.cn/redis/sets-sdiffstore.html)  返回给定所有集合的差集并存储在 destination 中 |
+| 5    | [SINTER key1 [key2]](https://www.w3cschool.cn/redis/sets-sinter.html)  返回给定所有集合的交集 |
+| 6    | [SINTERSTORE destination key1 [key2]](https://www.w3cschool.cn/redis/sets-sinterstore.html)  返回给定所有集合的交集并存储在 destination 中 |
+| 7    | [SISMEMBER key member](https://www.w3cschool.cn/redis/sets-sismember.html)  判断 member 元素是否是集合 key 的成员 |
+| 8    | [SMEMBERS key](https://www.w3cschool.cn/redis/sets-smembers.html)  返回集合中的所有成员 |
+| 9    | [SMOVE source destination member](https://www.w3cschool.cn/redis/sets-smove.html)  将 member 元素从 source 集合移动到 destination 集合 |
+| 10   | [SPOP key](https://www.w3cschool.cn/redis/sets-spop.html)  移除并返回集合中的一个随机元素 |
+| 11   | [SRANDMEMBER key [count]](https://www.w3cschool.cn/redis/sets-srandmember.html)  返回集合中一个或多个随机数 |
+| 12   | [SREM key member1 [member2]](https://www.w3cschool.cn/redis/sets-srem.html)  移除集合中一个或多个成员 |
+| 13   | [SUNION key1 [key2]](https://www.w3cschool.cn/redis/sets-sunion.html)  返回所有给定集合的并集 |
+| 14   | [SUNIONSTORE destination key1 [key2]](https://www.w3cschool.cn/redis/sets-sunionstore.html)  所有给定集合的并集存储在 destination 集合中 |
+| 15   | [SSCAN key cursor [MATCH pattern\] [COUNT count]](https://www.w3cschool.cn/redis/sets-sscan.html)  迭代集合中的元素 |
+
+## 3.7 有序集合(ZSet)
+
+Redis 有序集合和集合一样也是string类型元素的集合,且不允许重复的成员。
+
+不同的是每个元素都会关联一个double类型的分数。redis正是通过分数来为集合中的成员进行从小到大的排序。
+
+有序集合的成员是唯一的,但分数(score)却可以重复。
+
+```bash
+redis 127.0.0.1:6379> ZADD w3ckey 1 redis
+(integer) 1
+redis 127.0.0.1:6379> ZADD w3ckey 2 mongodb
+(integer) 1
+redis 127.0.0.1:6379> ZADD w3ckey 3 mysql
+(integer) 1
+redis 127.0.0.1:6379> ZADD w3ckey 3 mysql
+(integer) 0
+redis 127.0.0.1:6379> ZADD w3ckey 4 mysql
+(integer) 0
+redis 127.0.0.1:6379> ZRANGE w3ckey 0 10 WITHSCORES
+
+1) "redis"
+2) "1"
+3) "mongodb"
+4) "2"
+5) "mysql"
+6) "4"
+```
+
+| 序号 | 命令及描述                                                   |
+| ---- | ------------------------------------------------------------ |
+| 1    | [ZADD key score1 member1 [score2 member2]](https://www.w3cschool.cn/redis/sorted-sets-zadd.html)  向有序集合添加一个或多个成员，或者更新已存在成员的分数 |
+| 2    | [ZCARD key](https://www.w3cschool.cn/redis/sorted-sets-zcard.html)  获取有序集合的成员数 |
+| 3    | [ZCOUNT key min max](https://www.w3cschool.cn/redis/sorted-sets-zcount.html)  计算在有序集合中指定区间分数的成员数 |
+| 4    | [ZINCRBY key increment member](https://www.w3cschool.cn/redis/sorted-sets-zincrby.html)  有序集合中对指定成员的分数加上增量 increment |
+| 5    | [ZINTERSTORE destination numkeys key [key ...]](https://www.w3cschool.cn/redis/sorted-sets-zinterstore.html)  计算给定的一个或多个有序集的交集并将结果集存储在新的有序集合 key 中 |
+| 6    | [ZLEXCOUNT key min max](https://www.w3cschool.cn/redis/sorted-sets-zlexcount.html)  在有序集合中计算指定字典区间内成员数量 |
+| 7    | [ZRANGE key start stop [WITHSCORES]](https://www.w3cschool.cn/redis/sorted-sets-zrange.html)  通过索引区间返回有序集合成指定区间内的成员 |
+| 8    | [ZRANGEBYLEX key min max [LIMIT offset count]](https://www.w3cschool.cn/redis/sorted-sets-zrangebylex.html)  通过字典区间返回有序集合的成员 |
+| 9    | [ZRANGEBYSCORE key min max [WITHSCORES\] [LIMIT]](https://www.w3cschool.cn/redis/sorted-sets-zrangebyscore.html)  通过分数返回有序集合指定区间内的成员 |
+| 10   | [ZRANK key member](https://www.w3cschool.cn/redis/sorted-sets-zrank.html)  返回有序集合中指定成员的索引 |
+| 11   | [ZREM key member [member ...]](https://www.w3cschool.cn/redis/sorted-sets-zrem.html)  移除有序集合中的一个或多个成员 |
+| 12   | [ZREMRANGEBYLEX key min max](https://www.w3cschool.cn/redis/sorted-sets-zremrangebylex.html)  移除有序集合中给定的字典区间的所有成员 |
+| 13   | [ZREMRANGEBYRANK key start stop](https://www.w3cschool.cn/redis/sorted-sets-zremrangebyrank.html)  移除有序集合中给定的排名区间的所有成员 |
+| 14   | [ZREMRANGEBYSCORE key min max](https://www.w3cschool.cn/redis/sorted-sets-zremrangebyscore.html)  移除有序集合中给定的分数区间的所有成员 |
+| 15   | [ZREVRANGE key start stop [WITHSCORES]](https://www.w3cschool.cn/redis/sorted-sets-zrevrange.html)  返回有序集中指定区间内的成员，通过索引，分数从高到底 |
+| 16   | [ZREVRANGEBYSCORE key max min [WITHSCORES]](https://www.w3cschool.cn/redis/sorted-sets-zrevrangebyscore.html)  返回有序集中指定分数区间内的成员，分数从高到低排序 |
+| 17   | [ZREVRANK key member](https://www.w3cschool.cn/redis/sorted-sets-zrevrank.html)  返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序 |
+| 18   | [ZSCORE key member](https://www.w3cschool.cn/redis/sorted-sets-zscore.html)  返回有序集中，成员的分数值 |
+| 19   | [ZUNIONSTORE destination numkeys key [key ...]](https://www.w3cschool.cn/redis/sorted-sets-zunionstore.html)  计算给定的一个或多个有序集的并集，并存储在新的 key 中 |
+| 20   | [ZSCAN key cursor [MATCH pattern\] [COUNT count]](https://www.w3cschool.cn/redis/sorted-sets-zscan.html)  迭代有序集合中的元素（包括元素成员和元素分值） |
+
+## 3.8 HyperLogLog
+
+自Redis 2.8.9版本开始。
+
+**Redis HyperLogLog 是用来做基数统计的算法**，HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定 的、并且是很小的。
+
+在 Redis 里面，每个 HyperLogLog 键只需要花费 12 KB 内存，就可以计算接近 2^64 个不同元素的基数。这和计算基数时，元素越多耗费内存就越多的集合形成鲜明对比。
+
+**基数**
+
+比如数据集 {1, 3, 5, 7, 5, 7, 8}， 那么这个数据集的基数集为 {1, 3, 5 ,7, 8}, 基数(不重复元素)为5。 
+
+**基数统计**
+
+基数估计就是在误差可接受的范围内，快速计算基数。
+
+**实例**
+
+```bash
+redis 127.0.0.1:6379> PFADD w3ckey "redis"
+
+1) (integer) 1
+
+redis 127.0.0.1:6379> PFADD w3ckey "mongodb"
+
+1) (integer) 1
+
+redis 127.0.0.1:6379> PFADD w3ckey "mysql"
+
+1) (integer) 1
+
+redis 127.0.0.1:6379> PFCOUNT w3ckey
+
+(integer) 3
+```
+
+**指令**
+
+| 序号 | 命令及描述                                                   |
+| ---- | ------------------------------------------------------------ |
+| 1    | [PFADD key element [element ...]](https://www.w3cschool.cn/redis/hyperloglog-pfadd.html)  添加指定元素到 HyperLogLog 中。 |
+| 2    | [PFCOUNT key [key ...]](https://www.w3cschool.cn/redis/hyperloglog-pfcount.html)  返回给定 HyperLogLog 的基数估算值。 |
+| 3    | [PFMERGE destkey sourcekey [sourcekey ...]](https://www.w3cschool.cn/redis/hyperloglog-pfmerge.html)  将多个 HyperLogLog 合并为一个 HyperLogLog |
+
+## 3.9 Redis发布订阅
+
+Redis 发布订阅(pub/sub)是一种消息通信模式：发送者(pub)发送消息，订阅者(sub)接收消息。 
+
+<img src="image/wiki/Redis/sub.png" width = 700 alt="订阅">
+
+<img src="image/wiki/Redis/pub.png" width = 700 alt="订阅">
