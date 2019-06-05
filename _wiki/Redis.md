@@ -801,8 +801,8 @@ redis 127.0.0.1:6379> PUBLISH redisChat "Learn redis by w3cschool.cn"
 | 序号 | 命令及描述                                                   |
 | ---- | ------------------------------------------------------------ |
 | 1    | [PSUBSCRIBE pattern [pattern ...]](https://www.w3cschool.cn/redis/pub-sub-psubscribe.html)  订阅一个或多个符合给定模式的频道。 |
-| 2    | [PUBSUB subcommand [argument [argument ...\]]](https://www.w3cschool.cn/redis/pub-sub-pubsub.html)  查看订阅与发布系统状态。 |
+| 2    | [ PUBSUB subcommand [argument [argument ...]] ](https://www.w3cschool.cn/redis/pub-sub-pubsub.html)  查看订阅与发布系统状态。 |
 | 3    | [PUBLISH channel message](https://www.w3cschool.cn/redis/pub-sub-publish.html)  将信息发送到指定的频道。 |
-| 4    | [PUNSUBSCRIBE [pattern [pattern ...\]]](https://www.w3cschool.cn/redis/pub-sub-punsubscribe.html)  退订所有给定模式的频道。 |
+| 4    | [PUNSUBSCRIBE [pattern [pattern ...]]](https://www.w3cschool.cn/redis/pub-sub-punsubscribe.html)  退订所有给定模式的频道。 |
 | 5    | [SUBSCRIBE channel [channel ...]](https://www.w3cschool.cn/redis/pub-sub-subscribe.html)  订阅给定的一个或多个频道的信息。 |
-| 6    | [UNSUBSCRIBE [channel [channel ...\]]](https://www.w3cschool.cn/redis/pub-sub-unsubscribe.html)  指退订给定的频道。 |
+| 6    | [UNSUBSCRIBE [channel [channel ...]]](https://www.w3cschool.cn/redis/pub-sub-unsubscribe.html)  指退订给定的频道。 |
