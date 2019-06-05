@@ -58,14 +58,22 @@ redis> get foo
 
 ```bash
 #!/bin/sh
+
+# 运行mongodb
+echo "Starting run mongo"
+nohup mongod &
+sleep 5s
+echo "mongod run ok"
 # 运行redis
-nohup /home/songchaochao/opt/redis-5.0.5/src/redis-server &
+echo "Starting run redis"
+nohup /home/songchaochao/opt/redis-5.0.5/src/redis-server & 
 sleep 5s
 echo "redis-server run ok"
 
 # 运行redis命令行
-if [ $1 -eq 1 ]
-then
+if [ ! -n "$1" ];then
+    echo "[INFO] You can input a \$1 = 1 to start redis client"
+elif [ $1 -eq 1 ];then 
     /home/songchaochao/opt/redis-5.0.5/src/redis-cli
 fi
 ```
@@ -341,3 +349,171 @@ redis
 1.用一个hash函数将key转换为一个数字，比如使用crc32 hash函数。对key foobar执行crc32(foobar)会输出类似93024922的整数。
 
 2.对这个整数取模，将其转化为0-3之间的数字，就可以将这个整数映射到4个Redis实例中的一个了。93024922 % 4 = 2，就是说key foobar应该被存到R2实例中。注意：取模操作是取除的余数，通常在多种编程语言中用%操作符实现。
+
+## 2.7 使用Redis
+
+使用前保证Redis打开。
+
+### 2.7.1 原生Redis 接口使用
+
+```java
+import redis.clients.jedis.Jedis;
+public class RedisJava {
+    public static void main(String[] args) {
+        //连接本地的 Redis 服务
+        Jedis jedis = new Jedis("localhost");
+        System.out.println("连接成功");
+        //查看服务是否运行
+        System.out.println("服务器正在运行: "+jedis.ping());
+
+        /*字符串实例*/
+        //设置 redis 字符串数据
+        jedis.set("w3ckey", "www.w3cschool.cn");
+        // 获取存储的数据并输出
+        System.out.println("redis 存储的字符串为: "+ jedis.get("w3ckey"));
+
+        /*列表实例*/
+        //存储数据到列表中
+        jedis.lpush("tutorial-list", "Redis");
+        jedis.lpush("tutorial-list", "Mongodb");
+        jedis.lpush("tutorial-list", "Mysql");
+        // 获取存储的数据并输出
+        List<String> list = jedis.lrange("tutorial-list", 0 ,2);
+        for(int i=0; i<list.size(); i++) {
+            System.out.println("列表项为: "+list.get(i));
+        }
+        /*Java KEY 实例*/
+        // 获取数据并输出
+        Set<String> keys= jedis.keys("*");
+        Iterator<String> it=keys.iterator();
+        while(it.hasNext) {
+            String key=it.next();
+            System.out.println("key");
+        }
+    }
+```
+
+输出
+
+```
+  连接成功
+  服务正在运行：PONG
+  redis 存储的字符串为：www.w3cschool.cn
+  列表项为: Redis
+  列表项为: Mongodb
+  列表项为: Mysql
+  w3ckey
+  tutorial-list 
+```
+
+### 2.7.2 springframework的Redis接口
+
+测试类
+
+```java
+package com.neyzoter.aiot.dal.redis;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import javax.annotation.Resource;
+import java.util.concurrent.TimeUnit;
+
+@RunWith(SpringRunner.class)
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+@SpringBootTest
+public class RedisTest {
+    private final static Logger logger = LoggerFactory.getLogger(RedisApplicationTest.class);
+    //构建一个StringRedisTemplate的bean对象
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+    //构建一个RedisTemplate的bean对象
+    //本身是一个RedisTemplate<k,v>类型，这里可以不指明k和v的类型，自动识别
+	@Resource
+    private RedisTemplate<String, User> redisTemplate;
+
+    @Test
+    public void test() throws Exception {
+        stringRedisTemplate.opsForValue().set("aaa", "111");
+        Assert.assertEquals("111", stringRedisTemplate.opsForValue().get("aaa"));
+        if(stringRedisTemplate.opsForValue().get("aaa").equals("111")){
+            logger.info("stringRedisTemplate equal!");
+        }else{
+            logger.info("stringRedisTemplate not equal!");
+        }
+
+    }
+    
+    @Test
+    public void testObj() throws Exception {
+        User user=new User("aa@126.com", "aa", "aa123456", "aa","123");
+        ValueOperations<String, User> operations=redisTemplate.opsForValue();
+        operations.set("com.neox", user);
+        //设置Redis内部数据存活时间
+        operations.set("com.neo.f", user,1, TimeUnit.SECONDS);
+        //sleep1s后，"com.neo.f"对应的数值会被擦除
+        Thread.sleep(1000);
+        //redisTemplate.delete("com.neo.f");
+        boolean exists=redisTemplate.hasKey("com.neo.f");
+        if(exists){
+        	logger.info("exists is true");
+        }else{
+        	logger.info("exists is false");
+        }
+    }
+}
+
+```
+
+# 3、Redis命令
+
+## 3.1 基础
+
+```bash
+# 启动
+src/redis-cli
+# PING-PONG
+127.0.0.1:6379> PING
+PONG
+```
+
+## 3.2 Redis键
+
+```bash
+127.0.0.1:6379> SET w3ckey redis
+OK
+127.0.0.1:6379> DEL w3ckey
+(integer) 1
+```
+
+| 序号 | 命令及描述                                                   |
+| ---- | ------------------------------------------------------------ |
+| 1    | [DEL key](https://www.w3cschool.cn/redis/keys-del.html) 该命令用于在 key 存在时删除 key。 |
+| 2    | [DUMP key](https://www.w3cschool.cn/redis/keys-dump.html)  序列化给定 key ，并返回被序列化的值。 |
+| 3    | [EXISTS key](https://www.w3cschool.cn/redis/keys-exists.html)  检查给定 key 是否存在。 |
+| 4    | [EXPIRE key](https://www.w3cschool.cn/redis/keys-expire.html) seconds 为给定 key 设置过期时间。 |
+| 5    | [EXPIREAT key timestamp](https://www.w3cschool.cn/redis/keys-expireat.html)  EXPIREAT 的作用和 EXPIRE 类似，都用于为 key 设置过期时间。 不同在于 EXPIREAT 命令接受的时间参数是 UNIX 时间戳(unix timestamp)。 |
+| 6    | [PEXPIRE key milliseconds](https://www.w3cschool.cn/redis/keys-pexpire.html)  设置 key 的过期时间亿以毫秒计。 |
+| 7    | [PEXPIREAT key milliseconds-timestamp](https://www.w3cschool.cn/redis/keys-pexpireat.html)  设置 key 过期时间的时间戳(unix timestamp) 以毫秒计 |
+| 8    | [KEYS pattern](https://www.w3cschool.cn/redis/keys-keys.html)  查找所有符合给定模式( pattern)的 key 。 |
+| 9    | [MOVE key db](https://www.w3cschool.cn/redis/keys-move.html)  将当前数据库的 key 移动到给定的数据库 db 当中。 |
+| 10   | [PERSIST key](https://www.w3cschool.cn/redis/keys-persist.html)  移除 key 的过期时间，key 将持久保持。 |
+| 11   | [PTTL key](https://www.w3cschool.cn/redis/keys-pttl.html)  以毫秒为单位返回 key 的剩余的过期时间。 |
+| 12   | [TTL key](https://www.w3cschool.cn/redis/keys-ttl.html)  以秒为单位，返回给定 key 的剩余生存时间(TTL, time to live)。 |
+| 13   | [RANDOMKEY](https://www.w3cschool.cn/redis/keys-randomkey.html)  从当前数据库中随机返回一个 key 。 |
+| 14   | [RENAME key newkey](https://www.w3cschool.cn/redis/keys-rename.html)  修改 key 的名称 |
+| 15   | [RENAMENX key newkey](https://www.w3cschool.cn/redis/keys-renamenx.html)  仅当 newkey 不存在时，将 key 改名为 newkey 。 |
+| 16   | [TYPE key](https://www.w3cschool.cn/redis/keys-type.html)  返回 key 所储存的值的类型。 |
+
+
+
