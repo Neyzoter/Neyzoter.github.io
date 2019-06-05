@@ -765,6 +765,8 @@ Redis 发布订阅(pub/sub)是一种消息通信模式：发送者(pub)发送消
 
 <img src="image/wiki/Redis/pub.png" width=700 alt="发布">
 
+**订阅者的运行**
+
 ```bash
 # 客户端订阅频道redisChat
 redis 127.0.0.1:6379> SUBSCRIBE redisChat
@@ -773,7 +775,11 @@ Reading messages... (press Ctrl-C to quit)
 1) "subscribe"
 2) "redisChat"
 3) (integer) 1
+```
 
+**发布者的运行**
+
+```bash
 # 在同一个频道 redisChat 发布两次消息，订阅者就能接收到消息。
 redis 127.0.0.1:6379> PUBLISH redisChat "Redis is a great caching technique"
 
@@ -800,4 +806,3 @@ redis 127.0.0.1:6379> PUBLISH redisChat "Learn redis by w3cschool.cn"
 | 4    | [PUNSUBSCRIBE [pattern [pattern ...\]]](https://www.w3cschool.cn/redis/pub-sub-punsubscribe.html)  退订所有给定模式的频道。 |
 | 5    | [SUBSCRIBE channel [channel ...]](https://www.w3cschool.cn/redis/pub-sub-subscribe.html)  订阅给定的一个或多个频道的信息。 |
 | 6    | [UNSUBSCRIBE [channel [channel ...\]]](https://www.w3cschool.cn/redis/pub-sub-unsubscribe.html)  指退订给定的频道。 |
-
