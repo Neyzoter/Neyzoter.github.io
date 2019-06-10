@@ -1491,8 +1491,63 @@ make -f {MAKEFILE_NAME}
 
 ### 7.2.2 包含其他makfile文件
 
+include指示符告诉make暂停读取当前的Makefile，转而读取include指定的一个或者多个文件，完成所有这些文件以后再继续读取当前Makefile。
+
 ```bash
 # 不能以TAB开始，不然会被当作一个命令
 include {MAKEFILE_NAME}
 ```
 
+**include的场合**
+
+1、有很多个不同的程序，由不同目录下的几个独立的Makefile来描述其创建或者更新规则。
+
+2、当根据源文件自动产生依赖文件时，可以将自动产生的依赖关系保存在另外一个文件中，主Makefile使用指示符include包含这些文件。
+
+**include查找顺序**
+
+1、如果没有指明绝对路径，而且当前目录下也不存在指定文件，make将根据文件名试图在以下几个目录中寻找；
+
+2、查找使用命令行选项`"-I"`或者`"--include-dir"`指定的目录，如果找到指定的文件，则使用；否则进行第3步；
+
+3、依次搜索`/usr/gnu/include`、`/usr/local/include`和`/usr/include`，如果搜索不到，则进行第4步；
+
+4、make提示文件未找到，继续处理Makefile内容；
+
+5、Makefile文件全部读取后，make试图使用规则来创建通过include指定但是未找到的文件，不能创建时，make提示致命错误并退出。
+
+**-include**
+
+`-include`包含的文件不存在，或者不存在一个规则创建，make程序仍然正常执行。只有因为Makefile的目标的规则不存在时，才会提示致命错误并退出。
+
+### 7.2.3 变量MAKEFILES
+
+如果当前环境定义了一个**MAKEFILES的环境变量**，make执行时就会首先将此变量的值作为需要读入的Makefile文件，并且多个文件之间使用空格分开。
+
+变量MAKEFILES主要用在make的递归调用过程中的通信。实际应用中很少设置该**环境变量**，一旦设置了此变量，在多层make调用时，由于每一级make都会读取MAKEFILES环境变量指定的文件，这样可能导致执行的混乱。
+
+### 7.2.4 变量MAKEFILE_LIST
+
+make读取多个Makefile文件时，在对文件解析执行之前，make读取的文件名将会被自动追加到变量MAKEFILE_LIST的定义域中。
+
+可以通过测试MAKEFILE_LIST变量中的最后一个字，来得到make程序正在处理哪个Makefile文件。
+
+```makefile
+name1:=$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+include inc.mk
+name2:=$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+all:
+	@echo name1 = $(name1)
+	@echo name2 = $(name2)
+```
+
+输出
+
+```
+name1 = Makefile
+name2 = inc.mk
+```
+
+### 7.2.5 其他特殊变量
+
+GNU make支持一个特殊的变量，且不能通过任何途经给它赋值。此变量展开以后是一个特定的值。第一个重要的特殊变量是".VARIABLES"。表示此引用点之前Makefile文件中所定义的所有全局变量列表，包括空变量（未赋值的变量）和make的内嵌变量，但不包含目标制定的变量，目标指定变量值在特定目标的上下文有效。
