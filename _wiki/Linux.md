@@ -1551,3 +1551,54 @@ name2 = inc.mk
 ### 7.2.5 其他特殊变量
 
 GNU make支持一个特殊的变量，且不能通过任何途经给它赋值。此变量展开以后是一个特定的值。第一个重要的特殊变量是".VARIABLES"。表示此引用点之前Makefile文件中所定义的所有全局变量列表，包括空变量（未赋值的变量）和make的内嵌变量，但不包含目标制定的变量，目标指定变量值在特定目标的上下文有效。
+
+### 7.2.6 Makefile文件的重建
+
+Makefile可由其他文件生成，如果Makefile由其他文件重建，则在make开始解析Makefile时，需要读取的是更新后的Makefile，而不是那个没有更新的Makefile。具体的make处理过程：
+
+1、make读入所有Makefile文件；
+
+2、将所有读取的每个Makefile作为一个目标，试图更新。如果存在一个更新特定Makefile文件的明确规则或者隐含规则，则去更新这个Makefile文件；
+
+3、完成所有Makefile文件的更新检查动作后，如果之前所读取的Makefile文件已经被更新，则make就清除本次执行状态，重新读取一遍Makefile文件
+
+### 7.2.7 重载另外一个Makefile
+
+问题：Makefile-A通过include包含Makefile-B，且两个文件包含同一个目标，则其描述规则汇总使用了不同的命令，这是Makefile不允许的。则使用include指示符行不通，GNU make提供了另外一种途径：
+
+在需要包含的Makefile-A中，使用一个“**所有匹配模式**”的规则来描述在Makefile-A中没有明确定义的目标，make将会在给定的Makefile文件中寻找没有在当前Makefile文件中给出的目标更新规则。
+
+```makefile
+# sample GNUmakefile
+foo:
+	frobnicate > foo
+%:force
+	@$(MAKE) -f Makefile $@
+force:;
+```
+
+*待重新学习*
+
+### 7.2.8 make解析Makefile文件
+
+第一阶段：读取所有Makefile文件（包括MAKEFILES指定的、指示符include指定的以及命令行选项`-f (--file)指定的`）内建所有变量、明确规则和隐含规则，并建立所有目标和依赖之间的关系结构链表；
+
+第二阶段：根据第一阶段的依赖关系结构链表决定哪些目标需要更新，并使用对应的规则来重建这些目标。
+
+### 7.2.9 make执行过程总结
+
+1、一次读取变量MAKEFILES定义的Makefile文件；
+
+2、读取工作目录下的Makefile文件（根据命名的查找顺序GNUmakefile、makefile、Makefile，首先找到那个就读取哪个）；
+
+3、依次读取工作目录Makefile文件中使用指示符include包含的文件；
+
+4、查找重建所有已读取的Makefile文件的规则（如果存在一个目标是当前读取的某一个Makefile文件，则执行此规则重建此Makefile文件，完成后从第一步开始执行）；
+
+5、初始化变量值，展开需要立即展开的变量和函数，并根据预设条件确定执行分支；
+
+6、根据“终极目标”以及其他目标的依赖关系建立依赖关系链表；
+
+7、执行除“终极目标”以外的所有目标规则（规则中如果依赖文件中任何一个文件的时间戳比目标文件新，则使用规则所定义的命令重建目标文件）
+
+8、执行“终极目标”所在的规则。
