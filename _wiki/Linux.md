@@ -1491,8 +1491,114 @@ make -f {MAKEFILE_NAME}
 
 ### 7.2.2 包含其他makfile文件
 
+include指示符告诉make暂停读取当前的Makefile，转而读取include指定的一个或者多个文件，完成所有这些文件以后再继续读取当前Makefile。
+
 ```bash
 # 不能以TAB开始，不然会被当作一个命令
 include {MAKEFILE_NAME}
 ```
 
+**include的场合**
+
+1、有很多个不同的程序，由不同目录下的几个独立的Makefile来描述其创建或者更新规则。
+
+2、当根据源文件自动产生依赖文件时，可以将自动产生的依赖关系保存在另外一个文件中，主Makefile使用指示符include包含这些文件。
+
+**include查找顺序**
+
+1、如果没有指明绝对路径，而且当前目录下也不存在指定文件，make将根据文件名试图在以下几个目录中寻找；
+
+2、查找使用命令行选项`"-I"`或者`"--include-dir"`指定的目录，如果找到指定的文件，则使用；否则进行第3步；
+
+3、依次搜索`/usr/gnu/include`、`/usr/local/include`和`/usr/include`，如果搜索不到，则进行第4步；
+
+4、make提示文件未找到，继续处理Makefile内容；
+
+5、Makefile文件全部读取后，make试图使用规则来创建通过include指定但是未找到的文件，不能创建时，make提示致命错误并退出。
+
+**-include**
+
+`-include`包含的文件不存在，或者不存在一个规则创建，make程序仍然正常执行。只有因为Makefile的目标的规则不存在时，才会提示致命错误并退出。
+
+### 7.2.3 变量MAKEFILES
+
+如果当前环境定义了一个**MAKEFILES的环境变量**，make执行时就会首先将此变量的值作为需要读入的Makefile文件，并且多个文件之间使用空格分开。
+
+变量MAKEFILES主要用在make的递归调用过程中的通信。实际应用中很少设置该**环境变量**，一旦设置了此变量，在多层make调用时，由于每一级make都会读取MAKEFILES环境变量指定的文件，这样可能导致执行的混乱。
+
+### 7.2.4 变量MAKEFILE_LIST
+
+make读取多个Makefile文件时，在对文件解析执行之前，make读取的文件名将会被自动追加到变量MAKEFILE_LIST的定义域中。
+
+可以通过测试MAKEFILE_LIST变量中的最后一个字，来得到make程序正在处理哪个Makefile文件。
+
+```makefile
+name1:=$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+include inc.mk
+name2:=$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+all:
+	@echo name1 = $(name1)
+	@echo name2 = $(name2)
+```
+
+输出
+
+```
+name1 = Makefile
+name2 = inc.mk
+```
+
+### 7.2.5 其他特殊变量
+
+GNU make支持一个特殊的变量，且不能通过任何途经给它赋值。此变量展开以后是一个特定的值。第一个重要的特殊变量是".VARIABLES"。表示此引用点之前Makefile文件中所定义的所有全局变量列表，包括空变量（未赋值的变量）和make的内嵌变量，但不包含目标制定的变量，目标指定变量值在特定目标的上下文有效。
+
+### 7.2.6 Makefile文件的重建
+
+Makefile可由其他文件生成，如果Makefile由其他文件重建，则在make开始解析Makefile时，需要读取的是更新后的Makefile，而不是那个没有更新的Makefile。具体的make处理过程：
+
+1、make读入所有Makefile文件；
+
+2、将所有读取的每个Makefile作为一个目标，试图更新。如果存在一个更新特定Makefile文件的明确规则或者隐含规则，则去更新这个Makefile文件；
+
+3、完成所有Makefile文件的更新检查动作后，如果之前所读取的Makefile文件已经被更新，则make就清除本次执行状态，重新读取一遍Makefile文件
+
+### 7.2.7 重载另外一个Makefile
+
+问题：Makefile-A通过include包含Makefile-B，且两个文件包含同一个目标，则其描述规则汇总使用了不同的命令，这是Makefile不允许的。则使用include指示符行不通，GNU make提供了另外一种途径：
+
+在需要包含的Makefile-A中，使用一个“**所有匹配模式**”的规则来描述在Makefile-A中没有明确定义的目标，make将会在给定的Makefile文件中寻找没有在当前Makefile文件中给出的目标更新规则。
+
+```makefile
+# sample GNUmakefile
+foo:
+	frobnicate > foo
+%:force
+	@$(MAKE) -f Makefile $@
+force:;
+```
+
+*待重新学习*
+
+### 7.2.8 make解析Makefile文件
+
+第一阶段：读取所有Makefile文件（包括MAKEFILES指定的、指示符include指定的以及命令行选项`-f (--file)指定的`）内建所有变量、明确规则和隐含规则，并建立所有目标和依赖之间的关系结构链表；
+
+第二阶段：根据第一阶段的依赖关系结构链表决定哪些目标需要更新，并使用对应的规则来重建这些目标。
+
+### 7.2.9 make执行过程总结
+
+1、一次读取变量MAKEFILES定义的Makefile文件；
+
+2、读取工作目录下的Makefile文件（根据命名的查找顺序GNUmakefile、makefile、Makefile，首先找到那个就读取哪个）；
+
+3、依次读取工作目录Makefile文件中使用指示符include包含的文件；
+
+4、查找重建所有已读取的Makefile文件的规则（如果存在一个目标是当前读取的某一个Makefile文件，则执行此规则重建此Makefile文件，完成后从第一步开始执行）；
+
+5、初始化变量值，展开需要立即展开的变量和函数，并根据预设条件确定执行分支；
+
+6、根据“终极目标”以及其他目标的依赖关系建立依赖关系链表；
+
+7、执行除“终极目标”以外的所有目标规则（规则中如果依赖文件中任何一个文件的时间戳比目标文件新，则使用规则所定义的命令重建目标文件）
+
+8、执行“终极目标”所在的规则。
