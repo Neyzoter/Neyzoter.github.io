@@ -126,6 +126,35 @@ $ sudo service docker start
 [CentOs安装Docker](https://www.w3cschool.cn/docker/centos-docker-install.html)
 
 ## 2.3 Win下安装
+
+### 2.3.1 Windows自带Hyper-V虚拟机
+
+1、前期准备
+
+电脑是windows10专业版或企业版，才有Hyper-V
+
+2、[下载docker4win](https://store.docker.com/editions/community/docker-ce-desktop-windows)
+
+3、安装
+
+安装后会自动注销
+
+4、开启Hyper-V
+
+运行docker前需要开启Hyper-V（Docker自动提示），之前需要在**BIOS开启虚拟化技术**。
+
+<img src="images/wiki/Docker/Hyper_V_Enable.png" width=500 alt="Hyper-V">
+
+5、验证Docker
+
+cmd查看Docker版本
+
+```bash
+$ docker --version
+```
+
+### 2.3.2 Virtual box创建虚拟机
+
 [Win安装Docker](https://www.w3cschool.cn/docker/windows-docker-install.html)
 
 ## 2.4 以非ROOT方式管理Docker
