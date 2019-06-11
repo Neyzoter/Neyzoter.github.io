@@ -1171,17 +1171,17 @@ EXEC
 
 　　redis 提供 6种数据淘汰策略：
 
-　　． volatile-lru：从已设置过期时间的数据集（server.db[i].expires）中挑选最近最少使用的数据淘汰
+* volatile-lru：从已设置过期时间的数据集（server.db[i].expires）中挑选最近最少使用的数据淘汰
 
-　　． volatile-ttl：从已设置过期时间的数据集（server.db[i].expires）中挑选将要过期的数据淘汰
+* volatile-ttl：从已设置过期时间的数据集（server.db[i].expires）中挑选将要过期的数据淘汰
 
-　　． volatile-random：从已设置过期时间的数据集（server.db[i].expires）中任意选择数据淘汰
+* volatile-random：从已设置过期时间的数据集（server.db[i].expires）中任意选择数据淘汰
 
-　　． allkeys-lru：从数据集（server.db[i].dict）中挑选最近最少使用的数据淘汰
+* allkeys-lru：从数据集（server.db[i].dict）中挑选最近最少使用的数据淘汰
 
-　　． allkeys-random：从数据集（server.db[i].dict）中任意选择数据淘汰
+* allkeys-random：从数据集（server.db[i].dict）中任意选择数据淘汰
 
-　　． no-enviction（驱逐）：禁止驱逐数据
+* no-enviction（驱逐）：禁止驱逐数据
 
 　　注意这里的6种机制，volatile和allkeys规定了是对已设置过期时间的数据集淘汰数据还是从全部数据集淘汰数据，后面的lru、ttl以及random是三种不同的淘汰策略，再加上一种no-enviction永不回收的策略。
 

@@ -133,21 +133,13 @@ ApplicationContext 容器包括 BeanFactory 容器的所有功能
 |属性| 描述|
 |-|-|
 |class| 这个属性是强制性的，并且指定用来创建 bean 的 bean 类。|
-|-|-|
 |name| 这个属性指定唯一的 bean 标识符。在基于 XML 的配置元数据中，你可以使用 ID 和/或 name 属性来指定 bean 标识符。|
-|-|-|
 |scope| 这个属性指定由特定的 bean 定义创建的对象的作用域，它将会在 bean 作用域的章节中进行讨论。|
-|-|-|
 |constructor\-arg |	它是用来注入依赖关系的，并会在接下来的章节中进行讨论。|
-|-|-|
 |properties	| 它是用来注入依赖关系的，并会在接下来的章节中进行讨论。|
-|-|-|
 |autowiring mode| 它是用来注入依赖关系的，并会在接下来的章节中进行讨论。|
-|-|-|
 |lazy\-initialization mode| 延迟初始化的 bean 告诉 IoC 容器在它第一次被请求时，而不是在启动时去创建一个 bean 实例。|
-|-|-|
 |initialization方法| 在 bean 的所有必需的属性被容器设置之后，调用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
-|-|-|
 |destruction方法|  当包含该 bean 的容器被销毁时，使用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
 
 ## Bean作用域
@@ -156,13 +148,9 @@ ApplicationContext 容器包括 BeanFactory 容器的所有功能
 |作用域 |	描述|
 |-|-|
 |singleton|在spring IoC容器仅存在一个Bean实例，Bean以单例方式存在，默认值。每次需要时（getBean）都返回同一个bean实例。|
-|-|-|
 |prototype	| 每次从容器中调用Bean时，都返回一个新的实例，即每次调用getBean()时，相当于执行newXxxBean()|
-|-|-|
 |request	| 每次HTTP请求都会创建一个新的Bean，该作用域仅适用于WebApplicationContext环境|
-|-|-|
 |session	| 同一个HTTP Session共享一个Bean，不同Session使用不同的Bean，仅适用于WebApplicationContext环境|
-|-|-|
 |global-session	| 一般用于Portlet应用环境，该运用域仅适用于WebApplicationContext环境|
 
 *singleton*
