@@ -15,7 +15,7 @@ Docker 是一个开源的应用容器引擎，让开发者可以打包他们的�
 |组件|作用|
 |-|-|
 |Docker 镜像(Images)|Docker 镜像是用于创建 Docker容器的模板|
-|Docker 容器(Container)|容器是独立运行的一个或一组应用|
+|Docker 容器(Container)|容器是**独立运行**（有各自的网关、IP地址，比如mongo运行在127.0.0.2，应用运行在127.0.0.3，应用不能通过localhost来访问mongodb）的一个或一组应用|
 |Docker客户端(Client) |Docker 客户端通过命令行或者其他工具使用[Docker API](https://docs.docker.com/reference/api/docker_remote_api) 与 Docker 的守护进程通信。|
 |Docker 主机(Host)|一个物理或者虚拟的机器用于执行 Docker 守护进程和容器|
 |Docker 仓库(Registry)|Docker 仓库用来保存镜像，可以理解为代码控制中的代码仓库。[Docker Hub](https://hub.docker.com) 提供了庞大的镜像集合供使用。|
@@ -127,7 +127,7 @@ $ sudo service docker start
 
 ## 2.3 Win下安装
 
-### 2.3.1 Windows自带Hyper-V虚拟机
+### 2.3.1 方案1：Windows自带Hyper-V虚拟机
 
 1、前期准备
 
@@ -153,7 +153,7 @@ cmd查看Docker版本
 $ docker --version
 ```
 
-### 2.3.2 Virtual box创建虚拟机
+### 2.3.2 方案2：Virtual box创建虚拟机
 
 [Win安装Docker](https://www.w3cschool.cn/docker/windows-docker-install.html)
 
@@ -536,6 +536,14 @@ systemctl restart docker.service
 netstat -plnt |grep 2375
 ```
 
+**测试远程**
+
+```bash
+curl IP:PORT 
+```
+
+
+
 # 5.Docker实例
 
 ## 5.1 Ngnix
@@ -781,5 +789,25 @@ $ docker run -p 8080:8080 --name mytomcat -d tomcat:8.0
 $ docker exec -it mytomcat bash
 # 3.将war包部署到tomcat
 
+```
+
+## 5.4 Redis
+
+**开启Redis**
+
+```bash
+docker run --name test-redis -d redis
+```
+
+**运行客户端**
+
+```bash
+docker run -it --link test-redis:redis --rm redis redis-cli -h redis -p 6379
+```
+
+**问题解决**
+
+```
+127.0.0.1:6379> config set notify-keyspace-events Egx
 ```
 
