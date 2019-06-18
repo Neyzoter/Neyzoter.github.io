@@ -24,7 +24,7 @@ keywords: skills
 
 |MCU|RTOS|传感网络|
 |-|-|-|
-|STM32、C51 |FreeRTOS|NBIoT、WiFi、BlueTooth、CAN|
+|STM32、C51、TC26x |FreeRTOS、AUTOSAR|NBIoT、WiFi、BlueTooth、CAN|
 
 # 历年技能总结
 ## 2019年技能树
@@ -45,7 +45,7 @@ keywords: skills
 
 |MCU|RTOS|传感网络|
 |-|-|-|
-|||CAN|
+|英飞凌TC26x双核|[AUTOSAR](http://neyzoter.cn/wiki/AUTOSAR/)|CAN|
 
 ## 2018年技能树
 * 软件
