@@ -51,6 +51,16 @@ BSW可分为：
 
 ## 1.3 AUTOSAR方法
 
+<img src="/images/wiki/AUTOSAR/AutosarGenerateProcess.png" width="700 " alt="AUTOSAR总体图（最清楚细节）">
+
+1.定义 System Configuration Input，选择软、硬件组件，标识系统总体限制
+
+2.活动 Configure System 主要是将软件组件映射到关于资源和计时要求的 ECU 上
+
+3.Configure System 的输出是 System Configuration Description：系统信息（如总线映射、拓扑等）和关于软件组件定位到哪个 ECU 的映射
+
+4.活动 Extract ECU-Specific Information 从 System Configuration Description 中提取特定 ECU 所需的信息。
+
 
 
 # 2、BSW-MCAL
