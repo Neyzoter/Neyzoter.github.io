@@ -61,6 +61,16 @@ BSW可分为：
 
 4.活动 Extract ECU-Specific Information 从 System Configuration Description 中提取特定 ECU 所需的信息。
 
+5.提取的信息输出到 ECU Extract of System Configuration
+
+6.活动 Configure ECU 为实现添加了所有必需的信息，如任务调度、必需的 BSW（基础软件）模块、BSW 的配置、任务中可运行实体的赋值等。
+
+7.活动 Configure ECU 的结果将输出给 ECU Configuration Description，它负责收集所有关于特定 ECU 的局部信息。通过这些信息可以构建该特定 ECU 的可执行软件。
+
+8.在最后一步中，活动 Generate Executable 根据从 ECU Configuration Description中得到的信息生成可执行软件。这一步通常涉及生成代码（如为 RTE 和 BSW 生成代码）、编译代码（编译生长的代码或编译软件组件的源代码）、将所有编译后的代码连接成为可执行软件。
+
+9.得到可执行 ECU 软件。
+
 
 
 # 2、BSW-MCAL
