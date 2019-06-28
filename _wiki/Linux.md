@@ -1948,3 +1948,46 @@ print:foo.c bar.c
 	touch print
 ```
 
+### 7.3.9 Makefile符号
+
+* **shell前的`@`、`-`、`+`**
+
+1.makefile执行到某一行，都会打印改行命令，为了不打印命令，需要添加`@`
+
+```makefile
+clean_all:
+	rm *.o
+	# 输出
+	# echo ">>>>>>>>  DONE  <<<<<<<"
+	# >>>>>>>>  DONE  <<<<<<<
+	echo ">>>>>>>>  DONE  <<<<<<<"
+	
+	# 输出
+	# >>>>>>>>  DONE  <<<<<<<
+	@echo ">>>>>>>>  DONE  <<<<<<<"
+```
+
+2.忽略错误需要添加`-`
+
+3.只有某一些行被执行，其他行均为显示命令
+
+命令行前的`+`表示改行执行，其它没有`+`的行是显示命令而不执行
+
+### 7.3.10 多目标
+
+一个规则中可以有个多个目标，相当于多个规则。
+
+（1）仅需要一个描述依赖关系的规则，而不需要在规则中定义命令
+
+```makefile
+kbd.o command.o files.o:command.h
+```
+
+（2）对于多个具有类似重建命令的目标，重建这些目标的命令并不需要绝对相同
+
+```makefile
+bigoutput little output:text.g
+	# generate 根据命令行参数来决定输出文件的类型
+	generate text.g -$(subst output,,$@) > $@
+```
+
