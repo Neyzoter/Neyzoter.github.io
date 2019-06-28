@@ -1826,3 +1826,125 @@ foo.o:foo.c defs.h hack.h
 	cc -c $(CFLAGS) $^ -o $@
 ```
 
+**5.库文件和搜索目录**
+
+Makefile中程序链接的静态库、共享库同样也可以由目录搜索得到，需要用户在书写规则的依赖时指定一个类似`-lNAME`的依赖文件名（`-lNAME`的表示方式和`GNU ld`链接器对库的引用方式完全一样）。
+
+规则的依赖文件存在`-lNAME`形式的文件时，make将根据NAME首先搜索当前系统可提供的共享库。如果当前系统不能提供这个共享库，则搜索它的静态库。详细过程：
+
+```
+1.make在执行规则时会在当前目录下搜索一个名为libNAME.so的文件
+2.如果当前工作目录下不存在libNAME.so，则make程序会继续搜索使用VPATH或者vpath指定的搜索目录
+3.如果还不存在，make程序将搜索系统默认的目录，顺序是/lib、/usr/lib、和PREFIX/lib（Linux中是/usr/local/lib）
+如果还没有找到libNAME.so，则按以上顺序搜索libNAME.a文件
+```
+
+例子：
+
+```makefile
+# 假设/usr/lib/libcurses.a存在，而不存在/usr/lib/libcurses.so
+# -lNAME格式默认搜索libNAME.so和libNAME.a是由变量.LIBPATTERNS指定
+foo:foo.c -lcurses
+	cc $^ -o $@
+```
+
+### 7.3.6 Makefile伪目标
+
+将一个目标声明为伪目标需要将其作为特殊目标"`.PHONY`"的依赖。
+
+* **伪目标的2点作用**：
+
+*1、避免只执行命令的目标和工作目录下的文件名出现冲突*
+
+如果工作目录下没有clean文件，则`make clean`总是执行。（**问题**）如果工作目录下有clean文件，则`make clean`认为clean目标存在且没有依赖，而不会执行命令。
+
+```makefile
+clean:
+	rm *.o temp
+```
+
+修改为
+
+```makefile
+# 伪目标，不管工作目录下是否有clean文件，make clean都会执行清除
+.PHONY:clean
+clean:
+	rm *.o temp
+```
+
+*2、提高make的执行效率*
+
+```makefile
+SUBDIRS=foo bar baz
+# 利用Shell循环来完成对多个目录进行make
+subdirs:
+for dir in $(SUBDIRS);do \
+		$(MAKE) -C $$dir; \
+	done
+```
+
+**问题**：1、子目录执行make错误时，make不会退出，需要加`-k`选项；2、Shell循环方式，没有用到make对目录的并行处理功能。克服以上2个问题，修改为：
+
+```makefile
+SUBDIRS=foo bar baz
+
+.PHONY:subdirs $(SUBDIRS)
+
+subdirs:$(SUBDIRS)
+$(SUBDIRS):
+	$(MAKE) -C $@
+# 限制子目录make顺序：baz完成后才能foo
+foo:baz
+```
+
+* **伪目标依赖**
+
+伪目标运行前，需要执行其依赖。例子：
+
+```makefile
+# 伪目标依赖目标
+all:prog1 prog2 prog3
+.PHONY:all
+prog1:prog1.o utils.o
+	cc -o prog1 prog1.o utils.o
+prog2:prog2.o
+	cc -o prog2 prog2.o
+prog3:prog3.o sort.o utils.o
+	cc -o prog3 prog3.o	sort.o utils.o
+```
+
+```makefile
+# 伪目标依赖伪目标
+.PHONY:cleanall cleanobj cleandiff
+cleanall:cleanobj cleandiff
+	rm program
+cleanobj:
+	rm *.o
+cleandiff:
+	rm *.diff
+```
+
+注：`RM`变量等价于"`rm -f`"，可以用`$(RM)`
+
+### 7.3.7 强制目标
+
+FORCE总是被认为更新过，所以clean总是会执行，功能同于`.PHONY`
+
+```makefile
+clean:FORCE
+	rm $(objects)
+FORCE:
+```
+
+**推荐使用伪目标`.PHONY`**
+
+### 7.3.8 空目标文件
+
+空目标是伪目标的变种，**不同点在于空目标是一个存在的文件（记录上一次执行此规则定义命令的时间）**
+
+```makefile
+print:foo.c bar.c
+	lpr -p $?
+	touch print
+```
+
