@@ -1991,3 +1991,7 @@ bigoutput little output:text.g
 	generate text.g -$(subst output,,$@) > $@
 ```
 
+### 7.3.11 多规则目标
+
+一个文件可以作为多个规则的目标出现，目标文件的所有依赖将会被合并成此目标一个依赖文件列表。
+
