@@ -265,7 +265,7 @@ make BOARDDIR=mpc5516it BDIR=<anydir>[,<anydir>] all
 
 * `MOD_USE`
 
-  需要使用的模块，例如`MCU KERNEL`
+  需要使用的模块，例如`MCU` 、`KERNEL`、**`RTE`**等，RTE的路径在`project_default.mk`中加入
 
 * `COMPILER`
 
@@ -275,9 +275,41 @@ make BOARDDIR=mpc5516it BDIR=<anydir>[,<anydir>] all
 
   编译器地址，如`/usr/lib/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-`，后面会加上`gcc`
 
-  在文件`\core\scripts\guess_cc.sh`中运行了`export CROSS_COMPILE=$COMPILER`，在这里可以设置成和镜像默认的编译器。如wzh-ubuntu镜像的gcc版本是 5.4.0版本的，而4.9.3版本在`/usr/lib/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc`
+  在文件`\core\scripts\guess_cc.sh`中运行了`export CROSS_COMPILE=$COMPILER`，在这里可以设置成和镜像默认的编译器。如wzh-ubuntu镜像的默认gcc版本是 5.4.0版本的，而4.9.3版本在`/usr/lib/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc```
+
+* `ASFLAGS` - `assembler flags`
+
+  汇编flags
+
+* `ASOUT`-`how to generate output file`
+
+  如何生成输出文件
+
+* `LDFLAGS`-`linker flags`
+
+* `LDOUT`-`how to Generate linker output file`
+
+* `LDMAPFILE` - `How to generate mapfile `
+
+* `AROUT`-`archiver flags`
+
+  归档器的flags
+
+* obj-y : list of object files to build.
+
+* VPATH : list of directories in which to look for source files.
+
+* inc-y : list of directories in which to look for header files.
+
+* libitem-y : list of libraries to include. 
+
+* build-exe-y : the name of build the output file.
+
+* ldcmdfile-y: path to linkscript, used when building "build-exe-y"
 
 **make调用顺序**
+
+*顶层（core/下）的makefile会（进入目录`<anydir>/obj_<arch>`）调用core/scripts/rules.mk*，`rules.mk`的调用过程如下：
 
 * 1. 特定电路板的配置文件, 即`$(ROOTDIR)/boards/​$(BOARDDIR)/build_config.mk`
 
@@ -293,9 +325,9 @@ make BOARDDIR=mpc5516it BDIR=<anydir>[,<anydir>] all
 
 * 4. 编译器通用支持：` $(ROOTDIR)/scripts/cc_​$(COMPILER).mk`
 
-`COMPILER = gcc`，即`$(ROOTDIR)/scripts/cc_gcc.mk`文件
+`COMPILER = gcc`，即`$(ROOTDIR)/scripts/cc_gcc.mk`文件，一些编译器的支持情况，配置编译器（CFLAGS）、预处理器、链接器（LDFLAGS、LDOUT、LDMAPFILE）、汇编器（ASFLAGS、ASOUT）、Dumper、归档（AROUT）
 
 
+* 5.  `<anydir>`中的makefile
 
-
-* 5. The makefile in `<anydir>`
+example工程文件中的

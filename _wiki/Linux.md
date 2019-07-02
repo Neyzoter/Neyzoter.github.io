@@ -1316,7 +1316,8 @@ break n  #跳出第n层f循环
 continue  #跳出当前循环
 ```
 
-## 6.12 函数
+## 6.12 函数创建
+
 ```bash
 #!/bin/sh
 
@@ -1380,6 +1381,37 @@ echo $1
 git push origin master
 echo "--------End--------"
 ```
+
+## 6.15 shell指令
+
+### 6.15.1 sed
+
+可以对来自文本文件以及标准输入的文本进行编辑，标准输入可以是键盘、文件重定向、字符串、变量或者管道的文本。
+
+* **运行流程**：
+
+1、从文件或者标准输入读取一行数据，复制到缓存区
+
+2、读取命令行或者脚本的编辑子命令，对缓冲区的文本进行编辑
+
+3、重复以上过程
+
+* **格式**
+
+```
+sed [options] [script] [inputfile ...]
+```
+
+* **实例**
+
+```shell
+# 输出第1行，-n表示取消默认输出，1p即第一行
+sed -n 1p text.txt
+```
+
+
+
+### 6.15.2 awk
 
 # 7、make编译
 
@@ -1773,7 +1805,7 @@ VPATH=src:../headers
 
 **2.选择性搜索（关键字vpath）**
 
-* `vpath PATTERN DIRECTORIES`
+* `vpth PATTERN DIRECTORIES`
 
 如果当前目录下没有找到文件，就到vpath中查找。为符合模式`PATTERN`的文件指定搜索目录`DIRECTORIES`。多个目录用空格或者"`:`"隔开。
 
@@ -1781,13 +1813,13 @@ VPATH=src:../headers
 vpath %.h ../headers
 ```
 
-如果多个`vpath`使用了相同的`PATTERN `，make则对这些`vpath`语句一个一个进行处理，顺序由`vpath`语句在Makefile文件中出现的次序决定。
+如果多个`vpth`使用了相同的`PATTERN `，make则对这些`vpath`语句一个一个进行处理，顺序由`vpath`语句在Makefile文件中出现的次序决定。
 
-* `vpath PATTERN`
+* `vpth PATTERN`
 
 清除之前为符合模式`PATTERN`的文件设置的搜索路径
 
-* `vpath`
+* `vpth`
 
 清除所有已被设置的文件搜索路径
 
