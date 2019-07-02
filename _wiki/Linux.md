@@ -1973,6 +1973,32 @@ clean_all:
 
 命令行前的`+`表示改行执行，其它没有`+`的行是显示命令而不执行
 
+* 等于号
+
+`=`：最基本的赋值
+
+`:=`：覆盖变量之前的值（`=`和`:=`的区别见**`:=`和`=`的区别**）
+
+`?=`：变量为空，则赋值
+
+`+=`：赋值添加到变量的后面
+
+* obj-xxx
+
+`obj-y`：编译进内核
+
+`obj-m`：编译成模块
+
+`obj-$(CONFIG_PPC) `中 ​`$(CONFIG_PPC)`表示一个变量
+
+```
+比如定义CONFIG_PPC=y
+
+$(CONFIG_PPC)就是y
+
+obj-$(CONFIG_PPC) 就是 obj-y
+```
+
 ### 7.3.10 多目标
 
 一个规则中可以有个多个目标，相当于多个规则。
@@ -1994,4 +2020,47 @@ bigoutput little output:text.g
 ### 7.3.11 多规则目标
 
 一个文件可以作为多个规则的目标出现，目标文件的所有依赖将会被合并成此目标一个依赖文件列表。
+
+* 一个仅描述依赖关系的描述规则可以用来给一个或者多个目标文件的依赖文件。
+
+```makefile
+objects=foo.o bar.o
+foo.p:defs.h
+bar.o:defs.h test.h
+$(objects):config.h
+```
+
+* 可以通过一个变量来增加目标的依赖文件
+
+```makefile
+extradeps=
+$(objects):$(extradeps)
+```
+
+如果`make extradeps=foo.h`，则foo.h将作为所有的（objects中的）.o文件的依赖文件。
+
+### 7.3.12 静态模式
+
+静态模式规则存在多个目标，并且不同的目标可以根据目标文件的名字来自动构造出依赖文件，
+
+```makefile
+# TARGET-PATTERN和PREREQ-PATTERNS说明了如何为每一个目标文件生成依赖文件
+TARGETS ...:TARGET-PATTERN:PREREQ-PATTERNS ...
+	COMMANDS
+...
+```
+
+从目标模式`TARGET-PATTERN`的目标名字中抽取一部分字符串（称为“茎”），替代依赖模式`PREREQ-PATTERNS`中相应部分来产生对应目标的依赖文件。
+
+例子：根据相应的.c文件来编译生成foo.o和bar.o文件
+
+```makefile
+objects = foo.o bar.o
+all: $(objects)
+# 规则描述了所有.o文件的依赖文件是对应的.c文件
+# 对于目标foo.o，取其茎foo代替对应的依赖模式%.c中的模式字符%
+# 可以得到目标的依赖文件foo.c
+$(objects): %.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+```
 

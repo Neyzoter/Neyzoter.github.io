@@ -151,8 +151,6 @@ Communication Hardware
 
 I/O Hardware Abstraction，目标是使数据通过RTE来传输，而不完全依赖于ECU硬件。
 
-
-
 # 4、BSW-服务层
 
 ## 4.1 介绍
@@ -187,3 +185,117 @@ Complex Drivers Layer，涉及到从硬件到RTE，**任务**：
 Runtime Environment，是 AUTOSAR 虚拟功能总线（Virtual Function Bus，VFB）的接口（针对某个特定 ECU）的实现，为应用程序（软件组件）之间的通信提供了基本的服务，同时也便于访问包含 OS 的基本软件组件。
 
 为了满足系统设计者所做的一些限制，应用程序组件能够在系统配置期间被映射到任何有效的 ECU 上。**RTE 负责确保这些（应用程序）组件能够通信，提供了在 AUTOSAR 软件组件间通信的基础服务。**
+
+# 7、Core 21.0.0学习
+
+<img src="/images/wiki/AUTOSAR/Build_System_schematic.png" width="700 " alt="make架构">
+
+## 7.1 工程架构
+
+**工程方案1.工程文件和Arctic Core分开**
+
+```
+<anydir>                               - Your project
+|--- config
+|    |--- [config files]               - Overrides default module configurations
+|    '--- <board>
+|         '--- [config files]          - Overrides all other module configurations
+|
+|--- makefile
+|--- [build_config.mk]  
+'--- obj-<arch>
+ 
+<Arctic Core>
+|--- makefile
+|--- boards
+|    '--- <board>
+|         |--- [config files]          - Default module configurations
+|         '--- build_config.mk         - Configuration for the board
+|
+'--- scrips
+     |--- config.mk
+     |--- rules.mk
+     '--- cc_gcc.mk
+```
+
+**工程方案2.工程和Arctic Core在一起**
+
+```
+<Arctic Core>
+|--- makefile
+|--- boards
+|    '--- <board>
+|         |--- [config files]          - Default module configurations
+|         '--- build_config.mk         - Configuration for the board
+|
+|--- <anydir>
+|    |--- config
+|    |    |--- [config files]          - Overrides default module configurations
+|    |    '--- <board>
+|    |          '--- [config files]    - Overrides all other module configurations
+|    |
+|    |--- makefile
+|    |--- [build_config.mk]  
+|    '--- obj-<arch>
+|
+'--- scrips
+     |--- config.mk
+     |--- rules.mk
+     '--- cc_gcc.mk
+```
+
+## 7.2 工程make
+
+**make命令**
+
+```bash
+# BOARDDIR：电路板；BDIR：工程样例目录
+make BOARDDIR=mpc5516it BDIR=<anydir>[,<anydir>] all
+```
+
+**一些特定的变量**
+
+* `MOD_AVAIL`
+
+  一些可用模块，例如`ADC CAN DIO MCU FLS PORT PWM GPT EA`
+
+* ` CFG`
+
+  配置信息，例如`ARM ARMV7E_M ARM_CM4 HW_FLOAT THUMB`
+
+* `MOD_USE`
+
+  需要使用的模块，例如`MCU KERNEL`
+
+* `COMPILER`
+
+  编译器名称，如`gcc`
+
+* `CROSS_COMPILE`
+
+  编译器地址，如`/usr/lib/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-`，后面会加上`gcc`
+
+  在文件`\core\scripts\guess_cc.sh`中运行了`export CROSS_COMPILE=$COMPILER`，在这里可以设置成和镜像默认的编译器。如wzh-ubuntu镜像的gcc版本是 5.4.0版本的，而4.9.3版本在`/usr/lib/gcc-arm-none-eabi-4_9-2015q2/bin/arm-none-eabi-gcc`
+
+**make调用顺序**
+
+* 1. 特定电路板的配置文件, 即`$(ROOTDIR)/boards/​$(BOARDDIR)/build_config.mk`
+
+
+* 2. `<anydir>/build_config.mk` 文件
+
+主要给不同的电路板来添加各自要使用的模块，有点板可能没有某一项功能
+
+* 3. Compiler support target : `$(ROOTDIR)/​$(ARCH_PATH-y)/scripts/gcc.mk`
+
+在core21.0.0中是`$(ROOTDIR)/$(ARCH_KERNEL_PATH-y)/scripts/gcc.mk`，以armv7为例，即为`\core\system\Os\osal\arm\armv7_m\scripts`
+
+
+* 4. 编译器通用支持：` $(ROOTDIR)/scripts/cc_​$(COMPILER).mk`
+
+`COMPILER = gcc`，即`$(ROOTDIR)/scripts/cc_gcc.mk`文件
+
+
+
+
+* 5. The makefile in `<anydir>`
