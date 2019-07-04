@@ -1,6 +1,6 @@
 ---
-1layout: wiki
-title: Linux/Unix
+layout: wiki
+title: Linux
 categories: Linux
 description: 类 Unix 系统下的一些常用命令和用法。
 keywords: Linux
@@ -285,7 +285,7 @@ $ awk -F ':' '{ print $1 }' demo.txt
 
 2、变量
 
-变量NF表示当前行有多少个字段，因此$NF就代表最后一个字段。$(NF-1)代表倒数第二个字段。
+变量NF表示当前行有多少个字段，因此`$NF`就代表最后一个字段。$(NF-1)代表倒数第二个字段。
 
 ```bash
 # 输出最后一个字段——test
