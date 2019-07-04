@@ -263,6 +263,8 @@ make BOARDDIR=mpc5516it BDIR=<anydir>[,<anydir>] all
 
   配置信息，例如`ARM ARMV7E_M ARM_CM4 HW_FLOAT THUMB`
 
+  在文件中的冲突问题没有想明白。CFG=会不会影响其他文件中的CFG，但是CFG又没有export
+
 * `MOD_USE`
 
   需要使用的模块，例如`MCU` 、`KERNEL`、**`RTE`**等，RTE的路径在`project_default.mk`中加入
@@ -309,25 +311,5 @@ make BOARDDIR=mpc5516it BDIR=<anydir>[,<anydir>] all
 
 **make调用顺序**
 
-*顶层（core/下）的makefile会（进入目录`<anydir>/obj_<arch>`）调用core/scripts/rules.mk*，`rules.mk`的调用过程如下：
+[顶层（core/下）的makefile会（进入目录`<anydir>/obj_<arch>`）调用core/scripts/rules.mk](<https://github.com/Neyzoter/autosar_core21.0.0>)
 
-* 1. 特定电路板的配置文件, 即`$(ROOTDIR)/boards/​$(BOARDDIR)/build_config.mk`
-
-
-* 2. `<anydir>/build_config.mk` 文件
-
-主要给不同的电路板来添加各自要使用的模块，有点板可能没有某一项功能
-
-* 3. Compiler support target : `$(ROOTDIR)/​$(ARCH_PATH-y)/scripts/gcc.mk`
-
-在core21.0.0中是`$(ROOTDIR)/$(ARCH_KERNEL_PATH-y)/scripts/gcc.mk`，以armv7为例，即为`\core\system\Os\osal\arm\armv7_m\scripts`
-
-
-* 4. 编译器通用支持：` $(ROOTDIR)/scripts/cc_​$(COMPILER).mk`
-
-`COMPILER = gcc`，即`$(ROOTDIR)/scripts/cc_gcc.mk`文件，一些编译器的支持情况，配置编译器（CFLAGS）、预处理器、链接器（LDFLAGS、LDOUT、LDMAPFILE）、汇编器（ASFLAGS、ASOUT）、Dumper、归档（AROUT）
-
-
-* 5.  `<anydir>`中的makefile
-
-example工程文件中的

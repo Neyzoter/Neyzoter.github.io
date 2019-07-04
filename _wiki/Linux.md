@@ -1,5 +1,5 @@
 ---
-layout: wiki
+1layout: wiki
 title: Linux/Unix
 categories: Linux
 description: 类 Unix 系统下的一些常用命令和用法。
@@ -2030,6 +2030,21 @@ $(CONFIG_PPC)就是y
 
 obj-$(CONFIG_PPC) 就是 obj-y
 ```
+
+```makefile
+# 目录下有一个名为foo.o的目标文件。foo.o将从foo.c或foo.S文件编译得到。
+obj-y += foo.o
+```
+
+```makefile
+# 如果foo.o要编译成一模块，那就要用obj-m了
+# $(CONFIG_FOO)可以为y(编译进内核) 或m(编译成模块)
+obj-$(CONFIG_FOO) += foo.o
+```
+
+* `$(eval (​$call  xxx) )`
+
+```$(eval $(call xxx))```: 调用函数xxx, 其中的值作用到本mk文件
 
 ### 7.3.10 多目标
 
