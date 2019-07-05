@@ -194,8 +194,10 @@ Runtime Environment，是 AUTOSAR 虚拟功能总线（Virtual Function Bus，VF
 
 **工程方案1.工程文件和Arctic Core分开**
 
+*简单版本*
+
 ```
-<anydir>                               - Your project
+<anydir>                               - 工程
 |--- config
 |    |--- [config files]               - Overrides default module configurations
 |    '--- <board>
@@ -217,6 +219,49 @@ Runtime Environment，是 AUTOSAR 虚拟功能总线（Virtual Function Bus，VF
      |--- rules.mk
      '--- cc_gcc.mk
 ```
+
+*详细功能版本*
+
+```
+<examples>               - 工程
+|--- boards              - [ECL]  ecipse读取板子arxml
+|--- HelloWorld
+     |--- dbc            - [ECL]  描述CAN网络通信信号的文件
+     |--- HelloWorld     - 具体工程
+     |    |--- .settings - [ECL]  eclipse配置文件
+     |    |--- swcs      - [ECL]  SWC描述文件
+     |    |--- src       - [SWC]  软件组件  
+     |    '--- config    - [RTE]  板子配置和RTE配置、接口、映射
+     ...
+|--- OsSimple
+...
+ 
+<Arctic Core>            - core
+|--- .settings           - [ECL]    eclipse配置文件
+|--- arxml               - [ECL]    ecipse读取ECU配置
+|--- makefile            - [MAKE]   make顶层文件
+|--- scrips              - [MAKE]   脚本(编译、链接)
+|--- stylesheets         - [MAKE]   代码风格检查
+|--- base                - [MAKE]   编译器基本定义
+|--- diagnostic          - [SL]     诊断[Dlt Det Dcm..]
+|--- system              - [SL]     操作系统[Os BswM EcuM SchM..]
+|--- communication       - [ECU_AL] 通信HWA
+|--- memory              - [ECU_AL] memory HWA
+|--- Peripherals         - [ECU_AL] IO HWA, 会从examples读取参数
+|--- safety_security     - [ECU_AL] 安全库和WDG
+|--- cdd                 - [CDD]    Complex Device Driver
+|--- drivers             - [MCAL]   驱动(CAN Fr等)
+|--- arch                - [MCAL]   内有CAN收发器的SPI驱动
+|--- mcal                - [MCAL]   mcal
+|--- boards              - [MCAL]   具体板子配置结构体(WDG EEP FLS)
+|--- clib                - [BASE]   c库函数
+|--- common              - [BASE]   基础函数(log shell等)
+|--- include             - [BASE]   内核inc文件给上层使用
+|--- libs                - [BASE]   存放生成的libs
+'--- datastructures      - [BASE]   数据结构(队列和安全队列)给RTE
+```
+
+
 
 **工程方案2.工程和Arctic Core在一起**
 
