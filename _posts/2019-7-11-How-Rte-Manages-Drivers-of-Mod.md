@@ -69,11 +69,21 @@ keywords: AUTOSAR
 3.1 `boards/board_common.mk`根据`USE_XXX`决定是否执行编译底层MCAL文件进内核（例如`obj-
 $(CFG_STM32F1X)-$(USE_PWM) += stm32f10x_tim.o`，如果`$(CFG_STM32F1X)`或者`$(USE_PWM)`不是`y`，则不会将`stm32f10x_tim.o`编译得到）
 
-3.2 .c/.h文件会根据是否定义了使用模块（USE_XXX）来决定是否编译函数体、结构体等，如
+3.2 .c/.h文件会根据是否定义了使用模块（USE_XXX）来决定是否生成函数体、结构体等，如
 
 ```c
+//core/boards/generic/EcuM_PBcfg.c
 #if defined(USE_PDUR)
 	.PduRConfig = &PduR_Config,
+#endif
+```
+
+3.3 .c/.h文件会根据是否定义了使用模块（USE_XXX）来决定是否包含（include）.h文件，如
+
+```c
+//core/system/BswM/src/BswM.c
+#if defined(USE_PDUR)
+	#include "PduR.h"
 #endif
 ```
 
@@ -82,7 +92,8 @@ $(CFG_STM32F1X)-$(USE_PWM) += stm32f10x_tim.o`，如果`$(CFG_STM32F1X)`或者`$
 ```
 $(MOD_USE) -- 指示编译进内核 --> USE_XXX = y ------ 编译（进内核） ------>  eg.obj-$(CFG_STM32F1X)-$(USE_PWM) += stm32f10x_tim.o
    *.mk         rules.mk                    boards/board_common.mk      
-                                            ------ 编译c/h文件内函数和结构体等
+                                            -----> 编译c/h文件内函数和结构体等
+                                            -----> 包含模块头文件
 ```
 
 note:
