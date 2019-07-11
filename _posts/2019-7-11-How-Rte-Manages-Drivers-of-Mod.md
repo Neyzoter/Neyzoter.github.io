@@ -56,13 +56,33 @@ keywords: AUTOSAR
 ```
 
 # 2、RTE组织MCAL过程
-`Rte/config`文件夹下的`*.mk`文件讲模块添加到`MOD_USE`变量，变量`MOD_USE`在`rules.mk`中逐个转化为变量`USE_XXX`为`y`（比如`USE_PWM`
-，表示使用`PWM`模块），指示编译进内核，最后`boards/board_common.mk`根据`USE_XXX`决定是否执行编译底层MCAL文件进内核（例如`obj-
-$(CFG_STM32F1X)-$(USE_PWM) += stm32f10x_tim.o`，如何`$(CFG_STM32F1X)`或者`$(USE_PWM)`不是`y`，则不会将`stm32f10x_tim.o`编译得到）
+
+**过程**
+
+1.`Rte/config`文件夹下的`*.mk`文件讲模块添加到`MOD_USE`变量
+
+2.变量`MOD_USE`在`rules.mk`中逐个转化为变量`USE_XXX`为`y`（比如`USE_PWM`
+，表示使用`PWM`模块），指示编译进内核
+
+3.编译
+
+3.1 `boards/board_common.mk`根据`USE_XXX`决定是否执行编译底层MCAL文件进内核（例如`obj-
+$(CFG_STM32F1X)-$(USE_PWM) += stm32f10x_tim.o`，如果`$(CFG_STM32F1X)`或者`$(USE_PWM)`不是`y`，则不会将`stm32f10x_tim.o`编译得到）
+
+3.2 .c/.h文件会根据是否定义了使用模块（USE_XXX）来决定是否编译函数体、结构体等，如
+
+```c
+#if defined(USE_PDUR)
+	.PduRConfig = &PduR_Config,
+#endif
+```
+
+**示意图**
 
 ```
-$(MOD_USE) -- 指示编译进内核 --> USE_XXX = y ------ 编译进内核 ------>  eg.obj-$(CFG_STM32F1X)-$(USE_PWM) += stm32f10x_tim.o
-   *.mk         rules.mk                    boards/board_common.mk                    
+$(MOD_USE) -- 指示编译进内核 --> USE_XXX = y ------ 编译（进内核） ------>  eg.obj-$(CFG_STM32F1X)-$(USE_PWM) += stm32f10x_tim.o
+   *.mk         rules.mk                    boards/board_common.mk      
+                                            ------ 编译c/h文件内函数和结构体等
 ```
 
 note:
