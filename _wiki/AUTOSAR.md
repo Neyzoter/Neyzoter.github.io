@@ -358,3 +358,33 @@ make BOARDDIR=mpc5516it BDIR=<anydir>[,<anydir>] all
 
 [顶层（core/下）的makefile会（进入目录`<anydir>/obj_<arch>`）调用core/scripts/rules.mk](<https://github.com/Neyzoter/autosar_core21.0.0>)
 
+## 7.3 模块相关代码
+
+### 7.3.1 EcuM
+
+`core\system\EcuM\src\EcuM_Generated_Types.h`：定义EcuM需要的(模块接口配置)数据结构。例子：
+
+```c
+if defined(USE_SPI)
+     const Spi_ConfigType* SpiConfigPtr;
+endif
+```
+
+## 7.3.2 OS任务
+
+在`GEN_TASK_HEAD`中定义所有任务
+
+```c
+#define GEN_TASK_HEAD const OsTaskConstType  Os_TaskConstList[OS_TASK_CNT]
+```
+
+
+
+
+
+
+
+
+
+
+
