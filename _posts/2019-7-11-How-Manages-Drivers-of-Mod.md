@@ -1,8 +1,8 @@
 ---
 layout: post
-title: RTE如何组织模块已有代码
+title: 如何组织模块已有代码
 categories: AUTOSAR
-description: RTE如何组织模块已有代码MCAL
+description: 如何组织模块已有代码
 keywords: AUTOSAR
 ---
 
@@ -14,7 +14,7 @@ keywords: AUTOSAR
 
 `Rte.mk: examples\HelloWorld\HelloWorld\config\stm32_stm3210c\Rte\Config\Rte.mk（编译RTE功能的.o文件进内核）`
 
-`*.mk: examples\HelloWorld\HelloWorld\config\stm32_stm3210c\Rte\Config下的*.mk（将各种模块加入到MOD_USE变量, 会在rules.mk中转化为一个个USE_XXX变量，赋值为y(表示编译进内核)）`
+`*.mk: examples\HelloWorld\HelloWorld\config\stm32_stm3210c\（或者Rte\Config）下的*.mk（将各种模块加入到MOD_USE变量, 会在rules.mk中转化为一个个USE_XXX变量，赋值为y(表示编译进内核)）`
 
 `cc_gcc.mk:配置编译器（CFLAGS）、预处理器、链接器（LDFLAGS、LDOUT、LDMAPFILE）、汇编器（ASFLAGS、ASOUT）、Dumper、归档（AROUT），说明: 这里$(COMPILER)是gcc, 所以指向cc_$(COMPILER.mk), 还有cc_armcc.mk、cc_iar.mk等`
 
@@ -55,11 +55,11 @@ keywords: AUTOSAR
      '--- cc_cclint.mk           - 2.7 cclint设置
 ```
 
-# 2、RTE组织MCAL过程
+# 2、组织MCAL过程
 
 **过程**
 
-1.`Rte/config`文件夹下的`*.mk`文件讲模块添加到`MOD_USE`变量
+1.`/examples/<proj>/config/<board_name>`文件夹下的`*.mk`文件讲模块添加到`MOD_USE`变量
 
 2.变量`MOD_USE`在`rules.mk`中逐个转化为变量`USE_XXX`为`y`（比如`USE_PWM`
 ，表示使用`PWM`模块），指示编译进内核
