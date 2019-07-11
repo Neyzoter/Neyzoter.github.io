@@ -14,7 +14,7 @@ keywords: AUTOSAR
 
 `Rte.mk: examples\HelloWorld\HelloWorld\config\stm32_stm3210c\Rte\Config\Rte.mk（编译RTE功能的.o文件进内核）`
 
-`*.mk: examples\HelloWorld\HelloWorld\config\stm32_stm3210c\（或者Rte\Config）下的*.mk（将各种模块加入到MOD_USE变量, 会在rules.mk中转化为一个个USE_XXX变量，赋值为y(表示编译进内核)）`
+`*.mk: examples\HelloWorld\HelloWorld\config\stm32_stm3210c\下的*.mk（将各种模块加入到MOD_USE变量, 会在rules.mk中转化为一个个USE_XXX变量，赋值为y(表示编译进内核)）或者examples\HelloWorld\HelloWorld\config\stm32_stm3210c\Rte\Config下的*.mk（将RTE相关目标文件.o加入到内核编译，也是编译过程）`
 
 `cc_gcc.mk:配置编译器（CFLAGS）、预处理器、链接器（LDFLAGS、LDOUT、LDMAPFILE）、汇编器（ASFLAGS、ASOUT）、Dumper、归档（AROUT），说明: 这里$(COMPILER)是gcc, 所以指向cc_$(COMPILER.mk), 还有cc_armcc.mk、cc_iar.mk等`
 
@@ -57,9 +57,24 @@ keywords: AUTOSAR
 
 # 2、组织MCAL过程
 
+```
+<anydir>                         - 工程
+|--- config
+|    '--- <board>
+|         |--- Rte
+|         |    |--- Config       
+|         |    |--- Contract     
+|         |    '--- MemMap       
+|         '--- [config files]    - 将各种模块加入到MOD_USE变量
+|
+|--- makefile                    
+|--- build_config.mk             
+'--- obj-<arch>
+```
+
 **过程**
 
-1.`/examples/<proj>/config/<board_name>`文件夹下的`*.mk`文件讲模块添加到`MOD_USE`变量
+1.`/examples/<proj>/config/<board>`文件夹下的`*.mk`文件将模块添加到`MOD_USE`变量
 
 2.变量`MOD_USE`在`rules.mk`中逐个转化为变量`USE_XXX`为`y`（比如`USE_PWM`
 ，表示使用`PWM`模块），指示编译进内核
@@ -104,4 +119,20 @@ rules.mk : /core/scripts/rules.mk
 boards/board_common.mk : core/boards/board_common.mk
 ```
 
-# 3、RTE组织RTE接口
+# 3、组织RTE接口
+
+```
+<anydir>                         - 工程
+|--- config
+|    '--- <board>
+|         |--- Rte
+|         |    |--- Config       - *.mk内加入所有RTE相关的目标.o文件
+|         |    |--- Contract     - 软件组件接口（SR模式、CS模式等）
+|         |    '--- MemMap       - 内存映射：包含MemMap.h，然后undef错误定义
+|         '--- [config files]
+|
+|--- makefile                    
+|--- build_config.mk             
+'--- obj-<arch>
+```
+
