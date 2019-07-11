@@ -12,17 +12,17 @@ keywords: AUTOSAR
 
 # 1、[工程介绍](<https://github.com/Neyzoter/autosar_core21.0.0>)
 
-`Rte.mk: examples\HelloWorld\HelloWorld\config\stm32_stm3210c\Rte\Config\Rte.mk（编译RTE功能的.o文件进内核）`
+`Rte.mk: examples\HelloWorld\HelloWorld\config\stm32_stm3210c\Rte\Config\Rte.mk`（编译RTE功能的`.o`文件进内核）
 
-`*.mk: examples\HelloWorld\HelloWorld\config\stm32_stm3210c\下的*.mk（将各种模块加入到MOD_USE变量, 会在rules.mk中转化为一个个USE_XXX变量，赋值为y(表示编译进内核)）或者examples\HelloWorld\HelloWorld\config\stm32_stm3210c\Rte\Config下的*.mk（将RTE相关目标文件.o加入到内核编译，也是编译过程）`
+`*.mk: examples\HelloWorld\HelloWorld\config\stm32_stm3210c\`下的`*.mk`（将各种模块加入到`MOD_USE`变量, 会在`rules.mk`中转化为一个个`USE_XXX`变量，赋值为`y`(表示编译进内核)）或者`examples\HelloWorld\HelloWorld\config\stm32_stm3210c\Rte\Config`下的`*.mk`（将RTE相关目标文件`.o`加入到内核编译，也是编译过程）
 
-`cc_gcc.mk:配置编译器（CFLAGS）、预处理器、链接器（LDFLAGS、LDOUT、LDMAPFILE）、汇编器（ASFLAGS、ASOUT）、Dumper、归档（AROUT），说明: 这里$(COMPILER)是gcc, 所以指向cc_$(COMPILER.mk), 还有cc_armcc.mk、cc_iar.mk等`
+`cc_gcc.mk`:配置编译器（`CFLAGS`）、预处理器、链接器（`LDFLAGS`、`LDOUT`、`LDMAPFILE`）、汇编器（`ASFLAGS`、`ASOUT`）、Dumper、归档（`AROUT`），说明: 这里`$(COMPILER)`是`gcc`, 所以指向`cc_​$(COMPILER.mk)`, 还有`cc_armcc.mk`、`cc_iar.mk`等
 
-`gcc.mk: \core\system\Os\osal\arm\armv7_m\scripts\gcc.mk   一些gcc的乱七八糟的配置`
+`gcc.mk: \core\system\Os\osal\arm\armv7_m\scripts\gcc.mk`   一些gcc的乱七八糟的配置
 
 `project_defaults.mk: core\scripts\project_defaults.mk `
 
-`board_common.mk: 对所有的架构添加编译信息obj-$()、模块mod.mk文件调用（EcuM、Rtm、Gpt等）、一些文件的路径(stm32f10x_xxx.h/.c so on)、移除warning`
+`board_common.mk`: 对所有的架构添加编译信息`obj-$()`、模块`mod.mk`文件调用（`EcuM`、`Rtm`、`Gpt`等）、一些文件的路径(如`stm32f10x_xxx.h/.c`)、移除`warning`
 
 ```
 <anydir>                         - 工程
@@ -135,4 +135,3 @@ boards/board_common.mk : core/boards/board_common.mk
 |--- build_config.mk             
 '--- obj-<arch>
 ```
-
