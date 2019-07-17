@@ -6,6 +6,10 @@ description: Ubuntu安装stlink
 keywords: stlink, Ubuntu
 ---
 
+> 备注：
+>
+> 目前可下载，但是下载后无法运行
+
 # 1、准备
 
 安装依赖
