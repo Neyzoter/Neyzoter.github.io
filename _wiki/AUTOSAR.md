@@ -370,12 +370,37 @@ if defined(USE_SPI)
 endif
 ```
 
-## 7.3.2 OS任务
+### 7.3.2 OS任务
 
 在`GEN_TASK_HEAD`中定义所有任务
 
 ```c
 #define GEN_TASK_HEAD const OsTaskConstType  Os_TaskConstList[OS_TASK_CNT]
+```
+
+## 7.4 CAN调用过程
+
+* **初始化**
+
+```mermaid
+graph TB;
+	main["main() @ os_init.c"]  --> EcuM_Init["EcuM_Init()"]
+	EcuM_Init --> config["EcuM_World.config = EcuM_DeterminePbConfiguration()"]
+```
+
+* **运行CAN State Manager**
+
+```mermaid
+graph TB;
+OsBswTask["OsBswTask()"] --> ComM_MainFunction_ComMChannel["ComM_MainFunction_ComMChannel()<br> 映射到某种通信方式的状态管理"]
+	ComM_MainFunction_ComMChannel --> ComM_MainFunction["ComM_MainFunction(ComMConf_ComMChannel_ComMChannel)"]
+OsBswTask --> Com_MainFunctionRx/Tx["Com_MainFunctionRx()<br>Com_MainFunctionTx()"]
+OsBswTask --> EcuM_MainFunction["EcuM_MainFunction()<br>timeout倒计时，而后不再进行有意义的工作"]
+	EcuM_MainFunction -.-> EcuM_AL_DriverRestart["EcuM_AL_DriverRestart(EcuM_World.config)"]
+	EcuM_AL_DriverRestart -.-> EcuM_AL_DriverInitOne["EcuM_AL_DriverInitOne(config)<br>第一步初始化，包括端口配置"]
+	EcuM_AL_DriverInitOne -.-> EcuM_AL_DriverInitTwo["EcuM_AL_DriverInitTwo(config)<br>第二步初始化，包括CAN"]
+OsBswTask --> Can_MainFunction_Mode["Can_MainFunction_Mode()<br>"]
+	
 ```
 
 
