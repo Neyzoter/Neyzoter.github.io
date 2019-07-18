@@ -382,6 +382,8 @@ endif
 
 ## 7.4 CAN调用过程
 
+**说明**：`Github`不支持`mermaid`请使用`Typora`等软件查看具体流程图。
+
 * **初始化**
 
 ```mermaid
@@ -430,7 +432,7 @@ Com_SendSignal --> Com_Misc_TriggerTxOnConditions["Com_Misc_TriggerTxOnCondition
 	Can_Write --> CAN_Transmit["CAN_Transmit(canHw,&TxMessage)"]
 ```
 
-**CAN中断初始化**
+**CAN中断初始化和触发过程**
 
 ```mermaid
 graph TB;
@@ -443,8 +445,8 @@ ISR_INSTALL_ISR2 --_can_name ## _Rx0Isr -> Can_1_Rx0Isr作为中断入口--> __I
 __ISR_INSTALL_ISR2 --中断触发--> Can_1_Rx0Isr["Can_1_Rx0Isr()"]
 Can_1_Rx0Isr --> Can_RxIsr["Can_RxIsr((int)CAN_CTRL_1,CAN_FIFO0)"]
 Can_RxIsr --> CAN_Receive["Can_RxIsr(canHw,fifo, &RxMessage):<br>读取fifo中数据到RxMessage"]
-Can_RxIsr --> CanIf_RxIndication["CanIf_RxIndication(...,<br>(uint8 *)&RxMessage.Data[0])"]
-CanIf_RxIndication --> CanIfUserRxIndications["CanIfUserRxIndications[3]()"]
+Can_RxIsr --> CanIf_RxIndication["CanIf_RxIndication(...,(uint8 *)&RxMessage.Data[0])<br>@\core\communication\CanIf\src\CanIf.c"]
+CanIf_RxIndication --> CanIfUserRxIndications["CanIfUserRxIndications[3]()<br>@\examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c\CanIf_Cfg.c"]
 CanIfUserRxIndications --> PduR_CanIfRxIndication["PduR_CanIfRxIndication()@\core\communication\PduR\src\PduR_CanIf.c"]
 PduR_CanIfRxIndication --> PduR_LoIfRxIndication["PduR_LoIfRxIndication(pduId(0), pduInfoPtr, 0x01)<br>@\core\communication\PduR\src\PduR_Logic.c"]
 PduR_LoIfRxIndication --> PduR_ARC_RxIndication[" PduR_ARC_RxIndication(pduId, pduInfoPtr, serviceId)<br>@PduR_Logic.c"]
