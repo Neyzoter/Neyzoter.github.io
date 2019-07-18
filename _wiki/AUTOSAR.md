@@ -382,7 +382,7 @@ endif
 
 ## 7.4 CAN调用过程
 
-**说明**：`Github`不支持`mermaid`请使用`Typora`等软件查看具体流程图。
+**说明**：`Github`不支持`mermaid`请使用[在线`mermaid`查看器](<https://mermaidjs.github.io/mermaid-live-editor>)、`Typora`等软件查看具体流程图。
 
 * **初始化**
 
@@ -436,9 +436,9 @@ Com_SendSignal --> Com_Misc_TriggerTxOnConditions["Com_Misc_TriggerTxOnCondition
 
 ```mermaid
 graph TB;
-OsStartupTask["OsStartupTask()@BSWMainFunctionTask.c"] --> EcuM_StartupTwo["EcuM_StartupTwo()@EcuM_Fixed.c"]
-EcuM_StartupTwo --> EcuM_AL_DriverInitTwo["EcuM_AL_DriverInitTwo(...)@EcuM_Callout_Stubs.c"]
-EcuM_AL_DriverInitTwo --> Can_Init["Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)<br>@Can_stm32.c(Can_Global.Config参数在Can_PBcfg.c)"]
+OsStartupTask["OsStartupTask()<br>@\examples\CanCtrlPwm\CanCtrlPwm\src\BSWMainFunctionTask.c"] --> EcuM_StartupTwo["EcuM_StartupTwo()<br>@\core\system\EcuM\src\EcuM_Fixed.c"]
+EcuM_StartupTwo --> EcuM_AL_DriverInitTwo["EcuM_AL_DriverInitTwo(...)<br>@\core\system\EcuM\src\EcuM_Callout_Stubs.c"]
+EcuM_AL_DriverInitTwo --> Can_Init["Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)<br>(Can_Global.Config参数在Can_PBcfg.c)<br>@\core\mcal\Can\src\Can_stm32.c"]
 Can_Init --> INSTALL_HANDLERS["INSTALL_HANDLERS(Can_1, CAN1_SCE_IRQn, <br>USB_LP_CAN1_RX0_IRQn, CAN1_RX1_IRQn, USB_HP_CAN1_TX_IRQn)"]
 INSTALL_HANDLERS --> ISR_INSTALL_ISR2["ISR_INSTALL_ISR2(名称, _can_name ## _Rx0Isr, _rx0, 2, 0)"]
 ISR_INSTALL_ISR2 --_can_name ## _Rx0Isr -> Can_1_Rx0Isr作为中断入口--> __ISR_INSTALL_ISR2["__ISR_INSTALL_ISR2(...)添加到中断向量表"]
