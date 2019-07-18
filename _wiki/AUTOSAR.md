@@ -379,8 +379,17 @@ endif
 ```c
 #define GEN_TASK_HEAD const OsTaskConstType  Os_TaskConstList[OS_TASK_CNT]
 ```
+### 7.3.3 初始化
 
-### 7.3.3 CAN调用过程
+*未完待续*
+
+```mermaid
+graph TB;
+	main["main() @ os_init.c"]  --> EcuM_Init["EcuM_Init()"]
+	EcuM_Init --> config["EcuM_World.config = EcuM_DeterminePbConfiguration()"]
+```
+
+### 7.3.4 CAN调用过程
 
 **说明**：`Github`不支持`mermaid`请使用[在线`mermaid`查看器](<https://mermaidjs.github.io/mermaid-live-editor>)、`Typora`等软件查看具体流程图。
 
@@ -433,15 +442,9 @@ Com_SendSignal --> Com_Misc_TriggerTxOnConditions["Com_Misc_TriggerTxOnCondition
 	Can_Write --> CAN_Transmit["CAN_Transmit(canHw,&TxMessage)<br>@stm32f10x_can.c"]
 ```
 
-* **初始化**
+### 7.3.5 运行OsBswTask
 
-```mermaid
-graph TB;
-	main["main() @ os_init.c"]  --> EcuM_Init["EcuM_Init()"]
-	EcuM_Init --> config["EcuM_World.config = EcuM_DeterminePbConfiguration()"]
-```
-
-* **运行OsBswTask**
+*未完待续*
 
 ```mermaid
 graph TB;
