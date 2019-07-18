@@ -380,9 +380,58 @@ endif
 #define GEN_TASK_HEAD const OsTaskConstType  Os_TaskConstList[OS_TASK_CNT]
 ```
 
-## 7.4 CAN调用过程
+### 7.3.3 CAN调用过程
 
 **说明**：`Github`不支持`mermaid`请使用[在线`mermaid`查看器](<https://mermaidjs.github.io/mermaid-live-editor>)、`Typora`等软件查看具体流程图。
+
+* **CAN中断初始化、触发、数据写入到IPdu过程**
+
+```mermaid
+graph TB;
+OsStartupTask["OsStartupTask()<br>@\examples\CanCtrlPwm\CanCtrlPwm\src\BSWMainFunctionTask.c"] --> EcuM_StartupTwo["EcuM_StartupTwo()<br>@\core\system\EcuM\src\EcuM_Fixed.c"]
+EcuM_StartupTwo --> EcuM_AL_DriverInitTwo["EcuM_AL_DriverInitTwo(...)<br>@\core\system\EcuM\src\EcuM_Callout_Stubs.c"]
+EcuM_AL_DriverInitTwo --> Can_Init["Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)<br>(Can_Global.Config参数在Can_PBcfg.c)<br>@\core\mcal\Can\src\Can_stm32.c<br>!!!重点:从此处开始往下需要移植到TC26x"]
+Can_Init --> INSTALL_HANDLERS["INSTALL_HANDLERS(Can_1, CAN1_SCE_IRQn, <br>USB_LP_CAN1_RX0_IRQn, CAN1_RX1_IRQn, USB_HP_CAN1_TX_IRQn)<br>@Can_stm32.c"]
+INSTALL_HANDLERS --> ISR_INSTALL_ISR2["ISR_INSTALL_ISR2(名称, _can_name ## _Rx0Isr, _rx0, 2, 0)<br>@\core\include\isr.h"]
+ISR_INSTALL_ISR2 --_can_name ## _Rx0Isr -> Can_1_Rx0Isr作为中断入口--> __ISR_INSTALL_ISR2["__ISR_INSTALL_ISR2(...)添加到中断向量表<br>@\core\include\isr.h"]
+__ISR_INSTALL_ISR2 --中断触发--> Can_1_Rx0Isr["Can_1_Rx0Isr()@Can_stm32.c"]
+Can_1_Rx0Isr --> Can_RxIsr["Can_RxIsr((int)CAN_CTRL_1,CAN_FIFO0)<br>@Can_stm32.c"]
+Can_RxIsr --> CAN_Receive["Can_RxIsr(canHw,fifo, &RxMessage):<br>读取fifo中数据到RxMessage<br>@stm32f10x_can.c"]
+Can_RxIsr --> CanIf_RxIndication["CanIf_RxIndication(...,(uint8 *)&RxMessage.Data[0])<br>@\core\communication\CanIf\src\CanIf.c"]
+CanIf_RxIndication --> CanIfUserRxIndications["CanIfUserRxIndications[3]()<br>@\examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c\CanIf_Cfg.c"]
+CanIfUserRxIndications --> PduR_CanIfRxIndication["PduR_CanIfRxIndication()@\core\communication\PduR\src\PduR_CanIf.c"]
+PduR_CanIfRxIndication --> PduR_LoIfRxIndication["PduR_LoIfRxIndication(pduId(0), pduInfoPtr, 0x01)<br>@\core\communication\PduR\src\PduR_Logic.c"]
+PduR_LoIfRxIndication --> PduR_ARC_RxIndication[" PduR_ARC_RxIndication(pduId, pduInfoPtr, serviceId)<br>@PduR_Logic.c"]
+PduR_ARC_RxIndication --> PduR_ARC_RouteRxIndication["PduR_ARC_RouteRxIndication(destination, PduInfo)<br>@\core\communication\PduR\src\PduR_Routing.c"]
+PduR_ARC_RouteRxIndication --> Com_RxIndication["Com_RxIndication(destination->DestPduId, PduInfo)@Com_Com.c<br>destination->DestPduId即为存放数据的下标0"]
+Com_RxIndication --> memcpy["memcpy(Arc_IPdu->ComIPduDataPtr, <br>PduInfoPtr->SduDataPtr, IPdu->ComIPduSize)"]
+Com_RxIndication --> Com_Misc_RxProcessSignals["Com_Misc_RxProcessSignals():<br>会抛出Event(放在一个列表里)"]
+```
+
+* **CAN数据发送**
+
+```mermaid
+graph TB;
+OsRteTask["OsRteTask"] --Event--> Rte_lightManager_InteriorLightManagerMain["Rte_lightManager_InteriorLightManagerMain()<br>@\Rte\Config\Rte_InteriorLightManager.c"] 
+Rte_lightManager_InteriorLightManagerMain --PRE--> Rte_Read_InteriorLightManager_lightManager_RearDoorStatus_message["Rte_Read_InteriorLightManager_lightManager_<br>RearDoorStatus_message(...)<br>@\Rte\Config\Rte_Internal_InteriorLightManager.c"]
+Rte_Read_InteriorLightManager_lightManager_RearDoorStatus_message --> Com_ReceiveSignal["Com_ReceiveSignal(...)@<br>\core\communication\Com\src\Com_Com.c"]
+Com_ReceiveSignal --> Com_Misc_ReadSignalDataFromPdu["Com_Misc_ReadSignalDataFromPdu()@<br>\core\communication\Com\src\Com_misc.c"]
+
+Rte_lightManager_InteriorLightManagerMain --MAIN--> ..
+
+Rte_lightManager_InteriorLightManagerMain --POST--> Rte_Write_InteriorLightManager_lightManager_LightStatusOnCommMedia_message["Rte_Write_InteriorLightManager_lightManager_<br>LightStatusOnCommMedia_message(...)"]
+Rte_Write_InteriorLightManager_lightManager_LightStatusOnCommMedia_message --> Com_SendSignal["Com_SendSignal(ComConf_ComSignal_<br>LightStatus, &value)"]
+Com_SendSignal --> Com_Misc_WriteSignalDataToPdu["Com_Misc_WriteSignalDataToPdu(...)"]
+Com_SendSignal --> Com_Misc_TriggerTxOnConditions["Com_Misc_TriggerTxOnConditions(...)"]
+	Com_Misc_TriggerTxOnConditions --> Com_Misc_TriggerIPDUSend["Com_Misc_TriggerIPDUSend(pduHandleId)"]
+	Com_Misc_TriggerIPDUSend --> PduR_ComTransmit["PduR_ComTransmit(IPdu->ArcIPduOutgoingId,<br> &PduInfoPackage)"]
+	PduR_ComTransmit --> PduR_UpTransmit["PduR_UpTransmit(pduId, pduInfoPtr, 0x89)"]
+	PduR_UpTransmit -->PduR_ARC_Transmit["PduR_ARC_Transmit(pduId, pduInfoPtr, serviceId)"]
+	PduR_ARC_Transmit --> PduR_ARC_RouteTransmit["PduR_ARC_Transmit(destination, PduInfo)"]
+	PduR_ARC_RouteTransmit --> CanIf_Transmit["CanIf_Transmit(destination->DestPduId, pduInfo)"]
+	CanIf_Transmit --> Can_Write["Can_Write(txPduPtr->CanIfTxPduBufferRef-><br>CanIfBufferHthRef->CanIfHthIdSymRef, &canPdu)"]
+	Can_Write --> CAN_Transmit["CAN_Transmit(canHw,&TxMessage)"]
+```
 
 * **初始化**
 
@@ -409,52 +458,9 @@ OsBswTask --> Can_MainFunction_Mode["Can_MainFunction_Mode()<br>"]
 
 
 
-**运行OsRteTask的CAN部分**
 
-```mermaid
-graph TB;
-OsRteTask["OsRteTask"] --Event--> Rte_lightManager_InteriorLightManagerMain["Rte_lightManager_InteriorLightManagerMain()"] 
-Rte_lightManager_InteriorLightManagerMain --> Rte_Read_InteriorLightManager_lightManager_RearDoorStatus_message["Rte_Read_InteriorLightManager_lightManager_<br>RearDoorStatus_message(...)"]
-Rte_Read_InteriorLightManager_lightManager_RearDoorStatus_message --> Com_ReceiveSignal["Com_ReceiveSignal(...)"]
-Com_ReceiveSignal --> Com_Misc_ReadSignalDataFromPdu["Com_Misc_ReadSignalDataFromPdu()"]
 
-Rte_lightManager_InteriorLightManagerMain --> Rte_Write_InteriorLightManager_lightManager_LightStatusOnCommMedia_message["Rte_Write_InteriorLightManager_lightManager_<br>LightStatusOnCommMedia_message(...)"]
-Rte_Write_InteriorLightManager_lightManager_LightStatusOnCommMedia_message --> Com_SendSignal["Com_SendSignal(ComConf_ComSignal_<br>LightStatus, &value)"]
-Com_SendSignal --> Com_Misc_WriteSignalDataToPdu["Com_Misc_WriteSignalDataToPdu(...)"]
-Com_SendSignal --> Com_Misc_TriggerTxOnConditions["Com_Misc_TriggerTxOnConditions(...)"]
-	Com_Misc_TriggerTxOnConditions --> Com_Misc_TriggerIPDUSend["Com_Misc_TriggerIPDUSend(pduHandleId)"]
-	Com_Misc_TriggerIPDUSend --> PduR_ComTransmit["PduR_ComTransmit(IPdu->ArcIPduOutgoingId,<br> &PduInfoPackage)"]
-	PduR_ComTransmit --> PduR_UpTransmit["PduR_UpTransmit(pduId, pduInfoPtr, 0x89)"]
-	PduR_UpTransmit -->PduR_ARC_Transmit["PduR_ARC_Transmit(pduId, pduInfoPtr, serviceId)"]
-	PduR_ARC_Transmit --> PduR_ARC_RouteTransmit["PduR_ARC_Transmit(destination, PduInfo)"]
-	PduR_ARC_RouteTransmit --> CanIf_Transmit["CanIf_Transmit(destination->DestPduId, pduInfo)"]
-	CanIf_Transmit --> Can_Write["Can_Write(txPduPtr->CanIfTxPduBufferRef-><br>CanIfBufferHthRef->CanIfHthIdSymRef, &canPdu)"]
-	Can_Write --> CAN_Transmit["CAN_Transmit(canHw,&TxMessage)"]
-```
 
-**CAN中断初始化和触发过程**
-
-```mermaid
-graph TB;
-OsStartupTask["OsStartupTask()<br>@\examples\CanCtrlPwm\CanCtrlPwm\src\BSWMainFunctionTask.c"] --> EcuM_StartupTwo["EcuM_StartupTwo()<br>@\core\system\EcuM\src\EcuM_Fixed.c"]
-EcuM_StartupTwo --> EcuM_AL_DriverInitTwo["EcuM_AL_DriverInitTwo(...)<br>@\core\system\EcuM\src\EcuM_Callout_Stubs.c"]
-EcuM_AL_DriverInitTwo --> Can_Init["Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)<br>(Can_Global.Config参数在Can_PBcfg.c)<br>@\core\mcal\Can\src\Can_stm32.c"]
-Can_Init --> INSTALL_HANDLERS["INSTALL_HANDLERS(Can_1, CAN1_SCE_IRQn, <br>USB_LP_CAN1_RX0_IRQn, CAN1_RX1_IRQn, USB_HP_CAN1_TX_IRQn)"]
-INSTALL_HANDLERS --> ISR_INSTALL_ISR2["ISR_INSTALL_ISR2(名称, _can_name ## _Rx0Isr, _rx0, 2, 0)"]
-ISR_INSTALL_ISR2 --_can_name ## _Rx0Isr -> Can_1_Rx0Isr作为中断入口--> __ISR_INSTALL_ISR2["__ISR_INSTALL_ISR2(...)添加到中断向量表"]
-__ISR_INSTALL_ISR2 --中断触发--> Can_1_Rx0Isr["Can_1_Rx0Isr()"]
-Can_1_Rx0Isr --> Can_RxIsr["Can_RxIsr((int)CAN_CTRL_1,CAN_FIFO0)"]
-Can_RxIsr --> CAN_Receive["Can_RxIsr(canHw,fifo, &RxMessage):<br>读取fifo中数据到RxMessage"]
-Can_RxIsr --> CanIf_RxIndication["CanIf_RxIndication(...,(uint8 *)&RxMessage.Data[0])<br>@\core\communication\CanIf\src\CanIf.c"]
-CanIf_RxIndication --> CanIfUserRxIndications["CanIfUserRxIndications[3]()<br>@\examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c\CanIf_Cfg.c"]
-CanIfUserRxIndications --> PduR_CanIfRxIndication["PduR_CanIfRxIndication()@\core\communication\PduR\src\PduR_CanIf.c"]
-PduR_CanIfRxIndication --> PduR_LoIfRxIndication["PduR_LoIfRxIndication(pduId(0), pduInfoPtr, 0x01)<br>@\core\communication\PduR\src\PduR_Logic.c"]
-PduR_LoIfRxIndication --> PduR_ARC_RxIndication[" PduR_ARC_RxIndication(pduId, pduInfoPtr, serviceId)<br>@PduR_Logic.c"]
-PduR_ARC_RxIndication --> PduR_ARC_RouteRxIndication["PduR_ARC_RouteRxIndication(destination, PduInfo)<br>@\core\communication\PduR\src\PduR_Routing.c"]
-PduR_ARC_RouteRxIndication --> Com_RxIndication["Com_RxIndication(destination->DestPduId, PduInfo)@Com_Com.c<br>destination->DestPduId即为存放数据的下标0"]
-Com_RxIndication --> memcpy["memcpy(Arc_IPdu->ComIPduDataPtr, <br>PduInfoPtr->SduDataPtr, IPdu->ComIPduSize)"]
-Com_RxIndication --> Com_Misc_RxProcessSignals["Com_Misc_RxProcessSignals():<br>会抛出Event(放在一个列表里)"]
-```
 
 
 
