@@ -395,7 +395,7 @@ graph TB;
 
 **说明2**：CAN需要的底层接口包括`Can_Init( const Can_ConfigType *Config )`和`Can_ReturnType Can_Write( Can_HwHandleType Hth, const Can_PduType *PduInfo )`
 
-*注*：Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)：Can_Global.Config参数在Can_PBcfg.c
+*注*：Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)：CanConfigPtr参数在Can_PBcfg.c
 
 * **CAN中断初始化、触发、数据写入到IPdu过程**
 
