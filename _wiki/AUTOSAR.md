@@ -391,17 +391,21 @@ graph TB;
 
 ### 7.3.4 CAN调用过程
 
-**说明**：`Github`不支持`mermaid`请使用[在线`mermaid`查看器](<https://mermaidjs.github.io/mermaid-live-editor>)、`Typora`等软件查看具体流程图。
+**说明1**：`Github`不支持`mermaid`请使用[在线`mermaid`查看器](<https://mermaidjs.github.io/mermaid-live-editor>)、`Typora`等软件查看具体流程图。
+
+**说明2**：CAN需要的底层接口包括`Can_Init( const Can_ConfigType *Config )`和`Can_ReturnType Can_Write( Can_HwHandleType Hth, const Can_PduType *PduInfo )`
+
+*注*：Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)：Can_Global.Config参数在Can_PBcfg.c
 
 * **CAN中断初始化、触发、数据写入到IPdu过程**
 
 ```mermaid
 graph TB;
 OsStartupTask["OsStartupTask()<br>@\examples\CanCtrlPwm\CanCtrlPwm\src\BSWMainFunctionTask.c"] --> EcuM_StartupTwo["EcuM_StartupTwo()<br>@\core\system\EcuM\src\EcuM_Fixed.c"]
-EcuM_StartupTwo --> EcuM_AL_DriverInitTwo["EcuM_AL_DriverInitTwo(...)<br>@\core\system\EcuM\src\EcuM_Callout_Stubs.c"]
-EcuM_AL_DriverInitTwo --> Can_Init["Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)<br>(Can_Global.Config参数在Can_PBcfg.c)<br>@\core\mcal\Can\src\Can_stm32.c<br>!!!重点:从此处开始往下需要移植到TC26x"]
+EcuM_StartupTwo --> EcuM_AL_DriverInitTwo["EcuM_AL_DriverInitTwo(EcuM_World.config)<br>@\core\system\EcuM\src\EcuM_Callout_Stubs.c"]
+EcuM_AL_DriverInitTwo --> Can_Init["Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)<br>(CanConfigPtr参数在Can_PBcfg.c->CanConfigData)<br>CanConfigPtr而后赋值给Can_Global.config<br>@\core\mcal\Can\src\Can_stm32.c<br>!!!重点:从此处开始往下需要移植到TC26x"]
 Can_Init --> INSTALL_HANDLERS["INSTALL_HANDLERS(Can_1, CAN1_SCE_IRQn, <br>USB_LP_CAN1_RX0_IRQn, CAN1_RX1_IRQn, USB_HP_CAN1_TX_IRQn)<br>@Can_stm32.c"]
-INSTALL_HANDLERS --> ISR_INSTALL_ISR2["ISR_INSTALL_ISR2(名称, _can_name ## _Rx0Isr, _rx0, 2, 0)<br><br>@\core\include\isr.h"]
+INSTALL_HANDLERS --> ISR_INSTALL_ISR2["ISR_INSTALL_ISR2(名称, _can_name ## _Rx0Isr, _rx0, 2, 0)<br>@\core\include\isr.h"]
 ISR_INSTALL_ISR2 --_can_name ## _Rx0Isr -> Can_1_Rx0Isr作为中断入口--> __ISR_INSTALL_ISR2["__ISR_INSTALL_ISR2(...)添加到中断向量表<br>@\core\include\isr.h"]
 __ISR_INSTALL_ISR2 --中断触发--> Can_1_Rx0Isr["Can_1_Rx0Isr()@Can_stm32.c"]
 Can_1_Rx0Isr --> Can_RxIsr["Can_RxIsr((int)CAN_CTRL_1,CAN_FIFO0)<br>@Can_stm32.c"]
