@@ -12,13 +12,13 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |-|-|-|
-|Java、C/C++、Python、Matlab、R |Linux、 Git、Maven| Spring、Tomcat、 Netty、 MongoDB、 Docker、Hadoop、Ngnix、HBase、Redis |
+|Java、C/C++、Python、Matlab、R |Linux、 Git、Maven| Spring、Tomcat、 Netty、 MongoDB、 Docker、Hadoop、Ngnix、HBase、Redis、HTML |
 
 ## 算法
 
 |机器学习|信息安全|备用|
 |-|-|-|
-|XGBOOST |MD5、 RSA、HTTPS||
+|XGBOOST、特征工程 |MD5、 RSA、HTTPS||
 
 ## 硬件
 
@@ -33,7 +33,7 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |-|-|-|
-|[R](http://neyzoter.cn/wiki/R/)||[Docker](http://neyzoter.cn/wiki/Docker/)、[Hadoop](http://neyzoter.cn/wiki/Hadoop/)、[Ngnix](http://neyzoter.cn/wiki/Ngnix/)、[Log4j](http://neyzoter.cn/wiki/log4j/)、[Mybatis](http://neyzoter.cn/wiki/MyBatis/)、[HBase](http://neyzoter.cn/wiki/Hbase/)、[Redis](http://neyzoter.cn/wiki/Redis/)、[SpringBoot](http://neyzoter.cn/wiki/SpringBoot/)|
+|[R](http://neyzoter.cn/wiki/R/)||[Docker](http://neyzoter.cn/wiki/Docker/)、[Hadoop](http://neyzoter.cn/wiki/Hadoop/)、[Ngnix](http://neyzoter.cn/wiki/Ngnix/)、[Log4j](http://neyzoter.cn/wiki/log4j/)、[Mybatis](http://neyzoter.cn/wiki/MyBatis/)、[HBase](http://neyzoter.cn/wiki/Hbase/)、[Redis](http://neyzoter.cn/wiki/Redis/)、[SpringBoot](http://neyzoter.cn/wiki/SpringBoot/)、[HTML](<http://neyzoter.cn/wiki/HTML/>)|
 
 * 算法
 
@@ -59,3 +59,4 @@ keywords: skills
 |机器学习|信息安全|备用|
 |-|-|-|
 |[XGBOOST](http://neyzoter.cn/2018/12/30/Boosting-Based-Learning-Algorithms/)|[盐MD5](http://neyzoter.cn/2019/01/25/MD5-Verify/)、[RSA](http://neyzoter.cn/2018/10/29/RSA-Security/)、[HTTPS](http://neyzoter.cn/2018/10/18/Https-Encryption/)||
+

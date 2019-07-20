@@ -337,3 +337,52 @@ USA
 
 `=======  输出结束  =======`
 
+* 缩写和首字母缩写
+
+在某些浏览器中，当您把鼠标移至缩略词语上时，title 可用于展示表达的完整版本。
+
+仅对于 IE 5 中的 acronym 元素有效。
+
+对于 Netscape 6.2 中的 abbr 和 acronym 元素都有效。
+
+```html
+<html>
+<body>
+<abbr title="etcetera">etc.</abbr>
+<br />
+<acronym title="World Wide Web">WWW</acronym>
+</body>
+</html>
+```
+
+`-->`
+
+`=======  输出开始  =======`
+
+<abbr title="etcetera">etc.</abbr>
+<acronym title="World Wide Web">WWW</acronym>
+
+`=======  输出结束  =======`
+
+* 文字方向
+
+如果您的浏览器支持 bi-directional override (bdo)，下一行会从右向左输出 (rtl)；
+
+```html
+<html>
+<body>
+<bdo dir="rtl">
+Here is some Hebrew text
+</bdo>
+</body>
+</html>
+
+```
+
+`-->`
+
+
+<bdo dir="rtl">
+Here is some Hebrew text
+</bdo>
+

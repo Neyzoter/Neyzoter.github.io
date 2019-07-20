@@ -1,8 +1,8 @@
 ---
 layout: post
-title: 如何组织模块已有代码
+title: Core21.0.0如何组织模块已有代码
 categories: AUTOSAR
-description: 如何组织模块已有代码
+description: Core21.0.0如何组织模块已有代码
 keywords: AUTOSAR
 ---
 
