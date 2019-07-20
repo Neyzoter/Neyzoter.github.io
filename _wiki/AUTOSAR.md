@@ -384,10 +384,21 @@ endif
 *未完待续*
 
 ```mermaid
-graph TB;
-	main["main() @ os_init.c"]  --> EcuM_Init["EcuM_Init()"]
-	EcuM_Init --> config["EcuM_World.config = EcuM_DeterminePbConfiguration()"]
+graph LR;
+main["main()@\core\system<br>\Os\rtos\src\os_init.c"]  --> EcuM_Init["EcuM_Init()@\core\system<br>\EcuM\src\EcuM.c"]
+	EcuM_Init --1--> OS_CORE_IS_ID_MASTER["OS_CORE_IS_ID_MASTER(GetCoreID())<br>@\core\system\Os\rtos\inc\Os.h<br>如果多核,验证是否是主核<br>是主核运行2-10"]
+	EcuM_Init --2--> SetCurrentState["SetCurrentState(ECUM_STATE_STARTUP_ONE)<br>@\core\system\EcuM\src\EcuM_Main.c<br>切换为STARTUP_TWO状态"]
+	EcuM_Init --3--> EcuM_AL_DriverInitZero["EcuM_AL_DriverInitZero():初始化DET<br>@\core\system\EcuM\src\EcuM_Callout_Stubs.c<br>Ddefault Error Tracker(DET)初始化"]
+	EcuM_Init --4--> InitOS["InitOS()<br>@\core\system\Os\rtos\src\os_init.c<br>Os初始化,添加Task"]
+	EcuM_Init --5--> Os_IsrInit["Os_IsrInit()<br>@\core\system\Os\rtos\src\os_isr.c<br>中断初始化"]
+	EcuM_Init --6--> EcuM_DeterminePbConfiguration["EcuM_World.config=EcuM_DeterminePbConfiguration()<br>@EcuM_Callout_Stubs.c<br>包含所有PostBuild配置文件"]
+	EcuM_Init --7--> EcuM_AL_DriverInitOne["EcuM_AL_DriverInitOne(EcuM_World.config)<br>@EcuM_Callout_Stubs.c<br>OsStar之前的驱动初始化<br>MCU (DEM) PORT DIO (GPT) (WDG) (WDGM) <br>(DMA) (ADC) BSWM (STBM) PWM (OCU) (SHELL) USART<br>(..)代表本工程不使用"]
+	EcuM_Init --8--> Mcu_GetResetReason["Mcu_GetResetReason()<br>@\core\mcal\Mcu\src\Mcu.c"<br>决定复位方式]
+	EcuM_Init --9--> EcuM_SelectShutdownTarget["EcuM_SelectShutdownTarget()<br>@\core\system\EcuM\src\EcuM.c<br>选择低功耗的模式??-EcuM_OFF or SLEEP"]
+	EcuM_Init --10--> StartOS["StartOs(EcuM_World.config->EcuMDefaultAppMode)<br>@\core\system\Os\rtos\src\os_init.c"]
 ```
+
+
 
 ### 7.3.4 CAN调用过程
 
