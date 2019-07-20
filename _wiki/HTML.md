@@ -216,7 +216,7 @@ HTML 标签可以拥有*属性*。属性提供了有关 HTML 元素的*更多的
 
 ## 2.7 格式化
 
-* 文本格式化
+* **文本格式化**
 
 ```html
 <html>
@@ -264,7 +264,7 @@ This text contains
 
 `=======  输出结束  =======`
 
-* 预格式文本
+* **预格式文本**
 
 ```
 <html>
@@ -306,7 +306,7 @@ next i
 
 `=======  输出结束  =======`
 
-* 地址
+* **地址**
 
 ```html
 <!DOCTYPE html>
@@ -337,13 +337,13 @@ USA
 
 `=======  输出结束  =======`
 
-* 缩写和首字母缩写
+* **缩写和首字母缩写**
 
-在某些浏览器中，当您把鼠标移至缩略词语上时，title 可用于展示表达的完整版本。
+  在某些浏览器中，当您把鼠标移至缩略词语上时，title 可用于展示表达的完整版本。
 
-仅对于 IE 5 中的 acronym 元素有效。
+  仅对于 IE 5 中的 acronym 元素有效。
 
-对于 Netscape 6.2 中的 abbr 和 acronym 元素都有效。
+  对于 Netscape 6.2 中的 abbr 和 acronym 元素都有效。
 
 ```html
 <html>
@@ -360,13 +360,14 @@ USA
 `=======  输出开始  =======`
 
 <abbr title="etcetera">etc.</abbr>
+
 <acronym title="World Wide Web">WWW</acronym>
 
 `=======  输出结束  =======`
 
-* 文字方向
+* **文字方向**
 
-如果您的浏览器支持 bi-directional override (bdo)，下一行会从右向左输出 (rtl)；
+  如果您的浏览器支持 bi-directional override (bdo)，下一行会从右向左输出 (rtl)；
 
 ```html
 <html>
@@ -376,7 +377,6 @@ Here is some Hebrew text
 </bdo>
 </body>
 </html>
-
 ```
 
 `-->`
@@ -385,4 +385,40 @@ Here is some Hebrew text
 <bdo dir="rtl">
 Here is some Hebrew text
 </bdo>
+
+* **引用**
+
+  使用 blockquote 元素的话，浏览器会插入换行和外边距，而 q 元素不会有任何特殊的呈现。
+
+```html
+...
+<blockquote>
+这是长的引用。
+</blockquote>
+<q>
+这是短的引用。
+</q>
+...
+```
+
+`-->`
+
+<blockquote>
+这是长的引用。
+</blockquote>
+<q>这是短的引用。</q>
+
+* 删除和插入
+
+  此例演示如何标记删除文本和插入文本。大多数浏览器会改写为删除文本和下划线文本。一些老式的浏览器会把删除文本和下划线文本显示为普通文本。
+
+```html
+...
+<p>一打有 <del>二十</del> <ins>十二</ins> 件。</p>
+...
+```
+
+`-->`
+
+<p>一打有 <del>二十</del> <ins>十二</ins> 件。</p>
 
