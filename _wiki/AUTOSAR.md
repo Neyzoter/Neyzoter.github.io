@@ -402,7 +402,7 @@ main["main()@\core\system<br>\Os\rtos\src\os_init.c"]  --> EcuM_Init["EcuM_Init(
 
 ### 7.3.4 CAN调用过程
 
-**说明1**：`Github`不支持`mermaid`请使用[在线`mermaid`查看器](<https://mermaidjs.github.io/mermaid-live-editor>)、`Typora`等软件查看具体流程图。
+**说明1**：`Github`不支持`mermaid`请**将以下`mermaid`代码复制到**[在线`mermaid`查看器](<https://mermaidjs.github.io/mermaid-live-editor>)、`Typora`等软件查看具体流程图。
 
 **说明2**：CAN需要的底层接口包括`Can_Init( const Can_ConfigType *Config )`和`Can_ReturnType Can_Write( Can_HwHandleType Hth, const Can_PduType *PduInfo )`
 
