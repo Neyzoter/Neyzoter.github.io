@@ -1037,6 +1037,10 @@ HTML 表单用于搜集不同类型的用户输入。
 
 ## 3.2 输入input
 
+[输入类型](<http://www.w3school.com.cn/html/html_form_input_types.asp>)：password（密码替换为星号）、text、submit（提交）、radio（单选按钮）、checkbox（复选框）、button（按钮，onclick执行相应程序）
+
+<u>**HTML5输入类型**</u>：number（数字，可限制范围）、data（日期）、color、range（一定范围的滑块控件）、month（年份月份）、week（年周）、time（时分）、datetime-local（日期和时间）、email（邮箱，可验证邮箱正确性，智能手机可自动提示输入.com）、search（搜索，类似常规文本字段）、url（地址，自动验证）
+
 **文本输入text**
 
 ```html
@@ -1084,7 +1088,209 @@ Last name:<br>
 
 <img src = "/images/wiki/HTML/submit_input.png" alt="提交" width="200">
 
-## 3.3 下拉列表`<select>`
+**按钮button**
+
+onclick执行程序`alert('Hello World!')`。
+
+```html
+<form>
+<input type="button" onclick="alert('Hello World!')" value="Click Me!">
+</form>
+```
+
+**数字number**
+
+限制输入数字1-5
+
+```html
+<form>
+<input type="number" name="quantity" min="1" max="5">
+</form>
+```
+
+**日期date**
+
+根据浏览器支持，日期选择器会出现输入字段中。
+
+```html
+<input type="date" name="bday">
+```
+
+**颜色color**
+
+```html
+<form>
+<input type="color" name="favcolor">
+</form>
+```
+
+<img src = "/images/wiki/HTML/select_color.png" alt="提交" width="200">
+
+**滑块range**
+
+根据浏览器支持，输入字段能够显示为滑块控件，可用限制min、max、step、value。
+
+```html
+<form>
+<input type="range" name="points" min="0" max="10">
+</form> 
+```
+
+**月份month**
+
+```html
+<form>
+  Birthday (month and year):
+  <input type="month" name="bdaymonth">
+</form>
+```
+
+**周week**
+
+选择周和年
+
+```html
+<form>
+  Select a week:
+  <input type="week" name="week_year">
+</form>
+```
+
+**时间time**
+
+时分
+
+```html
+<form>
+  Select a time:
+  <input type="time" name="usr_time">
+</form>
+```
+
+**日期和时间datetime-local**
+
+```html
+<form>
+  Birthday (date and time):
+  <input type="datetime-local" name="bdaytime">
+</form>
+```
+
+**邮箱email**
+
+根据浏览器支持，能够在被提交时自动对电子邮件地址进行验证。
+
+某些智能手机会识别 email 类型，并在键盘增加 ".com" 以匹配电子邮件输入。
+
+```html
+<form>
+  E-mail:
+  <input type="email" name="email">
+</form>
+```
+
+**搜索search**
+
+```html
+<form>
+  Search Google:
+  <input type="search" name="googlesearch">
+</form>
+```
+
+**网址url**
+
+根据浏览器支持，在提交时能够自动验证 url 字段。
+
+```html
+<form>
+  Add your homepage:
+  <input type="url" name="homepage">
+</form>
+```
+
+**输入input限制**
+
+| 属性      | 描述                               |
+| :-------- | :--------------------------------- |
+| disabled  | 规定输入字段应该被禁用。           |
+| max       | 规定输入字段的最大值。             |
+| maxlength | 规定输入字段的最大字符数。         |
+| min       | 规定输入字段的最小值。             |
+| pattern   | 规定通过其检查输入值的正则表达式。 |
+| readonly  | 规定输入字段为只读（无法修改）。   |
+| required  | 规定输入字段是必需的（必需填写）。 |
+| size      | 规定输入字段的宽度（以字符计）。   |
+| step      | 规定输入字段的合法数字间隔。       |
+| value     | 规定输入字段的默认值。             |
+
+**[输入input属性](<http://www.w3school.com.cn/html/html_form_attributes.asp>)**
+
+*前期版本支持*
+
+value ：规定输入字段的初始值。
+
+readonly ：规定输入字段为只读（不能修改）。
+
+disabled ：规定输入字段是禁用的，被禁用的元素是不可用和不可点击的。被禁用的元素不会被提交。
+
+size ：规定输入字段的尺寸（以字符计），不是最小也不是最大，只是显示出来的效果。
+
+maxlength ：规定输入字段允许的最大长度。
+
+*HTML5开始支持*
+
+autocomplete ：规定表单或输入字段是否应该自动完成，当自动完成开启，浏览器会基于用户之前的输入值自动填写值。（可以把表单form的 autocomplete 设置为 on，同时把特定的输入字段设置为 off，反之亦然。）autocomplete 属性适用于 `<form>` 以及如下 `<input>` 类型：text、search、url、tel、email、password、datepickers、range 以及 color。
+
+form ：不同于表单，是表单属性，指示输入属于哪个表单
+
+height 和 width ：input高度和宽度
+
+list ：list 属性引用的` <datalist> `元素中包含了 `<input>` 元素的预定义选项。
+
+```html
+<input list="browsers">
+<datalist id="browsers">
+   <option value="Internet Explorer">
+   <option value="Firefox">
+   <option value="Chrome">
+   <option value="Opera">
+   <option value="Safari">
+</datalist> 
+```
+
+min 和 max：input最小和最大值。
+
+multiple ：如果设置，规定允许用户在 `<input> `元素中输入一个以上的值，适用于email和file。
+
+```html
+<!DOCTYPE HTML>
+<html>
+<body>
+<form action="/example/html5/demo_form.asp" method="get">
+选择图片：<input type="file" name="img" multiple="multiple" />
+<input type="submit" />
+</form>
+<p>请尝试在浏览文件时选取一个以上的文件。</p>
+</body>
+</html>
+```
+
+pattern ：规定用于检查 `<input>` 元素值的正则表达式，适用于text、search、url、tel、email、and password。
+
+```html
+Country code: 
+<!--只能包含3个字母的输入字段-->
+<input type="text" name="country_code" pattern="[A-Za-z]{3}" title="Three letter country code">
+```
+
+placeholder ：规定用以描述输入字段预期值的提示（样本值或有关格式的简短描述），适用于text、search、url、tel、email 以及 password。
+
+required ：如果设置，则规定在提交表单之前必须填写输入字段。
+
+step ：规定 `<input>` 元素的合法数字间隔。
+
+## 3.3 下拉列表`select`
 
 ```html
 <!DOCTYPE html>
@@ -1092,11 +1298,11 @@ Last name:<br>
 <body>
 <form action="/demo/demo_form.asp">
 <select name="cars">
-<option value="volvo">Volvo</option>
-<option value="saab">Saab</option>
-<!--通过 selected 属性预选择某些选项-->
-<option value="fiat" selected>Fiat</option>
-<option value="audi">Audi</option>
+	<option value="volvo">Volvo</option>
+	<option value="saab">Saab</option>
+	<!--通过 selected 属性预选择某些选项-->
+	<option value="fiat" selected>Fiat</option>
+	<option value="audi">Audi</option>
 </select>
 <br><br>
 <input type="submit">
