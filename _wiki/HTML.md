@@ -471,7 +471,7 @@ Here is some Hebrew text
   </p>
   ```
 
-## 2.9 链接
+## 2.9 链接a
 
 * **target属性**
 
@@ -501,7 +501,7 @@ Here is some Hebrew text
   <a href="http://www.w3school.com.cn/html/html_links.asp#tips">有用的提示</a>
   ```
 
-## 2.10 图像
+## 2.10 图像img
 
 `<img>` 是空标签，意思是说，它只包含属性，并且没有闭合标签。
 
@@ -740,7 +740,7 @@ Copyright ? W3Schools.com
 
 ```
 
-<img src = "/images/wiki/HTML/layout_css.png" alt="结果">
+<img src = "/images/wiki/HTML/layout_css.png" alt="结果" width="500">
 
 ## 2.14 [响应式设计](<http://www.w3school.com.cn/html/html_responsive.asp>)
 
@@ -750,7 +750,7 @@ Copyright ? W3Schools.com
 
 Bootstrap 是最流行的开发响应式 web 的 HTML, CSS, 和 JS 框架。
 
-## 2.15 框架
+## 2.15 框架frame
 
 同一个浏览器窗口中显示不止一个页面，每个框架都独立于其他的框架。
 
@@ -799,7 +799,7 @@ iframe 用于在网页内显示网页
 <body background="http://www.w3school.com.cn/clouds.gif">
 ```
 
-## 2.18 脚本
+## 2.18 脚本script
 
 `<script>` 标签用于定义客户端脚本，比如 JavaScript。
 
@@ -815,4 +815,293 @@ JavaScript 最常用于图片操作、表单验证以及内容动态更新。
 <script type="text/javascript">
 document.write("Hello World!")
 </script>
+<!--noscript标签提供无法使用脚本时的替代内容，比方在浏览器禁用脚本时，或浏览器不支持客户端脚本时。-->
+<noscript>Your browser does not support JavaScript!</noscript>
 ```
+
+**应对老式浏览器**
+
+如果浏览器压根没法识别 <script> 标签，那么 <script> 标签所包含的内容将以文本方式显示在页面上。为了避免这种情况发生，你应该将脚本隐藏在注释标签当中。那些老的浏览器（无法识别 <script> 标签的浏览器）将忽略这些注释，所以不会将标签的内容显示到页面上。而那些新的浏览器将读懂这些脚本并执行它们，即使代码被嵌套在注释标签内。
+
+```html
+<script type="text/javascript">
+<!--
+document.write("Hello World!")
+//-->
+</script>
+```
+
+## 2.19 头部head
+
+`<head>` 元素是所有头部元素的容器。`<head>` 内的元素可包含脚本，指示浏览器在何处可以找到样式表，提供元信息，等等，标签有`<title>`、`<base>`、`<link>`、`<meta>`、`<script>` 以及 `<style>`
+
+* **`<title>`**
+
+  定义浏览器**工具栏标题**
+
+  提供页面被添加到**收藏夹时显示的标题**
+
+  显示在**搜索引擎**结果中的页面标题
+
+* **base**
+
+  `<base>` 标签为页面上的所有链接规定默认地址或默认目标（target）
+
+  ```html
+  <head>
+  <base href="http://www.w3school.com.cn/images/" />
+  <!--默认开一个新的窗口-->
+  <base target="_blank" />
+  </head>
+  ```
+
+* **link**
+
+  `<link>` 标签定义文档与外部资源之间的关系，最常用于连接样式表。
+
+  ```html
+  <head>
+  <link rel="stylesheet" type="text/css" href="mystyle.css" />
+  </head>
+  ```
+
+* **style**
+
+  `<style>` 标签用于为 HTML 文档定义样式信息，在 style 元素内规定 HTML 元素在浏览器中呈现的样式。
+
+  ```html
+  <head>
+  <style type="text/css">
+  <!--定义body样式-->
+  body {background-color:yellow}
+  <!--定义p样式-->
+  p {color:blue}
+  </style>
+  </head>
+  ```
+
+* **meta**
+
+  元数据（metadata）是关于数据的信息，**始终位于 head 元素中**。通常，meta 元素被用于规定页面的描述、关键词、文档的作者、最后修改时间以及其他元数据。
+
+  元数据可用于浏览器（如何显示内容或重新加载页面），搜索引擎（关键词），或其他 web 服务。
+
+  ```html
+  <!--针对搜索引擎的描述-->
+  <meta name="description" content="Free Web tutorials on HTML, CSS, XML" />
+  <!--针对搜索引擎的关键词-->
+  <meta name="keywords" content="HTML, CSS, XML" />
+  ```
+
+* **script**
+
+  `<script>` 标签用于定义客户端脚本，比如 JavaScript。
+
+## 2.20 实体
+
+HTML中某些字符是预留的，如不能使用小于号（<）和大于号（>），代替方式：
+
+```
+&entity_name;
+或者
+&#entity_number;
+```
+
+小于号: `&lt`或者`&#60`
+
+不间断空格: `&nbsp`，实现多个空格
+
+| 显示结果 | 描述              | 实体名称            | 实体编号  |
+| :------- | :---------------- | :------------------ | :-------- |
+|          | 空格              | `&nbsp;`            | `&#160;`  |
+| `<`      | 小于号            | `&lt;`              | `&#60;`   |
+| `>`      | 大于号            | `&gt;`              | `&#62;`   |
+| `&`      | 和号              | `&amp;`             | `&#38;`   |
+| `"`      | 引号              | `&quot;`            | `&#34;`   |
+| `'`      | 撇号              | `&apos; `(IE不支持) | `&#39;`   |
+| `￠`     | 分（cent）        | `&cent;`            | `&#162;`  |
+| `£`      | 镑（pound）       | `&pound;`           | `&#163;`  |
+| `¥`      | 元（yen）         | `&yen;`             | `&#165;`  |
+| `€`      | 欧元（euro）      | `&euro;`            | `&#8364;` |
+| `§`      | 小节              | `&sect;`            | `&#167;`  |
+| `©`      | 版权（copyright） | `&copy;`            | `&#169;`  |
+| `®`      | 注册商标          | `&reg;`             | `&#174;`  |
+| `™`      | 商标              | `&trade;`           | `&#8482;` |
+| `×`      | 乘号              | `&times;`           | `&#215;`  |
+| `÷`      | 除号              | `&divide;`          | `&#247;`  |
+
+## 2.21统一资源定位器URL
+
+Uniform Resource Locator
+
+**特点**
+
+* URL 只能使用 ASCII 字符集来通过因特网进行发送。
+
+* 由于 URL 常常会包含 ASCII 集合之外的字符，URL 必须转换为有效的 ASCII 格式。
+
+* URL 编码使用` "%" `其后跟随两位的十六进制数来替换非 ASCII 字符。
+
+* URL 不能包含空格。URL 编码通常使用 `+` 来替换空格。
+
+**格式**
+
+`scheme://host.domain:port/path/filename`
+
+- scheme - 定义因特网服务的类型。最常见的类型是 http
+- host - 定义域主机（http 的默认主机是 www）
+- domain - 定义因特网域名，比如 w3school.com.cn
+- `:`port - 定义主机上的端口号（http 的默认端口号是 80）
+- path - 定义服务器上的路径（如果省略，则文档必须位于网站的根目录中）。
+- filename - 定义文档/资源的名称
+
+## 2.22 [颜色](<http://www.w3school.com.cn/html/html_colornames.asp>)
+
+aqua, black, blue, fuchsia, gray, green, lime, maroon, navy, olive, purple, red, silver, teal, white, yellow。
+
+## 2.23 `<!DOCTYPE>`声明
+
+ [DOCTYPE 参考手册](http://www.w3school.com.cn/tags/tag_doctype.asp)
+
+`<!DOCTYPE>` 不是 HTML 标签。它为浏览器提供一项信息（声明），即 HTML 是用什么版本编写的。
+
+| 版本      | 年份 |
+| :-------- | :--- |
+| HTML      | 1991 |
+| HTML+     | 1993 |
+| HTML 2.0  | 1995 |
+| HTML 3.2  | 1997 |
+| HTML 4.01 | 1999 |
+| XHTML 1.0 | 2000 |
+| HTML5     | 2012 |
+| XHTML5    | 2013 |
+
+```html
+<!-- html 5 -->
+<!DOCTYPE html>
+<!-- HTML 4.01 -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<!-- XHTML 1.0 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+```
+
+# 3. HTML表单form
+
+HTML 表单用于搜集不同类型的用户输入。
+
+`<form>` 元素定义 HTML 表单
+
+## 3.1 表单属性
+
+| 属性           | 描述                                                       |
+| :------------- | :--------------------------------------------------------- |
+| accept-charset | 规定在被提交表单中使用的字符集（默认：页面字符集）。       |
+| action         | 规定向何处提交表单的地址（URL）（提交页面）。              |
+| autocomplete   | 规定浏览器应该自动完成表单（默认：开启）。                 |
+| enctype        | 规定被提交数据的编码（默认：url-encoded）。                |
+| method         | 规定在提交表单时所用的 HTTP 方法（默认：GET）。            |
+| name           | 规定识别表单的名称（对于 DOM 使用：document.forms.name）。 |
+| novalidate     | 规定浏览器不验证表单。                                     |
+| target         | 规定 action 属性中地址的目标（默认：_self）。              |
+
+**Method属性**
+
+```html
+<!--如果表单提交是被动的（比如搜索引擎查询），并且没有敏感信息。表单数据在页面地址栏中是可见的-->
+<form action="action_page.php" method="GET">
+<!--如果表单正在更新数据，或者包含敏感信息（例如密码）,在页面地址栏中被提交的数据是不可见的-->
+<form action="action_page.php" method="POST">    
+```
+
+*[POST和GET的区别](<https://www.oschina.net/news/77354/http-get-post-different>)*
+
+1.来自W3CSchool
+
+- GET在浏览器回退时是无害的，而POST会再次提交请求。
+- GET产生的URL地址可以被Bookmark，而POST不可以。
+- GET请求会被浏览器主动cache，而POST不会，除非手动设置。
+- GET请求只能进行url编码，而POST支持多种编码方式。
+- GET请求参数会被完整保留在浏览器历史记录里，而POST中的参数不会被保留。
+- GET请求在URL中传送的参数是有长度限制的，而POST么有。
+- 对参数的数据类型，GET只接受ASCII字符，而POST没有限制。
+- GET比POST更不安全，因为参数直接暴露在URL上，所以不能用来传递敏感信息。
+- GET参数通过URL传递，POST放在Request body中。
+
+2.POST的内容放在request body，GET放在url，本质上都是TCP协议
+
+> 如果你用GET服务，在request body偷偷藏了数据，不同服务器的处理方式也是不同的，有些服务器会帮你卸货，读出数据，有些服务器直接忽略，所以，虽然GET可以带request body，也不能保证一定能被接收到哦。
+
+3.GET产生一个TCP数据包；POST产生两个TCP数据包
+
+## 3.2 输入input
+
+**文本输入text**
+
+```html
+<form>
+ First name:<br>
+ <!--<input> 元素是最重要的表单元素-->
+ <!--type包括text（文本输入） radio（单选按钮输入）  submit（提交表单按钮）-->
+ <!--如果要正确地被提交，每个输入字段必须设置一个 name 属性。-->   
+<input type="text" name="firstname">
+<br>
+ Last name:<br>
+<input type="text" name="lastname">
+</form> 
+```
+
+<img src = "/images/wiki/HTML/test_input.png" alt="输入文本" width="200">
+
+**单选按钮radio**
+
+```html
+<form>
+<input type="radio" name="sex" value="male" checked>Male
+<br>
+<input type="radio" name="sex" value="female">Female
+</form> 
+```
+
+<img src = "/images/wiki/HTML/radio_input.png" alt="输入单选按钮" width="200">
+
+**提交submit**
+
+```html
+<!--action指定表单处理程序-->
+<form action="action_page.php">
+First name:<br>
+<input type="text" name="firstname" value="Mickey">
+<br>
+Last name:<br>
+<input type="text" name="lastname" value="Mouse">
+<br><br>
+<!--表单处理程序（form-handler）提交表单的按钮-->
+<input type="submit" value="Submit">
+</form> 
+```
+
+<img src = "/images/wiki/HTML/submit_input.png" alt="提交" width="200">
+
+## 3.3 下拉列表`<select>`
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+<form action="/demo/demo_form.asp">
+<select name="cars">
+<option value="volvo">Volvo</option>
+<option value="saab">Saab</option>
+<!--通过 selected 属性预选择某些选项-->
+<option value="fiat" selected>Fiat</option>
+<option value="audi">Audi</option>
+</select>
+<br><br>
+<input type="submit">
+</form>
+</body>
+</html>
+```
+
