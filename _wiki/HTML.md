@@ -365,6 +365,20 @@ USA
 
 `=======  输出结束  =======`
 
+```html
+...
+<p><dfn title="World Health Organization">WHO</dfn> 成立于 1948 年。</p>
+...
+```
+
+`-->`
+
+`=======  输出开始  =======`
+
+<p><dfn title="World Health Organization">WHO</dfn> 成立于 1948 年。</p>
+
+`=======  输出结束  =======`
+
 * **文字方向**
 
   如果您的浏览器支持 bi-directional override (bdo)，下一行会从右向左输出 (rtl)；
@@ -421,4 +435,3 @@ Here is some Hebrew text
 `-->`
 
 <p>一打有 <del>二十</del> <ins>十二</ins> 件。</p>
-
