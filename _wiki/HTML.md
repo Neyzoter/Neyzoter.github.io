@@ -659,5 +659,159 @@ HTML` <span>` 元素是内联元素，可用作文本的容器。
 
 <p>My <span class="red">Important</span> Heading</p>
 
+## 2.13 布局
+
+说明：
+
+id 选择器可以为标有特定 id 的 HTML 元素指定特定的样式。
+
+id 选择器以"**#**"" 来定义。
+
+id 属性规定 HTML 元素的唯一的 id。
+
+id 在 HTML 文档中必须是唯一的。
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+<style>
+#header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+}
+#nav {
+    line-height:30px;
+    background-color:#eeeeee;
+    height:300px;
+    width:100px;
+    float:left;
+    padding:5px;	      
+}
+#section {
+    width:350px;
+    float:left;
+    padding:10px;	 	 
+}
+#footer {
+    background-color:black;
+    color:white;
+    clear:both;
+    text-align:center;
+   padding:5px;	 	 
+}
+</style>
+</head>
+
+<body>
+<!--id选择器由#定义-->
+<div id="header">
+<h1>City Gallery</h1>
+</div>
+
+<div id="nav">
+London<br>
+Paris<br>
+Tokyo<br>
+</div>
+
+<div id="section">
+<h2>London</h2>
+<p>
+London is the capital city of England. It is the most populous city in the United Kingdom,
+with a metropolitan area of over 13 million inhabitants.
+</p>
+<p>
+Standing on the River Thames, London has been a major settlement for two millennia,
+its history going back to its founding by the Romans, who named it Londinium.
+</p>
+</div>
+
+<div id="footer">
+Copyright ? W3Schools.com
+</div>
+
+</body>
+</html>
+
+```
+
+<img src = "/images/wiki/HTML/layout_css.png" alt="结果">
+
+## 2.14 [响应式设计](<http://www.w3school.com.cn/html/html_responsive.asp>)
+
+- RWD 指的是响应式 Web 设计（Responsive Web Design）
+- RWD 能够以可变尺寸传递网页
+- RWD 对于平板和移动设备是必需的
+
+Bootstrap 是最流行的开发响应式 web 的 HTML, CSS, 和 JS 框架。
+
+## 2.15 框架
+
+同一个浏览器窗口中显示不止一个页面，每个框架都独立于其他的框架。
+
+```html
+<!--第一列frame_a.htm被设置为占据浏览器窗口的 25%。第二列frame_b.htm被设置为占据浏览器窗口的 75%-->
+<frameset cols="25%,75%">
+   <frame src="frame_a.htm">
+   <frame src="frame_b.htm">
+</frameset>
+```
+
+**注意**：不能将` <body></body>` 标签与 `<frameset></frameset>` 标签同时使用！不过，假如你添加包含一段文本的 `<noframes>` 标签，就必须将这段文字嵌套于 `<body></body> `标签内。
+
+```html
+<html>
+<frameset cols="25%,50%,25%">
+  <frame src="/example/html/frame_a.html">
+  <frame src="/example/html/frame_b.html">
+  <frame src="/example/html/frame_c.html">
+<!--如果浏览器不支持frame，noframe内使用body-->
+<noframes>
+<body>您的浏览器无法处理框架！</body>
+</noframes>
+</frameset>
+</html>
+```
+
+## 2.16 内联框架iframe
+
+iframe 用于在网页内显示网页
+
+`<iframe src="URL"></iframe>`
+
+## 2.17 背景
+
+`<body>` 拥有两个配置背景的标签。背景可以是颜色或者图像。
+
+```html
+<body bgcolor="#000000">
+<body bgcolor="rgb(0,0,0)">
+<body bgcolor="black">
+```
+
+```html
+<body background="clouds.gif">
+<body background="http://www.w3school.com.cn/clouds.gif">
+```
+
+## 2.18 脚本
+
+`<script>` 标签用于定义客户端脚本，比如 JavaScript。
 
 
+script 元素既可包含脚本语句，也可通过 src 属性指向外部脚本文件。
+
+必需的 type 属性规定脚本的 MIME 类型。
+
+JavaScript 最常用于图片操作、表单验证以及内容动态更新。
+
+```html
+<!--脚本会向浏览器输出“Hello World!”-->
+<script type="text/javascript">
+document.write("Hello World!")
+</script>
+```
