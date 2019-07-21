@@ -264,7 +264,7 @@ This text contains
 
 `=======  输出结束  =======`
 
-* **预格式文本**
+* **预格式文本pre**
 
 ```
 <html>
@@ -306,7 +306,7 @@ next i
 
 `=======  输出结束  =======`
 
-* **地址**
+* **地址address**
 
 ```html
 <!DOCTYPE html>
@@ -337,7 +337,7 @@ USA
 
 `=======  输出结束  =======`
 
-* **缩写和首字母缩写**
+* **缩写abbr和首字母acronym缩写**
 
   在某些浏览器中，当您把鼠标移至缩略词语上时，title 可用于展示表达的完整版本。
 
@@ -379,7 +379,7 @@ USA
 
 `=======  输出结束  =======`
 
-* **文字方向**
+* **文字方向bdo**
 
   如果您的浏览器支持 bi-directional override (bdo)，下一行会从右向左输出 (rtl)；
 
@@ -400,7 +400,7 @@ Here is some Hebrew text
 Here is some Hebrew text
 </bdo>
 
-* **引用**
+* **引用blockquote和q**
 
   使用 blockquote 元素的话，浏览器会插入换行和外边距，而 q 元素不会有任何特殊的呈现。
 
@@ -422,7 +422,7 @@ Here is some Hebrew text
 </blockquote>
 <q>这是短的引用。</q>
 
-* **删除和插入**
+* **删除del和插入ins**
 
   此例演示如何标记删除文本和插入文本。大多数浏览器会改写为删除文本和下划线文本。一些老式的浏览器会把删除文本和下划线文本显示为普通文本。
 
@@ -435,3 +435,229 @@ Here is some Hebrew text
 `-->`
 
 <p>一打有 <del>二十</del> <ins>十二</ins> 件。</p>
+
+## 2.8 CCS
+
+* **外部样式**
+
+  当样式需要被应用到很多页面的时候，外部样式表将是理想的选择。
+
+  ```html
+  <head>
+  <link rel="stylesheet" type="text/css" href="mystyle.css">
+  </head>
+  ```
+
+* **内部样式**
+
+  当单个文件需要特别样式时，就可以使用内部样式表。你可以在 head 部分通过 <style> 标签定义内部样式表。
+
+  ```html
+  <head>
+  <style type="text/css">
+  body {background-color: red}
+  p {margin-left: 20px}
+  </style>
+  </head>
+  ```
+
+* **内联样式**
+
+  当特殊的样式需要应用到个别元素时，就可以使用内联样式。 使用内联样式的方法是在相关的标签中使用样式属性。样式属性可以包含任何 CSS 属性。
+
+  ```html
+  <p style="color: red; margin-left: 20px">
+  This is a paragraph
+  </p>
+  ```
+
+## 2.9 链接
+
+* **target属性**
+
+  如果把链接的 target 属性设置为 "_blank"，该链接会在新窗口中打开。
+
+  ```html
+  <a href="http://www.w3school.com.cn/" target="_blank">Visit W3School!</a>
+  ```
+
+* **name属性**
+
+  创建一个书签，对锚进行命名
+
+  ```html
+  <a name="tips">基本的注意事项 - 有用的提示</a>
+  ```
+
+  在同一个文档中创建指向该锚的链接
+
+  ```html
+  <a href="#tips">有用的提示</a>
+  ```
+
+  也可以在其他页面中创建指向该锚的链接
+
+  ```html
+  <a href="http://www.w3school.com.cn/html/html_links.asp#tips">有用的提示</a>
+  ```
+
+## 2.10 图像
+
+`<img>` 是空标签，意思是说，它只包含属性，并且没有闭合标签。
+
+`src `指 "source"。源属性的值是图像的 URL 地址。
+
+alt 属性用来为图像定义一串预备的可替换的文本。
+
+```html
+<img src="boat.gif" alt="Big Boat">
+```
+
+## 2.11 列表
+
+* **无序（号）列表**
+
+```html
+<html>
+<body>
+<ul>
+  <li>咖啡</li>
+  <li>茶</li>
+  <li>牛奶</li>
+</ul>
+</body>
+</html>
+```
+
+`-->`
+
+`=======  输出开始  =======`
+
+<ul>
+  <li>咖啡</li>
+  <li>茶</li>
+  <li>牛奶</li>
+</ul>
+
+`=======  输出结束  =======`
+
+* **有序（号）列表**
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+<ol>
+  <li>咖啡</li>
+  <li>牛奶</li>
+  <li>茶</li>
+</ol>
+<ol start="50">
+  <li>咖啡</li>
+  <li>牛奶</li>
+  <li>茶</li>
+</ol>
+</body>
+</html>
+
+```
+
+`-->`
+
+`=======  输出开始  =======`
+
+<ol>
+  <li>咖啡</li>
+  <li>牛奶</li>
+  <li>茶</li>
+</ol>
+<ol start="50">
+  <li>咖啡</li>
+  <li>牛奶</li>
+  <li>茶</li>
+</ol>
+
+`=======  输出结束  =======`
+
+## 2.12 块和内联元素
+
+块级元素在浏览器显示时，通常会以新行来开始（和结束），如`<h1>, <p>, <ul>, <table>`
+
+内联元素在显示时通常不会以新行开始，`<b>, <td>, <a>, <img>`
+
+| 标签     | 描述                                       |
+| :------- | :----------------------------------------- |
+| `<div>`  | 定义文档中的分区或节（division/section）。 |
+| `<span>` | 定义 span，用来组合文档中的行内元素。      |
+
+**`<div>`元素**
+
+HTML `<div> `元素是块级元素，它是可用于组合其他 HTML 元素的容器。
+
+<div> 元素没有特定的含义。除此之外，由于它属于块级元素，浏览器会在其前后显示折行。
+
+如果与 CSS 一同使用，`<div>` 元素可用于对大的内容块设置样式属性。
+
+`<div>` 元素的另一个常见的用途是文档布局。它取代了使用表格定义布局的老式方法。使用 `<table> `元素进行文档布局不是表格的正确用法。`<table> `元素的作用是显示表格化的数据。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.cities {
+    background-color:black;
+    color:white;
+    margin:20px;
+    padding:20px;
+}	
+</style>
+</head>
+<body>
+<div class="cities">
+<h2>London</h2>
+<p>London is the capital city of England. It is the most populous city in the United Kingdom, with a metropolitan area of over 13 million inhabitants.</p>
+<p>Standing on the River Thames, London has been a major settlement for two millennia, its history going back to its founding by the Romans, who named it Londinium.</p>
+</div> 
+<div class="cities">
+<h2>Paris</h2>
+<p>Paris is the capital and most populous city of France.</p>
+<p>Situated on the Seine River, it is at the heart of the 蝜e-de-France region, also known as the rion parisienne.</p>
+<p>Within its metropolitan area is one of the largest population centers in Europe, with over 12 million inhabitants.</p>
+</div>
+<div class="cities">
+<h2>Tokyo</h2>
+<p>Tokyo is the capital of Japan, the center of the Greater Tokyo Area, and the most populous metropolitan area in the world.</p>
+<p>It is the seat of the Japanese government and the Imperial Palace, and the home of the Japanese Imperial Family.</p>
+<p>The Tokyo prefecture is part of the world's most populous metropolitan area with 38 million people and the world's largest urban economy.</p>
+</div>
+</body>
+</html>
+```
+
+**`<span>`元素**
+
+HTML` <span>` 元素是内联元素，可用作文本的容器。
+
+`<span>` 元素也没有特定的含义。
+
+当与 CSS 一同使用时，`<span>` 元素可用于为部分文本设置样式属性。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  span.red {color:red;}
+</style>
+</head>
+<body>
+<h1>My <span class="red">Important</span> Heading</h1>
+</body>
+</html>
+```
+
+<p>My <span class="red">Important</span> Heading</p>
+
+
+
