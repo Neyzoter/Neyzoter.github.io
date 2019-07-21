@@ -77,14 +77,64 @@ JavaScript 不提供任何内建的打印或显示函数。方案：
 
 - 使用 `window.alert()` 写入警告框
 
-  
+  能够使用警告框来显示数据
+
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <body>
+  <h1>我的第一张网页</h1>
+  <p>我的第一个段落</p>
+  <script>
+  window.alert(5 + 6);
+  </script>
+  </body>
+  </html>  
+  ```
 
 - 使 `document.write() `写入 HTML 输出
 
-  
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <body>
+  <h1>我的第一张网页</h1>
+  <p>我的第一个段落</p>
+  <script>
+  document.write(5 + 6);
+  </script>
+  </body>
+  </html> 
+  ```
+
+  在 HTML 文档完全加载后使用 **document.write()** 将**删除所有已有的 HTML**
+
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <body>
+  <h1>我的第一张网页</h1>
+  <p>我的第一个段落</p>
+  <!--点击按钮后，出现11，上面的h1和p均消失-->
+  <button onclick="document.write(5 + 6)">试一试</button>
+  </body>
+  </html>
+  ```
 
 - 使用 `innerHTML` 写入 HTML 元素
 
-  
+    ```html
+    <!DOCTYPE html>
+    <html>
+    <body>
+    <h1>我的第一张网页</h1>
+    <p>我的第一个段落</p>
+    <p id="demo"></p>
+    <script>
+     document.getElementById("demo").innerHTML = 5 + 6;
+    </script>
+    </body>
+    </html> 
+    ```
 
 - 使用 `console.log() `写入浏览器控制台
