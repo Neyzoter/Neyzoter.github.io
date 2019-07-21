@@ -1056,7 +1056,7 @@ HTML 表单用于搜集不同类型的用户输入。
 </form> 
 ```
 
-<img src = "/images/wiki/HTML/test_input.png" alt="输入文本" width="200">
+<img src = "/images/wiki/HTML/test_input.png" alt="输入文本" width="140">
 
 **单选按钮radio**
 
@@ -1068,7 +1068,7 @@ HTML 表单用于搜集不同类型的用户输入。
 </form> 
 ```
 
-<img src = "/images/wiki/HTML/radio_input.png" alt="输入单选按钮" width="200">
+<img src = "/images/wiki/HTML/radio_input.png" alt="输入单选按钮" width="140">
 
 **提交submit**
 
@@ -1086,7 +1086,7 @@ Last name:<br>
 </form> 
 ```
 
-<img src = "/images/wiki/HTML/submit_input.png" alt="提交" width="200">
+<img src = "/images/wiki/HTML/submit_input.png" alt="提交" width="140">
 
 **按钮button**
 
@@ -1124,7 +1124,7 @@ onclick执行程序`alert('Hello World!')`。
 </form>
 ```
 
-<img src = "/images/wiki/HTML/select_color.png" alt="提交" width="200">
+<img src = "/images/wiki/HTML/select_color.png" alt="提交" width="400">
 
 **滑块range**
 
