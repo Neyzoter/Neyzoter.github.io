@@ -515,6 +515,14 @@ OsBswTask --> Can_MainFunction_Mode["Can_MainFunction_Mode()<br>"]
 	
 ```
 
+### 7.3.6 RTE设置PWM
+
+```mermaid
+graph TB;
+OsRteTask["OsRteTask()"] --> Rte_SwcReader_SwcReaderRunnable["Rte_SwcReader_SwcReaderRunnable()"]
+Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
+```
+
 
 
 
