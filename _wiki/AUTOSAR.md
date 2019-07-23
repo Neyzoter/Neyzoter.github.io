@@ -560,28 +560,82 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   **（4）计数器——COUNTERS**
 
-  主要用于定时给任务ALARM
+  主要用于定时给任务ALARM，周期性运行
+
+  **需要修改的内容**：无
+
+  **隐含变量**：`OS_COUNTER_CNT`  （`@Os_Cfg.h`）计数器个数，对应`GEN_COUNTER_HEAD`元素个数；
 
   ```c
   GEN_COUNTER_HEAD = {
   	GEN_COUNTER(
-          /* id          */		COUNTER_ID_OsRteCounter,  //唯一ID标识
-          /* name        */		"OsRteCounter",
-          /* counterType */		COUNTER_TYPE_HARD,
-          /* counterUnit */		COUNTER_UNIT_NANO,
-          /* maxAllowed  */		OSMAXALLOWEDVALUE,
+          /* id          */		COUNTER_ID_OsRteCounter,  //唯一ID标识，指示计数器下标，从0开始，GEN_COUNTER函数中未用到_id变量，主要给下面Os_Arc_OsTickCounter指示
+          /* name        */		"OsRteCounter",           //counter名称
+          /* counterType */		COUNTER_TYPE_HARD,        // @/Os/rtos/src/os_counter_i.h
+          /* counterUnit */		COUNTER_UNIT_NANO,        // @/Os/rtos/src/os_counter_i.h
+          /* maxAllowed  */		OSMAXALLOWEDVALUE,        // 计数器最大值
           /*             */		1,
-          /* minCycle    */		1,
+          /* minCycle    */		1,                       //最小周期
           /*             */		0,
-          /* owningApp   */		APPLICATION_ID_OsApplicationInteriorLight,
+          /* owningApp   */		APPLICATION_ID_OsApplicationInteriorLight,  //使用该计数器的应用，上方Os_AppConst定义应用
           /* accAppMask..*/       ((1u << APPLICATION_ID_OsApplicationInteriorLight))
       ) 
+  };
+  //定义Os的tick下标，所以上面的定义中id必须从0
+  CounterType Os_Arc_OsTickCounter = COUNTER_ID_OsRteCounter;
+  ```
+
+  **（5）ALARMS**
+
+  两个功能：1、周期性唤醒任务执行（通过`GEN_ALARM_AUTOSTART`设置）；2、周期性抛出事件ALARM（通过`GEN_ALARM_HEAD`设置），在任务内判断是否有相应事件出现。
+
+  **需要修改的内容**：无
+
+  ```c
+  GEN_ALARM_AUTOSTART(  // 命名方式  Os_AlarmAutoStart_ ## _id，可以通过GEN_ALARM_AUTOSTART_NAME获取
+  				ALARM_ID_OsRteAlarm100ms,  // _id，0,1,...
+  				ALARM_AUTOSTART_RELATIVE,
+  				100,                      //ALARM周期
+  				100,                      //循环周期
+  				OSDEFAULTAPPMODE );
+  
+  GEN_ALARM_AUTOSTART(
+  				ALARM_ID_OsAlarmBswServices,
+  				ALARM_AUTOSTART_RELATIVE,
+  				5,
+  				5,
+  				OSDEFAULTAPPMODE );
+  
+  GEN_ALARM_HEAD = {
+  	GEN_ALARM(	ALARM_ID_OsRteAlarm100ms,  //对应于上面生成的ALARM
+  				"OsRteAlarm100ms",
+  				COUNTER_ID_OsRteCounter,  //对应生成的计数器的id
+  				GEN_ALARM_AUTOSTART_NAME(ALARM_ID_OsRteAlarm100ms), //指向ALARM_AUTOSTART变量
+  				ALARM_ACTION_SETEVENT,    //设置事件
+  				TASK_ID_OsRteTask,     //任务ID @ Os_Cfg.h
+  				EVENT_MASK_OsMainEvent,
+  				0,
+  				APPLICATION_ID_OsApplicationInteriorLight, /* Application owner */
+  				(( 1u << APPLICATION_ID_OsApplicationInteriorLight ) 
+  				) /* Accessing application mask */
+  			)
+  ,
+  	GEN_ALARM(	ALARM_ID_OsAlarmBswServices,
+  				"OsAlarmBswServic",
+  				COUNTER_ID_OsRteCounter,
+  				GEN_ALARM_AUTOSTART_NAME(ALARM_ID_OsAlarmBswServices),
+  				ALARM_ACTION_ACTIVATETASK,//激活任务
+  				TASK_ID_OsBswTask,
+  				0,
+  				0,
+  				APPLICATION_ID_OsApplicationInteriorLight, /* Application owner */
+  				(( 1u << APPLICATION_ID_OsApplicationInteriorLight ) 
+  				) /* Accessing application mask */
+  			)
   };
   ```
 
   
-
-  **（5）ALARMS??**
 
   **（6）资源——RESOURSES**
 
