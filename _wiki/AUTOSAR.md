@@ -523,7 +523,41 @@ OsRteTask["OsRteTask()"] --> Rte_SwcReader_SwcReaderRunnable["Rte_SwcReader_SwcR
 Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 ```
 
+## 7.4 顶层配置和应用
 
+### 7.4.1 Os
+
+配置文件主要包括：`Os_Cfg.c`和`Os_Cfg.h`
+
+* `Os_Cfg.c`
+
+  **（1）外部参考——EXTERNAL REFERENCES**
+
+  
+
+  **（2）DEBUG输出——DEBUG OUTPUT**
+
+  **（3）应用——APPLICATIONS**
+
+  **（4）计数器——COUNTERS**
+
+  **（5）ALARMS??**
+
+  **（6）资源——RESOURSES**
+
+  **（7）任务栈空间——STACKS(TASKS)**
+
+  **（8）任务——TASKS**
+
+  **（9）勾子函数——HOOKS**
+
+  **（10）中断——ISRS**
+
+  **（11）调度表——SCHEDULE TABLES**
+
+  **（12）自旋锁——SPINLOCKS**
+
+* `Os_Cfg.h`
 
 
 
