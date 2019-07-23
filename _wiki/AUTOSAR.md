@@ -771,6 +771,10 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
 * `Os_Cfg.h`
 
+  **OS_NUM_CORES**：核个数 
+
+  具体见代码注释。
+
 
 
 
