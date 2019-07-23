@@ -523,7 +523,7 @@ OsRteTask["OsRteTask()"] --> Rte_SwcReader_SwcReaderRunnable["Rte_SwcReader_SwcR
 Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 ```
 
-## 7.4 顶层配置和应用
+## 7.4 顶层移植、配置和应用
 
 ### 7.4.1 Os
 
@@ -545,7 +545,41 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   每个应用下由多个任务TASK组成。
 
+  **需要修改的内容**：`.appId`和`.name`
+
+  ```c
+  const OsAppConstType Os_AppConst[OS_APPLICATION_CNT]  = {			
+  	{
+      .appId = APPLICATION_ID_OsApplicationInteriorLight,  // 应用ID：0,1,2...
+      .name = "OsApplicationInteriorLight",  //应用名称
+      .core = 0,     //运行该应用的内核
+      .trusted = true,    //是否信任
+  	}
+  };
+  ```
+
   **（4）计数器——COUNTERS**
+
+  主要用于定时给任务ALARM
+
+  ```c
+  GEN_COUNTER_HEAD = {
+  	GEN_COUNTER(
+          /* id          */		COUNTER_ID_OsRteCounter,  //唯一ID标识
+          /* name        */		"OsRteCounter",
+          /* counterType */		COUNTER_TYPE_HARD,
+          /* counterUnit */		COUNTER_UNIT_NANO,
+          /* maxAllowed  */		OSMAXALLOWEDVALUE,
+          /*             */		1,
+          /* minCycle    */		1,
+          /*             */		0,
+          /* owningApp   */		APPLICATION_ID_OsApplicationInteriorLight,
+          /* accAppMask..*/       ((1u << APPLICATION_ID_OsApplicationInteriorLight))
+      ) 
+  };
+  ```
+
+  
 
   **（5）ALARMS??**
 
