@@ -533,11 +533,17 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   **（1）外部参考——EXTERNAL REFERENCES**
 
-  
+  *Application externals*
+
+  *Interrupt externals*：设置Os Tick频率
 
   **（2）DEBUG输出——DEBUG OUTPUT**
 
+  变量`os_dbg_mask`来控制OS_DEBUG的日志输出等级。
+
   **（3）应用——APPLICATIONS**
+
+  每个应用下由多个任务TASK组成。
 
   **（4）计数器——COUNTERS**
 
