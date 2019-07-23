@@ -635,17 +635,135 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
   };
   ```
 
-  
-
   **（6）资源——RESOURSES**
+
+  
 
   **（7）任务栈空间——STACKS(TASKS)**
 
+  **需要修改的内容**：无
+
+  ```c
+  //DECLARE_STACK(_name,_size)  ->  stack__
+  DECLARE_STACK(OsIdle, OS_OSIDLE_STACK_SIZE);  //定义空闲任务的栈空间，栈空间名称stack_OsIdle
+  DECLARE_STACK(OsBswTask,  2048);             // 栈空间stack_OsBswTask
+  DECLARE_STACK(OsRteTask,  2048);
+  DECLARE_STACK(OsStartupTask,  2048);
+  ```
+
   **（8）任务——TASKS**
+
+  **需要修改的内容**：无
+
+  **EVENT_MASK_OsInitEvent说明**：`SetCurrentState() -> Rte_Switch_currentMode_currentMode(currentMode) -> Rte_Switch_EcuM_ecuM_currentMode_currentMode(currentMode) ->SYS_CALL_SetEvent(TASK_ID_OsRteTask, EVENT_MASK_OsInitEvent)`，将事件`EVENT_MASK_OsInitEvent`产生，由`OsRteTask`任务（ID为TASK_ID_OsRteTask）处理。
+
+  ```c
+  GEN_TASK_HEAD = {
+  	{
+  	.pid = TASK_ID_OsIdle,
+  	.name = "OsIdle",
+  	.entry = OsIdle,     //任务函数入口
+  	.prio = 0,           //优先级
+  	.scheduling = FULL,   // ??
+  	.autostart = TRUE,    // ??
+  	.proc_type = PROC_BASIC,
+  	.stack = {
+  		.size = sizeof stack_OsIdle,   //由上方的栈空间定义 
+  		.top = stack_OsIdle,
+  	},
+  	.resourceIntPtr = NULL_PTR, 
+  	.resourceAccess = 0,
+  	.activationLimit = 1,
+      .applOwnerId = OS_CORE_0_MAIN_APPLICATION,  //使用该任务的应用  定义为APPLICATION_ID_OsApplicationInteriorLight
+      .accessingApplMask = (1u << OS_CORE_0_MAIN_APPLICATION),
+  	},
+  	
+  {
+  	.pid = TASK_ID_OsBswTask,
+  	.name = "OsBswTask",
+  	.entry = OsBswTask,
+  	.prio = 2,
+  	.scheduling = FULL,
+  	.proc_type = PROC_BASIC,
+  	.stack = {
+  		.size = sizeof stack_OsBswTask,
+  		.top = stack_OsBswTask,
+  	},
+  	.autostart = TRUE,
+  	.resourceIntPtr = NULL_PTR, 
+  	.resourceAccess = 0 , 
+  	.activationLimit = 1,
+  	.eventMask = 0 ,
+  	.applOwnerId = APPLICATION_ID_OsApplicationInteriorLight,
+  	.accessingApplMask = (1u <<APPLICATION_ID_OsApplicationInteriorLight)
+  ,
+  },
+  {
+  	.pid = TASK_ID_OsRteTask,
+  	.name = "OsRteTask",
+  	.entry = OsRteTask,
+  	.prio = 1,
+  	.scheduling = FULL,
+  	.proc_type = PROC_EXTENDED,
+  	.stack = {
+  		.size = sizeof stack_OsRteTask,
+  		.top = stack_OsRteTask,
+  	},
+  	.autostart = TRUE,
+  	.resourceIntPtr = NULL_PTR, 
+  	.resourceAccess = 0 , 
+  	.activationLimit = 1,
+  	.eventMask = 0 | EVENT_MASK_OsMainEvent | EVENT_MASK_OsInitEvent ,  //两个时间在OsRteTask任务中判断。EVENT_MASK_OsInitEvent在Rte_Internal_EcuM.c中（每次模式转换都会）生成该事件
+  	
+  	.applOwnerId = APPLICATION_ID_OsApplicationInteriorLight,
+  	.accessingApplMask = (1u <<APPLICATION_ID_OsApplicationInteriorLight)
+  ,
+  },
+  {
+  	.pid = TASK_ID_OsStartupTask,
+  	.name = "OsStartupTask",
+  	.entry = OsStartupTask,
+  	.prio = 1,
+  	.scheduling = FULL,
+  	.proc_type = PROC_BASIC,
+  	.stack = {
+  		.size = sizeof stack_OsStartupTask,
+  		.top = stack_OsStartupTask,
+  	},
+  	.autostart = TRUE,
+  	.resourceIntPtr = NULL_PTR, 
+  	.resourceAccess = 0 , 
+  	.activationLimit = 1,
+  	.eventMask = 0 ,
+  	.applOwnerId = APPLICATION_ID_OsApplicationInteriorLight,
+  	.accessingApplMask = (1u <<APPLICATION_ID_OsApplicationInteriorLight)
+  ,
+  },
+  };
+  ```
 
   **（9）勾子函数——HOOKS**
 
+  ```c
+  GEN_HOOKS( 
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL
+  );
+  ```
+
   **（10）中断——ISRS**
+
+  ```c
+  #if (!defined(CFG_TC2XX) && !defined(CFG_TC3XX)) // Table Os_VectorToIsr is not used for Aurix architecture.
+  GEN_ISR_MAP = {
+    0
+  };
+  #endif
+  ```
 
   **（11）调度表——SCHEDULE TABLES**
 
