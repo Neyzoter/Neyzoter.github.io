@@ -525,18 +525,35 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
 ### 7.3.7 OsRteTask读取数据和设置灯电平
 
-```mermaid
-graph TB;
+```
+
+
 OsRteTask["OsRteTask"] --Event--> Rte_leftDoorSensor_DoorSensorMain["Rte_leftDoorSensor_DoorSensorMain()<br>@\Rte\Config\Rte_DoorSensor.c"] 
 
 OsRteTask["OsRteTask"] --Event--> Rte_rightDoorSensor_DoorSensorMain["Rte_leftDoorSensor_DoorSensorMain()<br>@Rte_DoorSensor.c"]
+```
 
+
+
+```mermaid
+graph LR;
+subgraph App
 OsRteTask["OsRteTask"] --Event--> Rte_lightManager_InteriorLightManagerMain["Rte_lightManager_InteriorLightManagerMain()<br>@/Rte/Config/Rte_InteriorLightManager.c"] 
     Rte_lightManager_InteriorLightManagerMain --PRE--> Rte_Read_InteriorLightManager_lightManager_RearDoorStatus_message["Rte_Read_InteriorLightManager_lightManager_<br>RearDoorStatus_message(...)<br>@/Rte/Config/Rte_Internal_InteriorLightManager.c"]
     Rte_Read_InteriorLightManager_lightManager_RearDoorStatus_message --> Com_ReceiveSignal["Com_ReceiveSignal(...)@<br>/core/communication/Com/src/Com_Com.c"]
     Com_ReceiveSignal --> Com_Misc_ReadSignalDataFromPdu["Com_Misc_ReadSignalDataFromPdu()@<br>/core/communication/Com/src/Com_misc.c"]
     
 OsRteTask["OsRteTask"] --Event--> Rte_frontLightActuator_LightActuatorMain["Rte_frontLightActuator_LightActuatorMain()<br>@\Rte\Config\Rte_DoorSensor.c"] 
+end
+subgraph RTE
+end
+subgraph SL
+end
+subgraph ECU_ABL
+end
+subgraph MCAL
+end
+
 
 ```
 
