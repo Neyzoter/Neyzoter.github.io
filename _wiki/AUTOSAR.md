@@ -408,6 +408,145 @@ main["main()@/core/system<br>/Os/rtos/src/os_init.c"]  --> EcuM_Init["EcuM_Init(
 
 *注*：Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)：CanConfigPtr参数在Can_PBcfg.c
 
+* **两个重要的IPdu**
+
+  **需要修改的内容**：
+
+```c
+IPdu = &(ComConfig->ComIPdu[0]);
+// @ \examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c\Com_PbCfg.c
+ SECTION_POSTBUILD_DATA const Com_ConfigType ComConfiguration = {
+	.ComConfigurationId 			= 1,
+	.ComNofIPdus					= 2,
+	.ComNofSignals					= 2,
+	.ComNofGroupSignals				= 0,
+	.ComIPdu 						= ComIPdu,  //指向本文件的ComIPdu
+	.ComIPduGroup 					= ComIPduGroup,
+	.ComSignal						= ComSignal,
+	.ComGroupSignal					= ComGroupSignal,
+	.ComGwMappingRef				= ComGwMapping,
+	.ComGwSrcDesc					= ComGwSourceDescs,
+	.ComGwDestnDesc					= ComGwDestinationDescs
+};   
+// @ \examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c\Com_PbCfg.c
+SECTION_POSTBUILD_DATA const ComIPdu_type ComIPdu[] = {	
+	{ // DoorStatusPdu  CAN接收
+		.ArcIPduOutgoingId			= PDUR_REVERSE_PDU_ID_PDURX,
+		.ComRxIPduCallout			= COM_NO_FUNCTION_CALLOUT,
+		.ComTxIPduCallout			= COM_NO_FUNCTION_CALLOUT,
+		.ComTriggerTransmitIPduCallout = COM_NO_FUNCTION_CALLOUT,
+		.ComIPduSignalProcessing 	= COM_DEFERRED,
+		.ComIPduSize				= 64,  //定义了Arc_IPdu中数据的长度，IPdu：64；Shadow_Buff：64；Deferred_IPdu：64，共192——对应COM_MAX_BUFFER_SIZE
+		.ComIPduDirection			= COM_RECEIVE,  //接收模式
+		.ComIPduGroupRefs			= ComIpduGroupRefs_DoorStatusPdu,
+		.ComTxIPdu = {
+			.ComTxIPduMinimumDelayFactor	= 0,
+			.ComTxIPduUnusedAreasDefault	= 0,
+			.ComTxModeTrue = {
+				.ComTxModeMode						= COM_NONE,
+				.ComTxModeNumberOfRepetitions		= 0,
+				.ComTxModeRepetitionPeriodFactor	= 0,
+				.ComTxModeTimeOffsetFactor			= 0,
+				.ComTxModeTimePeriodFactor			= 0,
+			},
+			.ComTxModeFalse = {
+				.ComTxModeMode						= COM_NONE,
+				.ComTxModeNumberOfRepetitions		= 0,
+				.ComTxModeRepetitionPeriodFactor	= 0,
+				.ComTxModeTimeOffsetFactor			= 0,
+				.ComTxModeTimePeriodFactor			= 0,
+			},
+		},
+		.ComIPduSignalRef			= ComIPduSignalRefs_DoorStatusPdu,
+		.ComIPduDynSignalRef		= NULL,
+		.ComIpduCounterRef			= NULL,
+		.ComIPduGwMapSigDescHandle	= NULL,
+		.ComIPduGwRoutingReq		= FALSE,
+		.Com_Arc_EOL				= 0
+	},
+	{ // LightStatusPdu  CAN发送
+		.ArcIPduOutgoingId			= PDUR_PDU_ID_PDUTX,
+		.ComRxIPduCallout			= COM_NO_FUNCTION_CALLOUT,
+		.ComTxIPduCallout			= COM_NO_FUNCTION_CALLOUT,
+		.ComTriggerTransmitIPduCallout = COM_NO_FUNCTION_CALLOUT,
+		.ComIPduSignalProcessing 	= COM_DEFERRED,
+		.ComIPduSize				= 64,
+		.ComIPduDirection			= COM_SEND,
+		.ComIPduGroupRefs			= ComIpduGroupRefs_LightStatusPdu,
+		.ComTxIPdu = {
+			.ComTxIPduMinimumDelayFactor	= 0,
+			.ComTxIPduUnusedAreasDefault	= 0,
+			.ComTxIPduClearUpdateBit		= TRANSMIT,
+			.ComTxModeTrue = {
+				.ComTxModeMode						= COM_PERIODIC,
+				.ComTxModeNumberOfRepetitions		= 0,
+				.ComTxModeRepetitionPeriodFactor	= 0,
+				.ComTxModeTimeOffsetFactor			= 0,
+				.ComTxModeTimePeriodFactor			= 10,
+			},
+			.ComTxModeFalse = {
+				.ComTxModeMode						= COM_NONE,
+				.ComTxModeNumberOfRepetitions		= 0,
+				.ComTxModeRepetitionPeriodFactor	= 0,
+				.ComTxModeTimeOffsetFactor			= 0,
+				.ComTxModeTimePeriodFactor			= 0,
+			},
+		},
+		.ComIPduSignalRef			= ComIPduSignalRefs_LightStatusPdu,
+		.ComIPduDynSignalRef		= NULL,
+		.ComIpduCounterRef			= NULL,
+		.ComIPduGwMapSigDescHandle	= NULL,
+		.ComIPduGwRoutingReq		= FALSE,
+		.Com_Arc_EOL				= 0
+	},
+	{   //停止信号
+        //void Com_Init(const Com_ConfigType *config )中for (uint16 i = 0; 0 == ComConfig->ComIPdu[i].Com_Arc_EOL; i++){}
+		.Com_Arc_EOL				= 1
+	}
+};
+```
+
+
+
+```c
+
+
+Arc_IPdu = &(Com_Arc_Config.ComIPdu[0]);  //Com_Arc_Config见下方
+    
+const Com_Arc_Config_type Com_Arc_Config = {  // @\core\communication\Com\src\Com_Internal.h
+    .ComIPdu            = Com_Arc_IPdu,     // 见下方
+    .ComSignal          = Com_Arc_Signal,
+#if (COM_MAX_N_GROUP_SIGNALS != 0)
+    .ComGroupSignal     = Com_Arc_GroupSignal,
+#else
+    .ComGroupSignal     = NULL,
+#endif
+#if (COM_SIG_GATEWAY_ENABLE == STD_ON)
+    .ComGwSrcDescSignal = Com_Arc_GwSrcDescSignals
+#else
+    .ComGwSrcDescSignal = NULL
+#endif
+};
+//@\core\communication\Com\src\Com.c
+static Com_Arc_IPdu_type Com_Arc_IPdu[COM_MAX_N_IPDUS]; //COM_MAX_N_IPDUS=2
+
+typedef struct {  // @\core\communication\Com\src\Com_Arc_Types.h
+    /** Reference to the actual pdu data storage */
+    void *ComIPduDataPtr;  //指向Com_Arc_Buffer[0]，见下方
+    void *ComIPduDeferredDataPtr;  //如果没有shadow_buffer，指向Com_Arc_Buffer[64]
+
+    Com_Arc_TxIPduTimer_type Com_Arc_TxIPduTimers;
+    uint32 Com_Arc_TxDeadlineCounter; 
+    uint16 Com_Arc_DynSignalLength;
+    boolean Com_Arc_IpduStarted;
+    boolean Com_Arc_IpduRxDMControl;
+    boolean Com_Arc_IpduTxMode;
+} Com_Arc_IPdu_type;
+
+//@\core\communication\Com\src\Com.c
+static uint8 Com_Arc_Buffer[COM_MAX_BUFFER_SIZE]; // COM_MAX_BUFFER_SIZE = 192
+```
+
 * **CAN数据接收**
 
   1.CAN接收中断初始化、触发、数据写入到IPdu过程
@@ -525,7 +664,7 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
 ### 7.3.7 OsRteTask读取数据和设置灯PWM
 
-<img src="/images/visio/AUTOSAR/RTEandSWV.png" width = "800" alt = "RTE读取数据设置灯Pwm">
+<img src="/images/wiki/AUTOSAR/RTEandSWV.png" width = "800" alt = "RTE读取数据设置灯Pwm">
 
 ## 7.4 顶层移植、配置和应用
 
