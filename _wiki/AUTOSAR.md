@@ -410,7 +410,7 @@ main["main()@/core/system<br>/Os/rtos/src/os_init.c"]  --> EcuM_Init["EcuM_Init(
 
 * **两个重要的IPdu**
 
-  **需要修改的内容**：
+  **需要修改的内容**：无
 
 ```c
 IPdu = &(ComConfig->ComIPdu[0]);
@@ -435,7 +435,7 @@ SECTION_POSTBUILD_DATA const ComIPdu_type ComIPdu[] = {
 		.ComRxIPduCallout			= COM_NO_FUNCTION_CALLOUT,
 		.ComTxIPduCallout			= COM_NO_FUNCTION_CALLOUT,
 		.ComTriggerTransmitIPduCallout = COM_NO_FUNCTION_CALLOUT,
-		.ComIPduSignalProcessing 	= COM_DEFERRED,
+		.ComIPduSignalProcessing 	= COM_DEFERRED,//指定为DEFERRED，IPdu需要先拷贝至Deferred_IPdu
 		.ComIPduSize				= 64,  //定义了Arc_IPdu中数据的长度，IPdu：64；Shadow_Buff：64；Deferred_IPdu：64，共192——对应COM_MAX_BUFFER_SIZE
 		.ComIPduDirection			= COM_RECEIVE,  //接收模式
 		.ComIPduGroupRefs			= ComIpduGroupRefs_DoorStatusPdu,
