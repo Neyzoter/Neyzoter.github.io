@@ -414,7 +414,7 @@ main["main()@/core/system<br>/Os/rtos/src/os_init.c"]  --> EcuM_Init["EcuM_Init(
 
 ```c
 IPdu = &(ComConfig->ComIPdu[0]);
-// @ \examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c\Com_PbCfg.c
+// @ /examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3210c/Com_PbCfg.c
  SECTION_POSTBUILD_DATA const Com_ConfigType ComConfiguration = {
 	.ComConfigurationId 			= 1,
 	.ComNofIPdus					= 2,
@@ -428,7 +428,7 @@ IPdu = &(ComConfig->ComIPdu[0]);
 	.ComGwSrcDesc					= ComGwSourceDescs,
 	.ComGwDestnDesc					= ComGwDestinationDescs
 };   
-// @ \examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c\Com_PbCfg.c
+// @ /examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3210c/Com_PbCfg.c
 SECTION_POSTBUILD_DATA const ComIPdu_type ComIPdu[] = {	
 	{ // DoorStatusPdu  CAN接收
 		.ArcIPduOutgoingId			= PDUR_REVERSE_PDU_ID_PDURX,
@@ -513,7 +513,7 @@ SECTION_POSTBUILD_DATA const ComIPdu_type ComIPdu[] = {
 
 Arc_IPdu = &(Com_Arc_Config.ComIPdu[0]);  //Com_Arc_Config见下方
     
-const Com_Arc_Config_type Com_Arc_Config = {  // @\core\communication\Com\src\Com_Internal.h
+const Com_Arc_Config_type Com_Arc_Config = {  // @/core/communication/Com/src/Com_Internal.h
     .ComIPdu            = Com_Arc_IPdu,     // 见下方
     .ComSignal          = Com_Arc_Signal,
 #if (COM_MAX_N_GROUP_SIGNALS != 0)
@@ -527,10 +527,10 @@ const Com_Arc_Config_type Com_Arc_Config = {  // @\core\communication\Com\src\Co
     .ComGwSrcDescSignal = NULL
 #endif
 };
-//@\core\communication\Com\src\Com.c
+//@/core/communication/Com/src/Com.c
 static Com_Arc_IPdu_type Com_Arc_IPdu[COM_MAX_N_IPDUS]; //COM_MAX_N_IPDUS=2
 
-typedef struct {  // @\core\communication\Com\src\Com_Arc_Types.h
+typedef struct {  // @/core/communication/Com/src/Com_Arc_Types.h
     /** Reference to the actual pdu data storage */
     void *ComIPduDataPtr;  //指向Com_Arc_Buffer[0]，见下方
     void *ComIPduDeferredDataPtr;  //如果没有shadow_buffer，指向Com_Arc_Buffer[64]
@@ -543,7 +543,7 @@ typedef struct {  // @\core\communication\Com\src\Com_Arc_Types.h
     boolean Com_Arc_IpduTxMode;
 } Com_Arc_IPdu_type;
 
-//@\core\communication\Com\src\Com.c
+//@/core/communication/Com/src/Com.c
 static uint8 Com_Arc_Buffer[COM_MAX_BUFFER_SIZE]; // COM_MAX_BUFFER_SIZE = 192
 ```
 
@@ -589,6 +589,60 @@ OsRteTask["OsRteTask"] --Event--> Rte_lightManager_InteriorLightManagerMain["Rte
 Rte_lightManager_InteriorLightManagerMain --PRE--> Rte_Read_InteriorLightManager_lightManager_RearDoorStatus_message["Rte_Read_InteriorLightManager_lightManager_<br>RearDoorStatus_message(...)<br>@/Rte/Config/Rte_Internal_InteriorLightManager.c"]
 Rte_Read_InteriorLightManager_lightManager_RearDoorStatus_message --> Com_ReceiveSignal["Com_ReceiveSignal(...)@<br>/core/communication/Com/src/Com_Com.c"]
 Com_ReceiveSignal --> Com_Misc_ReadSignalDataFromPdu["Com_Misc_ReadSignalDataFromPdu()@<br>/core/communication/Com/src/Com_misc.c"]
+```
+
+*相关数据结构*
+
+1.PRE
+
+```c
+// @/Rte/Contract/Rte_InteriorLightManager.h
+typedef struct {
+    Rte_DE_DoorStatusImpl * const InteriorLightManagerMain_LeftDoorStatus_status;
+    Rte_DE_IntImpl * const InteriorLightManagerMain_RearDoorStatus_message;
+    Rte_DE_DoorStatusImpl * const InteriorLightManagerMain_RightDoorStatus_status;
+    Rte_DE_LightStatusImpl * const InteriorLightManagerMain_FrontLightStatus_status;
+    Rte_DE_IntImpl * const InteriorLightManagerMain_LightStatusOnCommMedia_message;
+} Rte_CDS_InteriorLightManager;
+typedef Rte_CDS_InteriorLightManager const * const Rte_Instance;
+#define self (Rte_Inst_InteriorLightManager)  // 在.c中创建Rte_Inst_InteriorLightManager
+
+// @ /Rte/Config/Rte_InteriorLightManager.c
+Rte_DE_IntImpl ImplDE_lightManager_InteriorLightManagerMain_RearDoorStatus_message;//存放CAN发送过来的数据
+const Rte_CDS_InteriorLightManager InteriorLightManager_lightManager = {
+    .InteriorLightManagerMain_RearDoorStatus_message = &ImplDE_lightManager_InteriorLightManagerMain_RearDoorStatus_message,  //1.PRE指向存放CAN发送过来的空间
+    .InteriorLightManagerMain_RightDoorStatus_status = &ImplDE_lightManager_InteriorLightManagerMain_RightDoorStatus_status,
+    .InteriorLightManagerMain_LeftDoorStatus_status = &ImplDE_lightManager_InteriorLightManagerMain_LeftDoorStatus_status,
+    .InteriorLightManagerMain_FrontLightStatus_status = &ImplDE_lightManager_InteriorLightManagerMain_FrontLightStatus_status, //2.MAIN处理1数据，结果写入到此处；3.POST写入到Rte_Buffer_frontLightActuator_InteriorLightStatus_status @ Rte_Buffers.c
+    .InteriorLightManagerMain_LightStatusOnCommMedia_message = &ImplDE_lightManager_InteriorLightManagerMain_LightStatusOnCommMedia_message
+};
+const Rte_Instance Rte_Inst_InteriorLightManager = &InteriorLightManager_lightManager;
+```
+
+2.MAIN
+
+获取`/Rte/Config/Rte_InteriorLightManager.c`中的数值，并进行处理，最终写入到`Rte_Inst_InteriorLightManager ->InteriorLightManagerMain_FrontLightStatus_status`。
+
+3.POST
+
+```c
+// /Rte/Config/Rte_Buffers.c
+LightStatusImpl Rte_Buffer_frontLightActuator_InteriorLightStatus_status; // 3.将MAIN处理结果拷贝到此处
+```
+
+**执行器根据上述结果执行相应操作**
+
+*数据结构*
+
+```c
+// \Rte\Config\Rte_LightActuator.c
+Rte_DE_LightStatusImpl ImplDE_frontLightActuator_LightActuatorMain_InteriorLightStatus_status;
+const Rte_CDS_LightActuator LightActuator_frontLightActuator = {
+    .LightActuatorMain_InteriorLightStatus_status = &ImplDE_frontLightActuator_LightActuatorMain_InteriorLightStatus_status,  // 将Rte_Buffer_frontLightActuator_InteriorLightStatus_status内保存的处理结果拷贝到此处
+    .DigitalLight = {
+        .Call_Write = Rte_Call_LightActuator_frontLightActuator_DigitalLight_Write  //需要执行的操作
+    }
+};
 ```
 
 * **CAN数据发送**
@@ -663,6 +717,8 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 ```
 
 ### 7.3.7 OsRteTask读取数据和设置灯PWM
+
+
 
 <img src="/images/wiki/AUTOSAR/RTEandSWV.png" width = "800" alt = "RTE读取数据设置灯Pwm">
 
