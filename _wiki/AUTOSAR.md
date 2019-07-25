@@ -718,8 +718,6 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
 ### 7.3.7 OsRteTask读取数据和设置灯PWM
 
-
-
 <img src="/images/wiki/AUTOSAR/RTEandSWV.png" width = "800" alt = "RTE读取数据设置灯Pwm">
 
 ## 7.4 顶层移植、配置和应用
