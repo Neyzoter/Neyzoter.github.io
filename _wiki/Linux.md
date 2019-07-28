@@ -995,6 +995,14 @@ $ mongod --bind_ip 0.0.0.0
 $ mongo <远程IP>
 ```
 
+# 5.7 安装shadowsocks-qt5
+```bash
+# 添加PPA源
+sudo add-apt-repository ppa:hzwhuang/ss-qt5
+sudo apt-get update
+sudo apt-get install shadowsocks-qt5
+```
+
 # 6、Linux shell的编写与使用
 
 ## 6.1 最简单的应用
