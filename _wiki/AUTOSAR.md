@@ -740,6 +740,8 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
 ## 7.4 顶层移植、配置和应用
 
+路径：`\examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c`
+
 ### 7.4.1 Os
 
 配置文件主要包括：`Os_Cfg.c`和`Os_Cfg.h`
@@ -990,7 +992,53 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   具体见代码注释。
 
+### 7.4.2 Com
 
+* `Com_Cfg.c`
+
+  **需要修改的内容**：无
+
+  定义`callout`函数，例子：
+
+  ```c
+  const ComNotificationCalloutType ComNotificationCallouts [] = { // Notifications
+  	NULL};
+  const ComRxIPduCalloutType ComRxIPduCallouts[] = {// Rx callouts
+  	NULL};
+  const ComTxIPduCalloutType ComTxIPduCallouts[] = {// Tx callouts
+  	NULL};
+  const ComTxIPduCalloutType ComTriggerTransmitIPduCallouts[] = {// Trigger transmit callouts
+  	NULL};
+  ```
+
+* `Com_Cfg.h`
+
+  **需要修改的内容**：`信号ID`
+
+  通信相关配置，例如：
+
+  `COM_MAX_BUFFER_SIZE`：通信缓存192字节，见**7.3.7 OsRteTask读取数据和设置灯PWM**
+
+  `COM_MAX_N_IPDUS`：通信`IPdu`（类型为`Com_Arc_IPdu_type`）最多个数2个——发送和接收，结合上面`COM_MAX_BUFFER_SIZE`，共2个192字节通信缓存。
+
+  `COM_MAX_N_SIGNALS`：信号Signal（类型为`Com_Arc_Signal_type`）个数，如果大于0，则会开启`IPDU`计数
+
+  `COM_MAX_N_GROUP_SIGNALS`：信号组（类型为`Com_Arc_GroupSignal_type`）个数
+
+  `一些通错误编号`：`COM_INVALID_PDU_ID(104)`、`COM_INVALID_SIGNAL_ID(109)`等
+
+  **`信号ID`**：如门状态`ComConf_ComSignal_DoorStatus(0)`、灯状态`ComConf_ComSignal_LightStatus(1)`
+
+* `Com_PbCfg.c`
+
+* `Com_PbCfg.h`
+
+### 7.4.3 ComM
+
+* `ComM_Cfg.c`
+* `ComM_Cfg.h`
+* `ComM_PbCfg.c`
+* `ComM_PbCfg.h`
 
 
 
