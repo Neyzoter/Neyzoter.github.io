@@ -728,7 +728,13 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
 * Runnable调用的函数和定义
 
+（1）获取数据和处理数据
+
+实际系统处理数据后，会通过CAN发送函数`Rte_Write_InteriorPwmSetManager_pwmSetManager_PwmSetDutyOnCommMedia_message@Rte\Config\Rte_Internal_InteriorPwmSetManager.c（在Rte\Config\Rte_Internal.h声明）`发送至外部。
+
 <img src="/images/wiki/AUTOSAR/managerRunnable.png" width = "800" alt = "获取数据和处理">
+
+（2）执行Pwm占空比设置
 
 <img src="/images/wiki/AUTOSAR/actuatorRunnable.png" width = "800" alt = "执行设置占空比">
 
