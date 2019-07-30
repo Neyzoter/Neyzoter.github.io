@@ -740,7 +740,7 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   **函数定义总结**
 
-  `Rte_Internal_xxxx.c/Rte_Internal.h`：定义/声明内容包括从IPDU读取（通信接收到的）数据、将数据写入RteBuff、读取RteBuff、设置IO（Pwm）占空比、写入IPDU（准备发送）。
+  `Rte_Internal_xxxx.c/Rte_Internal.h`（`Rte/Config`）：定义/声明内容包括从IPDU读取（通信接收到的）数据、将数据写入RteBuff、读取RteBuff、设置IO（Pwm）占空比、写入IPDU（准备发送）。
 
   `Rte_xxxx.c`（`Rte/Config`）：定义Runnables，在要使用的地方extern引入
 
