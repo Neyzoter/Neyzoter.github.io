@@ -408,12 +408,19 @@ main["main()@/core/system<br>/Os/rtos/src/os_init.c"]  --> EcuM_Init["EcuM_Init(
 
 *注*：Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)：CanConfigPtr参数在Can_PBcfg.c
 
-* **两个重要的IPdu**
+* **两个重要的IPdu和`Signal`**
 
-  **需要修改的内容**：无
+  **需要修改的内容**：一些名称，如`ComIPduGroupRefs`对应的数值等
+
+  **`IPdu`、`Arc_IPud`和`Signal`区别**：`IPdu = &(ComConfig->ComIPdu[0])`、`Signal = &(ComConfig->ComSignal[0])`、`Arc_IPdu = &(Com_Arc_Config.ComIPdu[0])`；`IPdu[n]`类型`ComIPdu_type`（在examples中定义），`Arc_IPdu[n]`类型`Com_Arc_IPdu_type`（在core中定义，由`COM_MAX_N_IPDUS`定义数组元素个数）；`IPdu`中定义了发送或者接收模式，还指向了`Signal[n]`等，`Signal[n]`定义了大小端、对应的`Arc_IPdu`元素下标（数据发送或者接收都要经过此`Arc_IPdu`）等；
+
+  <img src="/images/wiki/AUTOSAR/IPdu.Arc_IPdu.Signal.png" width = "800" alt = "IPdu、Arc_IPud和Signal关系">
 
 ```c
+// GET_IPdu(IPduId)
 IPdu = &(ComConfig->ComIPdu[0]);
+// GET_Signal(SignalId)
+Signal = &(ComConfig->ComSignal[0]);
 // @ /examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3210c/Com_PbCfg.c
  SECTION_POSTBUILD_DATA const Com_ConfigType ComConfiguration = {
 	.ComConfigurationId 			= 1,
@@ -422,7 +429,7 @@ IPdu = &(ComConfig->ComIPdu[0]);
 	.ComNofGroupSignals				= 0,
 	.ComIPdu 						= ComIPdu,  //指向本文件的ComIPdu
 	.ComIPduGroup 					= ComIPduGroup,
-	.ComSignal						= ComSignal,
+	.ComSignal						= ComSignal, //即Signal，指向ComSignal
 	.ComGroupSignal					= ComGroupSignal,
 	.ComGwMappingRef				= ComGwMapping,
 	.ComGwSrcDesc					= ComGwSourceDescs,
@@ -457,7 +464,7 @@ SECTION_POSTBUILD_DATA const ComIPdu_type ComIPdu[] = {
 				.ComTxModeTimePeriodFactor			= 0,
 			},
 		},
-		.ComIPduSignalRef			= ComIPduSignalRefs_DoorStatusPdu,
+		.ComIPduSignalRef			= ComIPduSignalRefs_DoorStatusPdu,  //指向Signal[n]，见下方ComIPduSignalRefs_DoorStatusPdu
 		.ComIPduDynSignalRef		= NULL,
 		.ComIpduCounterRef			= NULL,
 		.ComIPduGwMapSigDescHandle	= NULL,
@@ -504,12 +511,73 @@ SECTION_POSTBUILD_DATA const ComIPdu_type ComIPdu[] = {
 		.Com_Arc_EOL				= 1
 	}
 };
+SECTION_POSTBUILD_DATA const ComSignal_type * const ComIPduSignalRefs_DoorStatusPdu[] = {
+	&ComSignal[ComConf_ComSignal_DoorStatus],
+	NULL
+};
+
+// @ /examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3210c/Com_PbCfg.c
+SECTION_POSTBUILD_DATA const ComSignal_type ComSignal[] = {
+    { // DoorStatus
+        .ComHandleId                = ComConf_ComSignal_DoorStatus,
+        .ComIPduHandleId            = ComConf_ComIPdu_DoorStatusPdu,
+        // @req COM292          
+        .ComFirstTimeoutFactor      = 0,
+        .ComNotification            = COM_NO_FUNCTION_CALLOUT,        
+        .ComTimeoutFactor           = 0,
+        .ComTimeoutNotification     = COM_NO_FUNCTION_CALLOUT,
+        .ComErrorNotification       = COM_NO_FUNCTION_CALLOUT,
+        .ComTransferProperty        = COM_TRIGGERED_ON_CHANGE,
+        .ComUpdateBitPosition       = 0,
+        .ComSignalArcUseUpdateBit   = FALSE,
+        .ComSignalInitValue         = &Com_SignalInitValue_DoorStatus,
+        .ComBitPosition             = 0,
+        .ComBitSize                 = 32,
+        .ComSignalEndianess         = COM_LITTLE_ENDIAN,
+        .ComSignalType              = COM_UINT32,
+        .Com_Arc_IsSignalGroup      = FALSE,
+        .ComGroupSignal             = NULL,
+        .ComRxDataTimeoutAction     = COM_TIMEOUT_DATA_ACTION_NONE,
+        .ComSigGwRoutingReq         = FALSE,
+        .ComOsekNmNetId             = COM_OSEKNM_INVALID_NET_ID,
+        .ComOsekNmNodeId            = 0,
+        .Com_Arc_EOL                = 0
+    },
+
+    { // LightStatus
+        .ComHandleId                = ComConf_ComSignal_LightStatus,
+        .ComIPduHandleId            = ComConf_ComIPdu_LightStatusPdu,
+        .ComFirstTimeoutFactor      = 0,      
+        .ComNotification            = COM_NO_FUNCTION_CALLOUT,        
+        .ComTimeoutFactor           = 0,
+        .ComTimeoutNotification     = COM_NO_FUNCTION_CALLOUT,
+        .ComErrorNotification       = COM_NO_FUNCTION_CALLOUT,
+        .ComTransferProperty        = COM_PENDING,
+        .ComUpdateBitPosition       = 0,
+        .ComSignalArcUseUpdateBit   = FALSE,
+        .ComSignalInitValue         = &Com_SignalInitValue_LightStatus,
+        .ComBitPosition             = 0,
+        .ComBitSize                 = 32,
+        .ComSignalEndianess         = COM_LITTLE_ENDIAN,
+        .ComSignalType              = COM_UINT32,
+        .Com_Arc_IsSignalGroup      = FALSE,
+        .ComGroupSignal             = NULL,
+        .ComRxDataTimeoutAction     = COM_TIMEOUT_DATA_ACTION_NONE,
+        .ComSigGwRoutingReq         = FALSE,
+        .ComOsekNmNetId             = COM_OSEKNM_INVALID_NET_ID,
+        .ComOsekNmNodeId            = 0,
+        .Com_Arc_EOL                = 0
+    },
+	{
+		.Com_Arc_EOL				= 1
+	}
+};
 ```
 
 
 
 ```c
-
+// GET_ArcIPdu(IPduId)
 
 Arc_IPdu = &(Com_Arc_Config.ComIPdu[0]);  //Com_Arc_Config见下方
     
@@ -546,6 +614,8 @@ typedef struct {  // @/core/communication/Com/src/Com_Arc_Types.h
 //@/core/communication/Com/src/Com.c
 static uint8 Com_Arc_Buffer[COM_MAX_BUFFER_SIZE]; // COM_MAX_BUFFER_SIZE = 192
 ```
+
+
 
 * **CAN数据接收**
 
@@ -1045,9 +1115,9 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   1.`Com_PbCfg.c`的`ComSignal[n]->ComHandleId`
 
-  2.调用`Com_ReceiveSignal`或者`Com_SendSignal`时候，如`Rte_Internal_PwmSetManager.c`的`retVal |= Com_ReceiveSignal(信号ID, value)`
+  2.调用`Com_ReceiveSignal`或者`Com_SendSignal`时候，如`Rte_Internal_PwmSetManager.c`的`retVal |= Com_ReceiveSignal(信号ID, value)`，函数体内通过`GET_Signal(信号ID)`获取`ComSignal_type * Signal`，通过`GET_ArcIPdu(Signal->ComIPduHandleId)`获取`Com_Arc_IPdu_type *Arc_IPdu`。
 
-  3.`Com_PbCfg.c`的`IPdu signal`
+  3.`Com_PbCfg.c`的`IPdu signal`，如
 
   ```c
   SECTION_POSTBUILD_DATA const ComSignal_type * const ComIPduSignalRefs_DoorStatusPdu[] = {
@@ -1060,9 +1130,9 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   **需要修改的内容**：`ComSignal[n].ComIPduHandleId`对应`Com_PbCfg.h`中的某一个ID
 
-  定义通信需要的数据结构——`ComConfiguration`，即`IPdu`。
+  定义通信需要的数据结构——`ComConfiguration`，即`Signal`（非`Arc_IPdu`）。
 
-  *注*：`Arc_IPud`在`/core/communication/Com/src/Com_Internal.h`中定义，不需要自行定义。见**7.3.4 CAN调用过程**中的两个IPDU说明。
+  *注*：`Arc_IPud`在`/core/communication/Com/src/Com_Internal.h`中定义，不需要自行定义。见**7.3.4 CAN调用过程**中的IPDU说明。
 
 * `Com_PbCfg.h`
 
@@ -1081,6 +1151,10 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
   1.`Com_PbCfg.c`的`ComSignal[n].ComIPduHandleId`
 
   2.`PduR_PbCfg.c`的`PduRDestination_PduRRoutingPathRx_PduRDestPdu->DestPduId`（接收）或者`PduRRoutingPath_PduRRoutingPathTx->SrcPduId`（发送）
+
+**关于信号ID的总结**：`Com_Cfg.h`和`Com_PbCfg.h`中都定义了信号ID，分别制定了`IPdu`和`Arc_IPdu`获取地址——通过`GET_Signal(信号ID)`获取`ComSignal_type * Signal`，通过`GET_ArcIPdu(Signal->ComIPduHandleId)`获取`Com_Arc_IPdu_type *Arc_IPdu`；信号ID需要修改三个地方：`PDUR(Arc_IPdu)`、`Signal(IPdu)`和具体函数调用的信号ID参数。
+
+**`IPdu`、`Arc_IPdu`和`Signal`的区别**：见**7.3.4 CAN调用过程**
 
 ### 7.4.3 ComM
 
