@@ -1025,7 +1025,7 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
 * `Com_Cfg.h`
 
-  **需要修改的内容**：`信号ID`
+  **需要修改的内容**：`信号ID`，及关联文件
 
   通信相关配置，例如：
 
@@ -1039,11 +1039,48 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   `一些通错误编号`：`COM_INVALID_PDU_ID(104)`、`COM_INVALID_SIGNAL_ID(109)`等
 
-  **`信号ID`**：如门状态`ComConf_ComSignal_DoorStatus(0)`、灯状态`ComConf_ComSignal_LightStatus(1)`
+  **`信号ID`**：如门状态`ComConf_ComSignal_DoorStatus    0 `、灯状态`ComConf_ComSignal_LightStatus     1   `
+
+  **关联文件**：
+
+  1.`Com_PbCfg.c`的`ComSignal[n]->ComHandleId`
+
+  2.调用`Com_ReceiveSignal`或者`Com_SendSignal`时候，如`Rte_Internal_PwmSetManager.c`的`retVal |= Com_ReceiveSignal(信号ID, value)`
+
+  3.`Com_PbCfg.c`的`IPdu signal`
+
+  ```c
+  SECTION_POSTBUILD_DATA const ComSignal_type * const ComIPduSignalRefs_DoorStatusPdu[] = {
+  	&ComSignal[信号ID],
+  	NULL
+  };
+  ```
 
 * `Com_PbCfg.c`
 
+  **需要修改的内容**：`ComSignal[n].ComIPduHandleId`对应`Com_PbCfg.h`中的某一个ID
+
+  定义通信需要的数据结构——`ComConfiguration`，即`IPdu`。
+
+  *注*：`Arc_IPud`在`/core/communication/Com/src/Com_Internal.h`中定义，不需要自行定义。见**7.3.4 CAN调用过程**中的两个IPDU说明。
+
 * `Com_PbCfg.h`
+
+  **需要修改的内容**：`IPDU ID`号，并修改关联文件
+
+  定义`IPDU ID`号，指定数据对应对应不同`IPDU`。如
+
+  ```c
+  #define ComConf_ComIPdu_DoorStatusPdu               0
+  ```
+
+  定义了门状态信息为`IPDU[0]`。
+
+  **关联文件**：
+
+  1.`Com_PbCfg.c`的`ComSignal[n].ComIPduHandleId`
+
+  2.`PduR_PbCfg.c`的`PduRDestination_PduRRoutingPathRx_PduRDestPdu->DestPduId`（接收）或者`PduRRoutingPath_PduRRoutingPathTx->SrcPduId`（发送）
 
 ### 7.4.3 ComM
 
@@ -1052,9 +1089,51 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 * `ComM_PbCfg.c`
 * `ComM_PbCfg.h`
 
-### 7.4.4 RTE
+### 7.4.4 BswM
 
-#### 7.4.4.1 Config
+* `BswM_Cfg.c`
+
+  **需要修改的内容**：无
+
+  根据`USE`来包含特定`.h`文件。
+
+* `BswM_Cfg.h`
+
+  **需要修改的内容**：针对使用了不同的模块，使能相应内容
+
+  使能BswM具体功能，如`BSWM_CANSM_ENABLED   STD_ON`、`BSWM_COMM_ENABLED     STD_ON`等
+
+  宏定义数值
+
+* `BswM_PBcfg.c`
+
+  **需要修改的内容**：无
+
+  定义BswM需要用到的数据结构。
+
+### 7.4.5 EcuM
+
+- `EcuM_PBcfg.c`
+
+  **需要修改的内容**：无
+
+  定义EcuM需要用到的数据结构。
+
+- `EcuM_GeneratedCallouts.c`
+
+  **需要修改的内容**：无
+
+  无
+
+- `EcuM_Cfg.h`
+
+  **需要修改的内容**：无
+
+  宏定义唤醒源对应数值、复位方式对应数值
+
+### 7.4.6 RTE
+
+#### 7.4.6.1 Config
 
 * `Rte`
 
@@ -1238,11 +1317,17 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   校验功能。
 
-#### 7.4.4.2 Contract
+#### 7.4.6.2 Contract
 
-#### 7.4.4.3 MemMap
+* `Rte_xxxx.h`
 
+  声明`xxxx.c`内的函数
 
+#### 7.4.6.3 MemMap
+
+* `xxxx_MemMap.h`
+
+  实现内存映射
 
 
 
