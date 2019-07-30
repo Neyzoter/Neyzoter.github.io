@@ -1040,6 +1040,36 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 * `ComM_PbCfg.c`
 * `ComM_PbCfg.h`
 
+### 7.4.4 RTE
+
+#### 7.4.4.1 Config
+
+* `Rte_Internal`
+
+  **需要修改的内容**：函数声明
+
+  (1)`Rte_Internal.c`
+
+  `RteInitialized`：初始化为`FALSE`，并`include <Rte_MemMap.h>`
+
+  (2)`Rte_Internal.h`
+
+  *状态机定义*：EcuM和ComM状态机类型声明。
+
+  *状态机取值定义*：EcuM的运行、停止、睡眠、启动等；ComM的`FULL_COMMUNICATION`（接收发送均使能）、`NO_COMMUNICATION`（不使能通信）和`SILENT_COMMUNICATION`（只接受，不发送）。
+
+  *函数声明*：
+
+* 
+
+  
+
+  
+
+#### 7.4.4.2 Contract
+
+#### 7.4.4.3 MemMap
+
 
 
 
