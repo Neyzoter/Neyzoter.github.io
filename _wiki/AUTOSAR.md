@@ -1,5 +1,5 @@
 ---
-layout: wiki
+`layout: wiki
 title: AUTOSAR
 categories: AUTOSAR
 description: AUTOSAR架构学习笔记
@@ -728,15 +728,27 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
 * Runnable调用的函数和定义
 
-（1）获取数据和处理数据
+  （1）获取数据和处理数据
 
-实际系统处理数据后，会通过CAN发送函数`Rte_Write_InteriorPwmSetManager_pwmSetManager_PwmSetDutyOnCommMedia_message@Rte\Config\Rte_Internal_InteriorPwmSetManager.c（在Rte\Config\Rte_Internal.h声明）`发送至外部。
+  实际系统处理数据后，会通过CAN发送函数`Rte_Write_InteriorPwmSetManager_pwmSetManager_PwmSetDutyOnCommMedia_message@Rte\Config\Rte_Internal_InteriorPwmSetManager.c（在Rte\Config\Rte_Internal.h声明）`发送至外部。
 
-<img src="/images/wiki/AUTOSAR/managerRunnable.png" width = "800" alt = "获取数据和处理">
+  <img src="/images/wiki/AUTOSAR/managerRunnable.png" width = "800" alt = "获取数据和处理">
 
-（2）执行Pwm占空比设置
+  （2）执行Pwm占空比设置
 
-<img src="/images/wiki/AUTOSAR/actuatorRunnable.png" width = "800" alt = "执行设置占空比">
+  <img src="/images/wiki/AUTOSAR/actuatorRunnable.png" width = "800" alt = "执行设置占空比">
+
+  **函数定义总结**
+
+  `Rte_Internal_xxxx.c/Rte_Internal.h`：定义/声明内容包括从IPDU读取（通信接收到的）数据、将数据写入RteBuff、读取RteBuff、设置IO（Pwm）占空比、写入IPDU（准备发送）。
+
+  `Rte_xxxx.c`（`Rte/Config`）：定义Runnables，在要使用的地方extern引入
+
+  `Rte_xxxx.h`（`Rte/Contract`）：声明`xxxx.c`中定义的执行器函数；定义内联函数，直接和Runnables**绑定**的操作变量。
+
+  `Rte_xxxx_Type.h`（`Rte/Config`）：结构体声明
+
+  `xxxx.c`（`Rte/src`）：定义执行器函数，具体进行Pwm占空比设置、Bsw主任务、IO操作等。
 
 ## 7.4 顶层移植、配置和应用
 
@@ -1058,7 +1070,7 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   *状态机取值定义*：EcuM的运行、停止、睡眠、启动等；ComM的`FULL_COMMUNICATION`（接收发送均使能）、`NO_COMMUNICATION`（不使能通信）和`SILENT_COMMUNICATION`（只接受，不发送）。
 
-  *函数声明*：
+  *函数声明*：BswM、ComM、EcuM、
 
 * 
 
