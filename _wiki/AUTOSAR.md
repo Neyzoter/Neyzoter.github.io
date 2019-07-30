@@ -1056,6 +1056,42 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
 #### 7.4.4.1 Config
 
+* `Rte`
+
+  **需要修改的内容**：RTE任务具体执行的运行实体Runnable
+
+  (1)`Rte.c`
+
+  Rte任务，等待事件（包括系统满足条件后抛出的事件和定时抛出的事件）；调用EcuM状态机转化函数；调用运行实体（RE, Runnable Entity）。
+
+  (2)`Rte.h`
+
+  定义RTE相关的宏定义，如错误码、RTE版本等。
+
+* `Rte_BswM`
+
+  **需要修改的内容**：无
+
+  (1)`Rte_BswM.c`
+
+  定义ComM三种模式，NO、SILENT和FULL，为什么在这里定义？？`Rte_ComM_Type.h`中也有定义。
+
+  (2)`Rte_BswM_Type.h`
+
+  BswM运行实体`Rte_bswM_BswMRunnable`，实际未被调用。**思考**：BswM是否可作为RTE任务的一个运行实体，循环调用？实际上Bsw任务直接调用了`Rte_bswM_BswMRunnable`中的MAIN功能函数`BswM_MainFunction`。
+
+* `Rte_ComM`
+
+  (1)`Rte_ComM.c`
+
+  定义函数：获取当前通信模式（状态）、获取请求的通信模式（模式）、请求通信模式（状态）等。
+
+  (2)`Rte_ComM_Type.h`
+
+  定义ComM三种模式，NO、SILENT和FULL。
+
+  **问题**：为什么`RTE_MODE_ComMMode_COMM_FULL_COMMUNICATION`和`COMM_FULL_COMMUNICATION`定义的值不同？用处是？
+
 * `Rte_Internal`
 
   **需要修改的内容**：函数声明
@@ -1074,17 +1110,83 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
 * `Rte_Buffers`
 
+  **需要修改的内容**：RTE缓存区
+
   (1)`Rte_Buffers.c`
 
   定义RTE缓存区，作为Runnable之间信息交换的桥梁。
 
   (2)`Rte_Buffers.h`
 
-  EcuM、ComM函数extern声明
+  EcurM、ComM函数、RTE缓存区（桥梁）变量的extern声明。
 
-  
+* `Rte_Type.h`
 
-  
+  **需要修改的内容**：用到的基础变量
+
+  声明基础变量，如
+
+  ```c
+  /* Redefinition type DigitalLevel */
+  typedef uint8 DigitalLevel;
+  /* Redefinition type DutyCycle */
+  typedef uint32 DutyCycle;
+  /* Redefinition type Frequency */
+  typedef uint32 Frequency;
+  //.....
+  ```
+
+* `Rte_DataHandleType.h`
+
+  **需要修改的内容**：用到的数据结构
+
+  对`Rte_Type.h`内基础变量进一步封装成数据结构（结构体），如
+
+  ```c
+  typedef struct {
+      PwmSetDutyImpl value;
+  } Rte_DE_PwmSetDutyImpl;
+  ```
+
+* `Rte_Cbk`
+
+  **需要修改的内容**：添加需要使用的回调函数。
+
+  定义回调函数，如，
+
+  ```c
+  void Rte_COMCbk_PwmSetDuty(void) {
+      //unused
+  }
+  ```
+
+  *补充*：什么是回调函数？回调函数，顾名思义，就是使用者自己定义一个函数，使用者自己实现这个函数的程序内容，然后把这个函数作为参数传入别人（或系统）的函数中，由别人（或系统）的函数在运行时来调用的函数。函数是你实现的，但由别人（或系统）的函数在运行时通过参数传递的方式调用，这就是所谓的回调函数。简单来说，就是由别人的函数运行期间来回调你实现的函数。
+
+* `Rte_Utils.h`
+
+  **需要修改的内容**：无
+
+  封装工具，如`memcpy`。
+
+* `Rte_Fifo`
+
+  初始化和使用Fifo。**很好用的一个数据结构。**
+
+* `Ioc（Inter OsApplication Communication）`
+
+  **需要修改的内容**：无
+
+  核间通信。
+
+* `Rte_Assert.h`
+
+  **需要修改的内容**：无
+
+  DET错误追踪分类，见《AUTOSAR_SWS_RTE》的DET Error Classification。
+
+* `Rte_Calprms`
+
+  校验功能。
 
 #### 7.4.4.2 Contract
 
