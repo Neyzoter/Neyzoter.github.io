@@ -1092,6 +1092,26 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   **问题**：为什么`RTE_MODE_ComMMode_COMM_FULL_COMMUNICATION`和`COMM_FULL_COMMUNICATION`定义的值不同？用处是？
 
+* `Rte_EcuM`
+
+  (1)`Rte_EcuM.c`
+
+  `Rte_ecuM_GetBootTarget()`、`Rte_ecuM_GetLastShutdownTarget()`等。
+
+  (2)`Rte_EcuM_Type.h`
+
+  定义ECUM状态，如`ECUM_STATE_OFF`、`ECUM_STATE_SLEEP`等，`ECUM_BOOT_TARGET_APP`、`ECUM_BOOT_TARGET_OEM_BOOTLOADER`等。
+
+* `Rte_ModeManager`
+
+  (1)`Rte_ModeManager.c`
+
+  模式管理初始化
+
+  (2)`Rte_ModeManager_Type.h`
+
+  如果`Rte_EcuM_Type.h`和`Rte_ComM_Type.h`未定义，在此处定义。
+
 * `Rte_Internal`
 
   **需要修改的内容**：函数声明
@@ -1107,6 +1127,26 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
   *状态机取值定义*：EcuM的运行、停止、睡眠、启动等；ComM的`FULL_COMMUNICATION`（接收发送均使能）、`NO_COMMUNICATION`（不使能通信）和`SILENT_COMMUNICATION`（只接受，不发送）。
 
   *函数声明*：BswM、ComM、EcuM、PwmSetManager（主要通过RTE进行数据的读写，见**7.3.7 OsRteTask读取数据和设置灯PWM-函数定义总结**）、IO操作
+
+* `Rte_Internal_xxx.c`
+
+  `Rte_Internal_BswM.c`：获取请求的模式（状态）
+
+  `Rte_Internal_ComM.c`：获取当前通信模式（状态）、获取请求的通信模式（模式）、请求通信模式（状态）等，封装了`Rte_ComM.c`中的函数。
+
+  `Rte_Internal_EcuM.c`：封装了`Rte_EcuM.c`中的函数。
+
+  `Rte_Internal_IoHwAb.c`：操作IO端口的接口。
+
+  `Rte_Internal_ModeManager.c`：模式管理——通信控制、运行控制等，其实是获取状态。
+
+  `Rte_Internal_PwmSetActuator.c`：面向执行器（运行实体），将RteBuff中数据拷贝到执行器数据结构或者给出BSW的接口。
+
+  `Rte_Internal_PwmSetManager.c`：面向数据管理/获取（运行实体），将数据拷贝到数据获取实体的数据结构，或者拷贝到RteBuff，或者给出BSW的接口。
+
+* `Rte_Main`
+
+  RTE启动、关闭，一块初始化 Ioc。
 
 * `Rte_Buffers`
 
@@ -1160,7 +1200,13 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
   }
   ```
 
-  *补充*：什么是回调函数？回调函数，顾名思义，就是使用者自己定义一个函数，使用者自己实现这个函数的程序内容，然后把这个函数作为参数传入别人（或系统）的函数中，由别人（或系统）的函数在运行时来调用的函数。函数是你实现的，但由别人（或系统）的函数在运行时通过参数传递的方式调用，这就是所谓的回调函数。简单来说，就是由别人的函数运行期间来回调你实现的函数。
+  *补充*：什么是回调函数？回调函数，顾名思义，就是使用者自己定义一个函数，使用者自己实现这个函数的程序内容，然后把这个函数作为参数传入别人（或系统）的函数中，由别人（或系统）的函数在运行时来调用的函数。
+
+* `Rte_Hook.h`
+
+  钩子函数。
+
+  *补充*：什么是钩子函数？ 钩子实际上是一个处理消息的程序段，通过系统调用，把它挂入系统。每当特定的消息发出，在没有到达目的窗口前，钩子程序就先捕获该消息，亦即钩子函数先得到控制权。这时钩子函数即可以加工处理（改变）该消息，也可以不作处理而继续传递该消息，还可以强制结束消息的传递。
 
 * `Rte_Utils.h`
 
@@ -1169,6 +1215,8 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
   封装工具，如`memcpy`。
 
 * `Rte_Fifo`
+
+  **需要修改的内容**：无
 
   初始化和使用Fifo。**很好用的一个数据结构。**
 
@@ -1185,6 +1233,8 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
   DET错误追踪分类，见《AUTOSAR_SWS_RTE》的DET Error Classification。
 
 * `Rte_Calprms`
+
+  **需要修改的内容**：无
 
   校验功能。
 
