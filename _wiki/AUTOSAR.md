@@ -820,6 +820,248 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   `xxxx.c`（`Rte/src`）：定义执行器函数，具体进行Pwm占空比设置、Bsw主任务、IO操作等。
 
+### 7.3.8 OsStartUp任务
+
+* 流程
+
+```mermaid
+graph TB;
+OsStartUp["OsStartUp()@BSWMainFunctionTask.c"]  --> EcuM_StartupTwo["EcuM_StartupTwo()@\system\EcuM\src\EcuM_Fixed.c"]
+EcuM_StartupTwo --1.current_state == <br>ECUM_STATE_STARTUP_ONE--> SetCurrentState["SetCurrentState<br>(ECUM_STATE_STARTUP_TWO)<br>@EcuM_Main.c<br>EcuM_World.current_state <br>= ECUM_STATE_STARTUP_TWO"]
+	
+EcuM_StartupTwo --2.current_state == <br>ECUM_STATE_STARTUP_TWO--> EcuM_AL_DriverInitTwo["EcuM_AL_DriverInitTwo(EcuM_World.config)<br>@EcuM_Callout_Stubs.c"] 
+	EcuM_AL_DriverInitTwo --> Can_Init["Can_Init(ConfigPtr-><br>PostBuildConfig->CanConfigPtr)<br>@Can_stm32.c"]
+		Can_Init --> Check["检查接收和发送个数（硬件）是否支持<br>STM32只有2个接收FIFO，1个发送FIFO"]
+		Can_Init --> INSTALL_HANDLERS["INSTALL_HANDLERS：<br>CAN中断服务配置"]
+		Can_Init --> Can_ChangeBaudrate["Can_ChangeBaudrate：<br>配置波特率、FIFOx、滤波器组等"]
+		Can_Init --> HTHmap["配置发送HTH映射"]
+	EcuM_AL_DriverInitTwo --> CanIf_Init["CanIf_Init(ConfigPtr-><br>PostBuildConfig->CanIfConfigPtr)"]
+	EcuM_AL_DriverInitTwo --> CanSM_Init["CanSM_Init(ConfigPtr-><br>CanSMConfigPtr)"]
+EcuM_StartupTwo --3.current_state == <br>ECUM_STATE_STARTUP_TWO--> Rte_Start["Rte_Start()"]
+EcuM_StartupTwo --4.current_state == <br>ECUM_STATE_STARTUP_TWO--> EcuM_AL_DriverInitThree["EcuM_AL_DriverInitThree(EcuM_World.config)"]
+```
+
+* 数据结构
+
+  ```c
+  // EcuM_World
+  typedef struct
+  {
+      boolean                           initiated;
+      EcuM_ConfigType                   *config;  // 在EcuM_Init()指向EcuMConfig @ EcuM_PBcfg.c，见下方
+      EcuM_StateType                    shutdown_target;
+      AppModeType                       app_mode;
+      EcuM_StateType                    current_state;
+      uint32                            run_requests;
+      uint32                            postrun_requests;
+      boolean                           killAllRequest;
+      boolean                           killAllPostrunRequest;
+  #if (defined(USE_ECUM_FLEXIBLE))
+      EcuM_ShutdownCauseType            shutdown_cause;
+  #endif
+      uint8                             sleep_mode;
+      /* Events set by EcuM_SetWakeupEvent */
+      uint32                            wakeupEvents;
+      uint32                            wakeupTimer;
+      /* Events set by EcuM_ValidateWakeupEvent */
+      uint32                            validEvents;
+      uint32                            validationTimer;
+  #if (ECUM_ARC_SAFETY_PLATFORM == STD_ON)
+      EcuM_SP_SyncStatus                syncStatusMaster;
+  #endif
+  } EcuM_GlobalType;
+  
+  /*@req SWS_EcuM_00793*/ /*@req SWS_EcuMf_00046*/
+  const EcuM_ConfigType EcuMConfig = {
+      .EcuMPostBuildVariant = 1,
+      .EcuMConfigConsistencyHashLow = PRE_COMPILED_DATA_HASH_LOW, 
+      .EcuMConfigConsistencyHashHigh = PRE_COMPILED_DATA_HASH_HIGH,  /* @req SWS_EcuM_02795 */
+      .EcuMDefaultShutdownTarget = ECUM_STATE_OFF,
+      .EcuMDefaultSleepMode = ECUM_SLEEP_MODE_FIRST,
+      .EcuMDefaultAppMode = OSDEFAULTAPPMODE,
+      .EcuMNvramReadAllTimeout = ECUM_NVRAM_READALL_TIMEOUT,
+      .EcuMNvramWriteAllTimeout = ECUM_NVRAM_WRITEALL_TIMEOUT,
+      .EcuMRunMinimumDuration = ECUM_NVRAM_MIN_RUN_DURATION,
+      .EcuMNormalMcuMode = McuConf_McuModeSettingConf_NORMAL,
+      .EcuMSleepModeConfig = EcuM_SleepModeConfig,
+      .EcuMWakeupSourceConfig = EcuM_WakeupSourceConfig,
+  #if defined(USE_COMM)
+      .EcuMComMConfig = EcuM_ComMConfig,
+  #endif
+  #if defined(USE_MCU)
+      .McuConfigPtr = McuConfigData,
+  #endif
+  #if defined(USE_PORT)
+      .PortConfigPtr = &PortConfigData,
+  #endif
+  #if defined(USE_DIO)
+      .DioConfigPtr = &DioConfigData,
+  #endif
+  #if defined(USE_CANSM)
+      .CanSMConfigPtr = &CanSM_Config,
+  #endif
+  #if defined(USE_ADC)
+      #if defined(CFG_ZYNQ)
+          .AdcConfigPtr = NULL,
+      #else
+          .AdcConfigPtr = AdcConfig,
+      #endif
+  #endif
+  #if defined(USE_PWM)
+      .PwmConfigPtr = &PwmConfig,
+  #endif
+  #if defined(USE_BSWM) || defined(USE_PDUR) || defined(USE_COM) || defined(USE_CANIF) ||\
+      defined(USE_CANTP) || defined(USE_CANNM) || defined(USE_COMM) || defined (USE_CANTRCV) || defined (USE_CAN) || (defined(USE_FIM) && (FIM_POSTBUILD_MODE == STD_ON))
+      .PostBuildConfig = &Postbuild_Config,  //指向一个包含以上模块配置信息的数据结构，见下方
+  #endif
+  // ...未完全展示
+  };
+  
+  // \core\system\EcuM\src\EcuM_PBHeader.c
+  SECTION_POSTBUILD_HEADER const PostbuildConfigType Postbuild_Config = {
+      .startPattern = 0x5A5A5A5A,
+      .postBuildVariant = 1,
+      .preCompileHashLow = PRE_COMPILED_DATA_HASH_LOW,
+      .preCompileHashHigh = PRE_COMPILED_DATA_HASH_HIGH,
+  #if defined (USE_BSWM)
+      .BswMConfigPtr = &BswM_Config,
+  #endif
+  #if defined (USE_CAN)
+      .CanConfigPtr = &CanConfigData,  //指向CanConfigData@Can_PBcfg.c，见下方
+  #endif
+  #if defined(USE_CANIF)
+      .CanIfConfigPtr = &CanIf_Config,
+  #endif
+  #if defined (USE_CANNM)
+      .CanNmConfigPtr = &CanNm_Config,
+  #endif
+  #if defined(USE_CANTP)
+      .CanTpConfigPtr = &CanTpConfig,
+  #endif
+  #if defined(USE_COM)
+      .ComConfigPtr = &ComConfiguration,
+  #endif
+  #if defined (USE_COMM)
+      .ComMConfigPtr = &ComM_Config,
+  #endif
+  #if defined(USE_PDUR)
+      .PduRConfigPtr = &PduR_Config,
+  #endif
+  #if defined(USE_CANTRCV)
+  	.CanTrcvConfigPtr = &CanTrcv_Config,
+  #endif
+  #if defined(USE_FIM) && (FIM_POSTBUILD_MODE == STD_ON)
+      .FiMConfigPtr = &FiM_Config,
+  #endif
+  };
+  //@Can_PBcfg.c
+  SECTION_POSTBUILD_DATA  const  Can_ConfigType CanConfigData = {
+  	.CanConfigSetPtr =	&CanConfigSetData
+  };
+  ```
+
+  * 对`Can_HwHandleType`探究
+
+    **问题**
+
+    在`Can_Cfg.h`中定义了
+
+    ```c
+    T#define CanConf_CanHardwareObject_CanHardwareObjectTx (Can_HwHandleType)0
+    #define Can_CanHardwareObjectTx CanConf_CanHardwareObject_CanHardwareObjectTx
+    #define NUM_OF_HTHS (Can_HwHandleType)1  // HTH(Transmit Handle) 个数 
+    
+    #define CanConf_CanHardwareObject_CanHardwareObjectRx (Can_HwHandleType)1
+    #define Can_CanHardwareObjectRx CanConf_CanHardwareObject_CanHardwareObjectRx
+    ```
+
+    但是EB中必须定义Tx比Rx高。所以这里设置成`Tx 1`和`Rx 0`，但是单片机无法通过CAN发送和接收数据（CAN中断服务函数也无法进入）。
+
+    **解释(我们的项目工程代码带注释)**
+
+    `Can_Init()`初始化的时候，需要给`Can_Global.CanHTHMap`（Transmit Handle）设置
+
+    ```c
+    // @Can_Init()
+    //     {  // Can_Arc_Hoh ptr to ...
+    //         .CanObjectId	=	CanConf_CanHardwareObject_CanHardwareObjectTx,//CanHardwareObjectTx,
+    //         .CanHandleType	=	CAN_ARC_HANDLE_TYPE_BASIC,
+    //         .CanIdType		=	CAN_ID_TYPE_STANDARD,
+    //         .CanObjectType	=	CAN_OBJECT_TYPE_TRANSMIT,
+    //         .CanHwFilterMask =	0, // Not applicable for Transmit object
+    //         .Can_Arc_EOL	= 	1  // [Chaochao Song] Stop while in Can_Init func , set the last enum's  Can_Arc_EOL = 1
+    //     },
+    hoh = canHwConfig->Can_Arc_Hoh;
+    hoh--;
+    do
+    {
+        hoh++;
+    
+        if (hoh->CanObjectType == CAN_OBJECT_TYPE_TRANSMIT)  // hoh ptr to 上面的元素
+        {
+            //设置哪个CAN，对于CanCtrlPwm Proj是CAN_CTRL_1
+            // !!!!! 这里hoh->CanObjectId就是上面所说的发送和接收的数值（Tx比Rx高）
+            // CanHTHMap只定义了1个（NUM_OF_HTHS），下标为0，Tx数值CanObjectId为1而造成溢出
+            // 但是这里不能单纯的 -1，因为还会在发送的时候检查是否存在HTH，造成ID不对应，具体见下面的解释
+            Can_Global.CanHTHMap[hoh->CanObjectId].CanControllerRef = canHwConfig->CanControllerId;
+            // 设置HOH(Hardware Object Handle)
+            Can_Global.CanHTHMap[hoh->CanObjectId].CanHOHRef = hoh;
+        }
+    } while (!hoh->Can_Arc_EOL);
+    ```
+
+    另外在发送的时候，也会检测（接上面的问题——“但是这里不能单纯的 -1，因为还会在发送的时候检查是否存在HTH，造成ID不对应，具体见下面的解释”）是否符合。见下图调用过程：
+
+    ```mermaid
+    graph TB;
+    CanIf_Transmit["CanIf_Transmit()"] --> txPduPtr["txPduPtr = &CanIf_ConfigPtr->InitConfig->CanIfTxPduConfigPtr<br>定义见下方补充"]
+    txPduPtr --> Can_Write["Can_Write(txPduPtr->CanIfTxPduBufferRef->CanIfBufferHthRef->CanIfHthIdSymRef, &canPdu)<br>CanIfHthIdSymRef = CanConf_CanHardwareObject_CanHardwareObjectTx<br>定义见下方补充"]
+    Can_Write --> Can_FindHoh["Can_FindHoh(Hth, &controller)<br>判断输入的hth是否和HTHmap中的一样"]
+     
+    ```
+
+    ```c
+    SECTION_POSTBUILD_DATA const CanIf_TxPduConfigType CanIfTxPduConfigData[] = {//下面的hth指向
+        {
+            .CanIfTxPduId               = PDUR_REVERSE_PDU_ID_PDUTX,
+            .CanIfCanTxPduIdCanId       = 2,
+            .CanIfCanTxPduIdDlc         = 8,
+            .CanIfCanTxPduType          = CANIF_PDU_TYPE_STATIC,
+            .CanIfTxPduPnFilterEnable   = STD_OFF,
+    #if ( CANIF_PUBLIC_READTXPDU_NOTIFY_STATUS_API == STD_ON )
+            .CanIfReadTxPduNotifyStatus = FALSE,
+    #endif
+            .CanIfTxPduIdCanIdType      = CANIF_CAN_ID_TYPE_11,
+            .CanIfUserTxConfirmation    = PDUR_CALLOUT,
+            /* [CanIfBufferCfg] */
+            .CanIfTxPduBufferRef        = &CanIfBufferCfgData[0],//指向下面的CanIfBufferCfgData
+        },
+    };
+    SECTION_POSTBUILD_DATA const CanIf_TxBufferConfigType CanIfBufferCfgData[] = {
+    	{
+    		.CanIfBufferSize = 0,
+    		.CanIfBufferHthRef = &CanIfHthConfigData_CanIfInitHohCfg[0],//指向下面的CanIfHthConfigData_CanIfInitHohCfg
+    		.CanIf_Arc_BufferId = 0
+    	},
+    };
+    SECTION_POSTBUILD_DATA const CanIf_HthConfigType CanIfHthConfigData_CanIfInitHohCfg[] =
+    {
+    	{ 
+        	.CanIfHthType 				= CANIF_HANDLE_TYPE_BASIC,
+        	.CanIfCanControllerIdRef 	= CanIfConf_CanIfCtrlCfg_CanIfCtrlCfg,
+        	.CanIfHthIdSymRef 			= CanConf_CanHardwareObject_CanHardwareObjectTx,//出现了!!!!!即为上面所定义的CanConf_CanHardwareObject_CanHardwareObjectTx
+    	},
+    };
+    ```
+
+    **解决方案**
+
+    ```c
+    #define NUM_OF_HTHS 2 //定义两个HTH，只用第二个
+    ```
+
+    *不能在Can_Init的时候，单纯将CanConf_CanHardwareObject_CanHardwareObjectTx -1 输入到HTHmap下标，解释是发送的时候会检测是否对应，具体见上面**解释***
+
 ## 7.4 顶层移植、配置和应用
 
 路径：`\examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c`
@@ -1109,7 +1351,13 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   `一些通错误编号`：`COM_INVALID_PDU_ID(104)`、`COM_INVALID_SIGNAL_ID(109)`等
 
-  **`信号ID`**：如门状态`ComConf_ComSignal_DoorStatus    0 `、灯状态`ComConf_ComSignal_LightStatus     1   `
+  **`信号ID`**：如
+
+  ```c
+  // COM SIGNAL GROUPS and SIGNAL IDs
+  #define ComConf_ComSignal_DoorStatus          0
+  #define ComConf_ComSignal_LightStatus          1
+  ```
 
   **关联文件**：
 
@@ -1141,7 +1389,9 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
   定义`IPDU ID`号，指定数据对应对应不同`IPDU`。如
 
   ```c
+  // COM IPDU IDs 
   #define ComConf_ComIPdu_DoorStatusPdu               0
+  #define ComConf_ComIPdu_LightStatusPdu               1
   ```
 
   定义了门状态信息为`IPDU[0]`。
@@ -1152,7 +1402,7 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   2.`PduR_PbCfg.c`的`PduRDestination_PduRRoutingPathRx_PduRDestPdu->DestPduId`（接收）或者`PduRRoutingPath_PduRRoutingPathTx->SrcPduId`（发送）
 
-**关于信号ID的总结**：`Com_Cfg.h`和`Com_PbCfg.h`中都定义了信号ID，分别制定了`IPdu`和`Arc_IPdu`获取地址——通过`GET_Signal(信号ID)`获取`ComSignal_type * Signal`，通过`GET_ArcIPdu(Signal->ComIPduHandleId)`获取`Com_Arc_IPdu_type *Arc_IPdu`；信号ID需要修改三个地方：`PDUR(Arc_IPdu)`、`Signal(IPdu)`和具体函数调用的信号ID参数。
+**关于信号ID的总结**：`Com_Cfg.h`和`Com_PbCfg.h`中定义了`SignalId`(命名为`ComConf_ComSignal_xxx`)和`IPduId`(命名为`ComConf_ComIPdu_xxx`)，分别制定了`IPdu`、`Arc_IPdu`和`Signal`获取地址——通过`GET_Signal(SignalId)`获取`ComSignal_type * Signal`，通过`GET_ArcIPdu(Signal->ComIPduHandleId)`获取`Com_Arc_IPdu_type *Arc_IPdu`，通过`GET_IPdu(Signal->ComIPduHandleId)`获取`ComIPdu_type *IPdu `；信号ID需要修改三个地方：`PDUR(Arc_IPdu)`、`Signal(IPdu)`和具体函数调用的信号ID参数。
 
 **`IPdu`、`Arc_IPdu`和`Signal`的区别**：见**7.3.4 CAN调用过程**
 
