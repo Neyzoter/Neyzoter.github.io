@@ -935,9 +935,6 @@ EcuM_StartupTwo --4.current_state == <br>ECUM_STATE_STARTUP_TWO--> EcuM_AL_Drive
   #if defined (USE_CANNM)
       .CanNmConfigPtr = &CanNm_Config,
   #endif
-  #if defined(USE_CANTP)
-      .CanTpConfigPtr = &CanTpConfig,
-  #endif
   #if defined(USE_COM)
       .ComConfigPtr = &ComConfiguration,
   #endif
@@ -947,12 +944,7 @@ EcuM_StartupTwo --4.current_state == <br>ECUM_STATE_STARTUP_TWO--> EcuM_AL_Drive
   #if defined(USE_PDUR)
       .PduRConfigPtr = &PduR_Config,
   #endif
-  #if defined(USE_CANTRCV)
-  	.CanTrcvConfigPtr = &CanTrcv_Config,
-  #endif
-  #if defined(USE_FIM) && (FIM_POSTBUILD_MODE == STD_ON)
-      .FiMConfigPtr = &FiM_Config,
-  #endif
+  // ...未完全展示
   };
   //@Can_PBcfg.c
   SECTION_POSTBUILD_DATA  const  Can_ConfigType CanConfigData = {
@@ -960,107 +952,107 @@ EcuM_StartupTwo --4.current_state == <br>ECUM_STATE_STARTUP_TWO--> EcuM_AL_Drive
   };
   ```
 
-  * 对`Can_HwHandleType`探究
+* 对`HTH MAP`的探究
 
-    **问题**
+  **问题**
 
-    在`Can_Cfg.h`中定义了
+  在`Can_Cfg.h`中定义了
 
-    ```c
-    T#define CanConf_CanHardwareObject_CanHardwareObjectTx (Can_HwHandleType)0
-    #define Can_CanHardwareObjectTx CanConf_CanHardwareObject_CanHardwareObjectTx
-    #define NUM_OF_HTHS (Can_HwHandleType)1  // HTH(Transmit Handle) 个数 
-    
-    #define CanConf_CanHardwareObject_CanHardwareObjectRx (Can_HwHandleType)1
-    #define Can_CanHardwareObjectRx CanConf_CanHardwareObject_CanHardwareObjectRx
-    ```
+  ```c
+  #define CanConf_CanHardwareObject_CanHardwareObjectTx (Can_HwHandleType)0
+  #define Can_CanHardwareObjectTx CanConf_CanHardwareObject_CanHardwareObjectTx
+  #define NUM_OF_HTHS (Can_HwHandleType)1  // HTH(Transmit Handle) 个数 
+  
+  #define CanConf_CanHardwareObject_CanHardwareObjectRx (Can_HwHandleType)1
+  #define Can_CanHardwareObjectRx CanConf_CanHardwareObject_CanHardwareObjectRx
+  ```
 
-    但是EB中必须定义Tx比Rx高。所以这里设置成`Tx 1`和`Rx 0`，但是单片机无法通过CAN发送和接收数据（CAN中断服务函数也无法进入）。
+  但是EB中必须定义Tx比Rx高。所以这里设置成`Tx 1`和`Rx 0`，但是单片机无法通过CAN发送和接收数据（CAN中断服务函数也无法进入）。
 
-    **解释(我们的项目工程代码带注释)**
+  **解释(我们的项目工程代码带注释)**
 
-    `Can_Init()`初始化的时候，需要给`Can_Global.CanHTHMap`（Transmit Handle）设置
+  `Can_Init()`初始化的时候，需要给`Can_Global.CanHTHMap`（Transmit Handle）设置
 
-    ```c
-    // @Can_Init()
-    //     {  // Can_Arc_Hoh ptr to ...
-    //         .CanObjectId	=	CanConf_CanHardwareObject_CanHardwareObjectTx,//CanHardwareObjectTx,
-    //         .CanHandleType	=	CAN_ARC_HANDLE_TYPE_BASIC,
-    //         .CanIdType		=	CAN_ID_TYPE_STANDARD,
-    //         .CanObjectType	=	CAN_OBJECT_TYPE_TRANSMIT,
-    //         .CanHwFilterMask =	0, // Not applicable for Transmit object
-    //         .Can_Arc_EOL	= 	1  // [Chaochao Song] Stop while in Can_Init func , set the last enum's  Can_Arc_EOL = 1
-    //     },
-    hoh = canHwConfig->Can_Arc_Hoh;
-    hoh--;
-    do
-    {
-        hoh++;
-    
-        if (hoh->CanObjectType == CAN_OBJECT_TYPE_TRANSMIT)  // hoh ptr to 上面的元素
-        {
-            //设置哪个CAN，对于CanCtrlPwm Proj是CAN_CTRL_1
-            // !!!!! 这里hoh->CanObjectId就是上面所说的发送和接收的数值（Tx比Rx高）
-            // CanHTHMap只定义了1个（NUM_OF_HTHS），下标为0，Tx数值CanObjectId为1而造成溢出
-            // 但是这里不能单纯的 -1，因为还会在发送的时候检查是否存在HTH，造成ID不对应，具体见下面的解释
-            Can_Global.CanHTHMap[hoh->CanObjectId].CanControllerRef = canHwConfig->CanControllerId;
-            // 设置HOH(Hardware Object Handle)
-            Can_Global.CanHTHMap[hoh->CanObjectId].CanHOHRef = hoh;
-        }
-    } while (!hoh->Can_Arc_EOL);
-    ```
+  ```c
+  // @Can_Init()
+  //     {  // Can_Arc_Hoh ptr to ...
+  //         .CanObjectId	=	CanConf_CanHardwareObject_CanHardwareObjectTx,//CanHardwareObjectTx,
+  //         .CanHandleType	=	CAN_ARC_HANDLE_TYPE_BASIC,
+  //         .CanIdType		=	CAN_ID_TYPE_STANDARD,
+  //         .CanObjectType	=	CAN_OBJECT_TYPE_TRANSMIT,
+  //         .CanHwFilterMask =	0, // Not applicable for Transmit object
+  //         .Can_Arc_EOL	= 	1  // [Chaochao Song] Stop while in Can_Init func , set the last enum's  Can_Arc_EOL = 1
+  //     },
+  hoh = canHwConfig->Can_Arc_Hoh;
+  hoh--;
+  do
+  {
+      hoh++;
+  
+      if (hoh->CanObjectType == CAN_OBJECT_TYPE_TRANSMIT)  // hoh ptr to 上面的元素
+      {
+          //设置哪个CAN，对于CanCtrlPwm Proj是CAN_CTRL_1
+          // !!!!! 这里hoh->CanObjectId就是上面所说的发送和接收的数值（Tx比Rx高）
+          // CanHTHMap只定义了1个（NUM_OF_HTHS），下标为0，Tx数值CanObjectId为1而造成溢出
+          // 但是这里不能单纯的 -1，因为还会在发送的时候检查是否存在HTH，造成ID不对应，具体见下面的解释
+          Can_Global.CanHTHMap[hoh->CanObjectId].CanControllerRef = canHwConfig->CanControllerId;
+          // 设置HOH(Hardware Object Handle)
+          Can_Global.CanHTHMap[hoh->CanObjectId].CanHOHRef = hoh;
+      }
+  } while (!hoh->Can_Arc_EOL);
+  ```
 
-    另外在发送的时候，也会检测（接上面的问题——“但是这里不能单纯的 -1，因为还会在发送的时候检查是否存在HTH，造成ID不对应，具体见下面的解释”）是否符合。见下图调用过程：
+  另外在发送的时候，也会检测（接上面的问题——“但是这里不能单纯的 -1，因为还会在发送的时候检查是否存在HTH，造成ID不对应，具体见下面的解释”）是否符合。见下图调用过程：
 
-    ```mermaid
-    graph TB;
-    CanIf_Transmit["CanIf_Transmit()"] --> txPduPtr["txPduPtr = &CanIf_ConfigPtr->InitConfig->CanIfTxPduConfigPtr<br>定义见下方补充"]
-    txPduPtr --> Can_Write["Can_Write(txPduPtr->CanIfTxPduBufferRef->CanIfBufferHthRef->CanIfHthIdSymRef, &canPdu)<br>CanIfHthIdSymRef = CanConf_CanHardwareObject_CanHardwareObjectTx<br>定义见下方补充"]
-    Can_Write --> Can_FindHoh["Can_FindHoh(Hth, &controller)<br>判断输入的hth是否和HTHmap中的一样"]
-     
-    ```
+  ```mermaid
+  graph TB;
+  CanIf_Transmit["CanIf_Transmit()"] --> txPduPtr["txPduPtr = &CanIf_ConfigPtr->InitConfig->CanIfTxPduConfigPtr<br>定义见下方补充"]
+  txPduPtr --> Can_Write["Can_Write(txPduPtr->CanIfTxPduBufferRef->CanIfBufferHthRef->CanIfHthIdSymRef, &canPdu)<br>CanIfHthIdSymRef = CanConf_CanHardwareObject_CanHardwareObjectTx<br>定义见下方补充"]
+  Can_Write --> Can_FindHoh["Can_FindHoh(Hth, &controller)<br>判断输入的hth是否和HTHmap中的一样"]
+   
+  ```
 
-    ```c
-    SECTION_POSTBUILD_DATA const CanIf_TxPduConfigType CanIfTxPduConfigData[] = {//下面的hth指向
-        {
-            .CanIfTxPduId               = PDUR_REVERSE_PDU_ID_PDUTX,
-            .CanIfCanTxPduIdCanId       = 2,
-            .CanIfCanTxPduIdDlc         = 8,
-            .CanIfCanTxPduType          = CANIF_PDU_TYPE_STATIC,
-            .CanIfTxPduPnFilterEnable   = STD_OFF,
-    #if ( CANIF_PUBLIC_READTXPDU_NOTIFY_STATUS_API == STD_ON )
-            .CanIfReadTxPduNotifyStatus = FALSE,
-    #endif
-            .CanIfTxPduIdCanIdType      = CANIF_CAN_ID_TYPE_11,
-            .CanIfUserTxConfirmation    = PDUR_CALLOUT,
-            /* [CanIfBufferCfg] */
-            .CanIfTxPduBufferRef        = &CanIfBufferCfgData[0],//指向下面的CanIfBufferCfgData
-        },
-    };
-    SECTION_POSTBUILD_DATA const CanIf_TxBufferConfigType CanIfBufferCfgData[] = {
-    	{
-    		.CanIfBufferSize = 0,
-    		.CanIfBufferHthRef = &CanIfHthConfigData_CanIfInitHohCfg[0],//指向下面的CanIfHthConfigData_CanIfInitHohCfg
-    		.CanIf_Arc_BufferId = 0
-    	},
-    };
-    SECTION_POSTBUILD_DATA const CanIf_HthConfigType CanIfHthConfigData_CanIfInitHohCfg[] =
-    {
-    	{ 
-        	.CanIfHthType 				= CANIF_HANDLE_TYPE_BASIC,
-        	.CanIfCanControllerIdRef 	= CanIfConf_CanIfCtrlCfg_CanIfCtrlCfg,
-        	.CanIfHthIdSymRef 			= CanConf_CanHardwareObject_CanHardwareObjectTx,//出现了!!!!!即为上面所定义的CanConf_CanHardwareObject_CanHardwareObjectTx
-    	},
-    };
-    ```
+  ```c
+  SECTION_POSTBUILD_DATA const CanIf_TxPduConfigType CanIfTxPduConfigData[] = {//下面的hth指向
+      {
+          .CanIfTxPduId               = PDUR_REVERSE_PDU_ID_PDUTX,
+          .CanIfCanTxPduIdCanId       = 2,
+          .CanIfCanTxPduIdDlc         = 8,
+          .CanIfCanTxPduType          = CANIF_PDU_TYPE_STATIC,
+          .CanIfTxPduPnFilterEnable   = STD_OFF,
+  #if ( CANIF_PUBLIC_READTXPDU_NOTIFY_STATUS_API == STD_ON )
+          .CanIfReadTxPduNotifyStatus = FALSE,
+  #endif
+          .CanIfTxPduIdCanIdType      = CANIF_CAN_ID_TYPE_11,
+          .CanIfUserTxConfirmation    = PDUR_CALLOUT,
+          /* [CanIfBufferCfg] */
+          .CanIfTxPduBufferRef        = &CanIfBufferCfgData[0],//指向下面的CanIfBufferCfgData
+      },
+  };
+  SECTION_POSTBUILD_DATA const CanIf_TxBufferConfigType CanIfBufferCfgData[] = {
+  	{
+  		.CanIfBufferSize = 0,
+  		.CanIfBufferHthRef = &CanIfHthConfigData_CanIfInitHohCfg[0],//指向下面的CanIfHthConfigData_CanIfInitHohCfg
+  		.CanIf_Arc_BufferId = 0
+  	},
+  };
+  SECTION_POSTBUILD_DATA const CanIf_HthConfigType CanIfHthConfigData_CanIfInitHohCfg[] =
+  {
+  	{ 
+      	.CanIfHthType 				= CANIF_HANDLE_TYPE_BASIC,
+      	.CanIfCanControllerIdRef 	= CanIfConf_CanIfCtrlCfg_CanIfCtrlCfg,
+      	.CanIfHthIdSymRef 			= CanConf_CanHardwareObject_CanHardwareObjectTx,//出现了!!!!!即为上面所定义的CanConf_CanHardwareObject_CanHardwareObjectTx
+  	},
+  };
+  ```
 
-    **解决方案**
+  **解决方案**
 
-    ```c
-    #define NUM_OF_HTHS 2 //定义两个HTH，只用第二个
-    ```
+  ```c
+  #define NUM_OF_HTHS 2 //定义两个HTH，只用第二个
+  ```
 
-    *不能在Can_Init的时候，单纯将CanConf_CanHardwareObject_CanHardwareObjectTx -1 输入到HTHmap下标，解释是发送的时候会检测是否对应，具体见上面**解释***
+  *不能在Can_Init的时候，单纯将CanConf_CanHardwareObject_CanHardwareObjectTx -1 输入到HTHmap下标，解释是发送的时候会检测是否对应，具体见上面**解释***
 
 ## 7.4 顶层移植、配置和应用
 
