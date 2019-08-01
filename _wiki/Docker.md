@@ -542,7 +542,15 @@ netstat -plnt |grep 2375
 curl IP:PORT 
 ```
 
+## 4.7 Idea连接本地Docker
 
+**1.开启docker远程**
+
+**2.Idea连接**
+
+`File -> Settings... -> Docker -> +`
+
+添加Docker名称，TCP Socket(`tcp://localhost:2375`)
 
 # 5.Docker实例
 
