@@ -17,8 +17,7 @@ AUTOSAR 是针对特定的汽车电子这一领域，提出的一套开放式软
 | 不成熟的过程，因为 ad-hoc 模式/缺少对功能需要的追踪能力。缺少兼容的工具（供应商、OEM） | 标准化的规范交换格式                     | 对规范的改进（格式、内容）提供无缝的工具链。                 |
 | 浪费在实现和优化组件上的努力，而顾客并不承认这些努力的价值。 | 基础软件核（BSW, Basic Software）        | 软件质量的加强。将工作集中在有价值的功能上。                 |
 | 微控制器模型缺乏可用性，很难适应现有软件。（由新功能引起的）微控制器性能的扩展需求所导致的升级需要（如重新设计）。 | 微控制器抽象（MCAL）                     | 微控制器能在不需要改变更高软件层的情况下调换。               |
-| 重定位 ECU 之间的功能时需要做大量的工作。
-功能重用时也需要做大量的工作。 | 运 行 时 环 境(RTE, RunTime Environment) | 功能封装导致的通信技术的独立性。通过标准化机制，使得通信更加简单。使功能分区和功能重定位变得可能。 |
+| 重定位 ECU 之间的功能时需要做大量的工作。功能重用时也需要做大量的工作。 | 运 行 时 环 境(RTE, RunTime Environment) | 功能封装导致的通信技术的独立性。通过标准化机制，使得通信更加简单。使功能分区和功能重定位变得可能。 |
 | 非竞争性功能必须适应OEM的特定环境。因为需要从其它组件供应接口需要很多功夫，所以哪怕是很微小的革新，也需要做很多工作。基础软件和模型生成的代码间缺少清晰的接口。 | 接口标准化                               | 减少/避免 OEM 和供应商之间的接口。通过使用通用接口目录，使独立于软件功能的硬件实现所耗费的工作量。简化模型驱动的开发，允许使用标准化的AUTOSAR代码生成工具。OEM 间的模型的可重用性。不同供应商之间模块的可交换性。 |
 
 ## 1.2 AUTOSAR架构
@@ -1053,6 +1052,43 @@ EcuM_StartupTwo --4.current_state == <br>ECUM_STATE_STARTUP_TWO--> EcuM_AL_Drive
   ```
 
   *不能在Can_Init的时候，单纯将CanConf_CanHardwareObject_CanHardwareObjectTx -1 输入到HTHmap下标，解释是发送的时候会检测是否对应，具体见上面**解释***
+
+### 7.3.9 RTE任务和BSW任务的通信模式如何联系
+
+**1.Rte任务初始化通信模式**
+
+```mermaid
+graph TB;
+OsRteTask["OsRteTask()"] --EVENT_MASK_OsInitEvent抛出--> Rte_modeManager_ModeManagerInit["Rte_modeManager_ModeManagerInit()"]
+Rte_modeManager_ModeManagerInit --> modeManagerInit["modeManagerInit()<br>@Rte_ModeManager.c"]
+Rte_modeManager_ModeManagerInit --> Rte_Write_ModeManager_modeManager_ComMControl_requestedMode["Rte_Write_ModeManager_modeManager<br>_ComMControl_requestedMode(requestedMode)<br>@Rte_ModeManager.c"]
+Rte_Write_ModeManager_modeManager_ComMControl_requestedMode --> changeRequestMode["改变Rte_Buffer_bswM_modeRequestPort_SwcStartCommunication_requestedMode"]
+```
+
+**2.Bsw获取开始的通信模式**
+
+```mermaid
+graph TB;
+BswM_Internal_UpdateNotificationMirrors["BswM_Internal_UpdateNotificationMirrors()<br>@BswM_Cfg.c<br>获取requestedMode（通过Rte任务修改），并修改<br>BswM_ModeReqMirrors[BSWM_SWCSTARTCOMMUNICATION_REQ_IDX]"] --> BswM_Internal_Read_SwcModeReq_SwcStartCommunication["BswM_Internal_Read_SwcModeReq_SwcStartCommunication()<br>@BswM_Cfg.c"]
+BswM_Internal_Read_SwcModeReq_SwcStartCommunication --> Rte_Read_modeRequestPort_SwcStartCommunication_requestedMode["Rte_Read_modeRequestPort_SwcStartCommunication_requestedMode()<br>@Rte_BswM.c"]
+Rte_Read_modeRequestPort_SwcStartCommunication_requestedMode --> Rte_Read_BswM_bswM_modeRequestPort_SwcStartCommunication_requestedMode["Rte_Read_BswM_bswM_modeRequestPort_SwcStartCommunication_requestedMode()<br>@Rte_Internal_BswM.c"]
+Rte_Read_BswM_bswM_modeRequestPort_SwcStartCommunication_requestedMode --> getRequestMode["获取Rte_Buffer_bswM_modeRequestPort_SwcStartCommunication_requestedMode"]
+```
+
+**3.BswM修改通信模式**
+
+根据`BswM_ModeReqMirrors[BSWM_SWCSTARTCOMMUNICATION_REQ_IDX]`修改`BswM_ModeReqMirrors[BSWM_BSWCOMMINDICATION_REQ_IDX]`。
+
+**4.Com发送数据**
+
+通信模块根据`Com_Arc_IpduStarted`是否是`TRUE`来发送数据
+
+```mermaid
+graph TB;
+BswM_MainFunction["BswM_MainFunction()"] --> changeBswM_PduGroupSwitchActionPerformedTrue["BswM_Internal_IterateActionList()<br>@BswM.c<br>修改BswM_PduGroupSwitchActionPerformed"]
+changeBswM_PduGroupSwitchActionPerformedTrue --BswM_PduGroupSwitchActionPerformed==TRUE--> Com_IpduGroupControl["Com_IpduGroupControl()<br>修改Com_Arc_IpduStarted<br>是否通过IPDU发送数据"]
+Com_IpduGroupControl --> changeBswM_PduGroupSwitchActionPerformedFalse["BswM_PduGroupSwitchActionPerformed = FALSE"]
+```
 
 ## 7.4 顶层移植、配置和应用
 
