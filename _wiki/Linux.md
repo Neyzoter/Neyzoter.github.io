@@ -1421,6 +1421,21 @@ sed -n 1p text.txt
 
 ### 6.15.2 awk
 
+## 6.16 sh小应用
+
+**1.ssh免密登录**
+
+```bash
+#!/usr/bin/expect
+spawn ssh username@your_server_ip
+expect {
+    "yes/no" { send "yes\n";exp_continue }      # 替你回答下载公钥是的提示
+    "password" { send "your_password\n" }         # 提示输入密码
+}
+interact
+expect eof 
+```
+
 # 7、make编译
 
 ## 7.1 make编译基础
@@ -2050,7 +2065,7 @@ obj-y += foo.o
 obj-$(CONFIG_FOO) += foo.o
 ```
 
-* `$(eval (​$call  xxx) )`
+* `$(eval ($call  xxx) )`
 
 ```$(eval $(call xxx))```: 调用函数xxx, 其中的值作用到本mk文件
 
