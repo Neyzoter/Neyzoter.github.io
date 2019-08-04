@@ -236,7 +236,7 @@ var carName;
 | `*`    | 乘法 |
 | `**`   | 幂   |
 | `/`    | 除法 |
-| `%`    | 系数 |
+| `%`    | 余数 |
 | `++`   | 递增 |
 | `--`   | 递减 |
 
@@ -253,17 +253,17 @@ var carName;
 
 * 比较运算符
 
-| 运算符 | 描述                      |
-| :----- | :------------------------ |
-| `==`   | 等于，如5=="5"为true      |
-| `===`  | 等值等型，如5=="5"为false |
-| `!=`   | 不相等                    |
-| `!==`  | 不等值或不等型            |
-| `>`    | 大于                      |
-| `<`    | 小于                      |
-| `>=`   | 大于或等于                |
-| `<=`   | 小于或等于                |
-| `?`    | 三元运算符                |
+| 运算符 | 描述                       |
+| :----- | :------------------------- |
+| `==`   | 等于，如5=="5"为true       |
+| `===`  | 等值等型，如5==="5"为false |
+| `!=`   | 不相等                     |
+| `!==`  | 不等值或不等型             |
+| `>`    | 大于                       |
+| `<`    | 小于                       |
+| `>=`   | 大于或等于                 |
+| `<=`   | 小于或等于                 |
+| `?`    | 三元运算符                 |
 
 * 逻辑运算
 
@@ -288,3 +288,85 @@ var carName;
 | `<<`   | 零填充左位移 | 5 `<<` 1  | 0101 `<<` 1   | 1010 | 10     |
 | `>>`   | 有符号右位移 | 5` >>` 1  | 0101 `>> `1   | 0010 | 2      |
 | `>>>`  | 零填充右位移 | 5 `>>>` 1 | 0101 `>>>` 1  | 0010 | 2      |
+
+## 2.5 数据类型
+
+**数据类型**
+
+数值、字符串、数组、布尔值、对象、undefined、null（属于对象）。
+
+```js
+var length = 7;                             // 数字
+var lastName = "Gates";                      // 字符串
+var cars = ["Porsche", "Volvo", "BMW"];         // 数组
+var y = true;                                //布尔值
+var x = {firstName:"Bill", lastName:"Gates"};    // 对象，包括两个属性——firstName和lastName
+var v;                                             //undefined类型
+var p = null;                                  // 值是 null，但是类型仍然是对象
+```
+
+*注*：js只有一种数值类型，可以不用小数点。支持科学计数法，如`123e5`等同于``12300000`。
+
+*null和undefined区别*
+
+```js
+typeof undefined              // undefined
+typeof null                   // object
+null === undefined            // false，值不相等
+null == undefined             // true
+```
+
+**不同类型相加**
+
+```js
+/* 数字和字符串相加，js将数字视为字符串*/
+var x = 911 + "Porsche";
+//等同于
+var x = "911" + "Porsche";
+
+// 多个数字相加
+var x = 911 + 7 + "Porsche";
+// =>
+"918Porsche"
+```
+
+**typeof的使用**
+
+typeof返回两种类型：function和object。
+
+```c
+typeof {name:'Bill', age:62} // 返回 "object"
+typeof [1,2,3,4]             // 返回 "object" (并非 "array")，数组即对象
+typeof null                  // 返回 "object"
+typeof function myFunc(){}   // 返回 "function"
+```
+
+## 2.6 函数
+
+**举例**
+
+```js
+var x = myFunction(4, 3);        // 调用函数，返回值被赋值给 x
+
+function myFunction(a, b) {
+    return a * b;                // 函数返回 a 和 b 的乘积
+}
+```
+
+输出结果
+
+```
+56
+```
+
+**引用函数对象和引用函数结果**
+
+```js
+function toCelsius(fahrenheit) {
+    return (5/9) * (fahrenheit-32);
+}
+
+document.getElementById("demo").innerHTML = toCelsius;//引用函数对象
+var x = toCelsius(50);//引用函数结果
+```
+
