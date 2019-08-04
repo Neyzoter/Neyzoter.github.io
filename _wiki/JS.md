@@ -1303,6 +1303,94 @@ var person = {
   }
   ```
 
-- 在函数中，严格模式下，this 是 undefined。
-
 - 在事件中，this 指的是接收事件的元素。
+
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <body>
+  <h1>JavaScript <b>this</b> 关键词</h1>
+  <button onclick="this.style.display='none'">单击来删除我！</button>
+  </body>
+  </html>
+  
+  ```
+
+## 2.24 块作用域
+
+**`let`修饰词** 
+
+一般的`{}`相当与没有作用，
+
+```js
+var x = 10;
+// 此处 x 为 10
+{ 
+  var x = 6;
+  // 此处 x 为 6
+}
+// 此处 x 为 6
+
+
+```
+
+用`let`声明变量，则表示变量只在`{}`有作用。
+
+```js
+var x = 10;
+// 此处 x 为 10
+{ 
+  let x = 6;
+  // 此处 x 为 6
+}
+// 此处 x 为 10
+```
+
+```js
+let i = 7;
+for (let i = 0; i < 10; i++) {
+  // 一些语句
+}
+// 此处 i 为 7
+```
+
+**`const`修饰词**
+
+类似与`let`，但是`const`修饰的变量不能重新赋值：
+
+```js
+const PI = 3.141592653589793;
+PI = 3.14;      // 会出错
+PI = PI + 10;   // 也会出错
+```
+
+```js
+var x = 10;
+// 此处，x 为 10
+{ 
+  const x = 6;
+  // 此处，x 为 6
+}
+// 此处，x 为 10
+```
+
+## 2.25 JSON
+
+```js
+{
+"employees":[
+    {"firstName":"Bill", "lastName":"Gates"}, 
+    {"firstName":"Steve", "lastName":"Jobs"},
+    {"firstName":"Alan", "lastName":"Turing"}
+]
+}
+```
+
+# 3.JS HTML DOM
+
+## 3.1 HTML DOM
+
+当网页被加载时，浏览器会创建页面的文档对象模型（*D*ocument *O*bject *M*odel）。
+
+<img src="/images/wiki/js/ct_htmltree.gif" width="600" alt="HTML DOM树">
+
