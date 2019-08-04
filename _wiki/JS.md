@@ -370,3 +370,240 @@ document.getElementById("demo").innerHTML = toCelsius;//引用函数对象
 var x = toCelsius(50);//引用函数结果
 ```
 
+## 2.7 对象
+
+**举例**
+
+```js
+//对象包括firstName、lastName、id、fullName等属性
+var person = {
+  firstName: "Bill",
+  lastName : "Gates",
+  id       : 678,
+  fullName : function() {
+    return this.firstName + " " + this.lastName;
+  }
+};
+```
+
+**访问对象属性**
+
+```js
+// objectName.propertyName
+person.lastName;
+// objectName["propertyName"]
+person["lastName"];
+// objectName.methodName()
+name = person.fullName;
+```
+
+**不要将字符串、数值和布尔值声明为对象**
+
+会增加代码复杂性，降低执行速度。
+
+```js
+// 将字符串、数值和布尔值声明为对象
+var x = new String();        // 把 x 声明为 String 对象
+var y = new Number();        // 把 y 声明为 Number 对象
+var z = new Boolean();       //	把 z 声明为 Boolean 对象
+```
+
+## 2.8 事件
+
+HTML事件是指发生在HTML元素上的“事情”——网页完成加载、输入字段改变、按钮点击等，JS能够处理HTML事件。
+
+JS处理HTML事件的格式：
+
+```html
+<element event='一些 JavaScript'>
+<element event="一些 JavaScript">
+```
+
+举例
+
+```html
+<!-- 点击按钮，通过js获取时间 -->
+<button onclick="document.getElementById('demo').innerHTML=Date()">时间是？</button>
+<p id="demo"></p>
+```
+
+常见的HTML事件
+
+| 事件        | 描述                         |
+| :---------- | :--------------------------- |
+| onchange    | HTML 元素已被改变            |
+| onclick     | 用户点击了 HTML 元素         |
+| onmouseover | 用户把鼠标移动到 HTML 元素上 |
+| onmouseout  | 用户把鼠标移开 HTML 元素     |
+| onkeydown   | 用户按下键盘按键             |
+| onload      | 浏览器已经完成页面加载       |
+
+## 2.9 字符串
+
+**转意符**
+
+| 代码 | 结果       |
+| :--- | :--------- |
+| `\b` | 退格键     |
+| `\f` | 换页       |
+| `\n` | 新行       |
+| `\r` | 回车       |
+| `\t` | 水平制表符 |
+| `\v` | 垂直制表符 |
+
+**代码换行**
+
+```js
+// 运算符后换行
+document.getElementById("demo").innerHTML =
+"Hello Kitty.";
+// 字符串中换行需要使用反斜杠\或者通过运算符+连接两个字符串
+document.getElementById("demo").innerHTML = "Hello \
+Kitty!";
+document.getElementById("demo").innerHTML = "Hello "+
+"Kitty!";
+// !!!! 代码不可以通过反斜杠换行
+// 以下为错误代码
+document.getElementById("demo").innerHTML = \ 
+"Hello Kitty!";
+```
+
+**判断字符串相等**
+
+```js
+var x = "Bill";             
+var y = new String("Bill");
+// (x == y) 为 true，因为 x 和 y 的值相等
+
+var x = "Bill";             
+var y = new String("Bill");
+// (x === y) 为 false，因为 x 和 y 的类型不同（字符串与对象）
+```
+
+*注*：两个对象比较，始终为false。
+
+```js
+var x = new String("Bill");             
+var y = new String("Bill");
+// (x == y) 为 false，因为 x 和 y 是不同的对象
+```
+
+**字符串方法**
+
+* 字符串长度
+
+  ```js
+  var txt = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var sln = txt.length;
+  ```
+
+* 查找字符串中的字符串
+
+  ```js
+  var str = "The full name of China is the People's Republic of China.";
+  // 未找到返回-1
+  var pos = str.indexOf("China");// 首次出现的索引，无法设置正则表达式
+  var pos = str.indexOf("China", 18);// 设置起始位置
+  var pos = str.lastIndexOf("China"); //最后一次出现的索引
+  var pos = str.search("China");//效果等同于indexOf("China")，不能设置第二个开始位置参数
+  ```
+
+* 提取部分字符串
+
+  ```js
+  slice(start, end);//提取字符串的某个部分并在新字符串中返回被提取的部分,如果某个参数为负，则从字符串的结尾开始计数
+  substring(start, end);//无法接收负的索引
+  substr(start, length); //可指定长度
+  ```
+
+* 替换字符串内容
+
+  ```js
+  str = "Please visit Microsoft Microsoft!";
+  var n = str.replace("Microsoft", "W3School");//只替换第一个匹配字符串，不改变原字符串，返回一个新的字符串
+  var m = str.replace("/MICROSOFT/i", "W3School");// /i表示大小写不敏感
+  var x = str.replace("/Microsoft/g", "W3School");// /g表示替换所有匹配
+  ```
+
+  结果
+
+  ```
+  n = "Please visit W3School Microsoft!"
+  m = "Please visit W3School Microsoft!"
+  x = "Please visit W3School W3School!"
+  ```
+
+* 大小写转换
+
+  ```js
+  var text1 = "Hello World!";       // 字符串
+  var text2 = text1.toUpperCase();  // text2 是被转换为大写的 text1
+  var text3 = text1.toLowerCase();  // text2 是被转换为小写的 text1
+  ```
+
+* 连接字符串
+
+  ```js
+  var text = "Hello" + " " + "World!";
+  var text = "Hello".concat(" ","World!");
+  ```
+
+* 剔除字符串两边空白
+
+  ```js
+  var str = "       Hello World!        ";
+  var str1 = str.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');//剔除两边空格
+  var str2 = str.trim(); //剔除两边空格，IE8或者更低版本不支持trim
+  ```
+
+  结果
+
+  ```
+  str1 = "Hello World!"
+  ```
+
+* 提取字符串字符
+
+  ```js
+  var str = "HELLO WORLD";
+  str.charAt(0);            // 返回字符串中指定下标（位置）的字符串 返回 H
+  
+  var str = "HELLO WORLD";
+  str.charCodeAt(0);         // 返回字符串中指定索引的字符 unicode 编码 返回 72
+  
+  var str = "HELLO WORLD";
+  str[0];                   // 返回 H  1.不适用 Internet Explorer 7 或更早的版本;2.只读，无法修改
+  ```
+
+* 字符串转数组
+
+  ```js
+  var txt = "a,b,c,d,e";   // 字符串
+  var c1 = txt.split(",");          // 用逗号分隔
+  var c2 = txt.split("");   //分割所有字符
+  ```
+
+  结果
+
+  ```js
+  c1 = ["a","b","c","d","e"]
+  c2 = ["a",",","b",",","c",",","d",",","e"]
+  ```
+
+## 2.10 数值
+
+JS的数值始终是64位浮点数，其中 0 到 51 存储数字（片段），52 到 62 存储指数，63 位存储符号
+
+整数（不使用指数或科学计数法）会被精确到 15 位。
+
+```js
+var x = 999999999999999;   // x 将是 999999999999999
+var y = 9999999999999999;  // y 将是 10000000000000000
+```
+
+小数的最大数是 17 位，但是浮点的算数并不总是 100% 精准：
+
+```js
+var x = 0.2 + 0.1;         // x 将是 0.30000000000000004
+```
+
