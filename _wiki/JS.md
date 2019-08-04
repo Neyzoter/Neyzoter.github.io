@@ -1,5 +1,5 @@
 ---
-layout: wiki
+`layout: wiki
 title: JavaScript
 categories: JavaScript
 description: JavaScript语法
@@ -681,8 +681,522 @@ document.getElementById("demo").innerHTML = cars[0];
 
   ```js
   var fruits = ["Banana", "Orange", "Apple", "Mango"];
-  fruits.sort();            // 对 fruits 中的元素进行排序
+  fruits.sort();            // 对 fruits 中的元素进行排序, ！！！针对字符串，如果对于数字会出错，如20大于100
   fruits.reverse();         // 反转元素顺序
   ```
 
+  修正sort对于数字排序的错误：
+
+  ```js
+  var points = [40, 100, 1, 5, 25, 10];
+  // function是比值函数，返回结果小于0,则将第一个数放在比第二个数更低
+  points.sort(function(a, b){return a - b}); 
+  ```
+
+  实现随机排序
+
+  ```js
+  var points = [40, 100, 1, 5, 25, 10];
+  points.sort(function(a, b){return 0.5 - Math.random()}); 
+  ```
+
+* 使用`Math`，得到最大最小值
+
+  ```js
+  function myArrayMax(arr) {
+      // Math.max.apply([1, 2, 3]) 等于 Math.max(1, 2, 3)
+      return Math.max.apply(null, arr);
+  }
+  ```
+
+* 数组迭代
+
+  ```js
+  var txt = "";
+  var numbers = [45, 4, 9, 16, 25];
+  // 除了IE8以及更低版本，都支持foreach
+  numbers.forEach(myFunction);  // 对每个元素进行myFunction处理
   
+  // 接收三个参数：项目值、项目索引、数组本身
+  function myFunction(value, index, array) {
+    txt = txt + value + "<br>"; 
+  }
+  ```
+
+* 根据数组迭代创建新数组
+
+  **处理每个元素组建新数组**
+
+  `map() `方法通过对每个数组元素执行函数来创建新数组。
+
+  `map() `方法不会对没有值的数组元素执行函数。
+
+  `map()` 方法不会更改原始数组。
+
+  ```js
+  var numbers1 = [45, 4, 9, 16, 25];
+  // 除了IE8以及更低版本，均支持
+  var numbers2 = numbers1.map(myFunction);
+  
+  function myFunction(value, index, array) {
+    return value * 2;
+  }
+  ```
+
+  结果
+
+  ```
+  numbers2 = [90,8,18,32,50]
+  ```
+
+  **过滤某些元素组建新数组**
+
+  `filter()`方法创建一个包含通过测试的数组元素的新数组。
+
+  ```js
+  var numbers = [45, 4, 9, 16, 25];
+  // 除了IE8以及更低版本，均支持
+  var over18 = numbers.filter(myFunction);
+  
+  function myFunction(value, index, array) {
+    return value > 18;
+  }
+  
+  //可以省略后面两个参数
+  //function myFunction(value) {
+  //  return value > 18;
+  //}
+  ```
+
+  结果
+
+  ```
+  over18 = [45,25]
+  ```
+
+* 处理每个元素得到最终结果
+
+  `reduce()` 方法在每个数组元素上运行函数，以生成（减少它）单个值。
+
+  `reduce() `方法在数组中从左到右工作。另请参见` reduceRight()`。
+
+  `reduce() `方法不会减少原始数组。
+
+  ```js
+  var numbers1 = [45, 4, 9, 16, 25];
+  // 除了IE8以及更低版本，均支持
+  var sum = numbers1.reduce(myFunction);
+  
+  var sum1 = numbers1.reduce(myFunction, 100);// 可以接收一个初始值
+  
+  // 将所有元素的加起来
+  // 参数： 总数（初始值/先前返回的值）、项目值、项目索引、数组本身
+  function myFunction(total, value, index, array) {
+    return total + value;
+  }
+  ```
+
+  结果
+
+  ```
+  sum = 99
+  sum1 = 199
+  ```
+
+* 检查每个元素是否通过测试
+
+  `every() `方法检查所有数组值是否通过测试。
+
+  ```js
+  var numbers = [45, 4, 9, 16, 25];
+  // 检查是否全部大于18
+  var allOver18 = numbers.every(myFunction);
+  
+  function myFunction(value, index, array) {
+    return value > 18;
+  }
+  ```
+
+* 检查是否有元素通过测试
+
+  `some()` 方法检查某些数组值是否通过了测试。
+
+  ```js
+  var numbers = [45, 4, 9, 16, 25];
+  var someOver18 = numbers.some(myFunction);
+  // 参数：项目值、项目索引、数组本身
+  function myFunction(value, index, array) {
+    return value > 18;
+  }
+  ```
+
+* 搜索元素
+
+  **根据索引搜索**
+
+  ```js
+  var fruits = ["Apple", "Orange", "Apple", "Mango"];
+  // 除了 Internet Explorer 8 或更早的版本, 均支持
+  // array.indexOf(item, start)
+  // item: 必需。要检索的项目
+  // start：可选。从哪里开始搜索。负值将从结尾开始的给定位置开始，并搜索到结尾。
+  var a = fruits.indexOf("Apple");
+  
+  var b = fruits.lastIndexOf("Apple");
+  ```
+
+  结果
+
+  ```
+  a = 0
+  b = 2
+  ```
+
+  **根据条件搜索**
+
+  ```js
+  var numbers = [4, 9, 16, 25, 29];
+  var first = numbers.find(myFunction);
+  
+  function myFunction(value, index, array) {
+    return value > 18;
+  }
+  ```
+
+## 2.12 日期
+
+**Date**
+
+JavaScript 从 0 到 11 计算月份。
+
+```js
+// 用当前日期和时间创建新的日期对象
+// Tue Apr 02 2019 09:01:19 GMT+0800 (中国标准时间)
+new Date()
+// 7个数字分别指定年、月、日、小时、分钟、秒和毫秒
+new Date(year, month, day, hours, minutes, seconds, milliseconds)
+// 1970年 1 月 1 日加上milliseconds毫秒
+new Date(milliseconds)
+new Date(date string)
+```
+
+**UTC时间**
+
+toUTCString() 方法将日期转换为 UTC 字符串（一种日期显示标准）
+
+```js
+var d = new Date();
+// Sun, 04 Aug 2019 07:10:25 GMT
+document.getElementById("demo").innerHTML = d.toUTCString();
+```
+
+**日期字符串**
+
+toDateString() 方法将日期转换为日期字符串
+
+```js
+var d = new Date();
+// Sun Aug 04 2019
+document.getElementById("demo").innerHTML = d.toDateString();
+```
+
+**日期获取方法**
+
+| 方法                | 描述                                 |
+| :------------------ | :----------------------------------- |
+| `getDate()`         | 以数值返回天（1-31）                 |
+| `getDay()`          | 以数值获取周名（0-6）                |
+| `getFullYear()`     | 获取四位的年（yyyy）                 |
+| `getHours()`        | 获取小时（0-23）                     |
+| `getMilliseconds()` | 获取1秒中的毫秒（0-999）             |
+| `getMinutes()`      | 获取分（0-59）                       |
+| `getMonth()`        | 获取月（0-11）                       |
+| `getSeconds()`      | 获取秒（0-59）                       |
+| `getTime()`         | 获取时间（从 1970 年 1 月 1 日至今） |
+
+**日期设置方法**
+
+| 方法                | 描述                                         |
+| :------------------ | :------------------------------------------- |
+| `setDate()`         | 以数值（1-31）设置日                         |
+| `setFullYear()`     | 设置年（可选月和日）                         |
+| `setHours()`        | 设置小时（0-23）                             |
+| `setMilliseconds()` | 设置毫秒（0-999）                            |
+| `setMinutes()`      | 设置分（0-59）                               |
+| `setMonth()`        | 设置月（0-11）                               |
+| `setSeconds()`      | 设置秒（0-59）                               |
+| `setTime()`         | 设置时间（从 1970 年 1 月 1 日至今的毫秒数） |
+
+## 2.13 [Math对象](https://www.w3school.com.cn/jsref/jsref_obj_math.asp)
+
+**四舍五入**
+
+```js
+Math.round(6.8);    // 返回 7
+Math.round(2.3);    // 返回 2
+```
+
+**向上舍入**
+
+```js
+Math.ceil(6.4);     // 返回 7
+```
+
+**向下舍入**
+
+```js
+Math.floor(2.7);    // 返回 2
+```
+
+**次幂**
+
+```js
+Math.pow(8, 2); // 返回 64
+```
+
+**平方根**
+
+```js
+Math.sqrt(64);      // 返回 8
+```
+
+**绝对值**
+
+```js
+Math.abs(-4.7);     // 返回 4.7
+```
+
+**随机数**
+
+0到1的随机数，包括0，但不包括1。
+
+```js
+Math.random();     // 返回随机数
+```
+
+**常数**
+
+```js
+Math.E          // 返回欧拉指数（Euler's number）
+Math.PI         // 返回圆周率（PI）
+Math.SQRT2      // 返回 2 的平方根
+Math.SQRT1_2    // 返回 1/2 的平方根
+Math.LN2        // 返回 2 的自然对数
+Math.LN10       // 返回 10 的自然对数
+Math.LOG2E      // 返回以 2 为底的 e 的对数（约等于 1.414）
+Math.LOG10E     // 返回以 10 为底的 e 的对数（约等于0.434）
+```
+
+**Math函数表**
+
+| 方法               | 描述                                                     |
+| :----------------- | :------------------------------------------------------- |
+| `abs(x)`           | 返回 x 的绝对值                                          |
+| `acos(x)`          | 返回 x 的反余弦值，以弧度计                              |
+| `asin(x)`          | 返回 x 的反正弦值，以弧度计                              |
+| `atan(x)`          | 以介于 -PI/2 与 PI/2 弧度之间的数值来返回 x 的反正切值。 |
+| `atan2(y,x)`       | 返回从 x 轴到点 (x,y) 的角度                             |
+| `ceil(x)`          | 对 x 进行上舍入                                          |
+| `cos(x)`           | 返回 x 的余弦                                            |
+| `exp(x)`           | 返回 Ex 的值                                             |
+| `floor(x)`         | 对 x 进行下舍入                                          |
+| `log(x)`           | 返回 x 的自然对数（底为e）                               |
+| `max(x,y,z,...,n)` | 返回最高值                                               |
+| `min(x,y,z,...,n)` | 返回最低值                                               |
+| `pow(x,y)`         | 返回 x 的 y 次幂                                         |
+| `random()`         | 返回 0 ~ 1 之间的随机数                                  |
+| `round(x)`         | 把 x 四舍五入为最接近的整数                              |
+| `sin(x)`           | 返回 x（x 以角度计）的正弦                               |
+| `sqrt(x)`          | 返回 x 的平方根                                          |
+| `tan(x)`           | 返回角的正切                                             |
+
+## 2.14 逻辑
+
+**布尔值**
+
+可以使用 `Boolean()` 函数来确定表达式（或变量）是否为真
+
+```js
+Boolean(10 > 9)        // 返回 true
+(10 > 9)              // 也返回 true
+10 > 9                // 也返回 true
+```
+
+**值的true或者false**
+
+```js
+// 所有具有“真实”值的即为 True
+100
+3.14
+-15
+"Hello"
+"false"
+7 + 1 + 3.14
+5 < 6 
+
+// 所有不具有“真实”值的即为 False
+var x = 0;
+Boolean(x);       // 返回 false
+x = -0;
+Boolean(x);       // 返回 false
+x = "";
+Boolean(x);       // 返回 false
+var y;
+Boolean(y);       // 返回 false
+x = null;
+Boolean(x);       // 返回 false
+x = false;
+Boolean(x);       // 返回 false
+x = 10 / "H";
+Boolean(x);       // NaN  返回 false
+```
+
+**条件运算符**
+
+```js
+variablename = (condition) ? value1:value2
+```
+
+## 2.15 条件语句
+
+- 使用 `if` 来规定要执行的代码块，如果指定条件为 `true`
+- 使用 `else` 来规定要执行的代码块，如果相同的条件为` false`
+- 使用 `else if` 来规定要测试的新条件，如果第一个条件为` false`
+- 使用 `switch` 来规定多个被执行的备选代码块
+
+```js
+switch(表达式) {
+     case n:
+        代码块
+        break;
+     case n:
+        代码块
+        break;
+     default:
+        默认代码块
+} 
+```
+
+## 2.16 for/while循环
+
+- `for `- 多次遍历代码块
+- `for/in` - 遍历对象属性
+- `while` - 当指定条件为 true 时循环一段代码块
+- `do/while` - 当指定条件为 true 时循环一段代码块
+
+```js
+var person = {fname:"Bill", lname:"Gates", age:62}; 
+
+var text = "";
+var x;
+for (x in person) {
+    text += person[x];
+}
+```
+
+## 2.17 数据类型转换
+
+```js
+String(123);       // 从数值文本 123 返回字符串
+(123).toString();
+
+String(false)        // 返回 "false"
+
+String(Date())      // 返回 "Sun Aug 04 2019 15:30:42 GMT+0800 (China Standard Time)"
+```
+
+## 2.18 位运算
+
+| 运算符 | 名称         | 描述                                                     |
+| :----- | :----------- | :------------------------------------------------------- |
+| `&`    | AND          | 如果两位都是 1 则设置每位为 1                            |
+| `|`    | OR           | 如果两位之一为 1 则设置每位为 1                          |
+| `^`    | XOR          | 如果两位只有一位为 1 则设置每位为 1                      |
+| `~`    | NOT          | 反转所有位                                               |
+| `<<`   | 零填充左位移 | 通过从右推入零向左位移，并使最左边的位脱落。             |
+| `>>`   | 有符号右位移 | 通过从左推入最左位的拷贝来向右位移，并使最右边的位脱落。 |
+| `>>>`  | 零填充右位移 | 通过从左推入零来向右位移，并使最右边的位脱落。           |
+
+## 2.19 正则表达式
+
+**语法**
+
+```
+/pattern/modifiers;
+```
+
+实例
+
+```js
+// /i表示将索引修改为大小写不敏感
+var patt = /w3school/i;
+```
+
+**修饰词**
+
+| 修饰符 | 描述                                                     |
+| :----- | :------------------------------------------------------- |
+| i      | 执行对大小写不敏感的匹配。                               |
+| g      | 执行全局匹配（查找所有匹配而非在找到第一个匹配后停止）。 |
+| m      | 执行多行匹配。                                           |
+
+| 表达式  | 描述                       |
+| :------ | :------------------------- |
+| `[abc]` | 查找方括号之间的任何字符。 |
+| `[0-9]` | 查找任何从 0 至 9 的数字。 |
+| `(x|y)` | 查找由 \| 分隔的任何选项。 |
+
+| `\d`     | 查找数字。                                  |
+| -------- | ------------------------------------------- |
+| `\s`     | 查找空白字符。                              |
+| `\b`     | 匹配单词边界。                              |
+| `\uxxxx` | 查找以十六进制数 xxxx 规定的 Unicode 字符。 |
+
+| 量词 | 描述                                |
+| :--- | :---------------------------------- |
+| `n+` | 匹配任何包含至少一个 n 的字符串。   |
+| `n*` | 匹配任何包含零个或多个 n 的字符串。 |
+| `n?` | 匹配任何包含零个或一个 n 的字符串。 |
+
+**正则表达式函数**
+
+* 搜索字符串是否存在
+
+  ```js
+  var patt = /e/;
+  patt.test("The best things in life are free!"); 
+  
+  /e/.test("The best things in life are free!");
+  ```
+
+  结果
+
+  ```
+  true
+  ```
+
+* 返回搜索到的文本
+
+  ```js
+  /e/.exec("The best things in life are free!");
+  ```
+
+  结果
+
+  ```
+  e
+  ```
+
+## 2.20 异常
+
+**异常处理**
+
+```js
+try {
+     供测试的代码块
+}
+ catch(err) {
+     处理错误的代码块
+} 
+```
+
