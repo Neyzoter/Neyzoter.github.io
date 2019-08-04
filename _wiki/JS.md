@@ -607,3 +607,82 @@ var y = 9999999999999999;  // y 将是 10000000000000000
 var x = 0.2 + 0.1;         // x 将是 0.30000000000000004
 ```
 
+支持16进制
+
+```js
+var x = 0xFF;             // x 将是 255
+```
+
+进制转换
+
+```js
+var myNumber = 128;
+myNumber.toString(16);     // 返回 80，16进制
+myNumber.toString(8);      // 返回 200，8进制
+myNumber.toString(2);      // 返回 10000000，2进制
+```
+
+## 2.11 数组
+
+**数组介绍**
+
+数组是一种特殊类型的对象，typeof一个数组会返回object
+
+实例
+
+```js
+var cars = ["Saab", "Volvo", "BMW"];
+document.getElementById("demo").innerHTML = cars[0]; 
+```
+
+**数组方法**
+
+* 增加删除元素
+
+  ```js
+  var fruits = ["Banana", "Orange", "Apple", "Mango"];
+  fruits.push("Lemon");                // 向 fruits 末尾添加一个新元素 (Lemon)
+  fruits.pop();                // 从 fruits 删除最后一个元素（"Lemon"）
+  fruits.shift();                 // 从 fruits 删除第一个元素 "Banana"
+  fruits.unshift("Banana");                 // 向 fruits 开头添加一个新元素 "Banana"
+  fruits[0] = "Kiwi";        // 把 fruits 的第0个元素改为 "Kiwi"
+  delete fruits[0];           // 把 fruits 中的首个元素改为 undefined
+  ```
+
+* 长度
+
+  ```js
+  var fruits = ["Banana", "Orange", "Apple", "Mango"];
+  fruits.length;                       // fruits 的长度是 4
+  ```
+
+* 遍历数组
+
+  ```js
+  fruits = ["Banana", "Orange", "Apple", "Mango"];
+  fruits.forEach(myFunction);  // 使用foreach遍历数组，并使用myFunction处理数据
+  function myFunction(value) {
+    text += "<li>" + value + "</li>";
+  }
+  ```
+
+* 识别数组
+
+  ```js
+  Array.isArray(fruits);     // 返回 true
+  // typeof 一个数组返回object
+  ```
+
+* 数组结合
+
+  join
+
+* 数组排序
+
+  ```js
+  var fruits = ["Banana", "Orange", "Apple", "Mango"];
+  fruits.sort();            // 对 fruits 中的元素进行排序
+  fruits.reverse();         // 反转元素顺序
+  ```
+
+  
