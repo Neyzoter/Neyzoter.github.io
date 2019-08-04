@@ -1390,7 +1390,6 @@ var x = 10;
 
 ## 3.1 HTML DOM
 
-当网页被加载时，浏览器会创建页面的文档对象模型（*D*ocument *O*bject *M*odel）。
+当网页被加载时，浏览器会创建页面的文档对象模型（Document Object Model）。
 
 <img src="/images/wiki/js/ct_htmltree.gif" width="600" alt="HTML DOM树">
-
