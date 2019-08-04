@@ -1,5 +1,5 @@
 ---
-`layout: wiki
+layout: wiki
 title: JavaScript
 categories: JavaScript
 description: JavaScript语法
@@ -1200,3 +1200,109 @@ try {
 } 
 ```
 
+## 2.21 Hoisting
+
+JavaScript 声明会被提升，而初始化不会被提升。
+
+```js
+var x = 5; // 初始化 x
+ 
+elem = document.getElementById("demo"); // 查找元素
+elem.innerHTML ="x is " x + " and y is " + y;           // 显示 x 和 y
+ 
+var y = 7; // 初始化 y 
+```
+
+结果
+
+```
+x is 5 and y is undefined
+```
+
+说明：在输出时，y已经声明但是还没有初始化。
+
+## 2.22 严格模式
+
+**使用方法**
+
+（**只能**）通过在脚本或函数的**开头**添加 `"use strict"; `来声明严格模式
+
+```js
+"use strict";
+```
+
+**严格模式不允许事项**
+
+* 不允许在不声明变量（对象）的情况下使用变量（对象）
+
+* 不允许删除函数
+
+* 不允许重复参数名
+
+* 不允许八进制数值
+
+  ```js
+  "use strict";
+  var x = 010;             // 这将引发错误
+  ```
+
+* 不允许转意字符
+
+  ```js
+  "use strict";
+  var x = \010;            // 这将引发错误
+  ```
+
+* 不允许写入只读
+
+  ```js
+  "use strict";
+  var obj = {get x() {return 0} };
+  
+  obj.x = 3.14;            // 这将引发错误
+  ```
+
+* 不允许删除不可删除的属性
+
+* 不运行使用的变量名
+
+  eval、arguments、implements、interface、let、package、private、protected、public、static、yield
+
+## 2.23 this关键字
+
+- 在方法中，this 指的是所有者对象。
+
+```js
+var person = {
+  firstName: "Bill",
+  lastName : "Gates",
+  id       : 678,
+  fullName : function() {
+      // this是指person对象
+    return this.firstName + " " + this.lastName;
+  }
+};
+```
+
+- 单独的情况下，this 指的是全局对象。
+
+  ```js
+  var x = this; // 全局对象 [object Window]
+  ```
+
+- 在函数中，this 指的是全局对象或者未定义（严格模式）。
+
+  ```js
+  function myFunction() {
+    return this;// 全局对象 [object Window]
+  }
+  
+  "use strict";
+  function myFunction() {
+    return this; // 严格模式下，this为未定义(undefined)
+  }
+  ```
+
+- 在函数中，严格模式下，this 是 undefined。
+
+- 在事件中，this 指的是接收事件的元素。
