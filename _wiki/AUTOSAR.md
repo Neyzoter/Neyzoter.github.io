@@ -1406,7 +1406,7 @@ Com_IpduGroupControl --> changeBswM_PduGroupSwitchActionPerformedFalse["BswM_Pdu
 
 * `Com_PbCfg.c`
 
-  **需要修改的内容**：`ComSignal[n].ComIPduHandleId`对应`Com_PbCfg.h`中的某一个ID
+  **需要修改的内容**：`ComSignal[n].ComIPduHandleId`对应`Com_PbCfg.h`中的某一个ID、信号初始数值如` Com_SignalInitValue_DoorStatus`、Post Build的一些结构体如SignalRef：`ComIPduSignalRefs_DoorStatusPdu`、GroupRef：`ComIpduGroupRefs_DoorStatusPdu`
 
   定义通信需要的数据结构——`ComConfiguration`，即`Signal`（非`Arc_IPdu`）。
 
@@ -1439,8 +1439,19 @@ Com_IpduGroupControl --> changeBswM_PduGroupSwitchActionPerformedFalse["BswM_Pdu
 ### 7.4.3 ComM
 
 * `ComM_Cfg.c`
+
+  **需要修改的内容**：无
+
+  定义了`ComM_MainFunction_ComMChannel()`调用`ComM_MainFunction(ComMConf_ComMChannel_ComMChannel)`，`ComMConf_ComMChannel_ComMChannel`定义了`ComMChannelId`，*每个通信端口对应一个channel？*
+
 * `ComM_Cfg.h`
+
+  **需要修改的内容**：无
+
+  宏定义，如`ComMConf_ComMChannel_ComMChannel`、`COMM_NETWORK_HANDLE_ComMChannel`、`COMM_CHANNEL_COUNT`、`COMM_USER_COUNT`。
+
 * `ComM_PbCfg.c`
+
 * `ComM_PbCfg.h`
 
 ### 7.4.4 BswM
@@ -1670,6 +1681,10 @@ Com_IpduGroupControl --> changeBswM_PduGroupSwitchActionPerformedFalse["BswM_Pdu
   **需要修改的内容**：无
 
   校验功能。
+
+* `Rte_Internal_PwmSetManager.c`
+
+  RTE Types Workarounds Header File，宏定义，可以使得ArcCore RTE 集成Simulink SWC更加 简单，此文件不是AUTOSAR标准。
 
 #### 7.4.6.2 Contract
 
