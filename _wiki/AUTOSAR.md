@@ -166,6 +166,18 @@ Services Layer，BSW最高层，**（任务）为应用、RTE和BSW提供基础�
 * 诊断服务（包括 UDS 通信及错误内存）
 * ECU 状态管理
 
+## 4.2 通信服务
+
+Communication Services
+
+<img src="/images/wiki/AUTOSAR/ComService.png" width="700 " alt="通信服务架构">
+
+### 4.2.1 DCM
+
+Diagnostic Com. Manager，在开发过程中，可用外部的诊断工具使用（通过通信调用和返回？）该模块进行调试。
+
+<img src="/images/wiki/AUTOSAR/useDCM.png" width="700 " alt="使用DCM">
+
 ## 4.2 服务层架构
 
 ### 4.2.1 系统服务
