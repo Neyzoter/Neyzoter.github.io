@@ -1104,6 +1104,23 @@ changeBswM_PduGroupSwitchActionPerformedTrue --BswM_PduGroupSwitchActionPerforme
 Com_IpduGroupControl --> changeBswM_PduGroupSwitchActionPerformedFalse["BswM_PduGroupSwitchActionPerformed = FALSE"]
 ```
 
+### 7.3.10 CAN如何注册中断向量表
+
+```mermaid
+graph TB;
+Can_Init["Can_Init()@Can_stm32.c"] --> INSTALL_HANDLERS["INSTALL_HANDLERS(Can_1, CAN1_SCE_IRQn, CAN1_RX0_IRQn, CAN1_RX1_IRQn, CAN1_TX_IRQn)<br>@Can_stm32.c<br>参数CAN1_SCE_IRQn, CAN1_RX0_IRQn, CAN1_RX1_IRQn, CAN1_TX_IRQn指定了向量表下标偏移量<br>该偏移量需要再加上OFFSET，比如STM32的内部中断有16个，所以OFFSET此时为16"]
+INSTALL_HANDLERS --> ISR_INSTALL_ISR2["ISR_INSTALL_ISR2( Can_name, _can_name ## _Rx0Isr, _rx0, 2, 0 )<br>@isr.h"]
+ISR_INSTALL_ISR2 --封装--> __ISR_INSTALL_ISR2["__ISR_INSTALL_ISR2(_name, _entry, _unique, _vector,_priority,_app)@isr.h"]
+__ISR_INSTALL_ISR2 --> Os_IsrAdd["Os_IsrAdd( & _entry ## _unique)<br>@os_isr.h"]
+Os_IsrAdd --1--> Os_CheckISRinstalled["Os_CheckISRinstalled( isrPtr )<br>@os_isr.c"]
+	Os_CheckISRinstalled --1.1--> addIntoVector["id = (ISRType)Os_VectorToIsr[isrPtr->vector +<br> IRQ_INTERRUPT_OFFSET <br>如果不是默认安装的中断ID，则会返回VECTOR_ILL<br>一般都是初始化为VECTOR_ILL"]
+Os_IsrAdd --2 1.1的id == VECTOR_ILL--> Os_IsrAddWithId["Os_IsrAddWithId(isrPtr,id)<br>@os_isr.c<br>通过id安装中断<br>注意：STM32的0-15中断默认开启，配置<br>外部中断external interrupt(>15)"]
+Os_IsrAddWithId --2.1--> addWithId["Os_VectorToIsr[isrPtr->vector + <br>IRQ_INTERRUPT_OFFSET ] = (uint8)id<br> 通过中断向量ID表赋值，表示已经安装"]
+Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry, isrPtr->vector, <br>isrPtr->type,  isrPtr->priority, <br>Os_ApplGetCore(isrPtr->appOwner) )<br>@irq.c<br>中断初始化使能"]
+```
+
+
+
 ## 7.4 顶层移植、配置和应用
 
 路径：`\examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c`
@@ -1464,7 +1481,13 @@ Com_IpduGroupControl --> changeBswM_PduGroupSwitchActionPerformedFalse["BswM_Pdu
 
 * `ComM_PbCfg.c`
 
+  **需要修改的内容**：无
+
+  定义ComM的通道和使用者信息。
+
 * `ComM_PbCfg.h`
+
+  `ComM_Config`的`extern`声明。
 
 ### 7.4.4 BswM
 
