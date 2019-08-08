@@ -1104,7 +1104,7 @@ changeBswM_PduGroupSwitchActionPerformedTrue --BswM_PduGroupSwitchActionPerforme
 Com_IpduGroupControl --> changeBswM_PduGroupSwitchActionPerformedFalse["BswM_PduGroupSwitchActionPerformed = FALSE"]
 ```
 
-### 7.3.10 CAN如何注册中断向量表
+### 7.3.10 如何注册中断向量表
 
 ```mermaid
 graph TB;
