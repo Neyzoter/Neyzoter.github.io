@@ -1733,5 +1733,36 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   实现内存映射
 
+# 8.[Artop](www.artop.org)
 
+## 8.1 介绍
 
+### 8.1.1 子项目
+
+|                             Name                             |                         Description                          | Status |
+| :----------------------------------------------------------: | :----------------------------------------------------------: | :----: |
+| [Core](https://www.artop.org/mediawiki/index.php?title=Core) | The core of Artop that mainly includes the Meta Models, Serialization and Workspace Management. | ACTIVE |
+| [Validation Sub-Project](https://www.artop.org/mediawiki/index.php?title=Validation_Sub-Project) | A framework which provides mechanisms for validating loaded AUTOSAR and non-AUTOSAR models. | ACTIVE |
+| [ECU Configuration Sub-Project](https://www.artop.org/mediawiki/index.php?title=ECU_Configuration_Sub-Project) | ECU Configuration editors, generators, wizards and further ECU configuration related functionalities. | ACTIVE |
+| [AUTOSAR Textual Language Sub-Project](https://www.artop.org/mediawiki/index.php?title=AUTOSAR_Textual_Language_Sub-Project) (ARText) |         A textual modeling environment for AUTOSAR.          | ACTIVE |
+| [AUTOSAR Test Environment Sub-Project](https://www.artop.org/mediawiki/index.php?title=AUTOSAR_Test_Environment_Sub-Project) (ARUnit) |          Artop based test environment for AUTOSAR.           | ACTIVE |
+
+### 8.1.2 三个文件
+
+`Artop Technology Demonstrator`、`Artop SDK`、`ARText SDK`
+
+* Artop Technology Demonstrator
+
+  > The Artop Technology Demonstrator is a collection of examples that demonstrate the features and capabilities of the underlying platform, i. e. Artop. It is a standalone application that can be used to conveniently explore Artop, it does not require an existing Eclipse installation.
+
+* Artop SDK
+
+  > The Artop SDK contains all Artop plug-ins needed to develop own plug-ins based on Artop. The SDK also contains source code and documentation, examples are provided as separate download. To get started with the SDK please refer to the Getting Started Guide in the Artop Wiki.
+
+* ARText SDK
+
+  文本建模语言框架，基于XText（语言开发框架）开发。
+
+  > The ARText SDK contains all the ARText plug-ins needed to develop your own AUTOSAR textual language based on Artop, as well as the current textual language plug-ins. The SDK contains source code and documentation. For more information please refer to the [ARText](https://www.artop.org/artext/) section.
+
+  *什么是XText*：XText帮助程序员创建一套基于文本的小型领域特定语言（DSL），抑或是实现一门成熟的通用计算机程序设计语言。
