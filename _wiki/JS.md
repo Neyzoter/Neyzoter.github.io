@@ -1390,7 +1390,7 @@ var x = 10;
 
 ## 3.1 HTML DOM
 
-当网页被加载时，浏览器会创建页面的文档对象模型（Document Object Model）。
+当网页被加载时，浏览器会创建页面的文档对象模型（DOM, Document Object Model）。
 
 <img src="/images/wiki/js/ct_htmltree.gif" width="600" alt="HTML DOM树">
 
@@ -1765,3 +1765,496 @@ function myMove() {
 var x = document.getElementsByTagName("p");
 ```
 
+# 4.JS Browser BOM
+
+浏览器对象模型（BOM, Browser Object Model）。
+
+## 4.1 Window对象
+
+* **实例**
+
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <body>
+  
+  <p id="demo"></p>
+  
+  <script>
+  var w = window.innerWidth
+  || document.documentElement.clientWidth
+  || document.body.clientWidth;
+  
+  var h = window.innerHeight
+  || document.documentElement.clientHeight
+  || document.body.clientHeight;
+  
+  var x = document.getElementById("demo");
+  x.innerHTML = "浏览器内窗宽度：" + w + "，高度：" + h + "。";
+  </script>
+  
+  </body>
+  </html>
+  
+  ```
+
+* **其他方法**
+
+  ```
+  window.open() - 打开新窗口
+  window.close() - 关闭当前窗口
+  window.moveTo() -移动当前窗口
+  window.resizeTo() -重新调整当前窗口
+  ```
+
+## 4.2 Window Screen
+
+- screen.width - 访问者屏幕宽度
+- screen.height - 访问者屏幕的高度
+- screen.availWidth - 访问者屏幕的可用宽度，即宽度减去工具条等
+- screen.availHeight - 访问者屏幕的可用高度
+- screen.colorDepth - 显示一种颜色的比特数
+- screen.pixelDepth - 屏幕的像素深度
+
+## 4.3 Window Location
+
+- window.location.href 返回当前页面的 href (URL)
+- window.location.hostname 返回 web 主机的域名
+- window.location.pathname 返回当前页面的路径或文件名
+- window.location.protocol 返回使用的 web 协议（http: 或 https:）
+- window.location.assign 加载新文档
+
+## 4.4 Window History
+
+- history.back() - 等同于在浏览器点击后退按钮
+- history.forward() - 等同于在浏览器中点击前进按钮
+
+## 4.5 Window Navigator
+
+window.navigator对象包含有关访问者的信息。
+
+* navigator.appName - 浏览器应用名称，“Netscape” 是 IE11、Chrome、Firefox 和 Safari 的应用程序名称。
+* navigator.appCodeName - 浏览器的应用程序代码名称“Mozilla” 是 Chrome、Firefox、IE、Safari 和 Opera 的应用程序代码名称。
+* navigator.platform - 浏览器平台，Linux x86_64
+* navigator.cookieEnabled - cookies是否使能
+
+## 4.6 Window 弹出框
+
+* **警告框**
+
+  如果要确保信息传递给用户，通常会使用警告框。
+
+  当警告框弹出时，用户将需要单击“确定”来继续。
+
+  ```js
+  window.alert("sometext");
+  ```
+
+* **确认框**
+
+  如果您希望用户验证或接受某个东西，则通常使用“确认”框。
+
+  当确认框弹出时，用户将不得不单击“确定”或“取消”来继续进行。
+
+  如果用户单击“确定”，该框返回 true。如果用户单击“取消”，该框返回 false。
+
+  ```js
+  window.confirm("sometext");
+  ```
+
+* **提示框**
+
+  如果您希望用户在进入页面前输入值，通常会使用提示框。
+
+  当提示框弹出时，用户将不得不输入值后单击“确定”或点击“取消”来继续进行。
+
+  如果用户单击“确定”，该框返回输入值。如果用户单击“取消”，该框返回 NULL
+
+  ```js
+  window.prompt("sometext","defaultText");
+  ```
+
+## 4.7 JS Timing 事件
+
+window 对象允许以指定的时间间隔执行代码。这些时间间隔称为定时事件。
+
+通过 JavaScript 使用的有两个关键的方法：
+
+- setTimeout(*function*, *milliseconds*)
+
+  在等待指定的毫秒数后执行函数。
+
+- setInterval(*function*, *milliseconds*)
+
+  等同于 setTimeout()，但持续重复执行该函数。
+
+setTimeout() 和 setInterval() 都属于 HTML DOM Window 对象的方法。
+
+```js
+myVar1 = setTimeout(function, milliseconds);//等待指定毫秒后执行函数
+clearTimeout(myVar1);//停止myVar这个Timing事件
+
+myVar2 = setInterval(function, milliseconds);
+clearInterval(myVar2);
+```
+
+## 4.8 JS Cookies
+
+Cookie 是在您的计算机上存储在小的文本文件中的数据。
+
+当 web 服务器向浏览器发送网页后，连接被关闭，服务器会忘记用户的一切。
+
+Cookie 是为了解决“如何记住用户信息”而发明的：
+
+- 当用户访问网页时，他的名字可以存储在 cookie 中。
+- 下次用户访问该页面时，cookie 会“记住”他的名字。
+
+Cookie 保存在名称值对中，如：
+
+```
+username = Bill Gates
+```
+
+当浏览器从服务器请求一个网页时，将属于该页的 cookie 添加到该请求中。这样服务器就获得了必要的数据来“记住”用户的信息。
+
+* **JS创建Cookie**
+
+  ```js
+  // 创建简单的cookie
+  document.cookie = "username=Bill Gates";
+  // 添加cookie有效日期，默认情况下，浏览器关闭时会删除cookie
+  document.cookie = "username=John Doe; expires=Sun, 31 Dec 2017 12:00:00 UTC";
+  //通过 path 参数，您可以告诉浏览器 cookie 属于什么路径。
+  document.cookie = "username=Bill Gates; expires=Sun, 31 Dec 2017 12:00:00 UTC; path=/";
+  ```
+
+* **JS读取cookie**
+
+  ```js
+  var x = document.cookie;
+  ```
+
+  document.cookie 会在一条字符串中返回所有 cookie，比如：cookie1=value; cookie2=value; cookie3=value;
+
+* **JS删除cookie**
+
+  将cookie的有效日期设置为过去
+
+  ```js
+  document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  ```
+
+* **实例**
+
+  ```js
+  // 设置cookie
+  function setCookie(cname, cvalue, exdays) {
+      var d = new Date();
+      d.setTime(d.getTime() + (exdays*24*60*60*1000));
+      var expires = "expires="+ d.toUTCString();
+      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+  } 
+  // 获取cookie
+  function getCookie(cname) {
+      var name = cname + "=";
+      var decodedCookie = decodeURIComponent(document.cookie);
+      var ca = decodedCookie.split(';');
+      for(var i = 0; i <ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') {
+              c = c.substring(1);
+           }
+           if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+           }
+       }
+      return "";
+  } 
+  // 检查cookie
+  function checkCookie() {
+      var username = getCookie("username");
+      if (username != "") {
+          alert("Welcome again " + username);
+      } else {
+          username = prompt("Please enter your name:", "");
+          if (username != "" && username != null) {
+              setCookie("username", username, 365);
+          }
+      }
+  } 
+  ```
+
+# 5.JS AJAX
+
+## 5.1 AJAX介绍
+
+AJAX = **A**synchronous **J**avaScript **A**nd **X**ML.
+
+AJAX的功能：
+
+- 不刷新页面更新网页
+- 在页面加载后从服务器请求数据
+- 在页面加载后从服务器接收数据
+- 在后台向服务器发送数据
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<div id="demo">
+<h1>XMLHttpRequest 对象</h1>
+<button type="button" onclick="loadDoc()">修改内容</button>
+</div>
+
+<script>
+function loadDoc() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("demo").innerHTML =
+      this.responseText;
+    }
+  };
+    //获取数据，GET访问，地址，异步为true
+  xhttp.open("GET", "/example/js/ajax_info.txt", true);
+    //发送数据
+  xhttp.send();
+}
+</script>
+
+</body>
+</html>
+
+```
+
+AJAX 并非编程语言。AJAX 仅仅组合了：
+
+- 浏览器内建的 XMLHttpRequest 对象（从 web 服务器请求数据）
+- JavaScript 和 HTML DOM（显示或使用数据）
+
+**ajax运行过程**
+
+<img src="/images/wiki/js/ajax.gif" width="600" alt="ajax过程">
+
+1. 网页中发生一个事件（页面加载、按钮点击）
+2. 由 JavaScript 创建 XMLHttpRequest 对象
+3. XMLHttpRequest 对象向 web 服务器发送请求
+4. 服务器处理该请求
+5. 服务器将响应发送回网页
+6. 由 JavaScript 读取响应
+7. 由 JavaScript 执行正确的动作（比如更新页面）
+
+## 5.2 AJAX - XMLHttpRequest 对象
+
+XMLHttpRequest 对象用于同幕后服务器交换数据。这意味着可以更新网页的部分，而不需要重新加载整个页面。
+
+* **跨域访问**
+
+  出于安全原因，现代浏览器不允许跨域访问。这意味着尝试加载的网页和 XML 文件都必须位于相同服务器上。
+
+  要解决该问题，在后端服务器内运行跨域访问——`@CrossOrigin`（org.springframework.web.bind.annotation.*），打开CROS。
+
+* **XMLHttpRequest对象方法**
+
+  | 方法                                          | 描述                                                         |
+  | :-------------------------------------------- | :----------------------------------------------------------- |
+  | new XMLHttpRequest()                          | 创建新的 XMLHttpRequest 对象                                 |
+  | abort()                                       | 取消当前请求                                                 |
+  | getAllResponseHeaders()                       | 返回头部信息                                                 |
+  | getResponseHeader()                           | 返回特定的头部信息                                           |
+  | open(*method*, *url*, *async*, *user*, *psw*) | 规定请求method：请求类型 GET 或 POSTurl：文件位置async：true（异步）或 false（同步）user：可选的用户名称psw：可选的密码 |
+  | send()                                        | 将请求发送到服务器，用于 GET 请求                            |
+  | send(*string*)                                | 将请求发送到服务器，用于 POST 请求                           |
+  | setRequestHeader()                            | 向要发送的报头添加标签/值对                                  |
+
+  ```js
+  /***  GET   */
+  // Math.random()随机数，防止返回一个缓存
+  // xhttp.open("GET", "demo_get.asp", true);
+  xhttp.open("GET", "demo_get.asp?t=" + Math.random(), true);
+  xhttp.send();
+  // GET携带信息
+  xhttp.open("GET", "demo_get2.asp?fname=Bill&lname=Gates", true);
+  xhttp.send();
+  ```
+
+  ```js
+  /***  POST   */
+  xhttp.open("POST", "ajax_test.asp", true);
+  // 如需像 HTML 表单那样 POST 数据，请通过setRequestHeader() 添加一个 HTTP 头部。
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.send("fname=Bill&lname=Gates");
+  
+  ```
+
+  | 方法                                | 描述                                                         |
+  | :---------------------------------- | :----------------------------------------------------------- |
+  | setRequestHeader(*header*, *value*) | 向请求添加 HTTP 头部*header*：规定头部名称*value*：规定头部值 |
+
+* **XMLHttpRequest对象属性**
+
+  | 属性               | 描述                                                         |
+  | :----------------- | :----------------------------------------------------------- |
+  | onreadystatechange | 定义当 readyState 属性发生变化时被调用的函数                 |
+  | readyState         | 保存 XMLHttpRequest 的状态。0：请求未初始化1：服务器连接已建立2：请求已收到3：正在处理请求4：请求已完成且响应已就绪 |
+  | responseText       | 以字符串返回响应数据                                         |
+  | responseXML        | 以 XML 数据返回响应数据                                      |
+  | status             | 返回请求的状态号200: "OK"403: "Forbidden"404: "Not Found"如需完整列表请访问 [Http 消息参考手册](https://www.w3school.com.cn/tags/ref_httpmessages.asp) |
+  | statusText         | 返回状态文本（比如 "OK" 或 "Not Found"）                     |
+
+  **onreadystatechange的使用**
+
+  通过 XMLHttpRequest 对象，您可以定义当请求接收到应答时所执行的函数。
+
+  ```js
+  xhttp.onreadystatechange = function() {
+      // 
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("demo").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "ajax_info.txt", true);
+  xhttp.send();
+  ```
+
+  | 属性               | 描述                                                         |
+  | :----------------- | :----------------------------------------------------------- |
+  | onreadystatechange | 定义了当 readyState 属性发生改变时所调用的函数。             |
+  | readyState         | 保存了 XMLHttpRequest 的状态。0: 请求未初始化；1: 服务器连接已建立；2: 请求已接收；3: 正在处理请求；4: 请求已完成且响应已就绪 |
+  | status             | 200: "OK"；403: "Forbidden"；404: "Page not found"；如需完整列表，请访问 [Http 消息参考手册](https://www.w3school.com.cn/tags/ref_httpmessages.asp) |
+  | statusText         | 返回状态文本（例如 "OK" 或 "Not Found"）                     |
+
+## 5.3 AJAX XML
+
+```html
+<!DOCTYPE html>
+<html>
+<style>
+table,th,td {
+  border : 1px solid black;
+  border-collapse: collapse;
+}
+th,td {
+  padding: 5px;
+}
+</style>
+<body>
+
+<h1>XMLHttpRequest 对象</h1>
+
+<button type="button" onclick="loadDoc()">获取我的音乐列表</button>
+<br><br>
+<table id="demo"></table>
+
+<script>
+function loadDoc() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      myFunction(this);
+    }
+  };
+  xhttp.open("GET", "/demo/music_list.xml", true);
+  xhttp.send();
+}
+function myFunction(xml) {
+  var i;
+  var xmlDoc = xml.responseXML;
+  var table="<tr><th>艺术家</th><th>曲目</th></tr>";
+  var x = xmlDoc.getElementsByTagName("TRACK");
+  for (i = 0; i <x.length; i++) { 
+    table += "<tr><td>" +
+    x[i].getElementsByTagName("ARTIST")[0].childNodes[0].nodeValue +
+    "</td><td>" +
+    x[i].getElementsByTagName("TITLE")[0].childNodes[0].nodeValue +
+    "</td></tr>";
+  }
+  document.getElementById("demo").innerHTML = table;
+}
+</script>
+
+</body>
+</html>
+
+```
+
+## 5.4 AJAX PHP
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>XMLHttpRequest 对象</h1>
+
+<h2>请在下面的输入字段中键入字母 A-Z：</h2>
+
+<p>搜索建议：<span id="txtHint"></span></p> 
+
+<p>姓名：<input type="text" id="txt1" onkeyup="showHint(this.value)"></p>
+
+<script>
+function showHint(str) {
+  var xhttp;
+  if (str.length == 0) { 
+    document.getElementById("txtHint").innerHTML = "";
+    return;
+  }
+    // 1 创建 XMLHttpRequest 对象
+  xhttp = new XMLHttpRequest();
+    // 2 创建当服务器响应就绪时执行的函数
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        // 4 显示php返回的内容
+      document.getElementById("txtHint").innerHTML = this.responseText;
+    }
+  };
+    // 3 发送请求到服务器上的 PHP 文件（gethint.php）,添加到 gethint.php 的 q 参数
+  xhttp.open("GET", "/demo/gethint.php?q="+str, true);
+  xhttp.send();   
+}
+</script>
+
+</body>
+</html>
+
+```
+
+# 6.JS JSON
+
+## 6.1 JSON简介
+
+JSON: JavaScript Object Notation（JavaScript 对象标记法）。
+
+* **JSON 发送**
+
+  ```js
+  var myObj = { name:"Bill Gates",  age:62, city:"Seattle" };
+  var myJSON =  JSON.stringify(myObj);
+  window.location = "demo_json.php?x=" + myJSON;
+  ```
+
+* **接受数据**
+
+  ```js
+  var myJSON = '{ "name":"Bill Gates",  "age":62, "city":"Seattle" }';
+  var myObj =  JSON.parse(myJSON);
+  document.getElementById("demo").innerHTML = myObj.name;
+  ```
+
+* **存储数据**
+
+  ```js
+  myObj = { name:"Bill Gates",  age:62, city:"Seattle" };
+  myJSON =  JSON.stringify(myObj);
+  localStorage.setItem("testJSON", myJSON);
+  ```
+
+# 7.JS/jQuery选择器
+
+jQuery 由 John Resig 于 2006 年创建。它旨在处理浏览器不兼容性并简化 HTML DOM 操作、事件处理、动画和 Ajax。
+
+十多年来，jQuery 一直是世界上最受欢迎的 JavaScript 库。
+
+但是，在 JavaScript Version 5（2009）之后，大多数 jQuery 实用程序都可以通过几行标准 JavaScript 来解决
