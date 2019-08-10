@@ -1393,3 +1393,375 @@ var x = 10;
 当网页被加载时，浏览器会创建页面的文档对象模型（Document Object Model）。
 
 <img src="/images/wiki/js/ct_htmltree.gif" width="600" alt="HTML DOM树">
+
+## 3.2 HTML DOM方法
+
+HTML DOM可以通过JS访问。
+
+```html
+<html>
+<body>
+<p id="demo"></p>
+<script>
+<!--getElementById找到ID为"demo"的元素，innerHTML属性可用于获取或替换 HTML 元素的内容-->
+document.getElementById("demo").innerHTML = "Hello World!";
+</script>
+</body>
+</html>
+```
+
+## 3.3 HTML DOM Document对象
+
+文档代表此网页，可从document访问网页的元素
+
+* **查找元素**
+
+  | 方法                                    | 描述                   |
+  | :-------------------------------------- | :--------------------- |
+  | document.getElementById(*id*)           | 通过元素 id 来查找元素 |
+  | document.getElementsByTagName(*name*)   | 通过标签名来查找元素   |
+  | document.getElementsByClassName(*name*) | 通过类名来查找元素     |
+
+* **修改元素**
+
+  | 方法                                       | 描述                   |
+  | :----------------------------------------- | :--------------------- |
+  | element.innerHTML = *new html content*     | 改变元素的 inner HTML  |
+  | element.attribute = *new value*            | 改变 HTML 元素的属性值 |
+  | element.setAttribute(*attribute*, *value*) | 改变 HTML 元素的属性值 |
+  | element.style.property = *new style*       | 改变 HTML 元素的样式   |
+
+* **添加和删除元素**
+
+  | 方法                              | 描述             |
+  | :-------------------------------- | :--------------- |
+  | document.createElement(*element*) | 创建 HTML 元素   |
+  | document.removeChild(*element*)   | 删除 HTML 元素   |
+  | document.appendChild(*element*)   | 添加 HTML 元素   |
+  | document.replaceChild(*element*)  | 替换 HTML 元素   |
+  | document.write(*text*)            | 写入 HTML 输出流 |
+
+* **添加时间处理**
+
+  | 方法                                                     | 描述                            |
+  | :------------------------------------------------------- | :------------------------------ |
+  | document.getElementById(id).onclick = function(){*code*} | 向 onclick 事件添加事件处理程序 |
+
+* **查找HTML对象**
+
+  DOM Level为版本。
+
+  | 属性                         | 描述                                            | DOM LEVEL |
+  | :--------------------------- | :---------------------------------------------- | :-------- |
+  | document.anchors             | 返回拥有 name 属性的所有` <a>` 元素。           | 1         |
+  | document.applets             | 返回所有 `<applet>` 元素（HTML5 不建议使用）    | 1         |
+  | document.baseURI             | 返回文档的绝对基准 URI                          | 3         |
+  | document.body                | 返回 `<body>` 元素                              | 1         |
+  | document.cookie              | 返回文档的 cookie                               | 1         |
+  | document.doctype             | 返回文档的 doctype                              | 3         |
+  | document.documentElement     | 返回` <html>` 元素                              | 3         |
+  | document.documentMode        | 返回浏览器使用的模式                            | 3         |
+  | document.documentURI         | 返回文档的 URI                                  | 3         |
+  | document.domain              | 返回文档服务器的域名                            | 1         |
+  | document.domConfig           | 废弃。返回 DOM 配置                             | 3         |
+  | document.embeds              | 返回所有 `<embed> `元素                         | 3         |
+  | document.forms               | 返回所有 `<form> `元素                          | 1         |
+  | document.head                | 返回 `<head> `元素                              | 3         |
+  | document.images              | 返回所有 `<img>` 元素                           | 1         |
+  | document.implementation      | 返回 DOM 实现                                   | 3         |
+  | document.inputEncoding       | 返回文档的编码（字符集）                        | 3         |
+  | document.lastModified        | 返回文档更新的日期和时间                        | 3         |
+  | document.links               | 返回拥有 href 属性的所有 `<area> `和 `<a> `元素 | 1         |
+  | document.readyState          | 返回文档的（加载）状态                          | 3         |
+  | document.referrer            | 返回引用的 URI（链接文档）                      | 1         |
+  | document.scripts             | 返回所有` <script>` 元素                        | 3         |
+  | document.strictErrorChecking | 返回是否强制执行错误检查                        | 3         |
+  | document.title               | 返回` <title> `元素                             | 1         |
+  | document.URL                 | 返回文档的完整 URL                              | 1         |
+
+## 3.4 JS改变HTML元素样式
+
+* **改变样式**
+
+  ```html
+  document.getElementById(id).style.property = new style
+  ```
+
+* **使用事件**
+
+  点击按钮时，更改 id="id1" 的 HTML 元素的样式
+
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <body>
+  <h1 id="id1">我的标题 1</h1>
+  <button type="button" onclick="document.getElementById('id1').style.color = 'red'">
+  点击我！
+  </button>
+  </body>
+  </html>
+  ```
+
+## 3.5 使用JS创建HTML动画
+
+```html
+<!DOCTYPE html>
+<html>
+<style>
+#container {
+  width: 400px;
+  height: 400px;
+  position: relative;
+  background: yellow;
+}
+#animate {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  background-color: red;
+}
+</style>
+<body>
+<p><button onclick="myMove()">单击我</button></p> 
+<div id ="container">
+  <div id ="animate"></div>
+</div>
+<script>
+function myMove() {
+  var elem = document.getElementById("animate");   
+  var pos = 0;
+  var id = setInterval(frame, 5);
+  function frame() {
+    if (pos == 350) {
+      clearInterval(id);
+    } else {
+      pos++; 
+      elem.style.top = pos + "px"; 
+      elem.style.left = pos + "px"; 
+    }
+  }
+}
+</script>
+</body>
+</html>
+
+```
+
+## 3.6 HTML DOM 事件
+
+* **事件类型**
+  - 当用户点击鼠标时
+  - 当网页加载后
+  - 当图像加载后
+  - 当鼠标移至元素上时
+  - 当输入字段被改变时
+  - 当 HTML 表单被提交时
+  - 当用户敲击按键时
+
+* **事件句柄**
+
+  | 属性        | 此事件发生在何时...                  |
+  | :---------- | :----------------------------------- |
+  | onabort     | 图像的加载被中断。                   |
+  | onblur      | 元素失去焦点。                       |
+  | onchange    | 域的内容被改变。                     |
+  | onclick     | 当用户点击某个对象时调用的事件句柄。 |
+  | ondblclick  | 当用户双击某个对象时调用的事件句柄。 |
+  | onerror     | 在加载文档或图像时发生错误。         |
+  | onfocus     | 元素获得焦点。                       |
+  | onkeydown   | 某个键盘按键被按下。                 |
+  | onkeypress  | 某个键盘按键被按下并松开。           |
+  | onkeyup     | 某个键盘按键被松开。                 |
+  | onload      | 一张页面或一幅图像完成加载。         |
+  | onmousedown | 鼠标按钮被按下。                     |
+  | onmousemove | 鼠标被移动。                         |
+  | onmouseout  | 鼠标从某元素移开。                   |
+  | onmouseover | 鼠标移到某元素之上。                 |
+  | onmouseup   | 鼠标按键被松开。                     |
+  | onreset     | 重置按钮被点击。                     |
+  | onresize    | 窗口或框架被重新调整大小。           |
+  | onselect    | 文本被选中。                         |
+  | onsubmit    | 确认按钮被点击。                     |
+  | onunload    | 用户退出页面                         |
+
+* **键盘/鼠标属性**
+
+  | 属性          | 描述                                         |
+  | :------------ | :------------------------------------------- |
+  | altKey        | 返回当事件被触发时，"ALT" 是否被按下。       |
+  | button        | 返回当事件被触发时，哪个鼠标按钮被点击。     |
+  | clientX       | 返回当事件被触发时，鼠标指针的水平坐标。     |
+  | clientY       | 返回当事件被触发时，鼠标指针的垂直坐标。     |
+  | ctrlKey       | 返回当事件被触发时，"CTRL" 键是否被按下。    |
+  | metaKey       | 返回当事件被触发时，"meta" 键是否被按下。    |
+  | relatedTarget | 返回与事件的目标节点相关的节点。             |
+  | screenX       | 返回当某个事件被触发时，鼠标指针的水平坐标。 |
+  | screenY       | 返回当某个事件被触发时，鼠标指针的垂直坐标。 |
+  | shiftKey      | 返回当事件被触发时，"SHIFT" 键是否被按下。   |
+
+* **其他DOM事件/属性**
+
+  https://www.w3school.com.cn/jsref/dom_obj_event.asp
+
+## 3.7 HTML DOM的时间监听器
+
+* **实例**
+
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <body>
+  <h2>JavaScript addEventListener()</h2>
+  <p>此示例使用 addEventListener() 方法将 click 事件附加到按钮。</p>
+  <button id="myBtn">试一试</button>
+  <p id="demo"></p>
+  <script>
+  document.getElementById("myBtn").addEventListener("click", displayDate);
+  function displayDate() {
+    document.getElementById("demo").innerHTML = Date();
+  }
+  </script>
+  </body>
+  </html>
+  ```
+
+* **语法**
+
+  ```html
+  <!--单个元素支持多个事件监听器-->
+  element.addEventListener(event, function, useCapture);
+  element.addEventListener(event, function, useCapture);
+  ```
+
+  第一个参数是事件的类型（比如 "click" 或 "mousedown"）。
+
+  第二个参数是当事件发生时我们需要调用的函数。
+
+  第三个参数是布尔值，指定使用事件冒泡还是事件捕获。此参数是可选的。
+
+  > 在冒泡中(false，默认)，最内侧元素的事件会首先被处理，然后是更外侧的：首先处理 `<p> `元素的点击事件，然后是 `<div> `元素的点击事件。
+  >
+  > 在捕获中(true)，最外侧元素的事件会首先被处理，然后是更内侧的：首先处理 `<div>` 元素的点击事件，然后是 `<p>` 元素的点击事件。
+
+* **窗口对象添加事件处理程序**
+
+  添加当用户调整窗口大小时触发的事件监听器
+
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <body>
+  <h1>JavaScript addEventListener()</h1>
+  <p>此例在 window 对象上使用 addEventListener() 方法。</p>
+  <p>尝试调整此浏览器窗口的大小以触发“resize”事件处理程序。</p>
+  <p id="demo"></p>
+  <script>
+      // function是匿名函数
+  window.addEventListener("resize", function(){
+    document.getElementById("demo").innerHTML = Math.random();
+  });
+  </script>
+  </body>
+  </html>
+  
+  ```
+
+* **传递参数**
+
+  ```html
+  element.addEventListener("click", function(){ myFunction(p1, p2); });
+  ```
+
+* **移除事件监听器**
+
+  `removeEventListener`
+
+## 3.8 DOM导航
+
+* **节点**
+
+  - 术语（父、子和同胞，parent、child 以及 sibling）用于描述这些关系。
+  - 在节点树中，顶端节点被称为根（根节点）。
+  - 每个节点都有父节点，除了根（根节点没有父节点）。
+  - 节点能够拥有一定数量的子
+  - 同胞（兄弟或姐妹）指的是拥有相同父的节点。
+
+* 结构
+
+  ```html
+  <html>
+     <head>
+         <title>DOM 教程</title>
+     </head>
+    <body>
+         <h1>DOM 第一课</h1>
+         <p>Hello world!</p>
+     </body>
+  </html> 
+  ```
+
+  <img src="/images/wiki/js/dom_navigate.gif" width="600" alt="HTML 节点关系">
+
+  - `<html>` 是根节点
+  - `<html>` 没有父
+  - `<html>` 是`<head>` 和 `<body>` 的父
+  - `<head>` 是 `<html>` 的第一个子
+  - `<body>` 是 `<html>` 的最后一个子
+  - `<head> `有一个子：`<title>`
+  - `<title>` 有一个子（文本节点）："DOM 教程"
+  - `<body> `有两个子：`<h1>` 和` <p>`
+  - `<h1>` 有一个子："DOM 第一课"
+  - `<p> `有一个子："Hello world!"
+  - `<h1>` 和` <p> `是同胞
+
+* **通过JS导航**
+  - parentNode
+  - childNodes[*nodenumber*]
+  - firstChild
+  - lastChild
+  - nextSibling
+  - previousSibling
+
+* **举例**
+
+  ```html
+  <!DOCTYPE html>
+  <html>
+  <body>
+  
+  <h1 id="id01">我的第一张网页</h1>
+  <p id="id02"></p>
+  
+  <script>
+  document.getElementById("id02").innerHTML = document.getElementById("id01").childNodes[0].nodeValue;// id02变为和id01一样的内容
+  </script>
+  
+  </body>
+  </html>
+  ```
+
+* **删除节点**
+
+  ```html
+  <div id="div1">
+  <p id="p1">这是一个段落。</p>
+  <p id="p2">这是另一个段落。</p>
+  </div>
+  
+  <script>
+  var parent = document.getElementById("div1");
+  var child = document.getElementById("p1");
+  parent.removeChild(child);
+  </script>
+  ```
+
+## 3.9 集合
+
+`getElementsByTagName()` 方法返回 *HTMLCollection* 对象。
+
+```js
+// 获取所有p
+var x = document.getElementsByTagName("p");
+```
+
