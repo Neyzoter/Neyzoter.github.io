@@ -1,0 +1,76 @@
+---
+layout: post
+title: 厦门旅游攻略
+categories: Tourism
+description: 厦门旅游攻略
+keywords: Tourism, Xiamen
+---
+
+> 原创
+>
+> 默认景点门票通过美团购买。
+
+## 1、旅游准备
+
+| 序号 | 项目     | 备注   |
+| ---- | -------- | ------ |
+| 1    | 泳衣泳裤 | 去游泳 |
+| 2    |          |        |
+| 3    |          |        |
+
+
+
+## 2、景点
+
+### 2.1 鼓浪屿
+
+鼓浪屿联票90.00元(含日光岩、菽庄花园、皓月园、风琴博物馆、国际刻字艺术馆)。
+
+| 名称               | 门票                 | 特点                                          | 美团评分 | 时间 |
+| ------------------ | -------------------- | --------------------------------------------- | -------- | ---- |
+| **鼓浪屿往返船票** | 当天68元             | 定得越早越便宜                                |          |      |
+| 景区电动观光车     | 一圈50元，按流程收费 |                                               |          |      |
+| **菽庄花园**       | 33元                 | 钢琴博物馆、马未都博物馆                      | 4.0      | 1h   |
+|                    |                      |                                               |          |      |
+| 风琴博物馆         | 18元                 |                                               | 4.3      | 1h   |
+| 日光岩             | 53元                 | 观景台、古炮台、龙头山寨<br/>日光岩就是一座山 | 3.9      | 1h   |
+| 皓月园             | 12元                 |                                               | 4.1      |      |
+| 国际刻字艺术馆     | 8元                  |                                               | 4.2      |      |
+| **美华沙滩**       |                      | 400米沙滩、鼓浪石                             |          |      |
+
+## 2.2 环岛路和海边木栈道
+
+| 名称                   | 门票 | 特点             | 美团评分 |
+| ---------------------- | ---- | ---------------- | -------- |
+| **环岛路和海边木栈道** | 免费 | 沙滩、风景、拍照 |          |
+
+# 3、景点快照
+
+## 3.1 鼓浪屿
+
+### 3.1.1 菽庄花园
+
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/garden1.jpg" width="600" alt="菽庄花园1" />
+
+### 3.1.2 风琴博物馆
+
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/fengqin.png" width="600" alt="风琴博物馆" />
+
+### 3.1.3 海边木栈道
+
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/muzhandao.png" width="600" alt="海边木栈道" />
+
+### 3.1.4 日光岩
+
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/riguangyan1.jpg" width="600" alt="日光岩1" />
+
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/riguangyan2.jpg" width="600" alt="日光岩2" />
+
+### 3.1.5 美华沙滩
+
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/meihuabeach.jpg" width="600" alt="美华沙滩" />
+
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/gulangstone.jpg" width="600" alt="鼓浪石" />
+
+
+
