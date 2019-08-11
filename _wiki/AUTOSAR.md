@@ -1761,6 +1761,8 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
 ## 8.1 介绍
 
+ARTOP针对AUTOSAR标准的XML文档，提供了专门的处理方法。其实现了AUTOSAR标准元模型的定义和一些列相关服务：符合AUTOSAR标准的XSD序列化和XML文件验证、AUTOSAR XML文件编辑、基于模板的目标代码、文件和报告生成。（来自硕士论文《基于AUTOSAR标准的VFB仿真工具》）
+
 ### 8.1.1 子项目
 
 |                             Name                             |                         Description                          | Status |
@@ -1790,5 +1792,17 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
   > The ARText SDK contains all the ARText plug-ins needed to develop your own AUTOSAR textual language based on Artop, as well as the current textual language plug-ins. The SDK contains source code and documentation. For more information please refer to the [ARText](https://www.artop.org/artext/) section.
 
   *什么是XText*：XText帮助程序员创建一套基于文本的小型领域特定语言（DSL），抑或是实现一门成熟的通用计算机程序设计语言。
+
+  ## 8.2 代码生成技术
+
+  **（1）面向属性编程（AOP）**
+
+  AOP通过在代码中添加元数据的方式来自动生成代码.
+
+  优秀软件`xDoclet`，是一个经过拓展的Javadoc Doclet引擎，允许用户使用类似于JavaDoc标记之类的东西来向诸如类、方法和字段之类的语言特征中添加元数据，然后利用这些额外的元数据来生成相关文件。
+
+  **（2）模板技术**
+
+  代码生成要有一定文本结构的文件，使用文本模板工具。Velocity开源项目（Apache），基于Java的模板引擎，用户可以使用Velocity Template Language（VTL）的脚本语言来引用Java代码定义的对象，将对象的信息和模板的内容相结合生成代码文件。
 
 # X.一些笔记
