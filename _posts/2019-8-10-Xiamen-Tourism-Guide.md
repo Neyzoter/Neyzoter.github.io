@@ -48,6 +48,10 @@ keywords: Tourism, Xiamen
 
 
 
+### 2.4 老铁路
+
+鹰厦铁路的最后一段，从火车站直到海边，80年代废弃，后来成为徒步胜地，再后来政府开发出来，真正的逼格爆表，小清新文艺胜地。全长约3.5公里，起点为“海敢小鱿鱼”（海鲜美食）附近，终点为轮渡海边。
+
 ## 3、景点快照
 
 ### 3.1 鼓浪屿
@@ -78,7 +82,7 @@ keywords: Tourism, Xiamen
 
 ### 3.2 环岛路和海边木栈道
 
-<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/muzhandaoaddr.jpg" width="600" alt="木栈道地址" />
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/muzhandaoaddr.png" width="600" alt="木栈道地址" />
 
 ### 3.3 厦门大学
 
@@ -88,13 +92,17 @@ keywords: Tourism, Xiamen
 
 <img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/xiadasuidao2.jpg" width="600" alt="隧道涂鸦2" />
 
+### 3.4 老铁路
+
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/oldraiway.jpg" width="600" alt="铁路文化公园" />
+
 ## 4、美食
 
 ### 4.1 海鲜
 
-| 店家 | 招牌 | 特点 |
-| ---- | ---- | ---- |
-|      |      |      |
-|      |      |      |
-|      |      |      |
+| 店家         | 招牌                                                         | 特点       | 地址                           |
+| ------------ | ------------------------------------------------------------ | ---------- | ------------------------------ |
+| 小眼镜大排档 | 辣炒花蛤、酱油水蒸鱿鱼、清蒸花蟹、白灼虾、清蒸多宝鱼、土笋冻、海蛎煎、椰子露和芒果汁 | 食材新鲜、 | 文灶站（住宿最近）             |
+| 海敢小鱿鱼   | 水煮小鱿鱼、鲜虾、木耳和花菜                                 |            | 文园路店（距离铁路文化公园近） |
+|              |                                                              |            |                                |
 
