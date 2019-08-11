@@ -70,6 +70,30 @@ BSW可分为：
 
 9.得到可执行 ECU 软件。
 
+> 以上来自《AUTOSAR技术分析报告》
+
+**流程分为四个步骤**（来自硕士论文《基于AUTOSAR标准的VFB仿真工具》）
+
+**（1）系统配置**
+
+先编写系统配置的输入文件——XML格式（软件组件描述文件），可手写，可通过软件组件开发工具生成。
+
+**系统配置定义ECU资源和系统约束，然后把软件组件分配到ECU，并进行总线信号映射。**
+
+**（2）ECU抽取**
+
+从系统配置描述中抽取单个ECU需要的所有信息，包括组件信息，ECU信息，信号信息等，构成一个完整系统。
+
+**（3）ECU配置**
+
+ECU配置主要进行与代码实现相关的配置，包括基础服务模块的配置和RTE代码生成所需要的配置。
+
+**（4）可执行代码生成**
+
+生成OS配置代码、RTE通信代码等粘合代码，最后与软件组件实现代码和基础服务一起编译运行。
+
+综上所述，需要四个开发工具支持：**软件组件设计工具**、**系统配置工具**、**ECU配置工具**、**RTE代码生成工具**。
+
 ## 1.4 缩写词
 
 * CANSM = CAN State Manager
@@ -1766,3 +1790,5 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
   > The ARText SDK contains all the ARText plug-ins needed to develop your own AUTOSAR textual language based on Artop, as well as the current textual language plug-ins. The SDK contains source code and documentation. For more information please refer to the [ARText](https://www.artop.org/artext/) section.
 
   *什么是XText*：XText帮助程序员创建一套基于文本的小型领域特定语言（DSL），抑或是实现一门成熟的通用计算机程序设计语言。
+
+# X.一些笔记
