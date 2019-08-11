@@ -38,39 +38,63 @@ keywords: Tourism, Xiamen
 | 国际刻字艺术馆     | 8元                  |                                               | 4.2      |      |
 | **美华沙滩**       |                      | 400米沙滩、鼓浪石                             |          |      |
 
-## 2.2 环岛路和海边木栈道
+### 2.2 环岛路和海边木栈道
 
 | 名称                   | 门票 | 特点             | 美团评分 |
 | ---------------------- | ---- | ---------------- | -------- |
 | **环岛路和海边木栈道** | 免费 | 沙滩、风景、拍照 |          |
 
-# 3、景点快照
+### 2.3 厦门大学
 
-## 3.1 鼓浪屿
 
-### 3.1.1 菽庄花园
+
+## 3、景点快照
+
+### 3.1 鼓浪屿
+
+#### 3.1.1 菽庄花园
 
 <img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/garden1.jpg" width="600" alt="菽庄花园1" />
 
-### 3.1.2 风琴博物馆
+#### 3.1.2 风琴博物馆
 
 <img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/fengqin.png" width="600" alt="风琴博物馆" />
 
-### 3.1.3 海边木栈道
+#### 3.1.3 海边木栈道
 
 <img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/muzhandao.png" width="600" alt="海边木栈道" />
 
-### 3.1.4 日光岩
+#### 3.1.4 日光岩
 
 <img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/riguangyan1.jpg" width="600" alt="日光岩1" />
 
 <img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/riguangyan2.jpg" width="600" alt="日光岩2" />
 
-### 3.1.5 美华沙滩
+#### 3.1.5 美华沙滩
 
 <img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/meihuabeach.jpg" width="600" alt="美华沙滩" />
 
 <img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/gulangstone.jpg" width="600" alt="鼓浪石" />
 
+### 3.2 环岛路和海边木栈道
 
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/muzhandaoaddr.jpg" width="600" alt="木栈道地址" />
+
+### 3.3 厦门大学
+
+#### 3.3.1 隧道涂鸦
+
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/xiadasuidao1.jpg" width="600" alt="隧道涂鸦1" />
+
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/xiadasuidao2.jpg" width="600" alt="隧道涂鸦2" />
+
+## 4、美食
+
+### 4.1 海鲜
+
+| 店家 | 招牌 | 特点 |
+| ---- | ---- | ---- |
+|      |      |      |
+|      |      |      |
+|      |      |      |
 
