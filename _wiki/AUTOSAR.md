@@ -98,6 +98,54 @@ ECU配置主要进行与代码实现相关的配置，包括基础服务模块�
 
 * CANSM = CAN State Manager
 
+## 1.5 AUTOSAR 元模型和XML序列化
+
+### 1.5.1 AUTOSAR元模型
+
+AUTOSAR元模型是一种基于Oracle Java和Eclipse的EMF（Eclipse Modeling Framework）的模型驱动开发技术（MDD, Model-Driven Development），表达AUTSOAR工程信息，比如系统描述、通信矩阵、基础软件定义、ECU参数配置，可以通过Java/EMF的API进行操作（get、set、add、remove）。
+
+**Java的作用 **
+
+AUTOSRA的元模型基于Java，可以简单地通过Eclipse的Plug-ins或者丰富的客户端应用。
+
+**EMF的作用**
+
+EMF帮助AUTOSAR工具实现模型驱动开发技术（MDD），使得AUTOSAR元模型应用具备一些能力（改变后通知、验证、事务操作、reflective access），并且简化Eclipse Plug-ins和客户端应用。
+
+### 1.5.2 XML序列化
+
+AUTOSAR XML序列化为AUTOSAR模型提供基于文件的持久化（persistence）。在内存中的AUTOSAR模型序列化存放在XML文件中，并符合AUTOSAR的XSD规范。
+
+*补充：*持久化是将数据存放在数据库/文件系统中，不会因为掉电而消失。
+
+**AUTOSAR规范验证**
+
+```xml
+ <AUTOSAR xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="(AUTOSAR namespace) (SYSTEM-Identifier)" xmlns="(AUTOSAR namespace)">
+```
+
+**使用二进制资源**
+
+XML相比于其他格式，非常冗长，导致AUTOSAR XML解析复杂和缓慢。Artop通过二进制格式解决该问题，空间占用降低至10%。该方法通过`IAutosarPrefenceConstants.PREF_USE_BINARY_RESOURCE`使能或者失能。
+
+### 1.5.3 拓展AUTOSAR模型
+
+Extending AUTOSAR models，通过SGD（Special Data Groups）来存储拓展数据（Externded Data）。`org.artop.aal.extender`实现了该功能。
+
+```xml
+  <ADMIN-DATA>
+     <LANGUAGE>FOR-ALL</LANGUAGE>
+     <SDGS>
+        <SDG GID="Properties"><!-- 1 创建一个对象，名称为Properties -->;
+           <SD GID="_mdlFile">ECLAIRER_EXTERIEUR_SWC_ExpDT.mdl</SD><!-- 2添字符串属性，名称为_mdlFile，数值是"ECLAIRER_EXTERIEUR_SWC_ExpDT.mdl" -->
+           <SD GID="_topLevelRef">/AR_ECLAIRER_EXT_SWC/ECLAIRER_EXT</SD><!-- 3定义字符串属性，名称为"_topLevelRef"，数值为"/AR_ECLAIRER_EXT_SWC/ECLAIRER_EXT" -->
+        </SDG>
+     </SDGS>
+  </ADMIN-DATA>
+```
+
+
+
 # 2、BSW-MCAL
 
 MicroController Abstraction Layer，BSW最底层，直接和芯片接触，对应AUTOSAR架构的红色部分。
@@ -1762,6 +1810,14 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 ## 8.1 介绍
 
 ARTOP针对AUTOSAR标准的XML文档，提供了专门的处理方法。其实现了AUTOSAR标准元模型的定义和一些列相关服务：符合AUTOSAR标准的XSD序列化和XML文件验证、AUTOSAR XML文件编辑、基于模板的目标代码、文件和报告生成。（来自硕士论文《基于AUTOSAR标准的VFB仿真工具》）
+
+**Artop架构层次**
+
+<img src="/images/wiki/AUTOSAR/Pg_architecturelayers.png" width="700" alt="Artop架构层次">
+
+**Artop 1.0 内部结构 **
+
+<img src="/images/wiki/AUTOSAR/Pg_artopcomponents_Internal.png" width="700" alt="Artop架构内部">
 
 ### 8.1.1 子项目
 
