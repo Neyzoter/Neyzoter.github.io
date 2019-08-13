@@ -497,6 +497,8 @@ main["main()@/core/system<br>/Os/rtos/src/os_init.c"]  --> EcuM_Init["EcuM_Init(
 
   **`IPdu`、`Arc_IPud`和`Signal`区别**：`IPdu = &(ComConfig->ComIPdu[IPduId])`、`Signal = &(ComConfig->ComSignal[SignalId])`、`Arc_IPdu = &(Com_Arc_Config.ComIPdu[IPduId])`；`IPdu[IPduId]`类型`ComIPdu_type`（在examples中定义），`Arc_IPdu[IPduId]`类型`Com_Arc_IPdu_type`（在core中定义，由`COM_MAX_N_IPDUS`定义数组元素个数）；`IPdu`中定义了发送或者接收模式、IPdu大小（64字节），还指向了`Signal[SignalId]`等，`Signal[SignalId]`定义了大小端、对应的`Arc_IPdu`元素下标（数据发送或者接收都要经过此`Arc_IPdu`）、初始值等；
 
+  *2019-8-13新理解补充：*IPDU相关数据结构中的配置信息包括通信方向（接收和发送）、IPDU大小等信息，主要进行底层的数据收发；Signal相关数据结构的配置信息包括初始化值、大小端模式等信息，主要进行上层的数据收发。具体而言，RTE任务根据Signal相关数据结构将数据拷贝至IPdu_Tx，以待BSW任务根据IPDU相关数据结构发送出去；CAN中断服务函数根据IPDU相关数据结构将数据拷贝至IPdu_Rx，BSW任务根据IPDU相关数据结构将IPdu_Rx中的数据拷贝至Deferred_IPdu中，RTE任务根据Signal相关数据结构将Deferred_IPdu中数据取出。
+  
   <img src="/images/wiki/AUTOSAR/IPdu.Arc_IPdu.Signal.png" width = "800" alt = "IPdu、Arc_IPud和Signal关系">
 
 ```c
