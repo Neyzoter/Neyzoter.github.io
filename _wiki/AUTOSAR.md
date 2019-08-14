@@ -1721,7 +1721,7 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   (2)`Rte_Buffers.h`
 
-  EcurM、ComM函数、RTE缓存区（桥梁）变量的extern声明。
+  EcuM、ComM函数、RTE缓存区（桥梁）变量的extern声明。
 
 * `Rte_Type.h`
 
@@ -1801,9 +1801,9 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   校验功能。
 
-* `Rte_Internal_PwmSetManager.c`
+* `RTE_Types_Workarounds.h`
 
-  RTE Types Workarounds Header File，宏定义，可以使得ArcCore RTE 集成Simulink SWC更加 简单，此文件不是AUTOSAR标准。
+   宏定义，可以使得ArcCore RTE 集成Simulink SWC更加 简单，此文件不是AUTOSAR标准。
 
 #### 7.4.6.2 Contract
 
