@@ -1193,6 +1193,16 @@ Os_IsrAddWithId --2.1--> addWithId["Os_VectorToIsr[isrPtr->vector + <br>IRQ_INTE
 Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry, isrPtr->vector, <br>isrPtr->type,  isrPtr->priority, <br>Os_ApplGetCore(isrPtr->appOwner) )<br>@irq.c<br>中断初始化使能"]
 ```
 
+### 7.3.11 OS任务调度
+
+* Os_AlarmCheck函数
+
+  Os_AlarmCheck函数按照OS的系统时钟运行，周期由变量OsTickFreq决定，在CanCtrlPwm中，定义为1000（us），即Os_AlarmCheck每1ms运行一次。在Os_AlarmCheck函数中，会进行每个ALARM时间是否到达，到达则运行相关动作。
+
+  *如何判断ALARM时间是否到达？*
+
+  每个ALARM都会有一个expire_val，每次运行后，就增加到下一次运行的时间。在下一次判断到系统时间和该时间相同，则运行。
+
 
 
 ## 7.4 顶层移植、配置和应用
@@ -1627,11 +1637,11 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   (1)`Rte_BswM.c`
 
-  定义ComM三种模式，NO、SILENT和FULL，为什么在这里定义？？`Rte_ComM_Type.h`中也有定义。
+  BswM运行实体`Rte_bswM_BswMRunnable`，实际未被调用。**思考**：BswM是否可作为RTE任务的一个运行实体，循环调用？实际上Bsw任务直接调用了`Rte_bswM_BswMRunnable`中的MAIN功能函数`BswM_MainFunction`。
 
   (2)`Rte_BswM_Type.h`
 
-  BswM运行实体`Rte_bswM_BswMRunnable`，实际未被调用。**思考**：BswM是否可作为RTE任务的一个运行实体，循环调用？实际上Bsw任务直接调用了`Rte_bswM_BswMRunnable`中的MAIN功能函数`BswM_MainFunction`。
+  定义ComM三种模式，NO、SILENT和FULL，为什么在这里定义？？`Rte_ComM_Type.h`中也有定义。
 
 * `Rte_ComM`
 
