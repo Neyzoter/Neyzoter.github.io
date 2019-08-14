@@ -16,7 +16,6 @@ keywords: Tourism, Xiamen
 | ---- | -------- | ------ |
 | 1    | 泳衣泳裤 | 去游泳 |
 
-<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/matou.png" width="600" alt="码头" />
 
 ## 2、景点
 
@@ -208,6 +207,8 @@ keywords: Tourism, Xiamen
 
 
 ## 5、厦门周边
+
+<img src="/images/posts/2019-8-10-Xiamen-Tourism-Guide/matou.png" width="600" alt="码头" />
 
 ### 5.1 南安古城
 
