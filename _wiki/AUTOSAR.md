@@ -1841,6 +1841,8 @@ ARTOP针对AUTOSAR标准的XML文档，提供了专门的处理方法。其实�
 | [AUTOSAR Textual Language Sub-Project](https://www.artop.org/mediawiki/index.php?title=AUTOSAR_Textual_Language_Sub-Project) (ARText) |         A textual modeling environment for AUTOSAR.          | ACTIVE |
 | [AUTOSAR Test Environment Sub-Project](https://www.artop.org/mediawiki/index.php?title=AUTOSAR_Test_Environment_Sub-Project) (ARUnit) |          Artop based test environment for AUTOSAR.           | ACTIVE |
 
+[2019-8-15 Artop Demonstrator使用过程](<http://neyzoter.cn/2019/08/15/Record-Artop-Demo-Usage/>)
+
 ### 8.1.2 三个文件
 
 `Artop Technology Demonstrator`、`Artop SDK`、`ARText SDK`
