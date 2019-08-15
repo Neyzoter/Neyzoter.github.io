@@ -43,13 +43,13 @@ keywords: AUTOSAR, ARTop, Automotive, 汽车电子
 
 双击**AUTOSAR**下的元素，通过编辑器看到信息，通过下面的Properties看到树结构。
 
-<img src="/images/posts/2019-8-15-Record-Artop-Demo-Usage/ARPackageDisp.png" width="400" alt="ARPackage属性" />
+<img src="/images/posts/2019-8-15-Record-Artop-Demo-Usage/ARPackageDisp.png" width="800" alt="ARPackage属性" />
 
 ### 6、Create AUTOSAR object
 
 **AR Package** `-右键->`**New Child** `->` **ECU Instance**
 
-<img src="/images/posts/2019-8-15-Record-Artop-Demo-Usage/ECUelement.png" width="400" alt="ARPackage属性" />
+<img src="/images/posts/2019-8-15-Record-Artop-Demo-Usage/ECUelement.png" width="600" alt="ARPackage属性" />
 
 ### 7、Edit object properties using the editor
 
@@ -59,5 +59,4 @@ keywords: AUTOSAR, ARTop, Automotive, 汽车电子
 
 **AUTSOAR** `-右键->` **Validation** `->` **Validate** 
 
-<img src="/images/posts/2019-8-15-Record-Artop-Demo-Usage/validation.png" width="400" alt="validation" />
-
+<img src="/images/posts/2019-8-15-Record-Artop-Demo-Usage/validation.png" width="600" alt="validation" />
