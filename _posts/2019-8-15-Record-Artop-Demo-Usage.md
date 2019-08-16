@@ -15,7 +15,7 @@ keywords: AUTOSAR, ARTop, Automotive, 汽车电子
 
 ### 2、Create a new AUTOSAR project
 
-**File** `->` **New **`->` **AUTOSAR Project** 
+**File** `->`  **New** `->`  **AUTOSAR Project** 
 
 <img src="/images/posts/2019-8-15-Record-Artop-Demo-Usage/newArProj.png" width="400" alt="创建工程" />
 
@@ -25,7 +25,7 @@ keywords: AUTOSAR, ARTop, Automotive, 汽车电子
 
 ### 3、Create a new AUTOSAR file
 
-**File** `->` **New **`->` **AUTOSAR file** 
+**File**  `->`  **New ** `->`  **AUTOSAR file** 
 
 <img src="/images/posts/2019-8-15-Record-Artop-Demo-Usage/newArFile.png" width="400" alt="创建ar文件" />
 
@@ -60,3 +60,4 @@ keywords: AUTOSAR, ARTop, Automotive, 汽车电子
 **AUTSOAR** `-右键->` **Validation** `->` **Validate** 
 
 <img src="/images/posts/2019-8-15-Record-Artop-Demo-Usage/validation.png" width="600" alt="validation" />
+

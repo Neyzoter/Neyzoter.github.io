@@ -1821,6 +1821,8 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
 ## 8.1 介绍
 
+Artop基于Eclipse的EMF建模框架而构建，提供一些公共的基础功能，如所有工具均要用到的元模型实现，而将具体的应用功能留给工具开发商实现。（来自硕士论文《基于Artop的汽车电子软件架构工具的设计与实现》）
+
 ARTOP针对AUTOSAR标准的XML文档，提供了专门的处理方法。其实现了AUTOSAR标准元模型的定义和一些列相关服务：符合AUTOSAR标准的XSD序列化和XML文件验证、AUTOSAR XML文件编辑、基于模板的目标代码、文件和报告生成。（来自硕士论文《基于AUTOSAR标准的VFB仿真工具》）
 
 **Artop架构层次**
