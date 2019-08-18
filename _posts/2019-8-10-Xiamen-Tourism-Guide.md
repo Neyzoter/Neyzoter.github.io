@@ -7,7 +7,6 @@ keywords: Tourism, Xiamen
 ---
 
 > 原创
->
 > 默认景点门票通过美团购买。
 
 # 1、旅游准备
