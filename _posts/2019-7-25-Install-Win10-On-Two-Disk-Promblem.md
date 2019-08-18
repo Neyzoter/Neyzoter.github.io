@@ -9,6 +9,8 @@ keywords: Windows, Windows10, Install, Problems
 > 原创
 >
 
+
+
 Thinkpad E480又“罢工”（这次是蓝屏，上次是直接烧主板）。
 
 开始重装系统。从学校网上下载win10，制作系统盘。
