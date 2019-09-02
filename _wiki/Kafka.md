@@ -967,5 +967,19 @@ Kafka 需要能够正常处理大量的数据积压，以便能够支持来自�
 
 批处理是提升性能的一个主要驱动，为了允许批量处理，kafka 生产者会尝试在内存中汇总数据，并用一次请求批次提交信息。 批处理，不仅仅可以配置指定的消息数量，也可以指定等待特定的延迟时间(如64k 或10ms)，这允许汇总更多的数据后再发送，在服务器端也会减少更多的IO操作。 该缓冲是可配置的，并给出了一个机制，通过权衡少量额外的延迟时间获取更好的吞吐量。
 
+### 2.5.5 消费者
+
+Kafka consumer通过向 broker 发出一个“fetch”请求来获取它想要消费的 partition。consumer 的每个请求都在 log 中指定了对应的 offset，并接收从该位置开始的一大块数据。因此，consumer 对于该位置的控制就显得极为重要，并且可以在需要的时候通过回退到该位置再次消费对应的数据。
+
+**Push vs. Pull**
+
+consumer从broker处pull数据，还是由broker将数据push到consumer。
+
+*Kafka*：pull-based，采用传统的consumer从broker中pull数据（当然producer是push到broker的）。
+
+*Scribe/Apache Flume*：push-based，采用broker主动将数据push到下游节点。
+
+*push-based和pull-based的比较*：pull-based的优势包括（1）消费者消费速度低于producer的生产速度时，push-based系统的consumer会超载；而pull-based系统的consumer自行pull数据，在生产高峰期也可以保证不会超载，在生产低谷，可以将生产的数据慢慢pull和处理；（2）push-based必须立即发送数据，不知道下游consumer是否能够处理；pull-based可以大批量生产和发送给consumer。pull-based的劣势包括（1）如果 broker 中没有数据，consumer 可能会在一个紧密的循环中结束轮询，实际上 busy-waiting 直到数据到来。
+
 # 3.Kafka使用
 
