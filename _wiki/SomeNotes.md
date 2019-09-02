@@ -79,6 +79,8 @@ hello.c          hello.i       hello.s       hello.o
 
 ORM 就是通过实例对象的语法，完成关系型数据库的操作的技术。
 
+* **事务如何实现？**
+
 # 5.计算机应用
 
 ## 5.1 后端技术
@@ -146,6 +148,38 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
   <img src="/images/wiki/Kafka/log_consumer.png" width="500" alt="Kafka offset" />
 
   *补充*：确认机制——当消息被发送出去的时候，消息仅被标记为sent 而不是 consumed；然后 broker 会等待一个来自 consumer 的特定确认，再将消息标记为consumed。该方案的问题是，（1）如果 consumer 处理了消息但在发送确认之前出错了，那么该消息就会被消费两次；（2）关于性能，现在 broker 必须为每条消息保存多个状态（首先对其加锁，确保该消息只被发送一次，然后将其永久的标记为 consumed，以便将其移除）（3）如何处理已经发送但一直得不到确认的消息。
+
+* **Kafka的producer、broker和consumer如何实现信息流流动？**
+
+  producer通过主动push到broker中，而consumer通过主动pull从broker拉取数据。为什么采用push-based和pull-based见上方**Kafka的pull-based优势和劣势？**。
+
+* **Kafka的producer的语义保证？**
+
+  如果一个 producer 在试图发送消息的时候发生了网络故障， 则不确定网络错误发生在消息提交之前还是之后。 以下是处理方法：
+
+  *0.11.0.0版本之前*（at-least-once）：如果 producer 没有收到表明消息已经被提交的响应，producer只能将消息重传。即提供了at-least-once的消息交付语义，因为如果最初的请求事实上执行成功了，那么重传过程中该消息就会被再次写入到 log 当中（导致了该消息的log可能会被写入多次）。
+
+  *0.11.0.0版本及之后*（at-least-once、at-most-once或者exactly-once）：（1）Kafka producer新增幂等性，该选项保证重传不会在 log 中产生重复条目。为实现这个目的, broker 给每个 producer 都分配了一个 ID ，并且 producer 给每条被发送的消息分配了一个序列号来避免产生重复的消息。（2）producer新增了类似事务的语义将消息发送到多个topic partition，即要么所有的消息都被成功的写入到了 log，要么一个都没写进去，保证多个partition的消息相同。
+
+* **Kafka如何保证producer将消息发送到多个partition中的语义保证？**
+
+  producer新增了类似事务的语义将消息发送到多个topic partition，即要么所有的消息都被成功的写入到了 log，要么一个都没写进去，保证多个partition的消息相同。
+
+* **交付语义包括哪些？**
+
+  - *At most once*——消息可能会丢失但绝不重传。
+  - *At least once*——消息可以重传但绝不丢失。
+  - *Exactly once*——这正是人们想要的, 每一条消息只被传递一次.
+
+* **Kafka的consumer如何实现以上三种交付语义？**
+
+  1. *at-most-once*    Consumer 可以先读取消息，然后将它的位置保存到 log 中，最后再对消息进行处理。在这种情况下，消费者进程可能会在保存其位置之后，带还没有保存消息处理的输出之前发生崩溃。而在这种情况下，即使在此位置之前的一些消息没有被处理，接管处理的进程将从保存的位置开始。在 consumer 发生故障的情况下，这对应于“at-most-once”（消息有可能丢失但绝不重传）的语义，可能会有消息得不到处理。
+
+  2. *at-least-once*   Consumer 可以先读取消息，然后处理消息，最后再保存它的位置。在这种情况下，消费者进程可能会在处理了消息之后，但还没有保存位置之前发生崩溃。而在这种情况下，当新的进程接管后，它最初收到的一部分消息都已经被处理过了。在 consumer 发生故障的情况下，这对应于“at-least-once”（消息可以重传但绝不丢失。）的语义。 在许多应用场景中，消息都设有一个主键，所以更新操作是幂等的（相同的消息接收两次时，第二次写入会覆盖掉第一次写入的记录）。
+
+  3. exactly-once   从一个 kafka topic 中消费并输出到另一个 topic 时 (正如在一个Kafka Streams 应用中所做的那样)，我们可以使用我们上文提到的*0.11.0.0 及以后版本*中的新事务型 producer，并将 consumer 的位置存储为一个 topic 中的消息，所以我们可以在输出 topic 接收已经被处理的数据的时候，在同一个事务中向 Kafka 写入 offset。*此事务保证consumer接收消息、处理消息和offset写入均成功进行或者同时不成功*。
+
+     > 因此，事实上 Kafka 在Kafka Streams中支持了exactly-once 的消息交付功能，并且在 topic 之间进行数据传递和处理时，通常使用事务型 producer/consumer 提供 exactly-once 的消息交付功能。 到其它目标系统的 exactly-once 的消息交付通常需要与该类系统协作，但 Kafka 提供了 offset，使得这种应用场景的实现变得可行。(详见 Kafka Connect)。否则，Kafka 默认保证 at-least-once 的消息交付， 并且 Kafka 允许用户通过禁用 producer 的重传功能和让 consumer 在处理一批消息之前提交 offset，来实现 at-most-once 的消息交付。
 
 
 
