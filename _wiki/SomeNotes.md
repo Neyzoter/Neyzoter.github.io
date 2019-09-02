@@ -131,6 +131,16 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
   Topic中的patition会将一个broker（一个服务器对应一个broker）作为leader，直接处理外部请求，而设置多个follwer备份此patition，实现容错。多个partition选择不同的broker作为leader，可以实现不同broker处理不同的请求。
 
+* **Kafka的pull-based优势和劣势？**
+
+  consumer获取数据的方式：consumer从broker处pull数据（pull-based，典型的案例包括Kafka）；由broker将数据push到consumer（push-based，典型案例包括Scribe和Apache Flume）。
+
+  pull-based的优势包括（1）消费者消费速度低于producer的生产速度时，push-based系统的consumer会超载；而pull-based系统的consumer自行pull数据，在生产高峰期也可以保证不会超载，在生产低谷，可以将生产的数据慢慢pull和处理；（2）push-based必须立即发送数据，不知道下游consumer是否能够处理；pull-based可以大批量生产和发送给consumer。
+
+  pull-based的劣势包括（1）如果 broker 中没有数据，consumer 可能会在一个紧密的循环中结束轮询，实际上 busy-waiting 直到数据到来。
+
+  
+
 #### 5.1.2.2 MQ
 
 * **为何使用MQ？**
