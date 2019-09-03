@@ -79,7 +79,7 @@ hello.c          hello.i       hello.s       hello.o
 
 ORM 就是通过实例对象的语法，完成关系型数据库的操作的技术。
 
-* **事务如何实现？**
+* **事务如何实现？**:negative_squared_cross_mark:
 
 # 5.计算机应用
 
@@ -129,7 +129,7 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
   （3）相比于维护尽可能多的 in-memory cache，并且在空间不足的时候匆忙将数据 flush 到文件系统，**所有数据一开始就被写入到文件系统的持久化日志中，而不用在 cache 空间不足的时候 flush 到磁盘**这一方案速度会更快，而且可以在下次启动时重新获取数据
 
-* **Kafka的负载均衡措施**
+* **Kafka的负载均衡措施？**
 
   Topic中的patition会将一个broker（一个服务器对应一个broker）作为leader，直接处理外部请求，而设置多个follwer备份此patition，实现容错。多个partition选择不同的broker作为leader，可以实现不同broker处理不同的请求。
 
@@ -181,7 +181,55 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
      > 因此，事实上 Kafka 在Kafka Streams中支持了exactly-once 的消息交付功能，并且在 topic 之间进行数据传递和处理时，通常使用事务型 producer/consumer 提供 exactly-once 的消息交付功能。 到其它目标系统的 exactly-once 的消息交付通常需要与该类系统协作，但 Kafka 提供了 offset，使得这种应用场景的实现变得可行。(详见 Kafka Connect)。否则，Kafka 默认保证 at-least-once 的消息交付， 并且 Kafka 允许用户通过禁用 producer 的重传功能和让 consumer 在处理一批消息之前提交 offset，来实现 at-most-once 的消息交付。
 
+* **Kafka的容错性？**
 
+  Kafka 允许 topic 的 partition 拥有若干副本，可以在server端配置partition 的副本数量。当集群中的节点出现故障时，能自动进行故障转移，保证数据的可用性。
+
+* **Kafka如何判断节点是否存货alive?**
+
+  1.节点必须可以维护和 ZooKeeper 的连接，Zookeeper 通过心跳机制检查每个节点的连接。
+  2.如果节点是个 follower ，它必须能及时的同步 leader 的写操作，并且延时不能太久。
+
+  满足这两个条件的节点处于 “in sync” 状态，区别于 “alive” 和 “failed” 。 Leader会追踪所有 “in sync” 的节点。如果有节点挂掉了, 或是写超时, 或是心跳超时, leader 就会把它从同步副本列表中移除。 同步超时和写超时的时间由 replica.lag.time.max.ms 配置确定。
+
+* **Quorums（Kafka未使用）读写机制？**  
+
+  Quorums读写机制：如果选择写入时候需要保证一定数量的副本写入成功，读取时需要保证读取一定数量的副本，读取和写入之间有重叠。
+
+  *实现Quorums的常见方法*：对提交决策和 leader 选举使用多数投票机制。**Kafka 没有采取这种方式**。假设我们有2*f* + 1个副本，如果在 leader 宣布消息提交之前必须有*f*+1个副本收到 该消息，并且如果我们从这至少*f*+1个副本之中，有着最完整的日志记录的 follower 里来选择一个新的 leader，那么在故障次数少于*f*的情况下，选举出的 leader 保证具有所有提交的消息。这是因为在任意*f*+1个副本中，至少有一个副本一定包含 了所有提交的消息。该副本的日志将是最完整的，因此将被选为新的 leader。
+
+  *多数投票的优点是，延迟是取决于最快的（f个，我的理解）服务器。也就是说，如果副本数是3，则备份完成的等待时间取决于最快的 Follwer 。除了Leader，还需要1个备份，最快的服务器响应后，即可满足f+1个副本有着完整的日志记录*
+
+  *多数投票缺点是，故障数f，则需要2f+1份数据（副本），对于处理海量数据问题不切实际。故常用于共享集群配置（如ZooKeeper），而不适用于原始数据存储*
+
+* **ISR模型和f+1个副本（Kafka使用）的机制？**
+
+  Kafka 动态维护了一个同步状态的备份的集合 （a set of in-sync replicas）， 简称 ISR ，在这个集合中的节点都是和 leader 保持高度一致的，只有这个集合的成员才 有资格被选举为 leader，一条消息必须被这个集合 **所有** 节点读取并追加到日志中了，这条消息才能视为提交。这个 ISR 集合发生变化会在 ZooKeeper 持久化，正因为如此，这个集合中的任何一个节点都有资格被选为 leader 。这对于 Kafka 使用模型中， 有很多分区和并确保主从关系是很重要的。因为 ISR 模型和 *f+1* 副本，一个 Kafka topic 冗余 *f* 个节点故障而不会丢失任何已经提交的消息。
+
+* **如果 Kafka的备份都挂了怎么办？**
+
+  两种实现方法：
+
+  1. 等待一个 ISR 的副本重新恢复正常服务，并选择这个副本作为领 leader （它有极大可能拥有全部数据）。
+  2. 选择第一个重新恢复正常服务的副本（不一定是 ISR 中的）作为leader。
+
+  如果我只等待 ISR 的备份节点，那么只要 ISR 备份节点都挂了，我们的服务将一直会不可用，如果它们的数据损坏了或者丢失了，那就会是长久的宕机。另一方面，如果不是 ISR 中的节点恢复服务并且我们允许它成为 leader ， 那么它的数据就是可信的来源，即使它不能保证记录了每一个已经提交的消息。 kafka 默认选择第二种策略，当所有的 ISR 副本都挂掉时，会选择一个可能不同步的备份作为 leader ，可以配置属性 unclean.leader.election.enable 禁用此策略，那么就会使用第 一种策略即停机时间优于不同步。
+
+* **Kafka在备份的可用性、持久性的权衡？**
+
+  1. *持久性优先*     等待一个 ISR 的副本重新恢复正常服务，并选择这个副本作为领 leader （它有极大可能拥有全部数据）。
+  2. *可用性优先*     选择第一个重新恢复正常服务的副本（不一定是 ISR 中的）作为leader。
+
+* **Kafka在备份的可用性、一致性的权衡？**
+
+  指定最小的 ISR 集合大小，只有当 ISR 的大小大于最小值，分区才能接受写入操作，以防止仅写入单个（非常少的）备份的消息丢失造成消息不可用的情况。
+
+  1. *可用性优先*    减小最小的 ISR 集合大小，降低写入出错的可能，提高可用性
+  2. *一致性优先*    提高最小的 ISR 集合大小，保证将消息被写入了更多的备份，减少了消息丢失的可能性，提高一致性
+
+* **Kafka应对broker级别故障？**
+
+  选择一个 broker 作为 “controller”节点。controller 节点负责 检测 brokers 级别故障,并负责在 broker 故障的情况下更改这个故障 Broker 中的 partition 的 leadership 。这种方式可以批量的通知主从关系的变化，使得对于拥有大量partition 的broker ,选举过程的代价更低并且速度更快。如果 controller 节点挂了，其他 存活的 broker 都可能成为新的 controller 节点。
 
 #### 5.1.2.2 MQ
 
@@ -200,6 +248,18 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
   <img src="/images/wiki/SomeNotes/MqConsumerProducor.jpg" width="600" alt="事件驱动结构">
 
   消息队列使利用发布-订阅模式工作，消息发送者（生产者）发布消息，一个或多个消息接受者（消费者）订阅消息。
+
+### 5.1.3 分布式
+
+* **对分布式算法的理解？**:negative_squared_cross_mark:
+
+  1. ZooKeeper 的 [Zab](http://web.archive.org/web/20140602093727/http://www.stanford.edu/class/cs347/reading/zab.pdf), [Raft](https://ramcloud.stanford.edu/wiki/download/attachments/11370504/raft.pdf), 和 [Viewstamped Replication](http://pmg.csail.mit.edu/papers/vr-revisited.pdf)
+
+  2. Kafka 的ISR模型（来自微软的[PacificA](http://research.microsoft.com/apps/pubs/default.aspx?id=66814)）
+
+  3. Quorums
+
+     
 
 ## 5.2 前端技术
 
