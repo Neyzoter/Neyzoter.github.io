@@ -1200,9 +1200,65 @@ Log Cleaner可以配置保留最小的不压缩的head log。可以通过配置�
 
 这可以保证消息在配置的时长内不被压缩。 如果没有设置，除了最后一个日志外，所有的日志都会被压缩。 活动的 segment 是不会被压缩的，即使它保存的消息的滞留时长已经超过了配置的最小压缩时间长。
 
-
-
 关于cleaner更详细的配置在 [这里]()。
+
+### 2.5.9 Quotas配额
+
+Kafka broker可以对客户端做两种类型的资源配额限制：
+
+1. 定义字节率的阈值来限定网络带宽的配额。 (从 0.9 版本开始)
+2. request 请求率的配额，网络和 I/O线程 cpu利用率的百分比。 (从 0.11 版本开始)
+
+**为什么要对资源进行配额?**
+
+producers 和 consumers 可能会生产或者消费大量的数据或者产生大量的请求，导致对 broker 资源的垄断，引起网络的饱和，对其他clients和brokers本身造成DOS攻击。 资源的配额保护可以有效防止这些问题，在大型多租户集群中，因为一小部分表现不佳的客户端降低了良好的用户体验，这种情况下非常需要资源的配额保护。 实际情况中，当把Kafka当做一种服务提供的时候，可以根据客户端和服务端的契约对 API 调用做限制。
+
+**客户端group**
+
+Kafka client 是一个用户的概念， 是在一个安全的集群中经过身份验证的用户。在一个支持非授权客户端的集群中，用户是一组非授权的 users，broker使用一个可配置的`PrincipalBuilder`
+
+资源配额可以针对 （user,client-id），users 或者client-id groups 三种规则进行配置。对于一个请求连接，连接会匹配最细化的配额规则的限制。同一个 group 的所有连接共享这个 group 的资源配额。 举个例子，如果 (user="test-user", client-id="test-client") 客户端producer 有10MB/sec 的生产资源配置，这10MB/sec 的资源在所有 "test-user" 用户，client-id是 "test-client" 的producer实例中是共享的。
+
+**Quota Configuration（资源配额的配置）**
+
+资源配额的配置可以根据 (user, client-id)，user 和 client-id 三种规则进行定义。在配额级别需要更高（或者更低）的配额的时候，是可以覆盖默认的配额配置。 这种机制和每个 topic 可以自定义日志配置属性类似。 覆盖 User 和 (user, client-id) 规则的配额配置会写到zookeeper的 `/config/users`路径下，client-id 配额的配置会写到 `/config/clients` 路径下。 这些配置的覆盖会被所有的 brokers 实时的监听到并生效。所以这使得我们修改配额配置不需要重启整个集群。更多细节参考 [here](#quotas)。 每个 group 的默认配额可以使用相同的机制进行动态更新。
+
+> 举个例子，如果 (user="test-user", client-id="test-client") 客户端producer 有10MB/sec 的生产资源配置，这10MB/sec 的资源在所有 "test-user" 用户，client-id是 "test-client" 的producer实例中是共享的。
+
+配额配置的优先级顺序是:
+
+1. `/config/users/<user>/clients/<client-id>`
+2. `/config/users/<user>/clients/<default>`
+3. `/config/users/<user>`
+4. `/config/users/<default>/clients/<client-id>`
+5. `/config/users/<default>/clients/<default>`
+6. `/config/users/<default>`
+7. `/config/clients/<client-id>`
+8. `/config/clients/<default>`
+
+Broker 的配置属性 (quota.producer.default, quota.consumer.default) 也可以用来设置 client-id groups 默认的网络带宽配置。这些配置属性在未来的 release 版本会被 deprecated。 client-id 的默认配额也是用zookeeper配置，和其他配额配置的覆盖和默认方式是相似的。
+
+**Network Bandwidth Quotas（网络带宽配额配置）**
+
+网络带宽配额使用字节速率阈值来定义每个 group 的客户端的共享配额。 默认情况下，每个不同的客户端 group 是集群配置的固定配额，单位是 bytes/sec。 这个配额会以broker 为基础进行定义。在 clients 被限制之前，每个 group 的clients可以发布和拉取单个broker 的最大速率，单位是 bytes/sec。
+
+**Request Rate Quotas（请求速率配额）**
+
+请求速率的配额定义了一个客户端可以使用 broker request handler I/O 线程和网络线程在一个配额窗口时间内使用的百分比。 `n%` 的配置代表一个线程的 `n%`的使用率，所以这种配额是建立在总容量 `((num.io.threads + num.network.threads) * 100)%`之上的. 每个 group 的client 的资源在被限制之前可以使用单位配额时间窗口内I/O线程和网络线程利用率的 `n%`。 由于分配给 I/O和网络线程的数量是基于 broker 的核数，所以请求量的配额代表每个group 的client 使用cpu的百分比。
+
+**Enforcement（限制）**
+
+默认情况下，集群给每个不同的客户端group 配置固定的配额。 这个**配额是以broker为基础定义的。每个 client 在受到限制之前可以利用每个broker配置的配额资源。 我们觉得给每个broker配置资源配额比为每个客户端配置一个固定的集群带宽资源要好，为每个客户端配置一个固定的集群带宽资源需要一个机制来共享client 在brokers上的配额使用情况**。这可能比配额本身实现更难。
+
+broker在检测到有配额资源使用违反规则会怎么办？在我们计划中，broker不会返回error，而是会尝试减速 client 超出的配额设置。 broker 会计算出将客户端限制到配额之下的延迟时间，并且延迟response响应。这种方法对于客户端来说也是透明的（客户端指标除外）。这也使得client不需要执行任何特殊的 backoff 和 retry 行为。而且不友好的客户端行为（没有 backoff 的重试）会加剧正在解决的资源配额问题。
+
+网络字节速率和线程利用率可以用多个小窗口来衡量（例如 1秒30个窗口），以便快速的检测和修正配额规则的违反行为。实际情况中 较大的测量窗口（例如，30秒10个窗口）会导致大量的突发流量，随后长时间的延迟，会使得用户体验不是很好。
+
+## 2.6 实现思路
+
+### 2.6.1 网络层
+
+
 
 # 3.Kafka使用
 
