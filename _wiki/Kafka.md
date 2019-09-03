@@ -1118,7 +1118,7 @@ Kafka的核心是备份日志文件**（理解：日志包括了消息和偏移�
 
 ### 2.5.8 日志压缩
 
-日志压缩可确保 Kafka 始终至少为单个 topic partition 的数据日志中的每个 message key 保留最新的已知值。 这样的设计解决了应用程序崩溃、系统故障后恢复或者应用在运行维护过程中重启后重新加载缓存的场景。 
+**日志压缩可确保 Kafka 始终至少为单个 topic partition 的数据日志中的每个 message key 保留最新的已知值**。 这样的设计解决了应用程序崩溃、系统故障后恢复或者应用在运行维护过程中重启后重新加载缓存的场景。 
 
 简单的日志保留方法：当旧的数据保留时间超过指定时间、日志大达到规定大小后就丢弃。这样的策略非常适用于处理那些暂存的数据，例如记录每条消息之间相互独立的日志。 然而在实际使用过程中还有一种非常重要的场景——根据key进行数据变更（例如更改数据库表内容），使用以上的方式显然不行。
 
@@ -1136,7 +1136,7 @@ Kafka的核心是备份日志文件**（理解：日志包括了消息和偏移�
 123 => bill@gmail.com
 ```
 
-日志压缩为我提供了更精细的保留机制，所以我们至少保留每个key的最后一次更新 （例如：bill@gmail.com）。 这样我们保证日志包含每一个key的最终值而不只是最近变更的完整快照。这意味着下游的消费者可以获得最终的状态而无需拿到所有的变化的消息信息。
+**日志压缩为我提供了更精细的保留机制，所以我们至少保留每个key的最后一次更新 （例如：bill@gmail.com），而不是根据上述简单的日志保留方法（当旧的数据保留时间超过指定时间、日志大达到规定大小后就丢弃）**。 这样我们保证日志包含每一个key的最终值而不只是最近变更的完整快照。这意味着下游的消费者可以获得最终的状态而无需拿到所有的变化的消息信息。
 
 *几个使用场景*：
 
@@ -1258,7 +1258,147 @@ broker在检测到有配额资源使用违反规则会怎么办？在我们计�
 
 ### 2.6.1 网络层
 
+网络层相当于一个 NIO 服务,在此不在详细描述. sendfile(零拷贝) 的实现是通过 `MessageSet` 接口的 `writeTo` 方法完成的.这样的机制允许 file-backed 集使用更高效的 `transferTo` 实现,而不在使用进程内的写缓存.线程模型是一个单独的接受线程和 N 个处理线程,每个线程处理固定数量的连接.这种设计方式在[其他地方](http://sna-projects.com/blog/2009/08/introducing-the-nio-socketserver-implementation)经过大量的测试,发现它是实现简单而且快速的.协议保持简单以允许未来实现其他语言的客户端.
 
+### 2.6.2 消息
+
+消息包含一个可变长度的 header ,一个可变长度不透明的字节数组 key ,一个可变长度不透明的字节数组 value ,消息中 header 的格式会在下一节描述. 保持消息中的 key 和 value 不透明(二进制格式)是正确的决定: 目前构建序列化库取得很大的进展,而且任何单一的序列化方式都不能满足所有的用途.毋庸置疑,使用kafka的特定应用程序可能会要求特定的序列化类型作为自己使用的一部分. `RecordBatch` 接口就是一种简单的消息迭代器,它可以使用特定的方法批量读写消息到 NIO 的 `Channel` 中.
+
+### 2.6.3 消息格式
+
+**消息通常按照*批量*的方式写入**.record batch 是批量消息的技术术语,它包含一条或多条 records.不良情况下, record batch 只包含一条 record. Record batches 和 records 都有他们自己的 headers.在 kafka 0.11.0及后续版本中(消息格式的版本为 v2 或者 magic=2)解释了每种消息格式.[点击](https://cwiki.apache.org/confluence/display/KAFKA/A+Guide+To+The+Kafka+Protocol#AGuideToTheKafkaProtocol-Messagesets)查看消息格式详情.
+
+* Record Batch
+
+  RecordBatch在硬盘上的格式：
+
+  ```
+  baseOffset: int64
+  batchLength: int32
+  partitionLeaderEpoch: int32
+  magic: int8 (current magic value is 2)
+  crc: int32
+  attributes: int16
+      bit 0~2:
+          0: no compression
+          1: gzip
+          2: snappy
+          3: lz4
+      bit 3: timestampType
+      bit 4: isTransactional (0 means not transactional)
+      bit 5: isControlBatch (0 means not a control batch)
+      bit 6~15: unused
+  lastOffsetDelta: int32
+  firstTimestamp: int64
+  maxTimestamp: int64
+  producerId: int64
+  producerEpoch: int16
+  baseSequence: int32
+  records: [Record]
+  ```
+
+  启用压缩时，压缩的记录数据将直接按照记录数进行序列化。
+
+  CRC(一种数据校验码) 会覆盖从属性到批处理结束的数据, (即 CRC 后的所有字节数据). CRC 位于 magic 之后,这意味着,在决定如何解释批次的长度和 magic 类型之前,客户端需要解析 magic 类型.CRC 计算不包括分区 learder epoch 字段,是为了避免 broker 收到每个批次的数据时 需要重新分配计算 CRC . CRC-32C (Castagnoli) 多项式用于计算.
+
+  压缩: 不同于旧的消息格式, magic v2 及以上版本在清理日志时保留原始日志中首次及最后一次 offset/sequence .这是为了能够在日志重新加载时恢复生产者的状态.例如,如果我们不保留最后一次序列号,当分区 learder 失败以后,生产者会报 OutOfSequence 的错误.必须保留基础序列号来做重复检查(broker 通过检查生产者该批次请求中第一次及最后一次序列号是否与上一次的序列号相匹配来判断是否重复).因此,当批次中所有的记录被清理但批次数据依然保留是为了保存生产者最后一次的序列号,日志中可能有空的数据.不解的是在压缩中时间戳可能不会被保留,所以如果批次中的第一条记录被压缩,时间戳也会改变
+
+  *RecordBatch-批次控制*
+
+  批次控制包含成为控制记录的单条记录. 控制记录不应该传送给应用程序,相反,他们是消费者用来过滤中断的事务消息.
+
+  控制记录的 key 符合以下模式:
+
+  ```
+  version: int16 (current version is 0)
+  type: int16 (0 indicates an abort marker, 1 indicates a commit)
+  ```
+
+  批次记录值的模式依赖于类型. 对客户端来说它是透明的.
+
+* Record（记录）
+
+  Record 级别的头部信息在0.11.0 版本引入. 拥有 headers 的 Record 的磁盘格式如下.
+
+  ```
+  length: varint
+  attributes: int8
+      bit 0~7: unused
+  timestampDelta: varint
+  offsetDelta: varint
+  keyLength: varint
+  key: byte[]
+  valueLen: varint
+  value: byte[]
+  Headers => [Header]
+  ```
+
+  以上的*Header*格式为
+
+  ```
+  headerKeyLength: varint
+  headerKey: String
+  headerValueLength: varint
+  Value: byte[]
+  ```
+
+  我们使用了和 Protobuf 编码格式相同的 varint 编码. 更多后者相关的信息 [在这里](https://developers.google.com/protocol-buffers/docs/encoding#varints). Record 中 headers 的数量也被编码为 varint .
+
+  ### 2.6.4 日志
+
+  命名为 "my_topic" 的主题日志有两个分区,包含两个目录 (命名为 `my_topic_0` 和 `my_topic_1`) ,目录中分布着包含该 topic 消息的日志文件.日志文件的格式是 "log entries" 的序列; 每个日志对象是由4位的数字*N*存储日志长度,后跟 *N* 字节的消息.每个消息使用64位的整数作为 *offset* 唯一标记, offset 即为发送到该 topic partition 中所有流数据的起始位置.每个消息的磁盘格式如下. 每个日志文件使用它包含的第一个日志的 offset 来命名.所以创建的第一个文件是 00000000000.kafka, 并且每个附件文件会有大概 *S* 字节前一个文件的整数名称,其中 *S* 是配置给出的最大文件大小.
+
+  记录的精确二进制格式是版本化的,并且按照标准接口进行维护,所以批量的记录可以在 producer, broker 和客户端之间传输,而不需要在使用时进行重新复制或转化.前一章包含了记录的磁盘格式的详情.
+
+  消息的偏移量用作消息 id 是不常见的.我们最开始的想法是使用 producer 自增的 GUID ,并维护从 GUID 到每个 broker 的 offset 的映射.这样的话每个消费者需要为每个服务端维护一个 ID,提供全球唯一的 GUID 没有意义.而且,维护一个从随机 ID 到偏移量映射的复杂度需要一个重度的索引结构,它需要与磁盘进行同步,本质上需要一个完整的持久随机访问数据结构.因此为了简化查找结构,我们决定针对每个分区使用一个原子计数器,它可以**利用分区id和节点id唯一标识一条消息**.虽然这使得查找结构足够简单,但每个消费者的多个查询请求依然是相似的.一旦我们决定使用计数器,直接跳转到对应的偏移量显得更加自然-毕竟对于每个分区来说它们都是一个单调递增的整数.由于消费者API隐藏了偏移量，所以这个决定最终是一个实现细节，我们采用了更高效的方法。
+
+  **Writes**
+
+  日志允许序列化的追加到最后一个文件中.当文件大小达到配置的大小(默认 1G)时,会生成一个新的文件.日志中有两个配置参数: *M* 是在 OS 强制写文件到磁盘之前的消息条数, *S* 是强制写盘的秒数.这提供了一个在系统崩溃时最多丢失 *M* 条或者 *S* 秒消息的保证.
+
+  **Reads**
+
+  通过提供消息的64位逻辑偏移量和 *S* 位的 max chunk size 完成读请求.这会返回一个包含 *S*位的消息缓存迭代器. *S* 必须大于任何单条的数据,但是在异常的大消息情况下,读取操作可以重试多次,每次会加倍缓冲的大小,直到消息被读取成功.可以指定最大消息大小和缓存大小使服务器拒绝接收超过其大小的消息,并为客户端设置消息的最大限度,它需要尝试读取多次获得完整的消息.读取缓冲区可能以部分消息结束,这很容易通过大小分界来检测.
+
+  按照偏移量读取的实际操作需要在数据存储目录中找到第一个日志分片的位置,在全局的偏移量中计算指定文件的偏移量,然后读取文件偏移量.搜索是使用二分查找法查找在内存中保存的每个文件的偏移量来完成的.
+
+  日志提供了将消息写入到当前的能力,以允许客户端从'当前开始订阅.在消费者未能在其SLA指定的天数内消费其数据的情况下,这也是有用的.在这种情况下,客户端会尝试消费不存在的偏移量的数据,这会抛出 OutOfRangeException 异常,并且也会重置 offset 或者失败.
+
+  以下是发送给消费者的结果格式.
+
+  单个消息
+
+  ```
+  MessageSetSend (fetch result)
+   
+  total length     : 4 bytes
+  error code       : 2 bytes
+  message 1        : x bytes
+  ...
+  message n        : x bytes
+  ```
+  
+  多个消息（即一个消息内包含了上述多个MessageSetSend消息）
+  
+  ```
+  MultiMessageSetSend (multiFetch result)
+  
+  total length       : 4 bytes
+  error code         : 2 bytes
+  messageSetSend 1
+  ...
+  messageSetSend n
+  ```
+  
+  **Deletes**
+  
+  在一个时点下只有一个 log segment 的数据能被删除。日志管理器允许使用可插拔的删除策略来选择哪些文件符合删除条件.当前的删除策略会删除 *N* 天之前改动的日志,尽管保留最后的 *N* GB 数据可能有用.为了避免锁定读，同时允许删除修改 segment 列表，我们使用 copy-on-write 形式的 segment 列表实现，在删除的同时它提供了一致的视图允许在多个 segment 列表视图上执行二进制的搜索。
+  
+  **Guarantees**
+  
+  日志提供了配置项 *M* ，它控制了在强制刷盘之前的最大消息数。启动时，日志恢复线程会运行，对最新的日志片段进行迭代，验证每条消息是否合法。如果消息对象的总数和偏移量小于文件的长度并且 消息数据包的 CRC32 校验值与存储在消息中的 CRC 校验值相匹配的话，说明这个消息对象是合法的。如果检测到损坏，日志会在最后一个合法 offset 处截断。
+  
+  请注意，有两种损坏必须处理：由于崩溃导致的未写入的数据块的丢失和将无意义已损坏的数据块添加到文件。原因是：通常系统不能保证文件索引节点和实际数据快之间的写入顺序，除此之外，如果在块数据被写入之前，文件索引已更新为新的大小，若此时系统崩溃，文件不会的到有意义的数据，则会导致数据丢失。
 
 # 3.Kafka使用
 
