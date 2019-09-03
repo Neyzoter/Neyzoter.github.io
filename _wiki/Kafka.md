@@ -1156,7 +1156,7 @@ Kafka的核心是备份日志文件**（理解：日志包括了消息和偏移�
 
 这是一个高级别的日志逻辑图，展示了kafka日志的每条消息的offset逻辑结构。
 
-<img src="/images/wiki/Kafka/highlevel-log-logic.png" width="500" alt="log logic" />
+<img src="/images/wiki/Kafka/log_cleaner_anatomy.png" width="500" alt="log logic" />
 
 Log head中包含传统的Kafka日志，它包含了连续的offset和所有的消息。 日志压缩增加了处理tail Log的选项。 上图展示了日志压缩的的Log tail的情况。tail中的消息保存了初次写入时的offset。 即使该offset的消息被压缩，所有offset仍然在日志中是有效的。在这个场景中，无法区分和下一个出现的更高offset的位置。 如上面的例子中，36、37、38是属于相同位置的，从他们开始读取日志都将从38开始。
 
@@ -1164,7 +1164,7 @@ Log head中包含传统的Kafka日志，它包含了连续的offset和所有的�
 
 压缩操作通过在后台周期性的拷贝日志段来完成。 清除操作不会阻塞读取，并且可以被配置不超过一定IO吞吐来避免影响Producer和Consumer。实际的日志段压缩过程有点像这样：
 
-<img src="/images/wiki/Kafka/Kafka-log-compress.png" width="500" alt="log compross" />
+<img src="/images/wiki/Kafka/log_compaction.png" width="500" alt="log compross" />
 
 **日志压缩的保障措施**
 
