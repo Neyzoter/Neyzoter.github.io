@@ -1486,11 +1486,36 @@ Kafka consumers在早先的版本中offset默认存储在ZooKeeper中。可以�
 
   1.在他的consumer组中登录consumer id
 
-  2.注册一个consuemer id登录的监视器（consumer登录或者退出）
+  2.注册一个consuemer id登录的监视器（consumer登录或者退出，每一次登录或者退出都会触发平衡该consumer组）
 
+  3.注册一个broker id登录的监视器（broker的加入或者退出，每一次加入或者推出都会触发平衡所有consumer组内的consumer）
 
+  4.如果consumer通过topic过滤器创建了一个信息流，也会注册一个broker topic的监视器（新的topic加入，每一次加入都会触发重新评估可用topics，进而决定哪个topic过滤器关联哪些topics）
 
+  5.强制consumer自身在此consumer 组内的平衡
 
+  *什么是重平衡？*当新的消费者加入消费组，它会消费一个或多个分区，而这些分区之前是由其他消费者负责的；另外，当消费者离开消费组（比如重启、宕机等）时，它所消费的分区会分配给其他分区。这种现象称为重平衡（rebalance）。重平衡是Kafka一个很重要的性质，这个性质保证了高可用和水平扩展。
+
+* Consumer重平衡算法
+
+  consumer重平衡算法可以使得一个consumer组内的所有consumer达成哪个consumer消费哪个partition的共识。consumer重平衡由每次增加或者移除broker节点或者同组内其他的consumer。一个partition总是被单个consumer消费（解释：kafka确保每个partition只能同一个group中的同一个consumer消费，如果想要重复消费，那么需要其他的组来消费）。此设计简化了应用。如果我们允许多个使用者同时使用分区，则会在分区上产生争用，并且需要某种锁定。如果消费者多于分区，则一些消费者根本不会获得任何数据。在重新平衡期间，我们尝试以减少每个消费者必须连接的代理节点数量的方式为消费者分配分区。
+
+  算法：
+
+  ```
+  1. For each topic T that C<sub>i</sub> subscribes to
+  2.   let P<sub>T</sub> be all partitions producing topic T
+  3.   let C<sub>G</sub> be all consumers in the same group as C<sub>i</sub> that consume topic T
+  4.   sort P<sub>T</sub> (so partitions on the same broker are clustered together)
+  5.   sort C<sub>G</sub>
+  6.   let i be the index position of C<sub>i</sub> in C<sub>G</sub> and let N = size(P<sub>T</sub>)/size(C<sub>G</sub>)
+  7.   assign partitions from i*N to (i+1)*N - 1 to consumer C<sub>i</sub>
+  8.   remove current entries owned by C<sub>i</sub> from the partition owner registry
+  9.   add newly assigned partitions to the partition owner registry
+          (we may need to re-try this until the original partition owner releases its ownership)
+  ```
+
+  如果一个consumer重平衡，则同组内其他consumer也需要重平衡。
 
 
 

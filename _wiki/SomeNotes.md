@@ -121,6 +121,10 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
   Kafka 以高效的批处理格式支持一批消息可以压缩在一起发送到服务器。这批消息将以压缩格式写入，并且在日志中保持压缩，只会在 consumer 消费时解压缩。
 
+* **kafka的topic为何要进行分区（partition）？**
+
+  为了性能考虑，如果topic内的消息只存于一个broker，那这个broker会成为瓶颈，无法做到水平扩展。所以把topic内的数据分布到整个集群（**topic内的多个partition分布在多个broker中**）就是一个自然而然的设计方式。Partition的引入就是解决水平扩展问题的一个方案。
+
 * **Kafka为何使用持久化？**
 
   （1）合理的设计方案可以大大提高持久化速度；
@@ -132,6 +136,8 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 * **Kafka的负载均衡措施？**
 
   Topic中的patition会将一个broker（一个服务器对应一个broker）作为leader，直接处理外部请求，而设置多个follwer备份此patition，实现容错。多个partition选择不同的broker作为leader，可以实现不同broker处理不同的请求。
+
+  *补充*：一个topic可以包括多个partition，而不同的partition存在于不同broker中，以实现并行，提高带宽。
 
 * **Kafka的pull-based优势和劣势？**
 
@@ -270,6 +276,10 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
   Kafka提供了一个选项在指定的broker中来存储所有给定的consumer组的offset，称为`offset manager`。
 
   可以通过手动实现管理offset，见[OffsetCommitRequest 和 OffsetFetchRequest的源码](https://cwiki.apache.org/confluence/display/KAFKA/Committing+and+fetching+consumer+offsets+in+Kafka)
+
+* **什么是Kafka的重平衡？**
+
+  当新的消费者加入消费组，它会消费一个或多个分区，而这些分区之前是由其他消费者负责的；另外，当消费者离开消费组（比如重启、宕机等）时，它所消费的分区会分配给其他分区。这种现象称为重平衡（rebalance）。重平衡是Kafka一个很重要的性质，这个性质保证了高可用和水平扩展。
 
 #### 5.1.2.2 MQ
 
