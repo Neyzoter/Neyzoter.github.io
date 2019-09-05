@@ -269,7 +269,13 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
   Kafka附带了一个在Kafka集群之间镜像数据的工具 mirror-maker。该工具从源集群中消费数据并产生数据到目标集群。
 
 * **Kafka安装bin目录下文件作用？**
+  * `zookeeper-server-start.sh`      启动ZooKeeper服务器
+  * `kafka-server-start.sh`      启动Kafka服务器
+  * `kafka-topics.sh`     topic相关的命令：创建、查看等
+  * `bin/kafka-console-producer.sh`     producer相关命令
+  * `bin/kafka-console-consumer.sh`     consumer相关命令
   * `kafka-reassign-partitions.sh`    分区（partition）重分配工具
+  * 
 
 * **Kafka如何管理offset？**
 

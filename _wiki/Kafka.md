@@ -116,8 +116,8 @@ Topic:test	PartitionCount:1	ReplicationFactor:1	Configs:
 
 ```bash
 # 拷贝设置文件
-$ cp config/server.properties config/server-1.properties
 $ cp config/server.properties config/server-2.properties
+$ cp config/server.properties config/server-3.properties
 ```
 
 然后修改属性文件
@@ -1521,9 +1521,139 @@ Kafka consumers在早先的版本中offset默认存储在ZooKeeper中。可以�
 
 
 
-## 2.7 基本操作
+# 3.Kafka使用
 
-### 2.7.1 基本的Kafka操作
+## 3.1 基本的Kafka操作
+
+### 3.1.1 Quick Start
+
+**启动zookeeper和kafka服务器**
+
+Kafka 使用 ZooKeeper 如果你还没有ZooKeeper服务器，你需要先启动一个ZooKeeper服务器。 您可以通过与kafka打包在一起的便捷脚本来快速简单地创建一个单节点ZooKeeper实例。
+
+```bash
+# zookeeper服务器启动
+$ bin/zookeeper-server-start.sh config/zookeeper.properties
+```
+
+修改server的properties
+
+```
+config/server-1.properties:
+    broker.id=1
+    listeners=PLAINTEXT://:9091
+    log.dirs=/tmp/kafka-logs-1
+```
+
+```bash
+# kafka服务器启动
+$ bin/kafka-server-start.sh config/server-1.properties
+```
+
+**创建一个topic**
+
+```bash
+# 创建一个名为test的topic，有一个分区和一个副本
+$ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+```
+
+可以运行list（列表）命令来查看这个topic：
+
+```bash
+$ bin/kafka-topics.sh --list --zookeeper localhost:2181
+```
+
+**发送一些消息**
+
+Kafka自带一个命令行客户端，它从文件或标准输入中获取输入，并将其作为message（消息）发送到Kafka集群。默认情况下，每行将作为单独的message发送。
+
+运行 producer，然后在控制台输入一些消息以发送到服务器。
+
+```bash
+$ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+```
+
+**启动一个 consumer**
+
+Kafka 还有一个命令行consumer（消费者），将消息转储到标准输出。
+
+```bash
+$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+```
+
+**设置多代理集群**
+
+```bash
+# 拷贝设置文件
+$ cp config/server.properties config/server-2.properties
+$ cp config/server.properties config/server-3.properties
+```
+
+然后修改属性文件
+
+```
+config/server-2.properties:
+    broker.id=2
+    listeners=PLAINTEXT://:9093
+    log.dirs=/tmp/kafka-logs-2
+ 
+config/server-3.properties:
+    broker.id=3
+    listeners=PLAINTEXT://:9094
+    log.dirs=/tmp/kafka-logs-3
+```
+
+运行
+
+```bash
+$ bin/kafka-server-start.sh config/server-2.properties &
+...
+$ bin/kafka-server-start.sh config/server-3.properties &
+...
+```
+
+创建**复制**因子为3的topic
+
+```bash
+$ bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 3 --partitions 1 --topic my-replicated-topic
+```
+
+查看信息
+
+```bash
+$ bin/kafka-topics.sh --describe --bootstrap-server localhost:9092 --topic my-replicated-topic
+```
+
+```
+Topic:my-replicated-topic	PartitionCount:1	ReplicationFactor:3	Configs:segment.bytes=1073741824
+	Topic: my-replicated-topic	Partition: 0	Leader: 2	Replicas: 2,3,1	Isr: 2,3,1
+```
+
+> "leader" is the node responsible for all reads and writes for the given partition. Each node will be the leader for a randomly selected portion of the partitions.
+> "replicas" is the list of nodes that replicate the log for this partition regardless of whether they are the leader or even if they are currently alive.
+> "isr" is the set of "in-sync" replicas. This is the subset of the replicas list that is currently alive and caught-up to the leader.
+
+*节点2是topic唯一的分区Leader*
+
+验证（待验证，*发现PID一直变动*）
+
+```bash
+# 消息生成
+$ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic my-replicated-topic
+...
+# 消费消息
+$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --from-beginning --topic my-replicated-topic
+...
+# 容错验证
+## 关闭Leader节点
+$ ps aux | grep server-1.properties
+$ sudo kill -9 [PID]
+
+# 查看topic信息
+$ bin/kafka-topics.sh --describe --bootstrap-server localhost:9092 --topic my-replicated-topic
+```
+
+### 3.1.2 基本操作
 
 **添加和删除topics**
 
@@ -1826,7 +1956,4 @@ Reassignment of partition [foo2,1] completed successfully
 Reassignment of partition [foo2,2] completed successfully
 ```
 
-
-
-# 3.Kafka使用
-
+# 
