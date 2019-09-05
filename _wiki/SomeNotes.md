@@ -258,6 +258,19 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
   <img src="/images/wiki/Kafka/log_compaction.png" width="500" alt="log compross" />
 
+* **Kafka实现数据中心备份？**
+
+  Kafka附带了一个在Kafka集群之间镜像数据的工具 mirror-maker。该工具从源集群中消费数据并产生数据到目标集群。
+
+* **Kafka安装bin目录下文件作用？**
+  * `kafka-reassign-partitions.sh`    分区（partition）重分配工具
+
+* **Kafka如何管理offset？**
+
+  Kafka提供了一个选项在指定的broker中来存储所有给定的consumer组的offset，称为`offset manager`。
+
+  可以通过手动实现管理offset，见[OffsetCommitRequest 和 OffsetFetchRequest的源码](https://cwiki.apache.org/confluence/display/KAFKA/Committing+and+fetching+consumer+offsets+in+Kafka)
+
 #### 5.1.2.2 MQ
 
 * **为何使用MQ？**

@@ -1402,6 +1402,100 @@ broker在检测到有配额资源使用违反规则会怎么办？在我们计�
 
   请注意，有两种损坏必须处理：由于崩溃导致的未写入的数据块的丢失和将无意义已损坏的数据块添加到文件。原因是：通常系统不能保证文件索引节点和实际数据快之间的写入顺序，除此之外，如果在块数据被写入之前，文件索引已更新为新的大小，若此时系统崩溃，文件不会的到有意义的数据，则会导致数据丢失。
 
+### 2.6.5 分布式
+
+**Consumer Offset Tracking（消费者offset跟踪）**
+
+高级别的consumer跟踪每个分区已消费的offset，并定期提交，以便在重启的情况下可以从这些offset中恢复。**Kafka提供了一个选项在指定的broker中来存储所有给定的consumer组的offset，称为`offset manager`**。例如，该consumer组的所有consumer实例向offset manager（broker）发送提交和获取offset请求。高级别的consumer将会自动处理这些过程。如果你使用低级别的consumer，你将需要手动管理offset。目前在低级别的java consumer中不支持，只能在Zookeeper中提交或获取offset。如果你使用简单的`Scala consumer`，将可拿到`offset manager`，并显式的提交或获取offset。对于包含`offset manager`的consumer可以通过发送`GroupCoordinatorRequest`到任意kafka broker，并接受`GroupCoordinatorResponse`响应，consumer可以继续向`offset manager broker`提交或获取offset。如果`offset manager`位置变动，consumer需要重新发现`offset manager`。如果你想手动管理你的offset，你可以看看[OffsetCommitRequest 和 OffsetFetchRequest的源码](https://cwiki.apache.org/confluence/display/KAFKA/Committing+and+fetching+consumer+offsets+in+Kafka)是如何实现的。
+
+当`offset manager`接收到一个`OffsetCommitRequest`，它将追加请求到一个特定的压缩名为`__consumer_offsets`的kafka topic中，当`offset topic`的所有副本接收offset之后，`offset manager`将发送一个提交offset成功的响应给consumer。万一offset无法在规定的时间内复制，offset将提交失败，consumer在回退之后可重试该提交（高级别consumer自动进行）。broker会定期压缩`offset topic`，因为只需要保存每个分区最近的offset。`offset manager`会缓存offset在内存表中，以便offset快速获取。
+
+当`offset manager`接收一个offset的获取请求，将从offset缓存中返回最新的的offset。如果`offset manager`刚启动或新的consumer组刚成为`offset manager`（成为offset topic`分区的leader），则需要加载offset topic的分区到缓存中，在这种情况下，offset将获取失败，并报出OffsetsLoadInProgress异常，consumer回滚后，重试`OffsetFetchRequest`s（高级别consumer自动进行这些操作）。
+
+**从ZooKeeper迁移offset到Kafka**
+
+Kafka consumers在早先的版本中offset默认存储在ZooKeeper中。可以通过下面的步骤迁移这些consumer到Kafka：
+
+1.在consumer配置中设置`offsets.storage=kafka` 和 `dual.commit.enabled=true`。
+
+2.consumer做滚动消费，验证你的consumer是健康正常的。
+
+3.在你的consumer配置中设置`dual.commit.enabled=false`。
+
+4.consumer做滚动消费，验证你的consumer是健康正常的。
+
+回滚（就是从kafka回到Zookeeper）也可以使用上面的步骤，通过设置 `offsets.storage=zookeeper`。
+
+**ZooKeeper 目录**
+
+下面给出了Zookeeper的结构和算法，用于协调consumer和broker。
+
+* Notation
+
+  当一个path中的元素表示为`[XYZ]`，这意味着xyz的值不是固定的，实际上每个xyz的值可能是Zookeeper的znode，例如`/topic/[topic]`是一个目录，`/topic`包含一个子目录(每个topic名称)。数字的范围如`[0...5]`来表示子目录`0，1，2，3，4`。箭头`->`用于表示znode的内容，例如:`/hello->world`表示znode` /hello`包含值”world”。
+
+* Broker节点注册
+
+  ```
+  /brokers/ids/[0...N] --> {"jmx_port":...,"timestamp":...,"endpoints":[...],"host":...,"version":...,"port":...} (ephemeral node)
+  ```
+
+  这是当前所有broker的节点列表，其中每个提供了一个唯一的逻辑broker的id标识它的consumer（必须作为配置的一部分）。在启动时，broker节点通过在`/brokers/ids/`下用逻辑broker id创建一个znode来注册它自己。逻辑broker id的目的是当broker移动到不同的物理机器时，而不会影响消费者。尝试注册一个已存在的broker id时将返回错误（因为2个server配置了相同的broker id）。
+
+  由于broker在Zookeeper中用的是临时znode来注册，因此这个注册是动态的，如果broker关闭或宕机，节点将消失（通知consumer不再可用）。
+
+* Broker Topic 注册
+
+  ```
+  /brokers/topics/[topic]/partitions/[0...N]/state --> {"controller_epoch":...,"leader":...,"version":...,"leader_epoch":...,"isr":[...]} (ephemeral node)
+  ```
+
+  每个broker在它自己的topic下注册，维护和存储该topic分区的数据。
+
+* Consumer和Consumer组
+
+  topic的consumer也在zookeeper中注册自己，以便相互协调和平衡数据的消耗。consumer也可以通过设置`offsets.storage = zookeeper`将他们的偏移量存储在zookeeper中。但是，这个偏移存储机制将在未来的版本中被弃用。因此，建议将数据迁移到kafka中。
+
+  多个consumer可组成一组，共同消费一个topic，在同一组中的每个consumer共享一个group_id。例如，如果一个consumer是foobar，在三台机器上运行，你可能分配这个这个consumer的ID是“foobar”。这个组id是在consumer的配置文件中配置的。 
+
+  每个分区正好被一个consumer组的consumer所消费，一组中的consumer尽可能公平地分配分区。
+
+* Consumer offset
+
+  如果`offset.storage=zookeeper`，consumer跟踪每个分区的最大offset，最大offset存储在zookeeper。
+
+* Consumer 用户登录
+
+  每个broker的分区被单个consumer组消费，consumer必须用户登录，
+
+  ```
+  /consumers/[group_id]/owners/[topic]/[partition_id] --> consumer_node_id (ephemeral node)
+  ```
+
+* 集群ID
+
+  集群ID唯一且不变。集群ID可以有最多22个特性，可以通过正则表达式`[a-zA-Z0-9_\-]+`来定义。
+
+  broker启动时，会尝试从`/cluster/id`znode获取集群ID。如果znode（zookeeper node？）不存在，则broker生成一个新的集群ID并为该ID创建一个znode。
+
+  
+
+* Consumer登录算法
+
+  当一个consumer启动时，进行以下步骤：
+
+  1.在他的consumer组中登录consumer id
+
+  2.注册一个consuemer id登录的监视器（consumer登录或者退出）
+
+
+
+
+
+
+
+
+
 ## 2.7 基本操作
 
 ### 2.7.1 基本的Kafka操作
@@ -1485,8 +1579,8 @@ $ bin/kafka-preferred-replica-election.sh --zookeeper zk_host:port/chroot
 
 由于运行此命令可能很乏味，您也可以通过以下配置来自动配置Kafka：
 
-```bash
-$ auto.leader.rebalance.enable=true
+```
+auto.leader.rebalance.enable=true
 ```
 
 **垮机架均衡副本**
@@ -1497,6 +1591,214 @@ $ auto.leader.rebalance.enable=true
 
 ```
 broker.rack=my-rack-id
+```
+
+当 topic 创建，修改或副本重新分配时， 机架约束将得到保证，确保副本跨越尽可能多的机架（一个分区将跨越 min(#racks，replication-factor) 个不同的机架）。
+用于向 broker 分配副本的算法可确保每个 broker 的 leader 数量将保持不变，而不管 broker 在机架之间如何分布。这确保了均衡的吞吐量。
+但是，如果 broker 在机架间分布不均 ，副本的分配将不均匀。具有较少 broker 的机架将获得更多复制副本，这意味着他们将使用更多存储并将更多资源投入复制。因此，每个机架配置相同数量的 broker 是明智的。
+
+**集群之间镜像数据**
+
+指的是**通过“镜像”复制Kafka集群之间的数据的过程，以避免与在单个集群中的节点之间发生的复制混淆**。Kafka附带了一个在Kafka集群之间镜像数据的工具 mirror-maker。该工具**从源集群中消费数据并产生数据到目标集群**。 **这种镜像的常见用例是在另一个数据中心提供副本**。
+
+您可以运行许多这样的镜像进程来提高吞吐量和容错能力（如果一个进程死亡，其他进程将承担额外的负载）。
+
+从源群集中的 topic 中读取数据，并将其写入目标群集中具有相同名称的 topic。事实上，镜像只不过是把一个 Kafka 的 consumer 和 producer 联合在一起了。
+
+源和目标集群是完全独立的实体：它们可以有不同数量的分区，偏移量也不会相同。由于这个原因，镜像集群并不是真正意义上的容错机制（因为 consumer 的偏移量将会不同）。为此，我们建议使用正常的群集内复制。然而，镜像制作进程将保留并使用消息 key 进行分区，所以在每个 key 的基础上保存顺序。
+
+以下示例显示如何从输入群集中镜像单个 topic（名为 my-topic ）：
+
+```bash
+$ bin/kafka-mirror-maker.sh
+      --consumer.config consumer.properties
+      --producer.config producer.properties --whitelist my-topic
+```
+
+请注意，我们使用 `--whitelist` 选项指定 topic 列表。此选项允许使用任何 [Java风格的正则表达式](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html) 因此，您可以使用`--whitelist 'A|B'`来镜像名为A 和 B 的两个 topic 。 或者您可以使用`--whitelist '*'`来镜像全部 topic。确保引用的任何正则表达式不会被 shell 尝试将其展开为文件路径。为了方便起见，我们允许使用`','`而不是`'|' `指定 topic 列表。
+
+有时，说出你不想要的东西比较容易。与使用--whitelist 来表示你想要的相反，通过镜像您可以使用 `--blacklist` 来表示要排除的内容。 这也需要一个正则表达式的参数。但是，当启用新的 consumer 时，不支持 `--blacklist`（即 `bootstrap.servers` ）已在 consumer 配置中定义）。
+
+将镜像与配置项 `auto.create.topics.enable = true` 结合使用，可以创建一个副本群集，即使添加了新的 topic，也可以自动创建和复制源群集中的所有数据。
+
+**检查consumer位置**
+
+有时观察到消费者的位置是有用的。我们有一个工具，可以显示 consumer 群体中所有 consumer 的位置，以及他们所在日志的结尾。要在名为my-group的 consumer 组上运行此工具，消费一个名为my-topic的 topic 将如下所示：
+
+```bash
+$ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
+```
+
+ 输出：
+
+```
+注意：这将仅显示使用Java consumer API（基于非ZooKeeper的 consumer）的 consumer 的信息。
+  
+TOPIC                          PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG        CONSUMER-ID                                       HOST                           CLIENT-ID
+my-topic                       0          2               4               2          consumer-1-029af89c-873c-4751-a720-cefd41a669d6   /127.0.0.1                     consumer-1
+my-topic                       1          2               3               1          consumer-1-029af89c-873c-4751-a720-cefd41a669d6   /127.0.0.1                     consumer-1
+my-topic                       2          2               3               1          consumer-2-42c1abd4-e3b2-425d-a8bb-e1ea49b29bb2   /127.0.0.1                     consumer-2
+```
+
+这个工具也适用于基于ZooKeeper的 consumer：
+
+```bash
+$ bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --describe --group my-group
+```
+
+ 输出：
+
+```
+注意：这只会显示关于使用ZooKeeper的 consumer 的信息（不是那些使用Java consumer API的消费者）。
+
+TOPIC                          PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG        CONSUMER-ID
+my-topic                       0          2               4               2          my-group_consumer-1
+my-topic                       1          2               3               1          my-group_consumer-1
+my-topic                       2          2               3               1          my-group_consumer-2
+```
+
+**管理consumer组**
+
+通过 ConsumerGroupCommand 工具，我们可以列出，描述或删除 consumer 组。请注意，删除仅在组元数据存储在ZooKeeper中时可用。当使用新的 consumer API （ broker 协调分区处理和重新平衡）时， 当该组的最后一个提交偏移量过期时，该组将被删除。 例如，要列出所有 topic 中的所有 consumer 组： 
+
+```bash
+$ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+```
+
+如前所述,为了查看偏移量，我们这样`“describe”consumer `组：
+
+```bash
+$ bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group test-consumer-group
+```
+
+ 输出
+
+```
+TOPIC                          PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG        CONSUMER-ID                                       HOST                           CLIENT-ID
+test-foo                       0          1               3               2          consumer-1-a5d61779-4d04-4c50-a6d6-fb35d942642d   /127.0.0.1                     consumer-1
+```
+
+如果您正在使用老的高级 consumer 并在ZooKeeper中存储组元数据（即 `offsets.storage = zookeeper `），则传递 `--zookeeper` 而不是`bootstrap-server`：
+
+```bash
+$ bin/kafka-consumer-groups.sh --zookeeper localhost:2181 --list
+```
+
+**拓展集群**
+
+将服务器添加到Kafka集群非常简单，只需为其分配唯一的 broker ID并在您的新服务器上启动Kafka即可。但是，这些新的服务器不会自动分配到任何数据分区，除非将分区移动到这些分区，否则直到创建新 topic 时才会提供服务。所以通常当您将机器添加到群集中时，您会希望将一些现有数据迁移到这些机器上。
+
+迁移数据的过程是手动启动的，但是完全自动化。在迁移数据时，Kafka会将新服务器添加为正在迁移的分区的 follower，并允许它完全复制该分区中的现有数据。当新服务器完全复制了此分区的内容并加入了同步副本时，其中一个现有副本将删除其分区的数据。
+
+分区重新分配工具可用于跨 broker 移动分区。理想的分区分布将确保所有 broker 的数据负载和分区大小比较均衡。分区重新分配工具不具备自动分析Kafka集群中的数据分布并移动分区以获得均匀负载的功能。因此，管理员必须找出哪些 topic 或分区应该移动。
+
+区重新分配工具可以以3种互斥方式运行：
+
+- `--generate`: 在此模式下，给定一个 topic 列表和一个 broker 列表，该工具会生成一个候选重新分配，以将指定的 topic 的所有分区移动到新的broker。此选项仅提供了一种便捷的方式，可以根据 tpoc 和目标 broker 列表生成分区重新分配计划。
+- `--execute`: 在此模式下，该工具基于用户提供的重新分配计划启动分区重新分配。（使用`--reassignment-json-file`选项）。这可以是由管理员制作的自定义重新分配计划，也可以是使用--generate选项提供的自定义重新分配计划。
+- `--verify`: 在此模式下，该工具将验证最近用 `--execute` 模式执行间的所有分区的重新分配状态。状态可以是成功完成，失败或正在进行
+
+**自动将数据迁移到新机器**
+
+分区重新分配工具可用于将当前一组 broker 的一些 topic 移至新增的topic。这在扩展现有群集时通常很有用，因为将整个 topic 移动到新 broker 集比移动一个分区更容易。当这样做的时候，用户应该提供需要移动到新的 broker 集合的 topic 列表和新的目标broker列表。该工具然后会均匀分配新 broker 集中 topic 的所有分区。在此过程中，topic 的复制因子保持不变。实际上，所有输入 topic 的所有分区副本都将从旧的broker 组转移到新 broker中。
+
+例如，以下示例将把名叫foo1，foo2的 topic 的所有分区移动到新的 broker 集5,6。最后，foo1和foo2的所有分区将只在`<5,6> broker `上存在。
+
+由于该工具接受由 topic 组成的输入列表作为json文件，因此首先需要确定要移动的 topic 并创建 json 文件，如下所示：
+
+```bash
+$ cat topics-to-move.json
+```
+
+输出
+
+```
+{"topics": [{"topic": "foo1"},
+            {"topic": "foo2"}],
+"version":1
+}
+```
+
+一旦json文件准备就绪，就可以使用分区重新分配工具来**生成候选分配**（而不是已经完成分配）：
+
+```bash
+$ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --topics-to-move-json-file topics-to-move.json --broker-list "5,6" --generate
+```
+
+输出
+
+```
+当前分区副本分配
+ 
+{"version":1,
+"partitions":[{"topic":"foo1","partition":2,"replicas":[1,2]},
+              {"topic":"foo1","partition":0,"replicas":[3,4]},
+              {"topic":"foo2","partition":2,"replicas":[1,2]},
+              {"topic":"foo2","partition":0,"replicas":[3,4]},
+              {"topic":"foo1","partition":1,"replicas":[2,3]},
+              {"topic":"foo2","partition":1,"replicas":[2,3]}]
+}
+ 
+建议的分区重新分配配置
+ 
+{"version":1,
+"partitions":[{"topic":"foo1","partition":2,"replicas":[5,6]},
+              {"topic":"foo1","partition":0,"replicas":[5,6]},
+              {"topic":"foo2","partition":2,"replicas":[5,6]},
+              {"topic":"foo2","partition":0,"replicas":[5,6]},
+              {"topic":"foo1","partition":1,"replicas":[5,6]},
+              {"topic":"foo2","partition":1,"replicas":[5,6]}]
+}
+```
+
+该工具会生成一个候选分配，将所有分区从topic foo1，foo2移动到`brokers 5,6`。但是，**请注意，这个时候（上面的一步），分区操作还没有开始，它只是告诉你当前的任务和建议的新任务**。应该保存当前的分配，以防您想要回滚到它。新的任务应该保存在一个json文件（例如`expand-cluster-reassignment.json`）中，并用`--execute`选项输入到工具中，如下所示：
+
+```bash
+$ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file expand-cluster-reassignment.json --execute
+```
+
+输出
+
+```
+当前分区副本分配
+ 
+{"version":1,
+"partitions":[{"topic":"foo1","partition":2,"replicas":[1,2]},
+              {"topic":"foo1","partition":0,"replicas":[3,4]},
+              {"topic":"foo2","partition":2,"replicas":[1,2]},
+              {"topic":"foo2","partition":0,"replicas":[3,4]},
+              {"topic":"foo1","partition":1,"replicas":[2,3]},
+              {"topic":"foo2","partition":1,"replicas":[2,3]}]
+}
+ 
+保存这个以在回滚期间用作--reassignment-json-file选项
+成功开始重新分配分区
+{"version":1,
+"partitions":[{"topic":"foo1","partition":2,"replicas":[5,6]},
+              {"topic":"foo1","partition":0,"replicas":[5,6]},
+              {"topic":"foo2","partition":2,"replicas":[5,6]},
+              {"topic":"foo2","partition":0,"replicas":[5,6]},
+              {"topic":"foo1","partition":1,"replicas":[5,6]},
+              {"topic":"foo2","partition":1,"replicas":[5,6]}]
+}
+```
+
+最后，可以使用`--verify`选项来检查分区重新分配的状态。请注意，相同的`expand-cluster-reassignment.json`（与`--execute`选项一起使用）应与`--verify`选项一起使用：
+
+```bash
+$ bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file expand-cluster-reassignment.json --verify
+```
+
+输出
+
+```
+Status of partition reassignment:
+Reassignment of partition [foo1,0] completed successfully
+Reassignment of partition [foo1,1] is in progress
+Reassignment of partition [foo1,2] is in progress
+Reassignment of partition [foo2,0] completed successfully
+Reassignment of partition [foo2,1] completed successfully
+Reassignment of partition [foo2,2] completed successfully
 ```
 
 
