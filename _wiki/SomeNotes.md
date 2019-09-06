@@ -329,6 +329,24 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
 ## 5.3 代码规范
 
+### 5.3.1 JUnit代码测试
+
+* **JUnit如何运行一个测试类？**
+
+  * 方法1，构建一个测试运行器，通过`JUnitCore.runClasses`来运行测试类。
+
+  ```java
+  public class TestRunner {
+     public static void main(String[] args) {
+        Result result = JUnitCore.runClasses(TestEmployeeDetails.class);
+        // do something
+  } 
+  ```
+
+  * 方法2，通过注解
+
+    
+
 # 6.数据结构 
 
 
@@ -339,17 +357,23 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
 
 
-# X.计算机语言
+# 8.计算机语言
 
-## X.1 Java
+## 8.1 Java
+
+### 8.1.1 基础语法
+
+* **Abstract的作用？**
+
+  1.抽象方法具体实现在子类中。在父类中，抽象方法只包含一个方法名，没有方法体。子类必须重写父类的抽象方法，或者声明自身为**抽象类**。
+
+  2.抽象类，不能用来实例化对象， 声明抽象类的唯一目的时为了将来对该类进行扩充,具体实现由子类提供。任何继承抽象类的子类必须实现父类的所有抽象方法，除非该子类也是抽象类。
+
+## 8.2 Python
 
 
 
-## X.2 Python
-
-
-
-## X.3 Shell
+## 8.3 Shell
 
 
 
