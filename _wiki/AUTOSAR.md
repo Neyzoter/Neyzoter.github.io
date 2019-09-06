@@ -1877,4 +1877,46 @@ ARTOP针对AUTOSAR标准的XML文档，提供了专门的处理方法。其实�
 
   代码生成要有一定文本结构的文件，使用文本模板工具。Velocity开源项目（Apache），基于Java的模板引擎，用户可以使用Velocity Template Language（VTL）的脚本语言来引用Java代码定义的对象，将对象的信息和模板的内容相结合生成代码文件。
 
+## 8.2 Artop例程
+
+### 8.2.1  org.artop.aal.examples.actions
+
+#### 8.2.1.1 文件夹结构
+
+```
+org.artop.aal.examples.actions
+|-- META-INF
+|   `-- MANIFEST.MF
+|-- build.properties
+|-- icons
+|   `-- sample.gif
+|-- plugin.properties
+|-- plugin.xml
+|-- pom.xml
+`-- src
+    `-- org
+        `-- artop
+            `-- aal
+                `-- examples
+                    `-- actions
+                        |-- AdvancedAddShortNamePrefixAction.java
+                        |-- CountIdentifiablesAction.java
+                        |-- CreateSaveNewAutosarAction.java
+                        |-- ShowProxyReferencesAction.java
+                        |-- SimpleAddShortNamePrefixAction.java
+                        |-- internal
+                        |   |-- Activator.java
+                        |   |-- dialogs
+                        |   |   |-- SelectTargetTypesDialog.java
+                        |   |   `-- ShortNamePrefixDialog.java
+                        |   `-- messages
+                        |       |-- Messages.java
+                        |       `-- messages.properties
+                        `-- providers
+                            |-- AbstractArtopExampleActionProvider.java
+                            `-- AutosarExampleActionProvider.java
+```
+
+
+
 # X.一些笔记
