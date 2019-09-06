@@ -308,4 +308,12 @@ public class TextEditor {
 
 * **如何处理多个符合的Bean**
 
-  @Autowired默认是按照byType进行注入的，但是当byType方式找到了多个符合的bean，又是怎么处理的？Autowired默认先按byType，如果发现找到多个bean，则又按照byName方式比对
+  @Autowired默认是按照byType进行注入的，但是当byType方式找到了多个符合的bean，又是怎么处理的？Autowired默认先按byType，如果发现找到多个bean，则又按照byName方式比对。
+
+## 2.7 @SpringBootApplication
+
+
+
+## 2.8 @RestController
+
+声明一个REST规则的controller。
