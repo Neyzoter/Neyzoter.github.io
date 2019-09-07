@@ -80,6 +80,7 @@ $ bin/kafka-server-start.sh  config/server.properties
 
 ```bash
 # 创建
+# 此处--zookeeper定义zookeeper或者--boostrap-server定义kafka server均可
 $ bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic test
 # 查看
 $ bin/kafka-topics.sh --list --bootstrap-server localhost:9092
@@ -1554,6 +1555,7 @@ $ bin/kafka-server-start.sh config/server-1.properties
 
 ```bash
 # 创建一个名为test的topic，有一个分区和一个副本
+# 此处--zookeeper定义zookeeper或者--boostrap-server定义kafka server均可
 $ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
 ```
 

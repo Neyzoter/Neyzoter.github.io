@@ -12,7 +12,7 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |-|-|-|
-|Java、C/C++、Python、Matlab、R |Linux、 Git、Maven、EclipsePluginDev| Spring、Tomcat、 Netty、 MongoDB、 Docker、Hadoop、Ngnix、HBase、Redis、HTML、React、JUnit |
+|Java、C/C++、Python、Matlab、R |Linux、 Git、Maven、EclipsePluginDev| Spring、Tomcat、 Netty、 MongoDB、 Docker、Hadoop、Ngnix、HBase、Redis、HTML、React、JUnit、Spring JPA |
 
 ## 算法
 
@@ -32,7 +32,7 @@ keywords: skills
 * 软件
 
 |编程语言|编程技能|框架|
-|-|-|-|
+|:--|-|-|
 |[R](http://neyzoter.cn/wiki/R/)|[EclipsePluginDev](http://neyzoter.cn/wiki/EclipsePluginDev/)|[Docker](http://neyzoter.cn/wiki/Docker/)、[Hadoop](http://neyzoter.cn/wiki/Hadoop/)、[Ngnix](http://neyzoter.cn/wiki/Ngnix/)、[Log4j](http://neyzoter.cn/wiki/log4j/)、[Mybatis](http://neyzoter.cn/wiki/MyBatis/)、[HBase](http://neyzoter.cn/wiki/Hbase/)、[Redis](http://neyzoter.cn/wiki/Redis/)、[SpringBoot](http://neyzoter.cn/wiki/SpringBoot/)、[HTML](<http://neyzoter.cn/wiki/HTML/>)、[React](http://neyzoter.cn/wiki/React/)、[JUnit](http://neyzoter.cn/wiki/JUnit/)|
 
 * 算法
