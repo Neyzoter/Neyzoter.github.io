@@ -6,8 +6,8 @@ description: Spring框架使用
 keywords: Spring, Java
 ---
 
-# Spring概述
-## 好处
+# 1、Spring概述
+## 1.1 好处
 * Spring 可以使开发人员使用 POJOs 开发企业级的应用程序。只使用 POJOs 的好处是你不需要一个 EJB 容器产品，比如一个应用程序服务器，但是你可以选择使用一个健壮的 servlet 容器，比如 Tomcat 或者一些商业产品。
 
 >POJOs：Plain Ordinary Java Objects简单洁净Java对象
@@ -28,15 +28,15 @@ keywords: Spring, Java
 
 >关于为什么要使用Bean：某个bean,第一次是被new出来的,然后被分配一块内存,存放这个bean的所有信息,之后在使用到该bean的地方使用注解自动注入,这时使用的就是刚才被new出来的那个,不会再new,除非你设置@Scope('prototype'),依次类推,所有注入该bean的地方，最多因为对象名不同，被分配一小块内存，但这小块内存只存放指向被new出来的bean的信息,都是引用。如果每次都是new出来，每次都要分配内存，虽然说Java有自动回收机制，但如果一个项目中bean很多，在启动服务器的时候，全部加载在Spring容器，不是项目启动失败就是跑起来很慢很慢，所以说能剩则剩
 
-## 依赖注入（DI）
+## 1.2 依赖注入（DI）
 当编写一个复杂的 Java 应用程序时，应用程序类应该尽可能的独立于其他的 Java 类来增加这些类可重用可能性，当进行单元测试时，可以使它们独立于其他类进行测试。依赖注入（或者有时被称为配线）有助于将这些类粘合在一起，并且在同一时间让它们保持独立。
 
 控制反转（IoC）是一个通用的概念，它可以用许多不同的方式去表达，依赖注入仅仅是控制反转的一个具体的例子。
 
-## 面向方面的程序设计（AOP）
+## 1.3 面向方面的程序设计（AOP）
 一个程序中跨越多个点的功能被称为横切关注点，这些横切关注点在概念上独立于应用程序的业务逻辑。有各种各样常见的很好的关于方面的例子，比如日志记录、声明性事务、安全性，和缓存等等。
 
-## IOC和AOP
+## 1.4 IOC和AOP
 
 IOC：控制反转，是一种设计模式。一层含义是控制权的转移：由传统的在程序中控制依赖转移到由容器来控制；第二层是依赖注入：将相互依赖的对象分离，在spring配置文件中描述他们的依赖关系。他们的依赖关系只在使用的时候才建立。简单来说就是不需要NEW一个对象了。
 
@@ -48,10 +48,10 @@ Spring 的AOP和IOC都是为了解决系统代码耦合度过高的问题。使�
 
 <img src="/images/wiki/Spring/AOPStructure.png" width="800" alt="AOPStructure" />
 
-# 体系结构
+# 2、体系结构
 <img src="/images/wiki/Spring/SpringArch.png" width="600" alt="Spring体系结构" />
 
-## 核心容器
+## 2.1 核心容器
 **spring-core**模块提供了框架的基本组成部分，包括 IoC 和依赖注入功能。
 
 **spring-beans** 模块提供 BeanFactory，工厂模式的微妙实现，它移除了编码式单例的需要，并且可以把配置和依赖从实际编码逻辑中解耦。
@@ -60,7 +60,7 @@ Spring 的AOP和IOC都是为了解决系统代码耦合度过高的问题。使�
 
 **spring-expression**模块提供了强大的表达式语言，用于在运行时查询和操作对象图。它是JSP2.1规范中定义的统一表达式语言的扩展，支持set和get属性值、属性赋值、方法调用、访问数组集合及索引的内容、逻辑算术运算、命名变量、通过名字从Spring IoC容器检索对象，还支持列表的投影、选择以及聚合等。。
 
-## 数据访问/集成
+## 2.2 数据访问/集成
 JDBC=Java Data Base Connectivity，ORM=Object Relational Mapping对象关系映射，OXM=Object XML Mapping，JMS=Java Message Service
 
 **JDBC** 模块提供了JDBC抽象层，它消除了冗长的JDBC编码和对数据库供应商特定错误代码的解析。
@@ -79,7 +79,7 @@ JDBC=Java Data Base Connectivity，ORM=Object Relational Mapping对象关系映�
 *隔离性*：在该事务执行的过程中，无论发生的任何数据的改变都应该只存在于该事务之中，对外界不存在任何影响。只有在事务确定正确提交之后，才会显示该事务对数据的改变。其他事务才能获取到这些改变后的数据。
 *持久性*：当事务正确完成后，它对于数据的改变是永久性的。
 
-## Web
+## 2.3 Web
 Web，Web-MVC，Web-Socket 和 Web-Portlet 
 
 **Web** 模块提供面向web的基本功能和面向web的应用上下文，比如多部分（multipart）文件上传功能、使用Servlet监听器初始化IoC容器等。它还包括HTTP客户端以及Spring远程调用中与web相关的部分。。
@@ -90,7 +90,7 @@ Web，Web-MVC，Web-Socket 和 Web-Portlet
 
 **Web-Portlet** 模块提供了用于Portlet环境的MVC实现，并反映了spring-webmvc模块的功能。
 
-## 其他
+## 2.4 其他
 **AOP** 模块提供了面向方面的编程实现，允许你定义方法拦截器和切入点对代码进行干净地解耦，从而使实现功能的代码彻底的解耦出来。使用源码级的元数据，可以用类似于.Net属性的方式合并行为信息到代码中。
 
 **Aspects** 模块提供了与 AspectJ 的集成，这是一个功能强大且成熟的面向切面编程（AOP）框架。
@@ -101,11 +101,11 @@ Web，Web-MVC，Web-Socket 和 Web-Portlet
 
 测试模块支持对具有 JUnit 或 TestNG 框架的 Spring 组件的测试。
 
-# Spring IoC容器
+# 3、Spring IoC容器
 Spring 容器是 Spring 框架的核心。容器将创建对象，把它们连接在一起，配置它们，并管理他们的整个生命周期从创建到销毁。Spring 容器使用依赖注入（DI）来管理组成一个应用程序的组件。这些对象被称为 Spring Beans。
 
 Spring IoC 容器利用 Java 的 POJO 类和配置元数据来生成完全配置和可执行的系统或应用程序。
-## 容器的种类
+## 3.1 容器的种类
 * Spring BeanFactory 容器
 
 它是最简单的容器，给 DI 提供了基本的支持，它用 org.springframework.beans.factory.BeanFactory 接口来定义。
@@ -128,7 +128,7 @@ ApplicationContext 容器包括 BeanFactory 容器的所有功能
         objAppContext.getMessage();
 ```
 
-## Bean定义
+## 3.2 Bean定义
 
 |属性| 描述|
 |-|-|
@@ -142,7 +142,7 @@ ApplicationContext 容器包括 BeanFactory 容器的所有功能
 |initialization方法| 在 bean 的所有必需的属性被容器设置之后，调用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
 |destruction方法|  当包含该 bean 的容器被销毁时，使用回调方法。它将会在 bean 的生命周期章节中进行讨论。|
 
-## Bean作用域
+## 3.3 Bean作用域
 **scope属性**
 
 |作用域 |	描述|
@@ -168,7 +168,7 @@ Singleton是单例类型，就是在创建起容器时就同时自动创建了�
 
 Prototype是原型类型，它在我们创建容器的时候并没有实例化，而是当我们获取bean的时候才会去创建一个对象，而且我们每次获取到的对象都不是同一个对象。
 
-## Bean生命周期
+## 3.4 Bean生命周期
 当一个 bean 被实例化时，它可能需要执行一些初始化使它转换成可用状态。同样，当 bean 不再需要，并且从容器中移除时，可能需要做一些清除工作。
 
 为了定义安装和拆卸一个 bean，我们只要声明带有 init-method 和/或 destroy-method 参数的 。init-method 属性指定一个方法，在实例化 bean 时，立即调用该方法。同样，destroy-method 指定一个方法，只有从容器中移除 bean 之后，才能调用该方法。
@@ -248,7 +248,7 @@ public class HelloWorld {
 }
 ```
 
-## Bean后置处理器
+## 3.5 Bean后置处理器
 BeanPostProcessor 接口定义回调方法，你可以实现该方法来提供自己的实例化逻辑，依赖解析逻辑等。你也可以在 Spring 容器通过插入一个或多个 BeanPostProcessor 的实现来完成实例化，配置和初始化一个bean之后实现一些自定义逻辑回调方法。
 
 可以在bean初始化（调用helloworld的init方法）前，自动调用postProcessBeforeInitialization；初始化后自动调用postProcessAfterInitialization。
@@ -348,7 +348,7 @@ xml指定的init-method方法   ->  postProcessAfterInitialization方法  ->  ..
 
 -> context.registerShutdownHook关闭     ->    xml指定的destroy-method方法
 
-## Bean定义继承
+## 3.6 Bean定义继承
 bean 定义可以包含很多的配置信息，包括构造函数的参数，属性值，容器的具体信息例如初始化方法，静态工厂方法名，等等。
 
 子 bean 的定义继承父定义的配置数据。子定义可以根据需要重写一些值，或者添加其他值。
@@ -490,12 +490,12 @@ India Message3 : Namaste India!
 </beans>
 ```
 
-# Spring依赖注入
+# 4、Spring依赖注入
 每个基于应用程序的 java 都有几个对象，这些对象一起工作来呈现出终端用户所看到的工作的应用程序。当编写一个复杂的 Java 应用程序时，应用程序类应该尽可能独立于其他 Java 类来增加这些类重用的可能性，并且在做单元测试时，测试独立于其他类的独立性。依赖注入（或有时称为布线）有助于把这些类粘合在一起，同时保持他们独立。
 
 **如果你要把一个引用传递给一个对象，那么你需要使用 标签的 ref 属性，而如果你要直接传递一个值，那么你应该使用 value 属性。**
 
-## 基于构造函数的依赖注入
+## 4.1 基于构造函数的依赖注入
 
 当容器调用带有多个参数的构造函数类时，实现基于构造函数的 DI，每个代表在其他类中的一个依赖关系。
 
@@ -601,7 +601,7 @@ public class Foo {
 ```
 
 
-## 基于setter方法的依赖注入
+## 4.2 基于setter方法的依赖注入
 
 基于 setter 方法的 DI 是通过在调用无参数的构造函数或无参数的静态工厂方法实例化 bean 之后容器调用 beans 的 setter 方法来实现的。
 
@@ -675,7 +675,7 @@ public class MainApp {
 </beans>
 ```
 
-## 内部Beans的依赖注入
+## 4.3 内部Beans的依赖注入
 也就是将一个bean写入到另外一个bean内
 
 ```xml
@@ -695,7 +695,7 @@ public class MainApp {
 </beans>
 ```
 
-## 注入集合
+## 4.4 注入集合
 
 
 |元素	| 描述|
@@ -822,9 +822,9 @@ public class JavaCollection {
 </bean>
 ```
 
-# Beans自动装配
+# 5、Beans自动装配
 
-## byName
+## 5.1 byName
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -846,7 +846,7 @@ public class JavaCollection {
 </beans>
 ```
 
-## byType
+## 5.2 byType
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -868,7 +868,7 @@ public class JavaCollection {
 </beans>
 ```
 
-## 构造函数自动转配
+## 5.3 构造函数自动转配
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -890,7 +890,7 @@ public class JavaCollection {
 </beans>
 ```
 
-# 基于注解的配置
+# 6、基于注解的配置
 使用注解来实现配置，则xml文件配置如下。
 
 ```xml
@@ -921,7 +921,7 @@ public class JavaCollection {
 @Resource
 ```
 
-## @Required
+## 6.1 @Required
 @Required 注释应用于 bean 属性的 setter 方法，它表明受影响的 **bean 属性在配置时必须放在 XML 配置文件中**，否则容器就会抛出一个 BeanInitializationException 异常。
 
 ```java
@@ -969,8 +969,8 @@ public class Student {
 </beans>
 ```
 
-## @Autowired和@Resource
-### @Autowired
+## 6.2 @Autowired和@Resource
+### 6.2.1 @Autowired
 
 @Autowired 注释可以在 setter 方法中被用于自动连接 bean，一个属性或者任意命名的可能带有多个参数的方法，**只按照byType注入**。
 
@@ -997,7 +997,7 @@ public class TestServiceImpl {
 }
 ```
 
-### @Resource
+### 6.2.2 @Resource
 
 @Resource，默认按照byName自动注入，并不是Spring的注解，它的包是javax.annotation.Resource，需要导入，但是Spring支持该注解的注入。@Resource有两个重要的属性：name和type，而Spring将@Resource注解的name属性解析为bean的名字，而type属性则解析为bean的类型。
 
@@ -1014,7 +1014,7 @@ public class TestServiceImpl {
 }
 ```
 
-## @Qualifier
+## 6.3 @Qualifier
 
 ```java
 package com.tutorialspoint;
@@ -1068,7 +1068,7 @@ public class Profile {
 </beans>
 ```
 
-## @Scheduled和@Component
+## 6.4 @Scheduled和@Component
 
 周期性运行一个程序
 
@@ -1101,7 +1101,7 @@ public class TaskJobs {
 }
 ```
 
-## JSR-250注释
+## 6.5 JSR-250注释
 
 为了定义一个 bean 的安装和卸载，我们使用 init-method 和/或 destroy-method 参数简单的声明一下 。init-method 属性指定了一个方法，该方法在 bean 的实例化阶段会立即被调用。同样地，destroy-method 指定了一个方法，该方法只在一个 bean 从容器中删除之前被调用。
 
@@ -1174,7 +1174,7 @@ public class TextEditor {
 }
 ```
 
-## 基于Java的配置
+## 6.6 基于Java的配置
 
 ```java
 package com.tutorialspoint;
@@ -1218,7 +1218,7 @@ public static void main(String[] args) {
 }
 ```
 
-## bean事件处理
+## 6.7 bean事件处理
 ApplicationContext负责管理 beans 的完整生命周期。当加载 beans 时，ApplicationContext 发布某些类型的事件。
 
 例如，当上下文启动时，ContextStartedEvent 发布，当上下文停止时，ContextStoppedEvent 发布。
@@ -1318,7 +1318,7 @@ public class MainApp {
 </beans>
 ```
 
-## 定时任务
+## 6.8 定时任务
 
 **1.配置`beans.xml`**
 
@@ -1390,7 +1390,7 @@ public class TaskJob{
 
 ```
 
-# AOP
+# 7、AOP
 
 面向方面的编程(Aspect Oriented Programming,AOP)框架
 
@@ -1400,7 +1400,7 @@ public class TaskJob{
 
 依赖注入帮助你对应用程序对象相互解耦和 AOP 可以帮助你从它们所影响的对象中对横切关注点解耦。
 
-## 术语和通知类型
+## 7.1 术语和通知类型
 
 |项	| 描述|
 |-|-|
@@ -1420,7 +1420,7 @@ public class TaskJob{
 |抛出异常后通知	|@AfterThrowing	|在一个方法执行之后，只有在方法退出抛出异常时，才能执行通知。|
 |环绕通知	|@Around	|在建议方法调用之前和之后，执行通知。|
 
-## 基于AOP的XML框架
+## 7.2 基于AOP的XML框架
 **使用注意点**
 
 * getBean()时调用set函数设置参数时，不会调用AOP的通知方法。
@@ -1664,7 +1664,7 @@ other exception content
 
 ```
 
-## 基于AOP的@AspectJ
+## 7.3 基于AOP的@AspectJ
 
 在java程序中用注解，需要声明
 
@@ -1806,7 +1806,7 @@ public class MainApp {
 </beans>
 ```
 
-# Spring 的JDBC框架
+# 8、Spring 的JDBC框架
 在使用普通的 JDBC 数据库时，就会很麻烦的写不必要的代码来处理异常，打开和关闭数据库连接等。但 Spring JDBC 框架负责所有的低层细节，从开始打开连接，准备和执行 SQL 语句，处理异常，处理事务，到最后关闭连接。
 
 *数据源的配置*
@@ -2045,8 +2045,8 @@ ID : 2, Name : Nuha, Age : 20
 
 ```
 
-# Spring事务管理
-## 相关概念
+# 9、Spring事务管理
+## 9.1 相关概念
 *事务的概念可表述为四个关键属性ACID*
 
 * **原子性**：事务应该当作一个单独单元的操作，这意味着整个序列操作要么是成功，要么是失败的。
@@ -2187,7 +2187,7 @@ public interface TransactionStatus extends SavepointManager {
 }
 ```
 
-## 编程式事务管理
+## 9.2 编程式事务管理
 至少要有两个数据库表，在事务的帮助下我们可以执行多种 CRUD 操作。
 
 ```sql
@@ -2431,8 +2431,8 @@ ID : 2, Name : Nuha, Marks : 97, Year : 2010, Age : 20
 ID : 3, Name : Ayan, Marks : 100, Year : 2011, Age : 25
 ```
 
-# Spring Web MVC框架
-## 基本概念
+# 10、Spring Web MVC框架
+## 10.1 基本概念
 **MVC框架**
 
 MVC 框架提供了模型-视图-控制的体系结构和可以用来开发灵活、松散耦合的 web 应用程序的组件。MVC 模式导致了应用程序的不同方面(输入逻辑、业务逻辑和 UI 逻辑)的分离，同时提供了在这些元素之间的松散耦合。
@@ -2487,3 +2487,441 @@ web.xml 文件将被保留在你的应用程序的 WebContent/WEB-INF 目录下�
    </servlet-mapping>
 </web-app>
 ```
+
+# 11、Spring JPA
+
+## 11.1 JPA介绍
+
+Jpa (Java Persistence API) 是 Sun 官方提出的 Java 持久化规范。它为 Java 开发人员提供了一种对象/关联映射工具来管理 Java 应用中的关系数据。它的出现主要是为了简化现有的持久化开发工作和整合 ORM 技术（Object Relational Mapping，对象关系映射），结束现在 Hibernate，TopLink，JDO 等 ORM 框架各自为营的局面。
+
+值得注意的是，Jpa是在充分吸收了现有 Hibernate，TopLink，JDO 等 ORM 框架的基础上发展而来的，具有易于使用，伸缩性强等优点。从目前的开发社区的反应上看，Jpa 受到了极大的支持和赞扬，其中就包括了 Spring 与 EJB3. 0的开发团队。
+
+Spring Boot Jpa 是 Spring 基于 ORM 框架、Jpa 规范的基础上封装的一套 Jpa 应用框架，可使开发者用极简的代码即可实现对数据的访问和操作。它提供了包括增删改查等在内的常用功能，且易于扩展！学习并使用 Spring Data Jpa 可以极大提高开发效率！Spring Boot Jpa 让我们解脱了 DAO 层的操作，基本上所有 CRUD 都可以依赖于它来实现
+
+## 11.2 使用Spring JPA
+
+### 11.2.1 核心概念
+
+Spring Data库的核心接口是`Repository`。它使用domain类去管理，domain类中的id类型作为类型参数。这个接口主要作为一个标记接口，依靠具体的类型运作并帮助您发现接口，`CrudRepository` 提供丰富的CRUD功能去管理实体类。
+
+- *例1 CrudRepository接口*
+
+  ```java
+  public interface CrudRepository<T, ID extends Serializable> extends Repository<T, ID> {       
+   <S extends T> S save(S entity);    //保存给定的实体。
+   T findOne(ID primaryKey);          //返回给定id的实体。
+   Iterable<T> findAll();             //返回所有实体。
+   Long count();                      //返回实体的数量。
+   void delete(T entity);             //删除给定的实体。
+   boolean exists(ID primaryKey);     //表明一个指定id的实体是否存在。
+  }
+  ```
+
+  > Spring还提供持久性特定于技术的抽象如: `JpaRepository`或 `MongoRepository`. 这些接口继承于`CrudRepository`，实现了特定的一些功能
+
+  `CrudRepository`有一个`PagingAndSortingRepository` 抽象,增加了额外的方法来简化对实体的分页访问:
+
+- *例2 PagingAndSortingRepository接口*
+
+  ```java
+  public interface PagingAndSortingRepository<T, ID extends Serializable> extends CrudRepository<T, ID> {
+    Iterable<T> findAll(Sort sort);
+    Page<T> findAll(Pageable pageable);
+  }
+  ```
+
+  进入`用户类别`的第二页（每一页的条目是20），可以照下面这样来分页
+
+  ```java
+  PagingAndSortingRepository<User, Long> repository = // … get access to a bean
+  Page<User> users = repository.findAll(new PageRequest(1, 20));
+  ```
+
+  除了查询方法外，还有统计查询和删除查询。
+
+- *例3 查询并统计*
+
+  ```java
+  public interface UserRepository extends CrudRepository<User, Long> {
+    Long countByLastname(String lastname);
+  }
+  ```
+
+- *例4 查询并删除*
+
+  ```java
+  public interface UserRepository extends CrudRepository<User, Long> {
+    Long deleteByLastname(String lastname);
+    List<User> removeByLastname(String lastname);
+  }
+  ```
+
+### 11.2.2 查询方法
+
+标准的CRUD功能存储库通常对底层数据存储查询。Spring Data把这些查询变成了四个步骤的过程:
+
+**1.声明一个接口继承Repository或其子类，输入实体类型和ID类型。**
+
+```java
+// 实体类型为Person，ID类型为Long
+interface PersonRepository extends Repository<Person, Long> { … }
+```
+
+**2.在接口里声明查询方法。**
+
+```java
+interface PersonRepository extends Repository<Person, Long> {
+  List<Person> findByLastname(String lastname);
+}
+```
+
+**3.为这些接口创建代理实例，也可通过 JavaConfig :**
+
+```java
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+@EnableJpaRepositories
+class Config {}
+```
+
+本例中使用了JPA名称空间。如果您正在使用repository中的抽象为任何其他数据源,你需要改变这种适当的名称空间声明你的存储模块来与jpa支持,例如:`mongodb`。
+
+注意，不用通过Java变量来配置包，默认情况下会根据注解的类来自动声明。定制的包扫描可以使用`basePackage`属性，特定的库可以使用`@Enable`来注解。
+
+**4.获得repository 实例注入并使用它。**
+
+```java
+class SomeClient {
+  @Autowired
+  private final PersonRepository repository;
+  SomeClient(PersonRepository repository) {
+      this.repository = repository;
+  }
+  public void doSomething() {
+    List<Person> persons = repository.findByLastname("Matthews");
+  }
+}
+```
+
+### 11.2.3 定义repository接口
+
+首先需要定义实体类的接口，接口必须继承repository并且输入实体类型和ID类型，如果需要用到CRUD方法，可以使用`CrudRepository`来替代`Repository`。
+
+#### 11.2.3.1 自定义接口
+
+通常,您的存储库接口将会扩展`Repository`, `CrudRepository`或`PagingAndSortingRepository`。 另外,如果你不想继承Spring Data接口,还可以注释库接口`@RepositoryDefinition`。 扩展`CrudRepository`公开了一套完整的方法来操作您的实体。 如果你喜欢选择调用方法,简单地从`CrudRepository`中复制你想要的方法到你的repository。
+
+*例 有选择地公开CRUD方法*
+
+```java
+@NoRepositoryBean
+interface MyBaseRepository<T, ID extends Serializable> extends Repository<T, ID> {
+  Optional<T> findById(ID id);
+  <S extends T> S save(S entity);
+}
+interface UserRepository extends MyBaseRepository<User, Long> {
+  User findByEmailAddress(EmailAddress emailAddress);
+}
+```
+
+第一步你定义了一个公共基础的接口提供了`findById(…)`和`save(...)`方法,这些方法将会引入到你选择的spring Data的实现类中，例如JPA：`SimpleJpaRepository`,因为他们匹配`CrudRepository`的方法签名，所以`UserRepository`将会具备save Users和根据ID查询的功能，当然也具备`findByEmailAddress`的功能。
+
+> 注意，如果中间的repository接口添加了`@NoRepositoryBean`注解，确认你所有的repository都添加了这个注解，这时候spring Data在运行时将不会创建实例。
+
+#### 11.2.3.2 Repository方法Null的处理
+
+在Spring Data 2.0中，Repository的CRUD方法使用Java 8的Optional返回一个独立的合计实例，表明一个值可能缺失。此外，Spring Data还支持查询方法返回其他包装类:
+
+- `com.google.common.base.Optional`
+- `scala.Option`
+- `io.vavr.control.Option`
+- `javaslang.control.Option`(deprecated as Javaslang is deprecated)
+
+查询方法也可不返回任何包装类，缺失的查询结果将返回null。返回集合，可选集合，包装类和流的Repository方法将返回相应的空表示而不返回null。
+
+**可以使用Nullability注解**。
+
+#### 11.2.3.3 使用Spring Data多模块来创建Repositories
+
+使用唯一的Spring Data模块在应用中是非常简单，但有时候我们需要多的Spring Data模块，比如：需要定义个Repository去区分两种不同的持久化技术，如果在class path中发现多个Repository时，spring data会进行严格的配置限制，确保每个repository或者实体决定绑定那个Spring Data模块：
+
+1、如果 repository 定义继承特殊的Repository，他是一个特殊的Spring Data模块
+
+2、如果实体注解了一个特殊的声明，它是一个特殊的spring Data模块，spring Data模块接收第三方的声明（例如：JPA's `@Entity`）或者提供来自 Spring Data MonggoDB/Spring Data Elasticsearch的 `@Document` 。
+
+- *例1 自定义特殊的Repository*
+
+  ```java
+  interface MyRepository extends JpaRepository<User, Long> { }
+  @NoRepositoryBean
+  interface MyBaseRepository<T, ID extends Serializable> extends JpaRepository<T, ID> {
+    …
+  }
+  interface UserRepository extends MyBaseRepository<User, Long> {
+    …
+  }
+  ```
+
+  `MyRepository` and `UserRepository` 继承于 `JpaRepository`在这个层级中是对Spring Data JPA 模块的合法替代
+
+- *例2 使用一般的接口定义Repository*
+
+  ```java
+  interface AmbiguousRepository extends Repository<User, Long> {
+   …
+  }
+  @NoRepositoryBean
+  interface MyBaseRepository<T, ID extends Serializable> extends CrudRepository<T, ID> {
+    …
+  }
+  interface AmbiguousUserRepository extends MyBaseRepository<User, Long> {
+    …
+  }
+  ```
+
+  `AmbiguousRepository`和`AmbiguousUserRepository` 仅继承于`Repository`和`CrudRepostory`在他们的层级。当它们使用一个spring data模块的时候是完美的，但是如果使用多模块spring data 是，spirng 无法区分每个Repository的范围。
+
+- *例3 使用实体类注解来定义Repository的使用范围*
+
+  ```java
+  interface PersonRepository extends Repository<Person, Long> {
+   …
+  }
+  @Entity
+  public class Person {
+    …
+  }
+  interface UserRepository extends Repository<User, Long> {
+   …
+  }
+  @Document
+  public class User {
+    …
+  }
+  ```
+
+  `Person`使用了`@Entity` 注解`PersonRepository`引用了它，所以这个仓库清晰的使用了Sping Data JPA。 `UserRepository`引用的`User` 声明了`@Document`表面这个仓库将使用Spring Data MongoDB 模块。
+
+- *例4 使用混合的注解来定义仓库*
+
+  ```java
+  interface JpaPersonRepository extends Repository<Person, Long> {
+   …
+  }
+  
+  interface MongoDBPersonRepository extends Repository<Person, Long> {
+   …
+  }
+  
+  @Entity   // 可用于JPA
+  @Document  // 可用于Mongodb
+  public class Person {
+    …
+  }
+  ```
+
+  这个例子中实体类`Person···使用了两种注解，表明这个实体类既可以用于`JpaPersonRepository`也可以用于`MongoDBPersonRepository ```，Spring Data不能确定仓库类型导致未定义的行为。
+
+  通过Repository继承或者使用注解都是为了确定使用那个Spring Data模块。使用多个注解到同一个实体来达到多类型的持久化技术，Spring Data不在限制只能绑定到一个Repostitory中。
+
+  最后一种方法来区分不同的仓库类型，使用包路径来判断。不同的包路径下的仓库使用不同的仓库类型，通过在配置类`configuration`中声明注解来实现，也可以通过xml配置来定义。
+
+- *例5 通过注解来实现不同包路径，使用不同的仓库*
+
+  ```java
+  @EnableJpaRepositories(basePackages = "com.acme.repositories.jpa")
+  @EnableMongoRepositories(basePackages = "com.acme.repositories.mongo")
+  interface Configuration { }
+  ```
+
+### 11.2.4 定义查询方法
+
+repository 代理有两种方法去查询。一种是根据方法名或者自定义查询，可用的选项取决于实际的商店。然而,根据相应的策略来决定实际SQL的创建，让我们看看选择项吧。
+
+#### 11.2.4.1 查询查找策略
+
+以下策略可供查询库基础设施来解决。您可以配置策略名称空间通过 `query-lookup-strategy`属性的XML配置或通过`queryLookupStrategy`启用的属性`${store}`库注释的Java配置。一些策略可能不支持特定的数据存储。
+
+- `create` 试图构建一个能找到查询的查询方法名称。 通常的做法是把给定的一组注明前缀的方法名和解析的方法。
+- `USE_DECLARED_QUERY`试图找到一个声明查询并将抛出一个异常情况。查询可以定义注释上。
+- `CREATE_IF_NOT_FOUND`(默认)结合`CREATE`和`USE_DECLARED_QUERY`。 看起来一个声明查询第一,如果没有声明查询发现,它创建一个定制的基于名称的查询方法。这是默认查找策略,因此如果你不使用任何显式配置。 它允许快速查询定义的方法名,还custom-tuning这些查询通过引入需要查询。
+
+#### 11.2.4.2 创建查询
+
+query builder机制内置为构建约束查询库的实体。 带前缀的机制`findXXBy`,`readAXXBy`,`queryXXBy`,`countXXBy`, `getXXBy`自动解析的其余部分。进一步引入子句可以包含表达式等`Distinct`设置不同的条件创建查询。 然而,第一个`By`作为分隔符来表示实际的标准的开始。 在一个非常基础的查询,可以定义条件`And`或者`Or`。
+
+- *例1 根据方法名创建查询*
+
+  ```java
+  public interface PersonRepository extends Repository<User, Long> {
+  
+    List<Person> findByEmailAddressAndLastname(EmailAddress emailAddress, String lastname);
+  
+    // Enables the distinct flag for the query
+    List<Person> findDistinctPeopleByLastnameOrFirstname(String lastname, String firstname);
+    List<Person> findPeopleDistinctByLastnameOrFirstname(String lastname, String firstname);
+  
+    // Enabling ignoring case for an individual property
+    List<Person> findByLastnameIgnoreCase(String lastname);
+    // Enabling ignoring case for all suitable properties
+    List<Person> findByLastnameAndFirstnameAllIgnoreCase(String lastname, String firstname);
+  
+    // Enabling static ORDER BY for a query
+    List<Person> findByLastnameOrderByFirstnameAsc(String lastname);
+    List<Person> findByLastnameOrderByFirstnameDesc(String lastname);
+  }
+  ```
+
+实际结果的解析方法取决于你的持久性存储创建查询。-然而,也有一些一般要注意的事情。
+
+- 遍历表达式通常结合运算符连接。您可以把表达式`And`和`Or`,`Between`,`LessThan`(不超过) , `GreaterThan`,`Like`等运算符，这些操作对不同的数据库可能有所不同，具体参考各参考文档
+- 方法解析支持设置`IgnoreCase`在属性上面（如，`findByLastnameIgnoreCase(…)`),或者支持查询所有属性忽略大小写（如，`findByLastnameAndFirstnameAllIgnoreCase(…)`), 忽略大小写支持所有的数据库，其它的查询参考相关文档
+- 您可以应用静态排序通过附加一个`OrderBy`基准进行排序,引用属性和方向提供了一个排序(`asc`或 `Desc`)。 创建一个支持动态排序的查询方法,明白了特殊参数处理 。
+
+#### 11.2.4.3 属性表达式
+
+属性表达式只能引用的直接财产管理的实体,如前面的示例所示。 在创建查询时你已经确保解析房地产管理的域类的一个属性。 然而,您还可以定义约束通过遍历嵌套属性。 假设一个`Person`有一个`Address`与一个`Zipcode`。 在这种情况下一个方法的名称
+
+```java
+List<Person> findByAddressZipCode(ZipCode zipCode);
+```
+
+创建属性遍历`x.address.zipCode`。方法执行首先解释整个部分(`AddressZipCode`)作为财产和检查的域类属性的名称(小写形式)。 分割源在驼峰式大小写部分从右侧头部和尾巴,试图找到对应的属性,在我们的例子中,分割为`AddressZip`和`Code`。 分裂不匹配,该算法分割点移动到左(`Address`, `Zipcode`)然后继续,
+
+在大多数情况下，这种算法有可能会出现错误，您可以使用来解决这种模糊性 _ 在方法名来手动定义遍历点。所以我们的方法名称最终将像这样:
+
+```java
+List<Person> findByAddress_ZipCode(ZipCode zipCode);
+```
+
+如果你的属性名称包含下划线(如。 first_name 中下划线),建议使用驼峰的方式来避免。
+
+#### 11.2.4.4 特殊参数处理
+
+处理参数查询只需方法参数定义为已经在上面的例子中。 除了基础查询将会认识到某些特定类型`Pageable`和`Sort`应用动态查询分页和排序
+
+- *使用 `Pageable`, `Slice` 和 `Sort`来查询*
+
+  ```java
+  Page<User> findByLastname(String lastname, Pageable pageable);
+  
+  Slice<User> findByLastname(String lastname, Pageable pageable);
+  
+  List<User> findByLastname(String lastname, Sort sort);
+  
+  List<User> findByLastname(String lastname, Pageable pageable);
+  ```
+
+第一个方法允许在你的查询方法的静态定义查询中通过一个`org.springframework.data.domain.Pageable`实例来动态的添加分页。分页类知道元素的总数和可用页数。它通过基础库来触发一个统计查询计算所有的总数。由于这个查询可能对store消耗巨大，可以使用Slice来替代。Slice仅仅知道是否有下一个Slice可用，这对查询大数据已经足够了。
+
+排序选项和分页的处理方式一样。如果你需要排序，简单的添加一个`org.springframework.data.domain.Sort`参数到你的方法即可。也正如你所见，简单的返回一个列表也是可以的，在这种情况下，生产的分页实例所需的附加元数据将不会被创建(这也意味着额外的计数查询可能需要但不一定被公布)。
+
+> 要找到在你的查询中有多少页，你需要触发一个额外的计数查询。按照默认来说这个查询可以从你实际触发查询中衍生出来
+
+#### 11.2.4.5 限制查询结果
+
+查询方法的结果可以通过关键字first或者top来限制,它们可以交替使用。在top/firest后添加数字来表示返回最大的结果数。如果没有数字，则默认假定1作为结果大小。
+
+- *用`Top`和`First`查询限制结果大小*
+
+  ```java
+  User findFirstByOrderByLastnameAsc();
+  
+  User findTopByOrderByAgeDesc();
+  
+  Page<User> queryFirst10ByLastname(String lastname, Pageable pageable);
+  
+  Slice<User> findTop3ByLastname(String lastname, Pageable pageable);
+  
+  List<User> findFirst10ByLastname(String lastname, Sort sort);
+  
+  List<User> findTop10ByLastname(String lastname, Pageable pageable);
+  ```
+
+限制表达式也支持Distinct关键字。对于限制查询的结果集定义到一个实例中包装这个结果到一个Optional中也是被支持的。
+
+如果分页或者切片被应用到一个限制查询分页(计算多少页可用)则它也能应用于限制结果。
+
+> 要注意结合通过Sort参数动态排序的限制结果容许表达查询的方法为“K”最小的，以及“K”最大的元素。
+
+#### 11.2.4.6 流查询结果
+
+查询方法能对以JAVA 8的Stream为返回的结果进行逐步处理。而不是简单地包装查询结果在被用来执行流的流数据存储特定的方法。
+
+- *以JAVA 8的Stream来进行查询的流处理结果*
+
+  ```java
+   @Query("select u from User u")
+  
+   Stream<User> findAllByCustomQueryAndStream();
+  
+   Stream<User> readAllByFirstnameNotNull();
+  
+   @Query("select u from User u")
+  
+   Stream<User> streamAllPaged(Pageable pageable);
+  ```
+
+一个数据流可能包裹底层数据存储特定资源，因此在使用后必须关闭。 你也可以使用close()方法或者`JAVA 7 try-with-resources`区块手动关闭数据流
+
+#### 11.2.4.7 异步查询结果
+
+```java
+@Async
+Future<User> findByFirstname(String firstname); //使用 java.util.concurrent.Future 作为返回类型 
+
+@Async
+CompletableFuture<User> findOneByFirstname(String firstname);//使用 Java 8 java.util.concurrent.CompletableFuture 作为返回类型
+
+@Async
+ListenableFuture<User> findOneByLastname(String lastname);// 使用 org.springframework.util.concurrent.ListenableFuture 作为返回类型
+```
+
+### 11.2.5 创建repository实例
+
+在这个部分，你创建实例和为repository接口定义的bean。这样做的一个方法是使用Spring的名称空间，这是与每个Spring Data模块，支持存储机制，虽然我们一般建议使用JAVA配置风格的配置。
+
+#### 11.2.5.1 配置
+
+一个Java配置的类使用`@Enable${store}Repositories`注解来触发repository框架。
+
+- *基于repository配置的注解示例*
+
+  ```java
+  @Configuration
+  @EnableJpaRepositories("com.acme.repositories")
+  class ApplicationConfiguration {
+  
+    @Bean
+    EntityManagerFactory entityManagerFactory() {
+      // …
+    }
+  }
+  ```
+
+  该示例使用特定于JPA的注解，您可以根据实际使用的store模块做相应改变。这同样适用于`EntityManagerFactory`bean的定义。请参阅有关store特定配置的章节。
+
+  **可以通过@Autowired来注入。**
+
+#### 11.2.5.2 独立使用
+
+还可以使用Spring容器之外的repository基础架构，例如CDI环境。你仍然需要在classpath中添加一些Spring库，但是通常来说你可以在代码中设置repositories。 提供repository支持的Spring Data模块提供了一个RepositoryFactory（持久化的技术特定），使用如下所示。
+
+- *例1 repository工厂的独立使用*
+
+  ```java
+  RepositoryFactorySupport factory = … // Instantiate factory here
+  UserRepository repository = factory.getRepository(UserRepository.class);
+  ```
+
+### 11.2.6 Spring Data repository的自定义实现
+
+[原文](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
+
+### 11.2.7 从聚合根处发布事件
+
+[原文](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
+
+### 11.2.8 Spring Data 的拓展
+
+[原文](
