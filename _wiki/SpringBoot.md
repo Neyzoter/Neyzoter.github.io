@@ -23,6 +23,7 @@ keywords: SpringBoot
 - @RequestMapping
 - @PathVariable
 - @ResponseBody
+- @ComponentScan
 
 ## 2.2 声明Bean的注解
 
@@ -30,10 +31,18 @@ keywords: SpringBoot
 在Spring Boot中就依靠注解，Spring提供了多个注解来声明Bean为Spring容器管理的Bean，注解不同代表的含义不同，但是对Spring容器来说都是Spring管理的Bean
 
 - @Component 没有明确角色的组件
+
 - @Service 在业务逻辑层（Service层）使用
+
+  Bean通过注解@Service声明为一个Spring容器管理的Bean,Spring容器会扫描classpath路径下的所有类，找到带有@Service注解的Impl类,并根据Spring注解对其进行初始化和增强
+
 - @Repositpry 在数据访问层（dao层）使用
+
 - @Controller 用于标注控制层组件
+
 - @RestController
+
+  
 
 ## 2.3 注册bean的方法
 
@@ -178,6 +187,8 @@ public class RedisApplicationTest {
 @SpringBootApplication(exclude={DataSourceAutoConfiguration.class})
 ```
 
+
+
 ## 2.6 @Autowired
 
 
@@ -317,3 +328,9 @@ public class TextEditor {
 ## 2.8 @RestController
 
 声明一个REST规则的controller。
+
+## 2.9 @ComponentScan
+
+对Application类添加@ComponentScan来指定扫描的包，但是一旦指定后，就不会再默认扫描Application类下的包
+
+**补充**：Bean要放在Application类目录之下，不然无法扫描到，进而无法依赖注入
