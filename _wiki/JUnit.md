@@ -780,3 +780,576 @@ in after
 in after class
 ```
 
+## 2.7 套件测试
+
+测试套件意味着捆绑几个单元测试用例并且一起执行他们。在 JUnit 中，@RunWith 和 @Suite 注释用来运行套件测试。
+
+**创建一个类**
+
+```java
+/*
+* This class prints the given message on console.
+*/
+public class MessageUtil {
+
+   private String message;
+
+   //Constructor
+   //@param message to be printed
+   public MessageUtil(String message){
+      this.message = message; 
+   }
+
+   // prints the message
+   public String printMessage(){
+      System.out.println(message);
+      return message;
+   }   
+
+   // add "Hi!" to the message
+   public String salutationMessage(){
+      message = "Hi!" + message;
+      System.out.println(message);
+      return message;
+   }   
+}  
+```
+
+**Test Case类**
+
+```java
+//第一个测试类
+import org.junit.Test;
+import org.junit.Ignore;
+import static org.junit.Assert.assertEquals;
+
+public class TestJunit1 {
+
+   String message = "Robert";   
+   MessageUtil messageUtil = new MessageUtil(message);
+
+   @Test
+   public void testPrintMessage() { 
+      System.out.println("Inside testPrintMessage()");    
+      assertEquals(message, messageUtil.printMessage());     
+   }
+}
+```
+
+```java
+//第二个测试类
+import org.junit.Test;
+import org.junit.Ignore;
+import static org.junit.Assert.assertEquals;
+
+public class TestJunit2 {
+
+   String message = "Robert";   
+   MessageUtil messageUtil = new MessageUtil(message);
+
+   @Test
+   public void testSalutationMessage() {
+      System.out.println("Inside testSalutationMessage()");
+      message = "Hi!" + "Robert";
+      assertEquals(message,messageUtil.salutationMessage());
+   }
+}
+```
+
+**使用Test Suite类**
+
+- 创建一个 java 类。
+- 在类中附上 @RunWith(Suite.class) 注释。
+- 使用 @Suite.SuiteClasses 注释给 JUnit 测试类加上引用。
+
+```java
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+   TestJunit1.class,
+   TestJunit2.class
+})
+public class JunitTestSuite {   
+}  
+```
+
+**创建TestRunner类**
+
+```java
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
+
+public class TestRunner {
+   public static void main(String[] args) {
+      Result result = JUnitCore.runClasses(JunitTestSuite.class);
+      for (Failure failure : result.getFailures()) {
+         System.out.println(failure.toString());
+      }
+      System.out.println(result.wasSuccessful());
+   }
+}
+```
+
+输出
+
+```
+Inside testPrintMessage()
+Robert
+Inside testSalutationMessage()
+Hi Robert
+true
+```
+
+## 2.8 忽略测试
+
+* 一个含有 @Ignore 注释的测试方法将不会被执行。
+* 如果一个测试类有 @Ignore 注释，则它的测试方法将不会执行。
+
+## 2.9 时间测试
+
+Junit 提供了一个暂停的方便选项。如果一个测试用例比起指定的毫秒数花费了更多的时间，那么 Junit 将自动将它标记为失败。timeout 参数和 @Test 注释一起使用。
+
+**创建一个类**
+
+```java
+/*
+* This class prints the given message on console.
+*/
+public class MessageUtil {
+
+   private String message;
+
+   //Constructor
+   //@param message to be printed
+   public MessageUtil(String message){
+      this.message = message; 
+   }
+
+   // prints the message
+    // while循环，用于测试是否超时
+   public void printMessage(){
+      System.out.println(message);
+      while(true);
+   }   
+
+   // add "Hi!" to the message
+   public String salutationMessage(){
+      message = "Hi!" + message;
+      System.out.println(message);
+      return message;
+   }   
+} 
+```
+
+**Test Case类**
+
+- 创建一个叫做 TestJunit.java 的 java 测试类。
+- 给 testPrintMessage() 测试用例添加 1000 的暂停时间。
+
+```java
+import org.junit.Test;
+import org.junit.Ignore;
+import static org.junit.Assert.assertEquals;
+
+public class TestJunit {
+
+   String message = "Robert";   
+   MessageUtil messageUtil = new MessageUtil(message);
+
+    //测试超时
+   @Test(timeout=1000)
+   public void testPrintMessage() { 
+      System.out.println("Inside testPrintMessage()");     
+      messageUtil.printMessage();     
+   }
+
+   @Test
+   public void testSalutationMessage() {
+      System.out.println("Inside testSalutationMessage()");
+      message = "Hi!" + "Robert";
+      assertEquals(message,messageUtil.salutationMessage());
+   }
+}
+```
+
+**Test Runner类**
+
+```java
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
+
+public class TestRunner {
+   public static void main(String[] args) {
+      Result result = JUnitCore.runClasses(TestJunit.class);
+      for (Failure failure : result.getFailures()) {
+         System.out.println(failure.toString());
+      }
+      System.out.println(result.wasSuccessful());
+   }
+} 
+```
+
+输出
+
+```
+Inside testPrintMessage()
+Robert
+Inside testSalutationMessage()
+Hi!Robert
+testPrintMessage(TestJunit): test timed out after 1000 milliseconds
+false
+```
+
+## 2.10 异常测试
+
+Junit 用代码处理提供了一个追踪异常的选项。你可以测试代码是否它抛出了想要得到的异常。expected 参数和 @Test 注释一起使用。
+
+**创建一个类**
+
+```java
+/*
+* This class prints the given message on console.
+*/
+public class MessageUtil {
+
+   private String message;
+
+   //Constructor
+   //@param message to be printed
+   public MessageUtil(String message){
+      this.message = message; 
+   }
+
+   // prints the message
+    // 1/0出错，用于测试
+   public void printMessage(){
+      System.out.println(message);
+      int a =0;
+      int b = 1/a;
+   }   
+
+   // add "Hi!" to the message
+   public String salutationMessage(){
+      message = "Hi!" + message;
+      System.out.println(message);
+      return message;
+   }   
+}  
+```
+
+**创建Test Case类**
+
+- 创建一个叫做 TestJunit.java 的 java 测试类。
+- 给 testPrintMessage() 测试用例添加需要的异常 ArithmeticException。
+
+```java
+import org.junit.Test;
+import org.junit.Ignore;
+import static org.junit.Assert.assertEquals;
+
+public class TestJunit {
+
+   String message = "Robert";   
+   MessageUtil messageUtil = new MessageUtil(message);
+
+    //测试有异常ArithmeticException？
+    //期望有该异常抛出
+   @Test(expected = ArithmeticException.class)
+   public void testPrintMessage() { 
+      System.out.println("Inside testPrintMessage()");     
+      messageUtil.printMessage();     
+   }
+
+   @Test
+   public void testSalutationMessage() {
+      System.out.println("Inside testSalutationMessage()");
+      message = "Hi!" + "Robert";
+      assertEquals(message,messageUtil.salutationMessage());
+   }
+}
+```
+
+**Test Runner类**
+
+```java
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
+
+public class TestRunner {
+   public static void main(String[] args) {
+      Result result = JUnitCore.runClasses(TestJunit.class);
+      for (Failure failure : result.getFailures()) {
+         System.out.println(failure.toString());
+      }
+      System.out.println(result.wasSuccessful());
+   }
+}
+```
+
+## 2.11 参数化测试
+
+Junit 4 引入了一个新的功能参数化测试。参数化测试允许开发人员使用不同的值反复运行同一个测试。你将遵循 5 个步骤来创建参数化测试。
+
+- 用 @RunWith(Parameterized.class) 来注释 test 类。
+- 创建一个由 @Parameters 注释的公共的静态方法，它返回一个对象的集合(数组)来作为测试数据集合。
+- 创建一个公共的构造函数，它接受和一行测试数据相等同的东西。
+- 为每一列测试数据创建一个实例变量。
+- 用实例变量作为测试数据的来源来创建你的测试用例。
+
+**创建一个类**
+
+```java
+public class PrimeNumberChecker {
+   public Boolean validate(final Integer primeNumber) {
+      for (int i = 2; i < (primeNumber / 2); i++) {
+         if (primeNumber % i == 0) {
+            return false;
+         }
+      }
+      return true;
+   }
+}
+```
+
+**创建 Parameterized Test Case 类**
+
+```java
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
+
+// 需要以 @RunWith(Parameterized.class) 来注释 test 类
+@RunWith(Parameterized.class)
+public class PrimeNumberCheckerTest {
+   private Integer inputNumber;
+   private Boolean expectedResult;
+   private PrimeNumberChecker primeNumberChecker;
+
+    //要测试的对象
+   @Before
+   public void initialize() {
+      primeNumberChecker = new PrimeNumberChecker();
+   }
+
+   // Each parameter should be placed as an argument here
+   // Every time runner triggers, it will pass the arguments
+   // from parameters we defined in primeNumbers() method
+   public PrimeNumberCheckerTest(Integer inputNumber, 
+      Boolean expectedResult) {
+      this.inputNumber = inputNumber;
+      this.expectedResult = expectedResult;
+   }
+	
+    // 为测试提供数多个数值
+   @Parameterized.Parameters
+   public static Collection primeNumbers() {
+      return Arrays.asList(new Object[][] {
+         { 2, true },
+         { 6, false },
+         { 19, true },
+         { 22, false },
+         { 23, true }
+      });
+   }
+
+   // This test will run 4 times since we have 5 parameters defined
+   @Test
+   public void testPrimeNumberChecker() {
+      System.out.println("Parameterized Number is : " + inputNumber);
+      assertEquals(expectedResult, 
+      primeNumberChecker.validate(inputNumber));
+   }
+}
+```
+
+**TestRunner类**
+
+```java
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
+
+public class TestRunner {
+   public static void main(String[] args) {
+      Result result = JUnitCore.runClasses(PrimeNumberCheckerTest.class);
+      for (Failure failure : result.getFailures()) {
+         System.out.println(failure.toString());
+      }
+      System.out.println(result.wasSuccessful());
+   }
+}
+```
+
+输出
+
+```
+Parameterized Number is : 2
+Parameterized Number is : 6
+Parameterized Number is : 19
+Parameterized Number is : 22
+Parameterized Number is : 23
+true
+```
+
+### 2.12 ANT插件运行JUnit
+
+https://www.w3cschool.cn/junit/mkvf1hvg.html
+
+## 2.13 框架拓展
+
+JUnit拓展包括：
+
+- Cactus
+- JWebUnit
+- XMLUnit
+- MockObject
+
+### 2.13.1 Cactus
+
+Cactus 是一个简单框架用来测试服务器端的 Java 代码（Servlets, EJBs, Tag Libs, Filters）。Cactus 的设计意图是用来减小为服务器端代码写测试样例的成本。它使用 JUnit 并且在此基础上进行扩展。Cactus 实现了 in-container 的策略，意味着可以在容器内部执行测试。
+
+Cactus 系统由以下几个部分组成：
+
+- **Cactus Framework（Cactus 框架）** 是 Cactus 的核心。它是提供 API 写 Cactus 测试代码的引擎。
+- **Cactus Integration Modules（Cactus 集成模块）** 它是提供使用 Cactus Framework（Ant scripts, Eclipse plugin, Maven plugin）的前端和框架。
+
+这是使用 cactus 的样例代码。
+
+```java
+import org.apache.cactus.*;
+import junit.framework.*;
+
+public class TestSampleServlet extends ServletTestCase {
+   @Test
+   public void testServlet() {
+      // Initialize class to test
+      SampleServlet servlet = new SampleServlet();
+
+      // Set a variable in session as the doSomething()
+      // method that we are testing 
+      session.setAttribute("name", "value");
+
+      // Call the method to test, passing an 
+      // HttpServletRequest object (for example)
+      String result = servlet.doSomething(request);
+
+      // Perform verification that test was successful
+      assertEquals("something", result);
+      assertEquals("otherValue", session.getAttribute("otherName"));
+   }
+}
+```
+
+### 2.13.2 JWebUnit
+
+JWebUnit 是一个基于 Java 的用于 web 应用的测试框架。它以一种统一、简单测试接口的方式包装了如 HtmlUnit 和 Selenium 这些已经存在的框架来允许你快速地测试 web 应用程序的正确性。
+
+JWebUnit 提供了一种高级别的 Java API 用来处理结合了一系列验证程序正确性的断言的 web 应用程序。这包括通过链接，表单的填写和提交，表格内容的验证和其他 web 应用程序典型的业务特征。
+
+这个简单的导航方法和随时可用的断言允许建立更多的快速测试而不是仅仅使用 JUnit 和 HtmlUnit。另外如果你想从 HtmlUnit 切换到其它的插件，例如 Selenium(很快可以使用)，那么不用重写你的测试样例代码。
+
+以下是样例代码。
+
+```java
+import junit.framework.TestCase;
+import net.sourceforge.jwebunit.WebTester;
+
+public class ExampleWebTestCase extends TestCase {
+   private WebTester tester;
+
+   public ExampleWebTestCase(String name) {
+        super(name);
+        tester = new WebTester();
+   }
+   //set base url
+   public void setUp() throws Exception {
+       getTestContext().setBaseUrl("http://myserver:8080/myapp");
+   }
+   // test base info
+   @Test
+   public void testInfoPage() {
+       beginAt("/info.html");
+   }
+}
+```
+
+### 2.13.3 XMLUnit
+
+XMLUnit 提供了一个单一的 JUnit 扩展类，即 XMLTestCase，还有一些允许断言的支持类：
+
+- 比较两个 XML 文件的不同（通过使用 Diff 和 DetailedDiff 类）
+- 一个 XML 文件的验证（通过使用 Validator 类）
+- 使用 XSLT 转换一个 XML 文件的结果（通过使用 Transform 类）
+- 对一个 XML 文件 XPath 表达式的评估（通过实现 XpathEngine 接口）
+- 一个 XML 文件进行 DOM Traversal 后的独立结点（通过使用 NodeTest 类）
+
+我们假设有两个我们想要比较和断言它们相同的 XML 文件，我们可以写一个如下的简单测试类：
+
+```java
+import org.custommonkey.xmlunit.XMLTestCase;
+
+public class MyXMLTestCase extends XMLTestCase {
+
+   // this test method compare two pieces of the XML
+   @Test
+   public void testForXMLEquality() throws Exception {
+      String myControlXML = "<msg><uuid>0x00435A8C</uuid></msg>";
+      String myTestXML = "<msg><localId>2376</localId></msg>";
+      assertXMLEqual("Comparing test xml to control xml",
+      myControlXML, myTestXML);
+   }
+}
+```
+
+### 2.13.4 MockObject
+
+在一个单元测试中，虚拟对象可以模拟复杂的，真实的（非虚拟）对象的行为，因此当一个真实对象不现实或不可能包含进一个单元测试的时候非常有用。
+
+用虚拟对象进行测试时一般的编程风格包括：
+
+- 创建虚拟对象的实例
+- 在虚拟对象中设置状态和描述
+- 结合虚拟对象调用域代码作为参数
+- 在虚拟对象中验证一致性
+
+以下是使用 Jmock 的 MockObject 例子。
+
+```java
+import org.jmock.Mockery;
+import org.jmock.Expectations;
+
+class PubTest extends TestCase {
+   Mockery context = new Mockery();
+   public void testSubReceivesMessage() {
+      // set up
+      final Sub sub = context.mock(Sub.class);
+
+      Pub pub = new Pub();
+      pub.add(sub);
+
+      final String message = "message";
+
+      // expectations
+      context.checking(new Expectations() {
+         oneOf (sub).receive(message);
+      });
+
+      // execute
+      pub.publish(message);
+
+      // verify
+      context.assertIsSatisfied();
+   }
+}
+```
+
