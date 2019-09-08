@@ -310,12 +310,11 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 #### 5.1.3.1 概念
 
 * **对分布式算法的理解？**:negative_squared_cross_mark:
-
-  1. ZooKeeper 的 [Zab](http://web.archive.org/web/20140602093727/http://www.stanford.edu/class/cs347/reading/zab.pdf), [Raft](https://ramcloud.stanford.edu/wiki/download/attachments/11370504/raft.pdf), 和 [Viewstamped Replication](http://pmg.csail.mit.edu/papers/vr-revisited.pdf)
-
-  2. Kafka 的ISR模型（来自微软的[PacificA](http://research.microsoft.com/apps/pubs/default.aspx?id=66814)）
-
-  3. Quorums
+1. ZooKeeper 的 [Zab](http://web.archive.org/web/20140602093727/http://www.stanford.edu/class/cs347/reading/zab.pdf), [Raft](https://ramcloud.stanford.edu/wiki/download/attachments/11370504/raft.pdf), 和 [Viewstamped Replication](http://pmg.csail.mit.edu/papers/vr-revisited.pdf)
+  
+2. Kafka 的ISR模型（来自微软的[PacificA](http://research.microsoft.com/apps/pubs/default.aspx?id=66814)）
+  
+3. Quorums
 
 - **EJB是什么？**
 
@@ -334,6 +333,44 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
   将原来在一个计算机上运算的几个类，分别放到其他计算机上去运行，以便分担运行这几个类所需要占用的CPU 和内存资源。同时，也可以将不同的软件功能模块放到不同的服务器上，当需要修改某些功能的时候直接修改这些服务器上的类就行了，修改以后所有客户端的软件都被修改了。
 
   <img src="/images/wiki/SomeNotes/EJB_Server_Clusters.jpeg" width="600" alt="数据立方体">
+
+### 5.1.4 安全
+
+#### 5.1.4.1 概念
+
+* **什么是token？**
+
+  Token是访问资源的凭证，例如当调用Google API时，需要带上有效token（Google提供，第一次获取时需要登录）来表明请求的合法性。
+
+  *补充：google token第一次获取过程*
+
+  1.向Google API注册一个应用，注册完毕后会拿到**认证信息**（credentials）包括ID和secret，不是所有的程序类型都有secret。
+
+  2.向Google请求`access token`，需要请求参数（上面申请到的secret）
+
+  3.如果用户授权完毕，Google返回`access token`和`refresh token`。
+
+  一旦`access token`过期，可以通过`refresh token`再次请求`access token`。
+
+* **什么是OAuth?**  :negative_squared_cross_mark:
+
+  
+
+* **什么是SSO？** :negative_squared_cross_mark:
+
+  单点登录（SSO, Single sign-on）即公司内部的**公用的用户体系**，用户只要登陆之后，就能够 **访问所有的系统**，如人力资源、代码管理、日志监控、预算申请。
+
+#### 5.1.4.2 技术
+
+* **数字证书的实现原理？**
+
+  [数字证书的实现原理和目的]([http://neyzoter.cn/2018/10/18/Https-Encryption/#24-%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D](http://neyzoter.cn/2018/10/18/Https-Encryption/#24-数字签名))
+
+* **MD5的实现原理？**
+
+  [MD5的实现原理](http://neyzoter.cn/2019/01/25/MD5-Verify/)
+
+  
 
 ## 5.2 前端技术
 

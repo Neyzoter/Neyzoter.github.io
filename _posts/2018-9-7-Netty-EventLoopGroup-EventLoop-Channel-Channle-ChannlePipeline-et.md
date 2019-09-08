@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 对Netty组件的理解（Channel、Pipeline、EventLoop等）
-categories: Java
+categories: Backend
 description: 我对于Netty的组件——Channel、Pipeline、EventLoop等的理解
 keywords: Java, Netty, Java框架
 ---

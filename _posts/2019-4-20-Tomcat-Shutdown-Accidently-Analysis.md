@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Tomcat意外停止的问题分析
-categories: Java
+categories: Backend
 description: Tomcat意外停止的问题分析
 keywords: Tomcat, ssh
 ---

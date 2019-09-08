@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Tomcat的server.xml配置文件分析
-categories: Java
+categories: Backend
 description: Tomcat的server.xml配置文件分析
 keywords: Tomcat, Web, Java
 ---
