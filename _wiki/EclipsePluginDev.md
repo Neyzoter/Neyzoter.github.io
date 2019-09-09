@@ -170,7 +170,7 @@ Combo控件由一个文本框和一个列表组合而成。
 
 ## 5.1 Composite
 
-Composite容器是SWT控件体系中最基础的容器类型，是其他所有容器类型的父类。Composite设计思想来自于设计模式中的[组合模式（Composite Pattern）](http://neyzoter.cn/wiki/DesignPattern/)。一个Composite容器中可以包含任意多的基本控件或子容器控件，父容器像处理基本控件一样对子容器发送各种消息。
+Composite容器是SWT控件体系中最基础的容器类型，是其他所有容器类型的父类。Composite设计思想来自于设计模式中的[组合模式（Composite Pattern）](http://neyzoter.cn/wiki/DesignPattern/#226-%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8Fcomposite--pattern)。一个Composite容器中可以包含任意多的基本控件或子容器控件，父容器像处理基本控件一样对子容器发送各种消息。
 
 不过Composite容器和基本控件一样，需要一个父控件，比如在Shell（父控件）中创建一个有边框的Composte。如下所示，
 
@@ -245,4 +245,46 @@ SWT中使用浏览器较为简单，浏览器实现了OLE技术。OLE（Object L
 SWT的事件监听采用了[观察者的设计模式（Observer Pattern）](http://neyzoter.cn/wiki/DesignPattern/#232-观察者模式observe-pattern)。事件发送者声明监听器接口，对事件感兴趣的各方实现此接口并将监听器注册到事件的发送者上。
 
 <img src="/images/wiki/EclipsePluginDev/Observe_Process.png" width="700" alt="Observer模式类图">
+
+SWT中，Listerner接口扮演了观察者接口的角色，而所有窗口组件的父类——Widget类则是事件源。
+
+## 8.2 常用事件
+
+### 8.2.1 鼠标事件
+
+当用户在某个控件的范围内操作鼠标（移动鼠标指针、单击按键等）时，就会产生鼠标事件，它的上下文是通过MouseEvent类传递到监听器的。
+
+### 8.2.2 键盘事件
+
+当用户按键盘时，处于活动状态的组件会接收到一个键盘事件。
+
+### 8.2.3 Paint事件
+
+当控件需要被重新绘制时，会送出该事件。
+
+### 8.2.4 应用案例
+
+## 8.3 JFace事件处理
+
+### 8.3.1 操作（Action）与贡献（Contribution）
+
+操作是JFace在SWT在事件监听框架基础上，对UI操作方法做出的更高一层的封装。使用操作，可以将一系列用户自定义的命令封装成一个对象。JFace将一系列用户自定义的命令封装成一个对象，开发者可以将操作关联到界面的一个或者多个组件上，当用户操作其中某个组件时，操作中所包含的命令就会被执行。
+
+直接监听SWT事件和使用操作的对比：
+
+<img src="/images/wiki/EclipsePluginDev/Direction_Listen_and_Point_Listen.png" width="700" alt="直接监听SWT事件和使用操作的对比">
+
+操作中除了封装用户操作外，还包含它本身应该如何显示在界面上的信息，如图像、文字、工具提示等，贡献负责将操作和具体的SWT组件（ToolItem、MenuItem等）关联起来。
+
+贡献分为两部分，贡献项目（ContributionItem）和贡献管理器（ContributionManager）。贡献项目关联着操作，而贡献管理器则包装了工具栏、菜单等可以放置操作的控件。当开发者讲一个贡献项目添加到贡献管理器上时，贡献管理器会从贡献项目中取出对应的操作的显示信息，并生成一个新的组件（工具栏按钮、菜单项等）显示在界面上。
+
+<img src="/images/wiki/EclipsePluginDev/ContributionItemAndManager.png" width="700" alt="贡献项目和贡献管理器">
+
+
+
+### 8.3.2 创建操作
+
+所有JFace操作都要实现`org.eclipse.jface.action.IAction`接口（**Artop使用**），这个接口规定了操作需要实现的一般方法，如运行用户操作、提供图片、文字信息等。
+
+<img src="/images/wiki/EclipsePluginDev/Action_Inherit.png" width="700" alt="操作的继承结构">
 

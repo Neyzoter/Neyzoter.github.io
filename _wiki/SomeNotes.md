@@ -400,7 +400,21 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
   * 方法2，通过注解
 
-    
+### 5.3.2  设计模式
+
+* **如何实现观察者设计模式？**
+
+  1.创建观察列表
+
+  2.主题的`notifyAllObserver()`实现为列表中每个观察者发送改变后的状态信息
+
+  3.主题的set方法（即改变某一个状态）中包括`notifyAllObserver()`函数
+
+  [观察者设计模式](http://neyzoter.cn/wiki/DesignPattern/#232-%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8Fobserve-pattern)
+
+* **你所使用过的设计模式？**
+
+  http://neyzoter.cn/wiki/DesignPattern/
 
 # 6.数据结构 
 
@@ -441,17 +455,9 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
   list.add(子类)
   ```
 
-  具体应用见[观察者设计模式](http://neyzoter.cn/wiki/DesignPattern/#232-观察者模式observe-pattern)
+  具体应用见[观察者设计模式](http://neyzoter.cn/wiki/DesignPattern/#232-%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8Fobserve-pattern)
 
-* **如何实现观察者设计模式？**
-
-  1.创建观察列表
-
-  2.主题的`notifyAllObserver()`实现为列表中每个观察者发送改变后的状态信息
-
-  3.主题的set方法（即改变某一个状态）中包括`notifyAllObserver()`函数
-
-  [观察者设计模式](http://neyzoter.cn/wiki/DesignPattern/#232-观察者模式observe-pattern)
+* 
 
 ## 8.2 Python
 
