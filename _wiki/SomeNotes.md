@@ -432,6 +432,27 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
   2.父类转化为子类时，父类必须是某个子类的引用，如Frui引用Oringe，可以转化为Oringe，但不能转化为Apple。
 
+* **Java是否可以在List中放同一父类的不同子类？**
+
+  可以。实现方式为：
+
+  ```java
+  List<父类> list = ....
+  list.add(子类)
+  ```
+
+  具体应用见[观察者设计模式](http://neyzoter.cn/wiki/DesignPattern/#232-观察者模式observe-pattern)
+
+* **如何实现观察者设计模式？**
+
+  1.创建观察列表
+
+  2.主题的`notifyAllObserver()`实现为列表中每个观察者发送改变后的状态信息
+
+  3.主题的set方法（即改变某一个状态）中包括`notifyAllObserver()`函数
+
+  [观察者设计模式](http://neyzoter.cn/wiki/DesignPattern/#232-观察者模式observe-pattern)
+
 ## 8.2 Python
 
 

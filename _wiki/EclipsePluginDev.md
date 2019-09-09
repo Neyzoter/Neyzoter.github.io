@@ -242,4 +242,7 @@ SWT中使用浏览器较为简单，浏览器实现了OLE技术。OLE（Object L
 
 ## 8.1SWT的事件处理
 
-SWT的事件监听采用了观察者的设计模式（Observer Pattern）。
+SWT的事件监听采用了[观察者的设计模式（Observer Pattern）](http://neyzoter.cn/wiki/DesignPattern/#232-观察者模式observe-pattern)。事件发送者声明监听器接口，对事件感兴趣的各方实现此接口并将监听器注册到事件的发送者上。
+
+<img src="/images/wiki/EclipsePluginDev/Observe_Process.png" width="700" alt="Observer模式类图">
+
