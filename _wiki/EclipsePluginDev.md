@@ -164,5 +164,82 @@ Combo控件由一个文本框和一个列表组合而成。
 
 ## 4.10 对话框
 
+# 5.容器与布局管理器
+
+未完待续，具体说明见《Eclipse插件开发学习笔记》
+
+## 5.1 Composite
+
+Composite容器是SWT控件体系中最基础的容器类型，是其他所有容器类型的父类。Composite设计思想来自于设计模式中的[组合模式（Composite Pattern）](http://neyzoter.cn/wiki/DesignPattern/)。一个Composite容器中可以包含任意多的基本控件或子容器控件，父容器像处理基本控件一样对子容器发送各种消息。
+
+不过Composite容器和基本控件一样，需要一个父控件，比如在Shell（父控件）中创建一个有边框的Composte。如下所示，
+
+<img src="/images/wiki/EclipsePluginDev/Shell_Constains_Composite.png" width="700" alt="有边框的Composite">
+
+## 5.2 Group
+
+Group容器是Composite容器的子类，直接继承自Composite容器，为包含在其中的控件提供了默认的边框，并且可以支持在边框左上方显示一行文字表弟。
+
+<img src="/images/wiki/EclipsePluginDev/Group_Create.png" width="700" alt="Group控件创建">
+
+## 5.3 Shell
+
+无论是Composite和Group，都创建在一个父容器里面，而Shell是一个不需要父容器的顶层容器。
+
+## 5.4 容器上下文菜单设置
+
+容器上下文菜单（Context Menu）是指在容器上单击鼠标右键时弹出的菜单，包含于当前位置最相关的操作选项。
+
+## 5.5 容器颜色、背景和鼠标指针设置
+
+和基本控件一样，对容器的背景色的设置是通过setBackgroud函数完成的，而setBackgroudImage将一张图片设置为容器的背景。
+
+## 5.6 布局管理概述
+
+布局管理（Layout Management）负责在容器的尺寸发生变化时，按照布局重新设置其中的子控件的位置和尺寸。
+
+# 6.界面开发工具
+
+未完待续，具体说明见《Eclipse插件开发学习笔记》
+
+## 6.1 安装Visual Editor
+
+Visual Editor是一种可视化界面设计工具。
+
+## 6.2 使用Visual Editor
 
 
+
+## 6.3 其他工具介绍
+
+# 7.高级控件使用
+
+未完待续，具体说明见《Eclipse插件开发学习笔记》
+
+## 7.1 列表、表格和树
+
+列表、表格和树等高级控件显示复杂的结构化数据类型。JFace为高级控件提供了查看器（Viewer），简化使用高级控件，主要包括JFace列表查看器、JFace表格查看器、JFace树查看器等。
+
+## 7.2 文本编辑器
+
+StyledText控件实现了为不同的文字使用不同的属性的功能，而Text控件无法做到。
+
+## 7.3 滚动条、Scrollable、ScrolledComposite和滑动条
+
+## 7.4 进度条与进度指示器
+
+进度条可以用来动态显示工作进度，进度条无法接受用户键盘或者鼠标的输入。
+
+进度指示器（ProgressIndication）是JFace以ProgressBar为基础编写的控件，克服了进度条控件的一些缺陷，如创建以后无法改变状态等，并重新包装了接口。
+
+## 7.5 浏览器与OLE
+
+SWT中使用浏览器较为简单，浏览器实现了OLE技术。OLE（Object Linking & Embedding，对象链接与嵌入）是微软制定的一种用于创建符合文档的协议，任何遵循该协议的程序所产生的对象都可以被别的对象包含，并在需要的时候调用原来的程序激活。如在一片word文档中嵌入了一个Excel表格，在双击该表格时，可以打开Excel程序编辑它。
+
+# 8.SWT/JFace的事件处理
+
+未完待续，具体说明见《Eclipse插件开发学习笔记》
+
+## 8.1SWT的事件处理
+
+SWT的事件监听采用了观察者的设计模式（Observer Pattern）。

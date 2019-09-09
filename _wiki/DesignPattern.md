@@ -8,9 +8,36 @@ keywords: 设计模式
 
 # 1、设计模式简介
 
+```
+Gang of Four
+(
+GoF
+)
+```
+
+的分类将设计模式分类为 23 种经典的模式，根据用途我们又可以分为三大类，分别为创建型模式、结构型模式和行为型模式。
+
+**重要的设计模式**
+
+1.面向接口编程，而不是面向实现。这个很重要，也是优雅的、可扩展的代码的第一步，这就不需要多说了吧。
+
+2.职责单一原则。每个类都应该只有一个单一的功能，并且该功能应该由这个类完全封装起来。
+
+3.对修改关闭，对扩展开放。对修改关闭是说，我们辛辛苦苦加班写出来的代码，该实现的功能和该修复的 bug 都完成了，别人可不能说改就改；对扩展开放就比较好理解了，也就是说在我们写好的代码基础上，很容易实现扩展。
+
 # 2、设计模式类型
 
-## 2.1 单例模式（Singleton Pattern）
+## 2.1 创建者模式
+
+### 2.1.1 简单工厂模式
+
+### 2.1.2 工厂模式
+
+### 2.1.3 抽象工厂模式
+
+### 2.1.4 单例模式（Singleton Pattern）
+
+**介绍**
 
 确保某一个类只有一个实例，而且自行实例化并向整个系统提供这个实例。
 
@@ -38,6 +65,180 @@ public class Singleton {
 ● 创建一个对象需要消耗的资源过多，如要访问 IO 和数据库等资源；
 
 ● 需要定义大量的静态常量和静态方法（如工具类）的环境，可以采用单例模式 （当然，也可以直接声明为 static 的方式）。
+
+### 2.1.5建造者模式
+
+### 2.1.6 原型模式
+
+### 2.1.7 创建型模式总结
+
+## 2.2 结构性模式
+
+### 2.2.1 代理模式
+
+### 2.2.2 适配器模式
+
+### 2.2.3 桥梁模式
+
+### 2.2.4 装饰模式
+
+### 2.2.5 门面模式
+
+### 2.2.6 组合模式（Composite  Pattern）
+
+**介绍**
+
+组合模式用于表示具有层次结构的数据，使得我们对单个对象和组合对象的访问具有一致性。例如，
+
+每个员工都有姓名、部门、薪水这些属性，同时还有下属员工集合（虽然可能集合为空），而下属员工和自己的结构是一样的，也有姓名、部门这些属性，同时也有他们的下属员工集合。
+
+```java
+public class Employee {
+   private String name;
+   private String dept;
+   private int salary;
+   private List<Employee> subordinates; // 下属，有可能是空的，即没有下属
+
+   public Employee(String name,String dept, int sal) {
+      this.name = name;
+      this.dept = dept;
+      this.salary = sal;
+      subordinates = new ArrayList<Employee>();
+   }
+
+   public void add(Employee e) {
+      subordinates.add(e);
+   }
+
+   public void remove(Employee e) {
+      subordinates.remove(e);
+   }
+
+   public List<Employee> getSubordinates(){
+     return subordinates;
+   }
+
+   public String toString(){
+      return ("Employee :[ Name : " + name + ", dept : " + dept + ", salary :" + salary+" ]");
+   }   
+}
+```
+
+**应用场景**
+
+●Eclipse界面开发SWT的容器父类，可以包含任意多的基本控件或者子容器控件。
+
+### 2.2.7 享元模式
+
+### 2.2.8 结构性模式总结
+
+## 2.3 行为型模式
+
+### 2.3.1 策略模式
+
+### 2.3.2 观察者模式（Observe Pattern）
+
+**介绍**
+
+观察者模式包括两个操作
+
+* 观察者订阅自己关心的主题
+* 主题有数据变化后通知观察者
+
+实现过程如下：
+
+*1.定义主题，每个主题持有观察者列表的引用，用在数据变更的时候通知各个观察者*
+
+```java
+// 主题
+public class Subject {
+	// 观察者列表
+    // Observer是一个接口，可以在此处存入多个Observer接口的应用类
+   private List<Observer> observers = new ArrayList<Observer>();
+   private int state;
+
+   public int getState() {
+      return state;
+   }
+
+   public void setState(int state) {
+      this.state = state;
+      // 数据已变更，通知观察者们
+      notifyAllObservers();
+   }
+
+   public void attach(Observer observer){
+      observers.add(observer);        
+   }
+
+   // 通知观察者们
+   public void notifyAllObservers(){
+      for (Observer observer : observers) {
+         observer.update();
+      }
+   }     
+}
+```
+
+*2.定义观察者接口*
+
+```java
+public abstract class Observer {
+   protected Subject subject;
+   public abstract void update();
+}
+```
+
+其实如果只有一个观察者类的话，接口都不用定义了，不过，通常场景下，既然用到了观察者模式，我们就是希望一个事件出来了，会有多个不同的类需要处理相应的信息。比如，订单修改成功事件，我们希望发短信的类得到通知、发邮件的类得到通知、处理物流信息的类得到通知等。
+
+*3.定义观察者类*
+
+下面定义2个观察者
+
+```java
+// Binary观察者
+public class BinaryObserver extends Observer {
+      // 在构造方法中进行订阅主题
+    public BinaryObserver(Subject subject) {
+        this.subject = subject;
+        // 通常在构造方法中将 this 发布出去的操作一定要小心
+        this.subject.attach(this);
+    }
+      // 该方法由主题类在数据变更的时候进行调用
+    @Override
+    public void update() {
+        String result = Integer.toBinaryString(subject.getState());
+        System.out.println("订阅的数据发生变化，新的数据处理为二进制值为：" + result);
+    }
+}
+// Hexa观察者
+public class HexaObserver extends Observer {
+
+    public HexaObserver(Subject subject) {
+        this.subject = subject;
+        this.subject.attach(this);
+    }
+
+    @Override
+    public void update() {
+          String result = Integer.toHexString(subject.getState()).toUpperCase();
+        System.out.println("订阅的数据发生变化，新的数据处理为十六进制值为：" + result);
+    }
+}
+
+```
+
+
+
+### 2.3.3 责任链模式
+
+### 2.3.4 模板方法模式
+
+### 2.3.5 状态模式
+
+### 2.3.6 行为型模式总结
+
+
 
 ## 2.2 工厂模式
 
