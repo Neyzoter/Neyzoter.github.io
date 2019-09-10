@@ -276,15 +276,51 @@ SWT中，Listerner接口扮演了观察者接口的角色，而所有窗口组�
 
 操作中除了封装用户操作外，还包含它本身应该如何显示在界面上的信息，如图像、文字、工具提示等，贡献负责将操作和具体的SWT组件（ToolItem、MenuItem等）关联起来。
 
-贡献分为两部分，贡献项目（ContributionItem）和贡献管理器（ContributionManager）。贡献项目关联着操作，而贡献管理器则包装了工具栏、菜单等可以放置操作的控件。当开发者讲一个贡献项目添加到贡献管理器上时，贡献管理器会从贡献项目中取出对应的操作的显示信息，并生成一个新的组件（工具栏按钮、菜单项等）显示在界面上。
+贡献分为两部分，贡献项目（ContributionItem）和贡献管理器（ContributionManager）。贡献项目关联着操作，而贡献管理器则包装了工具栏、菜单等可以放置操作的控件。当开发者讲一个贡献项目添加到贡献管理器上时，贡献管理器会从贡献项目中取出对应的操作的显示信息，并生成一个新的组件（工具栏按钮、菜单项等）显示在界面上。以下为贡献管理器、贡献项目和操作之间的互动：
 
 <img src="/images/wiki/EclipsePluginDev/ContributionItemAndManager.png" width="700" alt="贡献项目和贡献管理器">
 
+1.将操作关联到贡献项目；
 
+2.将贡献项目添加到贡献管理器；
+
+3.贡献管理器从贡献项目取得图标、文字等显示信息（贡献项目会从关联的操作上取得这些信息），然后创建新的组件来代表这个操作；
+
+4.用户单击贡献项目做对应的组件时，贡献项目会负责执行相关联的操作。
 
 ### 8.3.2 创建操作
 
-所有JFace操作都要实现`org.eclipse.jface.action.IAction`接口（**Artop使用**），这个接口规定了操作需要实现的一般方法，如运行用户操作、提供图片、文字信息等。
+* **IAction**
 
-<img src="/images/wiki/EclipsePluginDev/Action_Inherit.png" width="700" alt="操作的继承结构">
+  所有JFace操作都要实现`org.eclipse.jface.action.IAction`接口（**Artop使用**），这个接口规定了操作需要实现的一般方法，如运行用户操作、提供图片、文字信息等。
 
+  <img src="/images/wiki/EclipsePluginDev/Action_Inherit.png" width="700" alt="操作的继承结构">
+
+  上图的自上层时接口`org.eclipse.jface.action.IAction`，这是所有操作都必须实现的。在JFace其他部分使用到操作时，也会使用该接口。IAction中声明了getText、getImageDescription、getDescription等用于提供界面显示内容的方法，也声明了run、runWithEvent等**用于执行操作中包含的用户命令**的方法。
+
+* **Action**
+
+  上图另外一个比较重要的类是`org.eclipse.jface.action.Action`，这个抽象类是JFace提供的标准实现，其实现了IAction所有的方法。如果没有特殊需求，开发者可以直接继承Action并重载run方法来实现自己的操作。
+
+  实例：
+
+  ````java
+  public class MyAction extends Action(){
+      public static String ID = "MyAction";
+      //构造函数
+      public MyAction(){
+          super();
+          setId(ID);
+          //下面3个函数设置各种用于显示的内容
+          setText("My Action");
+          setToolTipText("My Action Tooltip"); // 运行时控制台输出
+          setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),"toolbar1.gif")); // 写字板的图标
+      }
+  }
+  ````
+
+  ### 8.3.3 使用贡献
+
+  本节概述如何使用贡献框架完成一些常用的任务，如生成工具栏按钮、生成菜单项等。
+
+  

@@ -257,7 +257,7 @@ jdk 也提供了相似的支持，具体参考 `java.util.Observable` 和` java.
 **使用场景**
 
 * 消息中间件，实现消息订阅，如Kafka
-* Eclipse SWT的事件处理机制，事件发送者声明监听器接口，对事件感兴趣的各方实现此接口并将监听器注册到事件的发送者上
+* Eclipse SWT的[事件处理机制](http://neyzoter.cn/wiki/EclipsePluginDev/#81swt%E7%9A%84%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86)，事件发送者声明监听器接口，对事件感兴趣的各方实现此接口并将监听器注册到事件的发送者上
 
 ### 2.3.3 责任链模式
 
@@ -266,6 +266,8 @@ jdk 也提供了相似的支持，具体参考 `java.util.Observable` 和` java.
 ### 2.3.5 状态模式
 
 ### 2.3.6 行为型模式总结
+
+
 
 
 
