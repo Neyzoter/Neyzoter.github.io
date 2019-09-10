@@ -86,7 +86,7 @@ GEF基于MVC的设计思想，将显示的图形和底层的数据模型分离�
 
 ## 2.2 SWT API结构
 
-SWT 的API包括【布局类、组件类、事件类和图形类】（具体说明见[《Eclipse插件开发学习笔记》](https://pan.baidu.com/s/1nKCw2EyOBFlNe3MDMpZyMw)  提取码：z8k3）。
+SWT 的API包括【布局类、组件类、事件类和图形类】（具体说明见[《Eclipse插件开发》](https://pan.baidu.com/s/1nKCw2EyOBFlNe3MDMpZyMw)  提取码：z8k3）。
 
 <img src="/images/wiki/EclipsePluginDev/SWT_API.png" width="700" alt="SWT的API">
 
@@ -323,4 +323,92 @@ SWT中，Listerner接口扮演了观察者接口的角色，而所有窗口组�
 
   本节概述如何使用贡献框架完成一些常用的任务，如生成工具栏按钮、生成菜单项等。
 
-  
+  ```java
+  ToolBarManager toolBarMgr = new ToolBarManager(toolBar);
+  // 将MyAction操作添加到组件
+  toolBarMgr.add(new MyAction());
+  toolBarMgr.update(true); // 让刚添加的操作显示出来
+  ```
+
+  使用MenuManager管理窗口菜单见《Eclipse插件开发》。
+
+# 9.Eclipse插件体系结构
+
+## 9.1 Eclipse体系结构
+
+Eclipse通过拓展点来拓展功能。
+
+### 9.1.1 Eclipse平台架构
+
+Eclipse围绕插件概念构建，见下图
+
+<img src="/images/wiki/EclipsePluginDev/Eclipse_Framework.png" width="700" alt="Eclipse体系结构">
+
+其中中间为Eclipse的平台部分，平台的子系统除了很小的核心外，都由插件构成，具体为：
+
+* **运行时**（Runtime）——运行时定义了插件的结构，负责在Eclipse运行时发现和管理插件。
+
+* **工作空间**（Workspace）——工作空间定义了Eclipse的工作区，用来分配和跟踪资源。
+
+* **标准窗口小部件工具箱**（SWT）——一个UI窗口小部件通用库，能生成本地化风格的用户交互界面组件，但是拥有独立于操作系统的API。
+
+* **JFace**——建立在SWT之上，提供对常用UI任务的支持。
+
+* **工作台**（Workbench）——工作台定义了Eclipse的UI聚合体，提供包括编辑器、视图、透视图等界面组成部分。
+
+* **小组**（Team）——“小组”插件为Eclipse中集成各种类型的源代码控制管理系统（如CVS、Subversion）
+
+  > CVS是一个C/S系统，是一个常用的代码版本控制软件。主要在开源软件管理中使用。与它相类似的代码版本控制软件有subversion。多个开发人员通过一个中心版本控制系统来记录文件版本，从而达到保证文件同步的目的。CVS版本控制系统是一种GNU软件包，主要用于在多人开发环境下的源码的维护。但是由于之前CVS编码的问题，现在大多数软件开发公司都使用SVN替代了CVS。
+
+* **帮助**——“帮助”插件为开发者编写帮助文档提供帮助。
+
+* **Java开发工具**（JDT）——JDT提供对Java程序的编辑、编译、调试、调试功能，实现功能完整的Java开发环境。
+
+* **插件开发环境**（PDE）——PDE提供自动创建、处理、调试和部署插件的工具。
+
+  Eclipse 平台和JDT、PDE构成了Eclipse的三层结构，
+
+  <img src="/images/wiki/EclipsePluginDev/Eclipse_JDT_PDE.png" width="700" alt="Eclipse的三层结构">
+
+### 9.1.2 插件工作模式
+
+Eclipse通过插件的依赖关系将不同的插件联系在一起。每个插件可以扮演双重角色，即其他插件服务的使用者和其他插件所需服务的提供者。以下是Eclipse UI插件的依赖关系，
+
+<img src="/images/wiki/EclipsePluginDev/UI_Depandency.png" width="700" alt="UI插件的依赖关系">
+
+Eclipse使用懒加载工作方式，只有运行时需要某依赖，才会将此依赖加入到内存。
+
+### 9.1.3 工作层次结构
+
+<img src="/images/wiki/EclipsePluginDev/Eclipse_Workbench.png" width="700" alt="Eclipse工作台层次结构及其对应界面元素">
+
+## 9.2 插件加载过程
+
+插件加载过程分为：插件安装、插件查找和插件启动。
+
+### 9.2.1 插件安装
+
+插件被Eclipse安装的条件：
+
+（1）插件必须有一个唯一的标识符，Eclipse以此识别此插件；
+
+（2）插件包含*.jar文件（有一个继承AbstractUIPlugin的插件类）、清单文件以及所需的资源
+
+插件安装推荐方式：
+
+* **方式1.通过文件系统手动安装插件**
+
+  1）创建`location/new-extension`的位置来存储插件。
+
+  <img src="/images/wiki/EclipsePluginDev/Plugin_Install_Dir.png" width="700" alt="Eclipse插件安装目录">
+
+  在`.eclipseextension`文件中输入如下内容，（version为Eclipse的版本）
+
+  ```
+  id=org.eclipse.platform name=Eclipse Platform
+  version=4.10
+  ```
+
+  2）Eclipse查找插件
+
+  `Help -> Software Update -> Manage Configuration -> Product Configuration -> Eclipse SDK` （老版本，新版本有所不同）
