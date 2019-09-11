@@ -519,6 +519,73 @@ Eclipse中，每个插件都有一个相应的`plugin.xml`清单文件与其相�
 
 ### 9.3.3 常用拓展点
 
+查看以下内容可参考如下图，
+
+<img src="/images/wiki/EclipsePluginDev/Eclipse_Workbench.png" width="700" alt="Eclipse工作台层次结构及其对应界面元素">
+
 **1.org.eclipse.ui.views**
 
-拓展点`org.eclipse.ui.views`允许插件将视图添加到工作台中。添加视图的插件必须在plugin.xml中注册该视图，并提供有关该视图的配置信息，例如，它的实现类、它所属的视图的类别（或组）以及应该用来在菜单和标签中描述该视图的名称和图标。
+拓展点`org.eclipse.ui.views`允许插件将**视图**添加到工作台中。添加视图的插件必须在plugin.xml中注册该视图，并提供有关该视图的配置信息，例如，它的实现类、它所属的视图的类别（或组）以及应该用来在菜单和标签中描述该视图的名称和图标。
+
+**2.org.eclipse.ui.editors**
+
+插件使用工作台拓展点`org.eclipse.ui.editors`将**编辑器**添加到工作台。添加编辑器的插件必须在他们的plugin.xml文件中注册编辑器拓展即编辑器的配置信息。
+
+**3.org.eclipse.ui.popupMenus**
+
+`org.eclipse.ui.popupMenus`（**弹出式菜单**）拓展点允许插件添加到其他视图和编辑器的上下文菜单。可以利用操作的标识将操作添加到特定上下文菜单（viewerContribution），或者通过将操作与特定对象类型进行关联来添加操作（objectContribution）。
+
+**4.org.eclipse.ui.action.Sets**
+
+插件可以使用`org.eclipse.ui.actionSets`（动作集）拓展点向工作台菜单和工具栏添加菜单、菜单项和工具栏项。为了减少同时显示每个插件的菜单添加项而导致的混乱，可将添加项分成多个**操作集**，通过用户首选项来使这些操作集可视。
+
+**5.org.eclipse.ui.viewActions**
+
+如果插件要**为工作台中已经存在的视图添加行为**，可以通过`org.eclipse.ui.viewActions`拓展点来完成。此拓展点允许插件为现有视图的本地下拉菜单和本地工具栏添加菜单项、紫菜当和工具栏条目。
+
+**6.org.eclipse.ui.editorAcitons**
+
+当编辑器活动时，`org.eclipse.ui.editorActions`拓展点允许向工作台菜单和工具栏做添加条目。
+
+# 10.开发第一个插件项目
+
+## 10.1 创建插件工程
+
+1.`File->New->Plug-in Project`
+
+<img src="/images/wiki/EclipsePluginDev/createNewPluginProj.png" width="500" alt="创建新plugin工程">
+
+2.输入项目名称——`com.nescar.examples.helloworld`，并设置Target Platform基于Eclipse还是OSGi框架。
+
+<img src="/images/wiki/EclipsePluginDev/setProjName_setTargetPlatform.png" width="500" alt="设置项目名称和TargetPlatform">
+
+Target Platform选项选择插件运行的框架——Eclipse、Equinox和standard。
+
+Eclipse框架是指使用了Eclipse拓展注册表（IExtensionRegistry，本文第9章）的插件。IExtensionRegistry是在Eclipse平台的运行时层提供的，因而大部分的Eclipse插件都会使用此框架。如果不希望依赖Eclipse平台的运行时层，就要使用OSGi框架。
+
+3.设置content
+
+控制插件生命周期的插件类为激活器（Activator），该激活器会根据是否选择“此插件将对UI进行添加”复选框而继承自不同的类。如果选择`Generate an activator...`选框，则激活器类（插件类）将拓展`org.eclipse.ui.plugin.AbstractUIPlugin`类来对插件项目的生命周期进行管理。
+
+* 如果该插件不对UI进行添加，则激活器类拓展`org.eclipse.ui.plugin.AbstractUIPlugin`类来对插件项目的生命周期进行管理。
+* 如果“插件项目”*（第2步中的图）页OSGi框架，激活器则会实现`org.eclipse.core.runtime.Plugin`类对插件项目的生命周期进行管理。
+
+`Rich Client Application`可以选择否，后期可以添加。
+
+<img src="/images/wiki/EclipsePluginDev/setContent.png" width="500" alt="设置content">
+
+4.选择模板
+
+选择Hello World Command模板。
+
+5.运行查看效果
+
+点击打开文件`MENIFEST.MF`，点击`Launch an Eclipse application`运行。
+
+<img src="/images/wiki/EclipsePluginDev/RunHelloworld.png" width="500" alt="运行">
+
+运行效果如下：
+
+<img src="/images/wiki/EclipsePluginDev/HelloWorld_Appearance.png" width="500" alt="运行查看效果">
+
+[实例代码和解析地址](https://github.com/NESCAR/eclipse_plugin_dev_examples_song)
