@@ -412,3 +412,113 @@ Eclipse使用懒加载工作方式，只有运行时需要某依赖，才会将�
   2）Eclipse查找插件
 
   `Help -> Software Update -> Manage Configuration -> Product Configuration -> Eclipse SDK` （老版本，新版本有所不同）
+
+* **方式2.采用链接的形式安装插件**
+
+  如果在文件系统中已经有了产品拓展，例如已经使用上述方法创建了拓展，就可以在Eclipse程序目录中创建一些简单的文件，告知Eclipse需要检查这些目录以寻找相应的插件。
+
+  在Eclipse安装文件夹中创建一个名为links的目录。在这个目录中，创建`*.link`文件（例如myPlugins.link）。每个链接文件都指向一个产品拓展位置。Eclipse会在启动时扫描这个文件夹，并在每个链接文件所指向的产品拓展中寻找插件。
+
+  <img src="/images/wiki/EclipsePluginDev/plugin_link.png" width="500" alt="link方式安装目录布局">
+
+  link内容实例：
+
+  ```
+  path=D:/location/new-plugins/ve
+  ```
+
+### 9.2.2 插件的发现和启动
+
+自Eclipse3.1以后，支持插件的机制通过OSGi（Open Service Gateway Initiative）框架实现。当Eclipse第一次启动时，Eclipse**运行时**（Runtime）会遍历plugins文件夹中的目录，扫描每个插件的清单文件信息，并且建立一个内部模型来记录它所找到的每个插件的信息。此时未运行任何代码，因而插件未启动。只有当插件中的start()方法被调用后，插件才真正启动起来。
+
+### 9.2.3 插件信息的获取
+
+每个捆绑软件都有一个象征标识符（Symbolic Name），这个象征标识符便是插件的唯一标识。不论插件是否启动，都可以通过`Platform.getBundle(symbolicName)`来获取捆绑软件对象(`org.osgi.framework.Bundle`)。当插件启动后，插件的信息由内存中的捆绑软件上下文管理。如果安装了兼容软件，使当前Eclipse版本同先前版本兼容，便可以使用原来的`Platform.getPlugin(pluginID)`来获得插件实例(`org.eclipse.core.runtime.Plugin`)。
+
+Bundle提供了获取插件的信息的方法：
+
+具体见《Eclipse插件开发》
+
+## 9.3 插件的拓展模式
+
+**宿主插件**（host plug-in）：提供拓展点的插件；
+
+**拓展者插件**（extender plug-in）：使用拓展点的插件；
+
+**回调对象**（call-back object）：实现宿主插件和拓展者插件的通信。
+
+### 9.3.1 拓展和拓展点
+
+> 重点！对照artop例程的plugin.xml
+
+下图中，拓展者插件`org.eclipse.search`在宿主插件`org.eclipse.ui`中拓展了一个动作集（actionSets）。
+
+<img src="/images/wiki/EclipsePluginDev/host_plugin_extender_plugin.png" width="700" alt="link方式安装目录布局">
+
+通过拓展UI插件声明的actionSets拓展点实现。运行Eclipse，选择“搜索”`->`“搜索”按钮之后，出现了下图效果。
+
+<img src="/images/wiki/EclipsePluginDev/Search_Apparence.png" width="700" alt="搜索对话框">
+
+拓展改变了宿主插件的某些行为，包括为宿主插件增加处理元素和为这些处理元素定制相应的动作。上例中，`org.eclipse.search`插件为`org.eclipse.ui`插件增加了两个菜单项，即“搜索”`->`“搜索”和“搜索”`->`“文件”，并且定制了相应的行为，`OpenFileSearchPageAction`和`OpenSearchDialogAction`。拓展者插件和宿主插件通过这两个菜单项通信。
+
+Eclipse中，每个插件都有一个相应的`plugin.xml`清单文件与其相对应。它们在其中声明了该插件的所有拓展和拓展点。下面两段代码是与上面例子相对应的清单。
+
+```xml
+<plugin>
+    <!--工作台拓展点-->
+    <!--忽略一些代码-->
+    
+    <!--1.定义拓展点id：actionSets，不是完整标识，要拓展该拓展点，必须在前面加入其所在插件的ID   org.eclipse.ui.actionSets-->
+    <extension-point id="actionSets" name="%ExtPoint.actionSets" schema="schema/actionSets.exsd"/>
+    <!-- .....  -->
+</plugin>
+```
+
+声明拓展清单中的每个XML元素和它们的属性都是在Schema中定义的，不同的拓展点这些元素和属性都可能不同。
+
+```xml
+<!-- 动作集 -->
+<!--2.在声明拓展的时候使用了拓展的完整id-->
+<extension point="org.eclipse.ui.actionSets">
+    <actionSet 
+               id="org.eclipse.search.searchActionSet"
+               label="%search"
+               visible="true">
+        <!--搜索菜单-->
+        <menu
+              id="org.eclipse.search.menu"
+              label="%searchMenu.label"
+              path="navigate">
+            <groupMarker name="internalDialogGroup"/>
+            <separator name="fileSearchContextMenuActionGroup"/>
+            <!--跳过一些代码-->
+        </menu>
+        <!--会话组-->
+        <!--跳过一些代码-->
+        <!--3.定义操作action，声明了OpenSearchDialogAction类（4），该类便是回调对象，回调对象类由拓展者插件定义，当用户第一次使用“搜索”->“搜索”菜单项时，由宿主插件创建实例-->
+        <action id="org.eclipse.search.OpenSearchDialog"
+                definitionId="org.eclipse.search.ui.openSearchDialog"
+                toolbarPath="Normal/Search"
+                menubarPath="org.eclipse.search.menu/internalDialogGroup"
+                label="%openSearchDialogAction.label"
+                tooltip="%openSearchDialogAction.tooltip"
+                icon="%nl$/icons/full/etool16/search.gif"
+                helpContextId="open_search_dialog_action_context"
+                class="org.eclipse.search.internal.ui.OpenSearchDialogAction"/><!--4.声明了OpenSearchDialogAction类-->
+    </actionSet>
+</extension>
+```
+
+### 9.3.2 拓展加载过程
+
+* 1.从Eclipse平台取得拓展点
+* 2.取得已在此拓展点上注册的拓展
+* 3.取出以XML方式声明的配置元素
+* 4.根据每个配置元素的属性值创建回调对象
+* 5.处理创建的对象
+
+### 9.3.3 常用拓展点
+
+**1.org.eclipse.ui.views**
+
+拓展点`org.eclipse.ui.views`允许插件将视图添加到工作台中。添加视图的插件必须在plugin.xml中注册该视图，并提供有关该视图的配置信息，例如，它的实现类、它所属的视图的类别（或组）以及应该用来在菜单和标签中描述该视图的名称和图标。
