@@ -406,7 +406,7 @@ Eclipse使用懒加载工作方式，只有运行时需要某依赖，才会将�
 
   ```
   id=org.eclipse.platform name=Eclipse Platform
-  version=4.10
+  version=4.10.0
   ```
 
   2）Eclipse查找插件
@@ -426,6 +426,10 @@ Eclipse使用懒加载工作方式，只有运行时需要某依赖，才会将�
   ```
   path=D:/location/new-plugins/ve
   ```
+
+* **方式3.将插件（包括fetures和plugins）的内容拷贝至Eclipse安装目录下的features和plugins**
+
+  重启Eclipse即可找到插件。
 
 ### 9.2.2 插件的发现和启动
 
@@ -519,6 +523,8 @@ Eclipse中，每个插件都有一个相应的`plugin.xml`清单文件与其相�
 
 ### 9.3.3 常用拓展点
 
+[更多拓展点](https://help.eclipse.org/2018-12/index.jsp)通过输入`org.eclipse.ui.`搜索。
+
 查看以下内容可参考如下图，
 
 <img src="/images/wiki/EclipsePluginDev/Eclipse_Workbench.png" width="700" alt="Eclipse工作台层次结构及其对应界面元素">
@@ -572,7 +578,7 @@ Eclipse框架是指使用了Eclipse拓展注册表（IExtensionRegistry，本文
 
 `Rich Client Application`可以选择否，后期可以添加。
 
-<img src="/images/wiki/EclipsePluginDev/setContent.png" width="500" alt="设置content">
+<img src="/images/wiki/EclipsePluginDev/setContent.png" width="800" alt="设置content">
 
 4.选择模板
 
@@ -582,10 +588,206 @@ Eclipse框架是指使用了Eclipse拓展注册表（IExtensionRegistry，本文
 
 点击打开文件`MENIFEST.MF`，点击`Launch an Eclipse application`运行。
 
-<img src="/images/wiki/EclipsePluginDev/RunHelloworld.png" width="500" alt="运行">
+<img src="/images/wiki/EclipsePluginDev/RunHelloworld.png" width="800" alt="运行">
 
 运行效果如下：
+1.菜单栏效果
 
-<img src="/images/wiki/EclipsePluginDev/HelloWorld_Appearance.png" width="500" alt="运行查看效果">
+<img src="/images/wiki/EclipsePluginDev/HelloWorld_Appearance.png" width="800" alt="运行查看效果">
+
+2.工具栏效果
+
+<img src="/images/wiki/EclipsePluginDev/HelloWorld_Appearance_toolbar.png" width="800" alt="运行查看效果">
 
 [实例代码和解析地址](https://github.com/NESCAR/eclipse_plugin_dev_examples_song)
+
+## 10.2 “插件开发”透视图
+
+完成项目创建后，进入“插件开发”透视图（Perspective）。
+
+### 10.2.1 PDE视图
+
+`Windows->Open Pespective->Other..`，而后选择PDE类别，看到插件视图和插件依赖项视图两个视图。
+
+<img src="/images/wiki/EclipsePluginDev/Perspective_Other.png" width="800" alt="打开透视图">
+
+### 10.2.2 PDE运行时视图
+
+### 10.2.3 清单编辑器
+
+PDE提供了一个基于表单的多页插件清单编辑器。打开本插件的地址，可以看到清单编辑器包括概述页（Overview）、依赖性页（Dependencies）、运行时页（Runtime）、拓展页（Extensions）、拓展点页（Extension Point）、构建页（Build）、MANIFEST.MF、plugin.xml和build.properties，后面三个是特定的文本编辑器。
+
+概述页是快速进入其他各个页面的通道。
+
+<img src="/images/wiki/EclipsePluginDev/Overview_Intro.png" width="800" alt="Overview介绍">
+
+## 10.3 插件工程结构
+
+* **源代码部分**——Java源代码，包括动作（action）、操作（handler）
+* **插件文件**
+  * plugin.xml：插件清单文件，**在此处进行贡献和操作的关联**
+  * MANIFEST.MF：OSGi捆绑软件清单文件
+  * build.properties文件
+  * 所依赖的系统库：JRE库和插件依赖项
+
+* **其他资源**
+
+## 10.4 插件文件
+
+### 10.4.1 plugin.xml文件
+
+plugin.xml用于记录插件的拓展点和拓展的。下图是plugin.xml的可视化编辑界面，
+
+<img src="/images/wiki/EclipsePluginDev/plugin.xml_view.png" width="800" alt="plugin.xml介绍">
+
+### 10.4.2 MANIFEST.MF文件
+
+MANIFEST.MF文件用于提供关于捆绑软件的描述信息，对应于Overview页的信息，如General Information、Excution Environment等，其还通过变量`Require-Bundle`决定依赖插件，如
+
+```yaml
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+```
+
+通过`Bundle-ActivationPolicy`来指定懒加载机制，如
+
+```yaml
+Bundle-ActivationPolicy: lazy
+```
+
+
+
+### 10.4.3 build.properties文件
+
+ build.properties文件计略需要构建的元素列表，PDE可以通过这个文件来构建插件，并且在最终构建的插件中不需要再包含这个文件。
+
+```properties
+# 源目录
+source.. = src/
+# 输出目录
+output.. = bin/
+# bin文件夹所包含的目录
+## 可以看到最终没有build.properties文件了
+bin.includes = plugin.xml,\
+               META-INF/,\
+               .,\
+               icons/
+```
+
+## 10.5 插件类
+
+```java
+// Activator
+package com.nescar.examples.helloworld;
+
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.BundleContext;
+
+/**
+ * The activator class controls the plug-in life cycle
+ * @author Neyzoter Song
+ * @date 2019/9/11
+ */
+public class Activator extends AbstractUIPlugin {
+
+	// The plug-in ID
+	/**
+	 * 插件类声明一个静态字段，用于引用这个唯一的实例——插件标识
+	 */
+	public static final String PLUGIN_ID = "com.nescar.examples.helloworld"; //$NON-NLS-1$
+
+	// The shared instance
+	private static Activator plugin;
+	
+	/**
+	 * The constructor
+	 */
+	public Activator() {
+	}
+
+	/**
+	 * 启动插件时调用start
+	 */
+	@Override
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		plugin = this;
+	}
+
+	/**
+	 * 卸载插件时调用stop
+	 */
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
+	}
+
+	/**
+	 * Returns the shared instance
+	 * 获得该插件实例
+	 *
+	 * @return the shared instance
+	 */
+	public static Activator getDefault() {
+		return plugin;
+	}
+
+	/**
+	 * Returns an image descriptor for the image file at the given
+	 * plug-in relative path
+	 * 获得插件中图像的描述符，依据此标识符可以使用图像资源，例如在本地址插件
+	 * 中使用此插件中icons目录下的sample.gif图标
+	 * eg. AbstractUIPlugin.getImageDescriptor(icon.sample.gif).createImage();
+	 * @param path the path
+	 * @return the image descriptor
+	 */
+	public static ImageDescriptor getImageDescriptor(String path) {
+		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+}
+
+```
+
+## 10.6 运行插件程序
+
+在工具栏单击“Run”菜单，选择“Run Configuration...”来进行“Create, manage, and run configurations”的设置Eclipse Application。
+
+<img src="/images/wiki/EclipsePluginDev/Create_manage_run_config.png" width="800" alt="Create, manage, and run configurations设置">
+
+## 10.7 调试插件
+
+根据情况适当设置断点，设置断点只需在Java编辑器页面中需要调试的代码左侧双击鼠标。
+
+在工具栏的虫子图标可以开启调试。
+
+## 10.8 发布插件
+
+使用PDE所提供的“Export”即可实现。
+
+`File->Export`，然后选择“可部署的插件和段”。
+
+<img src="/images/wiki/EclipsePluginDev/Plugin_Export.png" width="800" alt="插件导出">
+
+然后设置目录，
+
+<img src="/images/wiki/EclipsePluginDev/Export_Set.png" width="800" alt="导出目录">
+
+将产生的.jar文件放入Eclipse程序的plugin文件夹中，重启Eclipse程序，地址本插件就包含在其中了。
+
+## 10.9 发布RCP工程
+
+### 10.9.1 创建工程时即设置为RCP
+
+在创建工程时，可以设置为RCP工程
+
+<img src="/images/wiki/EclipsePluginDev/export_product.png" width="800" alt="导出product">
+
+设置，
+
+<img src="/images/wiki/EclipsePluginDev/Export_RCP.png" width="800" alt="设置输出的product">
+
+### 10.9.2 将插件改造成RCP
+
+见《Eclipse插件开发》第20.4节。
