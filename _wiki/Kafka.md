@@ -1044,9 +1044,21 @@ producer和consumer的语义保证有多种：
 
 Kafka 允许 topic 的 partition 拥有若干副本，你可以在server端配置partition 的副本数量。当集群中的节点出现故障时，能自动进行故障转移，保证数据的可用性。
 
-创建副本的单位是 topic 的 partition ，正常情况下， 每个分区都有一个 leader 和零或多个 followers 。 总的副本数是包含 leader 的总和。 所有的读写操作都由 leader 处理，一般 partition 的数量都比 broker 的数量多的多，各分区的 leader 均 匀的分布在brokers 中。所有的 followers 节点都同步 leader 节点的日志，**日志中的消息和偏移量（理解：日志包括了消息和偏移量）**都和 leader 中的一致。（当然, 在任何给定时间, leader 节点的日志末尾时可能有几个消息尚未被备份完成）。
+创建副本的单位是 topic 的 partition ，正常情况下， 每个分区都有一个 leader 和零或多个 followers 。 总的副本数是包含 leader 的总和。 **所有的读写操作都由 leader 处理**（所以要知道Leader的IP和端口，不然通过设置成follower的IP和端口会连接失败），一般 partition 的数量都比 broker 的数量多的多，各分区的 leader 均 匀的分布在brokers 中。所有的 followers 节点都同步 leader 节点的日志，**日志中的消息和偏移量（理解：日志包括了消息和偏移量）**都和 leader 中的一致。（当然, 在任何给定时间, leader 节点的日志末尾时可能有几个消息尚未被备份完成）。
 
 *Followers 节点就像普通的 consumer 那样从 leader 节点那里拉取消息并保存在自己的日志文件中。Followers 节点可以从 l 节点那里批量拉取消息日志到自己的日志文件中。*
+
+**Kafka分配Replica的算法**
+
+1.将所有存活的`N`个Brokers和待分配的Partition排序
+
+2.将第i个Partition分配到第`(i mod n)`个Broker上，这个Partition的第一个Replica存在于这个分配的Broker上，并且会作为partition的优先副本
+
+3.将第`i`个Partition的第`j`个Replica分配到第`((i + j) mod n)`个Broker上
+
+最终形成以下结果，
+
+<img src="/images/wiki/Kafka//Kafka_Partition_Allocation_iteblog.svg" width="700" alt="Kafka replica分配结果">
 
 **Kafka判断节点存活alive的方式**
 
