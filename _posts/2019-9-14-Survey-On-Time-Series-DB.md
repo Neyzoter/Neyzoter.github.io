@@ -103,3 +103,21 @@ InfluxDB中有一个seriesKey概念，即datasourc（tags）+metric，时序数�
 **好处二**：时间序列和value可以在同一个Block内分开独立存储，独立存储就可以对时间列以及数值列分别进行压缩。InfluxDB对时间列的存储借鉴了Beringei的压缩方式，使用delta-delta压缩方式极大的提高了压缩效率。而对Value的压缩可以针对不同的数据类型采用相同的压缩效率。
 
 **好处三**：对于给定数据源以及时间范围的数据查找，可以非常高效的进行查找。这一点和OpenTSDB一样。
+
+# 5.Beringei
+
+## 5.1 Beringei介绍
+
+Beringei是google开源的一个时间序列数据库，模型设计类似InfluxDB，其相对于InfluxDB增加了在内存中对数据压缩的功能。
+
+InfluxDB在写入内存的时候没有压缩，而是在数据写入文件的时候进行对应压缩。而时间序列数据存在最新数据最热的特点，存放在内存中可以大大提升效率。
+
+## 5.2 Beringei和InfluxDB的区别
+
+1. 文件组织形式不同。Beringei的文件存储形式按照时间窗口组织，比如最近5分钟的数据全部写入同一个文件，这个文件分为很多block，每个block中的所有时序数据共用一个SeriesKey。Beringei文件没有索引，InfluxDB有索引。
+
+2. Beringei目前没有倒排索引机制，因此对于多维查询并不高效。
+
+# 参考
+
+https://sq.163yun.com/blog/article/169864634071179264
