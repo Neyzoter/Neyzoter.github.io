@@ -102,7 +102,13 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
 ## 4.2 技术
 
+* **典型时间序列数据库特点？**
+
+  [典型时间序列数据库特点](http://neyzoter.cn/2019/09/14/Survey-On-Time-Series-DB/#1%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BB%8B%E7%BB%8D)
+
 * **介绍几种时间序列数据库？**
+
+  [时间序列数据库](http://neyzoter.cn/2019/09/14/Survey-On-Time-Series-DB/)
 
 # 5.计算机应用
 

@@ -1,7 +1,14 @@
     <footer class="container">
         <div class="site-footer" role="contentinfo">
             <div class="copyright left mobile-block">
-                    © 2015
+                <p id="showyear"></p>  
+                <script type="text/javascript" language="javascript">
+                  function show_year(){
+                    var year = "© "+date_time.getFullYear();   
+                    document.getElementById("showtimes").innerHTML= date_str;
+                  }
+                    
+                </script>
                     <span title="{{ site.author}}">{{ site.author }}</span>
                     <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
             </div>
@@ -53,5 +60,15 @@
       </script>
     </div>
     {% endif %}
+</body>
+
+<body>
+    <meta charset="utf-8">
+  <script type="text/javascript" language="javascript">
+    function show_year(){
+      var year = "© "+date_time.getFullYear();   
+      document.getElementById("showyear").innerHTML= date_str;
+    }     
+  </script>
 </body>
 </html>
