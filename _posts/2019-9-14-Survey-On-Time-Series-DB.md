@@ -68,3 +68,8 @@ Druid是一个列式存储系统。
 
 <img src="/images/posts/2019-9-14-Survey-On-Time-Series-DB/Druid_Column.jpg" width="700" alt="Druid数据库" />
 
+## 3.2 优势
+
+**1.数据压缩率高**
+
+每列独立存储，可以针对每列进行压缩，也可根据不同的列采取不同的压缩策略。
