@@ -68,7 +68,7 @@ Druid是一个列式存储系统。
 
 <img src="/images/posts/2019-9-14-Survey-On-Time-Series-DB/Druid_Column.jpg" width="700" alt="Druid数据库" />
 
-## 3.2 优势
+## 3.2 Druid的优势
 
 **1.数据压缩率高**
 
@@ -77,3 +77,10 @@ Druid是一个列式存储系统。
 **2.支持多维查找**
 
 Druid为datasource的每个列分别设置了Bitmap索引，利用Bitmap索引可以有效实现多维查找，比如用户想查找`20110101T00:00:00`这个时间点所有发布在USA的所有广告的浏览量，可以根据`country=USA`在Bitmap索引中找到要找的行号，再根据行号定位待查的metrics。
+
+## 3.3 Druid的问题
+
+**问题一**：数据依然存在冗余。和OpenTSDB一样，tags存在大量的冗余。
+
+**问题二**：指定数据源的范围查找并没有OpenTSDB高效。这是因为Druid会将数据源拆开成多个标签，每个标签都走Bitmap索引，再最后使用与操作找到满足条件的行号，这个过程需要一定的开销。而OpenTSDB中直接可以根据数据源拼成rowkey，查找走B+树索引，效率必然会更高。
+
