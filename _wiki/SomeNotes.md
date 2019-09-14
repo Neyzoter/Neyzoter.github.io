@@ -50,7 +50,6 @@ hello.c          hello.i       hello.s       hello.o
   3. `nohup sh test.sh  & `
     将`sh test.sh`任务放到后台，但是依然可以使用标准输入，前台能够接收任何输入，重定向标准输出和标准错误到当前目录下的nohup.out文件，即使关闭xshell退出当前session依然继续运行。
 
-
 # 3.计算机网络
 
 ## 3.1 概念
@@ -100,6 +99,10 @@ hello.c          hello.i       hello.s       hello.o
 ORM 就是通过实例对象的语法，完成关系型数据库的操作的技术。
 
 * **事务如何实现？**:negative_squared_cross_mark:
+
+## 4.2 技术
+
+* **介绍几种时间序列数据库？**
 
 # 5.计算机应用
 
