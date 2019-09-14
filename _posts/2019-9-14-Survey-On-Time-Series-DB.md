@@ -38,7 +38,7 @@ OpenTSDB基于HBase，RowKey规则为：metric+timestamp+datasource（tags）。
 
 * 末位
 
-  metric，放最后一位，防止出现大范围过滤查询。
+  datasource，放最后一位，防止出现大范围过滤查询。
 
 ## 2.3 HBase的问题
 
@@ -84,3 +84,22 @@ Druid为datasource的每个列分别设置了Bitmap索引，利用Bitmap索引�
 
 **问题二**：指定数据源的范围查找并没有OpenTSDB高效。这是因为Druid会将数据源拆开成多个标签，每个标签都走Bitmap索引，再最后使用与操作找到满足条件的行号，这个过程需要一定的开销。而OpenTSDB中直接可以根据数据源拼成rowkey，查找走B+树索引，效率必然会更高。
 
+# 4.InfluxDB
+
+## 4.1 介绍
+
+和以上HBase、Druid相同，**采用LSM结构，数据先写入内存，当内存到达一定阈值后flush到文件**。InfluxDB只存储数据，可以对时序数据做非常多的优化工作。
+
+InfluxDB中有一个seriesKey概念，即datasourc（tags）+metric，时序数据写入内存后按照seriesKey进行组织：
+
+<img src="/images/posts/2019-9-14-Survey-On-Time-Series-DB/Influxdb_structure.jpg" width="700" alt="InfluxDB数据库" />
+
+以上看出，InfluxDB的存储结构实际是一个map：`<seriesKey, List<timestamp,value>>`。内存中的数据flush的文件后，同样会将同一个seriesKey中的时间线数据写入同一个Block块内，即一个Block块内的数据都属于同一个数据源下的一个metric。
+
+## 4.2 InfluxDB优势
+
+**好处一**：同一数据源的tags不再冗余存储。一个Block内的数据都共用一个SeriesKey，只需要将这个SeriesKey写入这个Block的Trailer部分就可以。大大降低了时序数据的存储量。
+
+**好处二**：时间序列和value可以在同一个Block内分开独立存储，独立存储就可以对时间列以及数值列分别进行压缩。InfluxDB对时间列的存储借鉴了Beringei的压缩方式，使用delta-delta压缩方式极大的提高了压缩效率。而对Value的压缩可以针对不同的数据类型采用相同的压缩效率。
+
+**好处三**：对于给定数据源以及时间范围的数据查找，可以非常高效的进行查找。这一点和OpenTSDB一样。
