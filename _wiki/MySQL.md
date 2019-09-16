@@ -56,10 +56,13 @@ tables：所有的表
 
 ```
 
-（3）删库
+（3）删/建库
 
 ```bash
+# 删除
 $ drop database 库名;
+# 创建
+$ create database 库名;
 ```
 
 （4）使用库
