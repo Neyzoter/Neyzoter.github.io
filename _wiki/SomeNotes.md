@@ -48,7 +48,7 @@ hello.c          hello.i       hello.s       hello.o
     将`sh test.sh`任务放到后台，关闭标准输入，前台不再能够接收任何输入（标准输入），重定向标准输出和标准错误到当前目录下的nohup.out文件，即使关闭xshell退出当前session依然继续运行。
 
   3. `nohup sh test.sh  & `
-    将`sh test.sh`任务放到后台，但是依然可以使用标准输入，前台能够接收任何输入，重定向标准输出和标准错误到当前目录下的nohup.out文件，即使关闭xshell退出当前session依然继续运行。
+      将`sh test.sh`任务放到后台，但是依然可以使用标准输入，前台能够接收任何输入，重定向标准输出和标准错误到当前目录下的nohup.out文件，即使关闭xshell退出当前session依然继续运行。
 
 # 3.计算机网络
 
@@ -490,7 +490,40 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
   具体应用见[观察者设计模式](http://neyzoter.cn/wiki/DesignPattern/#232-%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8Fobserve-pattern)
 
-* 
+* **both methods has the same erasure问题解释和解决？**
+
+  ```java
+  public class FruitKata {
+      class Fruit {}
+      class Apple extends generic.Fruit {} 
+      public void eat(List fruitList) {}
+      public void eat(List<Fruit> fruitList) { }   // error， both methods has the same erasure
+  }
+  ```
+
+  **问题**：由于Java的泛型擦除，在运行时，只有一个List类。
+
+  **补充**：Java的泛型是在Jdk 1.5 引入的，在此之前Jdk中的容器类等都是用Object来保证框架的灵活性，然后在读取时强转。但是这样做有个很大的问题，那就是类型不安全，编译器不能帮我们提前发现类型转换错误，会将这个风险带到运行时。引入泛型，也就是为解决类型不安全的问题（在创建对象时，确定范型的类型，进而保证类型安全），但是由于当时java已经被广泛使用，保证版本的向前兼容是必须的，所以为了兼容老版本jdk，泛型的设计者选择了基于擦除的实现。
+
+  **解决**：取不同名
+
+* **范型的extends和super的区别**
+
+  <img src="/images/wiki/SomeNotes/fanxing_example.png" width="600" alt="example">
+
+  - `<? extends T>`：是指 **“上界通配符（Upper Bounds Wildcards）”**
+
+    （设置T为具体什么类型的时候）可以存放T类和T派生类（子类），但是（确定了T是具体什么类型后）存放的函数set()会失效，因为具体不知道T是什么类型。
+
+    <img src="/images/wiki/SomeNotes/lowerBounds.png" width="600" alt="extends">
+
+  - `<? super T>`：是指 **“下界通配符（Lower Bounds Wildcards）”**
+
+    （设置T为具体什么类型的时候）可以存放T和T基类（父类），获取的函数get()失效，因为（确定了T是具体什么类型后）不知道T是什么类型，只有Object才能装下，会丢失信息。
+
+    <img src="/images/wiki/SomeNotes/upperBounds.png" width="600" alt="extends">
+
+    
 
 ## 8.2 Python
 

@@ -37,9 +37,17 @@ keywords: database, InfluxDB
 
 进入`http://localhost:9999/`设置用户、密码、组织、bucket等信息。
 
-# 2.InfluxDB操作
+# 2.InfluxDB语言——Flux
 
-## 2.1 写操作
+## 2.1 实例
+
+<img src="/images/wiki/InfluxDB/Flux_Language.gif" width="700" alt="Flux语言实例" />
+
+
+
+# 3.InfluxDB操作
+
+## 3.1 写操作
 
 * **influx指令**
 
@@ -85,6 +93,6 @@ $ curl "http://localhost:9999/api/v2/write?org=YOUR_ORG&bucket=YOUR_BUCKET&preci
     
     `Timestampe`（Option）：数据点的Unix纳秒时间戳。InfluxDB每点接受一个时间戳。如果未提供时间戳，InfluxDB将使用其主机的系统时间（UTC）。数据类型是`Unix timestamp`。
 
-## 2.2 查看数据
+## 3.2 查看数据
 
 浏览器进入`localhost:9999`选择`Data Explore`，再选择过滤选项，如选择`_measurement`的`boltdb_reads_total`，再点击`Script Editor`按钮，再点击`Query Builder`来查看数据。
