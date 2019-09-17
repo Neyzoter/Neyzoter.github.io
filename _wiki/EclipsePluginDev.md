@@ -791,3 +791,38 @@ public class Activator extends AbstractUIPlugin {
 ### 10.9.2 将插件改造成RCP
 
 见《Eclipse插件开发》第20.4节。
+
+# 11.操作（Actions）
+
+## 11.1 Eclipse的操作概览
+
+操作在Eclipse IDE出现的所有位置：
+
+<img src="/images/wiki/EclipsePluginDev/Eclipse_IDE_Actions.png" width="800" alt="Eclipse IDE的Action位置">
+
+（1）工具栏
+
+（2）视图工具栏
+
+（3）对象上下文菜单
+
+（4）编辑器上下文菜单
+
+（5）视图上下文菜单
+
+（6）菜单栏
+
+（7）视图下拉菜单
+
+## 11.2 添加工作台窗口操作
+
+### 11.2.1 使用模板创建拓展
+
+打开“地址本”插件清单编辑器（plugin.xml文件），选择“拓展”页，在“拓展”选项卡中单击“新建”，在弹出的上下文菜单中选择“新建”`->`“拓展”命令来打开“新建拓展”向导，比如出创建一个`org.eclipse.ui.munus`的拓展点。
+
+可以在现有的contribution下建立menu，然后
+
+<img src="/images/wiki/EclipsePluginDev/createMenu.png" width="800" alt="Menu创建">
+
+<img src="/images/wiki/EclipsePluginDev/NescInfo.png" width="800" alt="Menu设置">
+
