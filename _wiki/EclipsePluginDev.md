@@ -870,13 +870,13 @@ public class Activator extends AbstractUIPlugin {
 
   设置，其中commandId引用对应的command。
 
-  <img src="/images/wiki/EclipsePluginDev/setContributionCommand.png" width="800" alt="设置贡献内的command">
+  <img src="/images/wiki/EclipsePluginDev/setContributionCommand.png" width="500" alt="设置贡献内的command">
 
 * 效果图
 
   图中，Nesc Information菜单的名称为menu的label，Nesc Info Command菜单栏的名称为command的name。
 
-  <img src="/images/wiki/EclipsePluginDev/apperance.png" width="300" alt="效果图1">
+  <img src="/images/wiki/EclipsePluginDev/apperance.png" width="200" alt="效果图1">
 
-  <img src="/images/wiki/EclipsePluginDev/apperance2.png" width="300" alt="效果图2">
+  <img src="/images/wiki/EclipsePluginDev/apperance2.png" width="450" alt="效果图2">
 
