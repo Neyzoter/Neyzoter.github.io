@@ -553,6 +553,8 @@ Eclipse中，每个插件都有一个相应的`plugin.xml`清单文件与其相�
 
 当编辑器活动时，`org.eclipse.ui.editorActions`拓展点允许向工作台菜单和工具栏做添加条目。
 
+>Eclipse 提供了两种扩展点供用户添加菜单项到相应的位置。这两种扩展点为 org.eclipse.ui.commands（本文简称为 Commands 方式）和 org.eclipse.ui.actionSets（本文简称为 Actions 方式）。Actions 方式为界面上不同区域的表现方式提供了相应的扩展点，并且没有分离其界面表现和内在实现。恰恰相反，Commands 方式通过三步有效的达到界面表现和内部实现的分离：首先，通过 org.eclipse.ui.commands 扩展点创建命令和类别（Category），并且可以把某些命令放在一个类别（Category）中；然后，通过 org.eclipse.ui.menus 指定命令出现在界面的哪个区域（视图菜单 / 主菜单 / 上下文菜单）；最后通过 org.eclipse.ui.handlers 指定命令的实现。因此，Eclipse 推荐新开发的插件使用 Commands 来创建您的界面菜单。当然，由于 Actions 在现有的插件中用得比较多，如果我们需要扩展或基于之前的插件开发，也需要对其进行了解。除此之外，针对上下文菜单，虽然 Commands 和 Actions 方式均可以创建上下文菜单，但是 Eclipse 还提供了另外一种创建上下文菜单的扩展点 org.eclipse.ui.popupMenus（本文简称为 popupMenus 方式），本文将就这三种扩展点做详细的介绍。
+
 # 10.开发第一个插件项目
 
 ## 10.1 创建插件工程
@@ -818,11 +820,63 @@ public class Activator extends AbstractUIPlugin {
 
 ### 11.2.1 使用模板创建拓展
 
+[本项目连接](https://github.com/NESCAR/eclipse_plugin_dev_examples_song/tree/master/com.nescar.examples.actions)
+
 打开“地址本”插件清单编辑器（plugin.xml文件），选择“拓展”页，在“拓展”选项卡中单击“新建”，在弹出的上下文菜单中选择“新建”`->`“拓展”命令来打开“新建拓展”向导，比如出创建一个`org.eclipse.ui.munus`的拓展点。
 
-可以在现有的contribution下建立menu，然后
+* 创建和设置command
 
-<img src="/images/wiki/EclipsePluginDev/createMenu.png" width="800" alt="Menu创建">
+  首先，通过 `org.eclipse.ui.commands` 扩展点创建命令和类别（Category），并且可以把某些命令放在一个类别（Category）中。
 
-<img src="/images/wiki/EclipsePluginDev/NescInfo.png" width="800" alt="Menu设置">
+  <img src="/images/wiki/EclipsePluginDev/createCommand.png" width="800" alt="创建command">
+
+  设置，name表示菜单项的名称。
+
+  <img src="/images/wiki/EclipsePluginDev/setCommand.png" width="800" alt="创建command">
+
+  **Command将菜单项添加到主菜单及其工具栏上。**
+
+* 创建和设置Handler
+
+  在`org.eclipse.ui.handlers`拓展点创建handler，然后在`Extention Element Details`中定义commandId和class，commandId是**要引用的**（即上面的）command的ID号，可以根据指向的类名取；class表示指向（使用）的一个类，此类（继承了抽象类AbstractHandler）中包含方法。
+
+  <img src="/images/wiki/EclipsePluginDev/createAndSetHandler.png" width="800" alt="创建和设置Handler">
+
+* 创建和设置key
+
+  在`org.eclipse.ui.bindings`拓展点中创建`key`，
+
+  <img src="/images/wiki/EclipsePluginDev/createAndSetKey.png" width="800" alt="创建和设置Key">
+
+* 在`org.eclipse.ui.menus`这一拓展点下创建贡献（contribution）
+
+  <img src="/images/wiki/EclipsePluginDev/createMenuContribution.png" width="500" alt="MenuContribution创建">
+
+* 创建和设置贡献内的menu
+
+  此项对应Eclipse菜单栏的项目
+
+  创建，
+
+  <img src="/images/wiki/EclipsePluginDev/createMenu.png" width="800" alt="Menu创建">
+
+  设置，其中label对应Eclipse菜单栏的项目名称，
+
+  <img src="/images/wiki/EclipsePluginDev/NescInfo.png" width="800" alt="Menu设置">
+
+* 创建和设置贡献内的command
+
+  在menu中创建command。
+
+  设置，其中commandId引用对应的command。
+
+  <img src="/images/wiki/EclipsePluginDev/setContributionCommand.png" width="800" alt="设置贡献内的command">
+
+* 效果图
+
+  图中，Nesc Information菜单的名称为menu的label，Nesc Info Command菜单栏的名称为command的name。
+
+  <img src="/images/wiki/EclipsePluginDev/apperance.png" width="300" alt="效果图1">
+
+  <img src="/images/wiki/EclipsePluginDev/apperance2.png" width="300" alt="效果图2">
 
