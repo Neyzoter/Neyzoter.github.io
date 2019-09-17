@@ -832,7 +832,7 @@ public class Activator extends AbstractUIPlugin {
 
   设置，name表示菜单项的名称。
 
-  <img src="/images/wiki/EclipsePluginDev/setCommand.png" width="800" alt="创建command">
+  <img src="/images/wiki/EclipsePluginDev/setCommand.png" width="500" alt="创建command">
 
   **Command将菜单项添加到主菜单及其工具栏上。**
 
