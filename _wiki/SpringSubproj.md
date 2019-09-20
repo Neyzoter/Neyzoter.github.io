@@ -44,7 +44,7 @@ Spring Security是一个专注于Java应用的身份验证和授权的框架。�
 
   Bean通过注解@Service声明为一个Spring容器管理的Bean,Spring容器会扫描classpath路径下的所有类，找到带有@Service注解的Impl类,并根据Spring注解对其进行初始化和增强
 
-- @Repositpry 在数据访问层（dao层）使用
+- @Repository 在数据访问层（dao层）使用
 
 - @Controller 用于标注控制层组件
 

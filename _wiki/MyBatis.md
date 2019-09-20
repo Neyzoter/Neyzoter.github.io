@@ -447,5 +447,10 @@ public class SpringMyBatisTest {
 }
 ```
 
+## 2.3 注解
 
+### 2.3.1 @Mapper
 
+@Mapper可以将一个接口（interface）生成相应的实现类。
+
+*补充*：Spring的@MapperScan也可以实现接口实现类，可以操作整个包内的接口。

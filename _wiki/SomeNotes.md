@@ -427,7 +427,24 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
   [MD5的实现原理](http://neyzoter.cn/2019/01/25/MD5-Verify/)
 
+### 5.1.5 Spring
+
+#### 5.1.5.1 注解
+
+* **@Component、@Repository、@Service和@Controller的区别？**
+
+  @Repository、@Service和@Controller是@Component（通用注解）的拓展，具有特定的功能。
+
+  | 注解        | 含义                                                         |
+  | ----------- | ------------------------------------------------------------ |
+  | @Component  | 最普通的组件，可以被注入到spring容器进行管理                 |
+  | @Repository | 作用于持久层（DAL），具有将数据库操作抛出的异常翻译转化为spring的持久层异常的功能 |
+  | @Service    | 作用于逻辑层，标注该类处于业务逻辑层                         |
+  | @Controller | 作用于表现层，具有将请求进行转发，重定向的功能               |
+
   
+
+
 
 ## 5.2 前端技术
 
