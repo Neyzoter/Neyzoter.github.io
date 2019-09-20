@@ -49,5 +49,9 @@ keywords: IDEA, Springboot, properties, modules
 
 此后，可以实现运行顶层应用（上图中的uop子模块），application.properties会激活dal模块中的application-userMysql.properties。
 
+# 3.项目参考地址
+
+[本项目Github地址](https://github.com/Neyzoter/aiot)
+
 
 
