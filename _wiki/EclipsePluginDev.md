@@ -850,6 +850,12 @@ public class Activator extends AbstractUIPlugin {
 
 * 在`org.eclipse.ui.menus`这一拓展点下创建贡献（contribution）
 
+  我们也可以把菜单项添加到已经存在的菜单当中，例如添加一个菜单项到 Eclipse 的 Search 主菜单当中，其 locationURI 为：
+
+  `menu:org.eclipse.search.menu?dialogGroup`
+
+  也可以设置一个新的菜单。
+
   <img src="/images/wiki/EclipsePluginDev/createMenuContribution.png" width="500" alt="MenuContribution创建">
 
 * 创建和设置贡献内的menu
@@ -874,7 +880,7 @@ public class Activator extends AbstractUIPlugin {
 
 * 效果图
 
-  图中，Nesc Information菜单的名称为menu的label，Nesc Info Command菜单栏的名称为command的name。
+  图中，Nesc Information菜单的名称为menu的label，Nesc Info Command菜单项（Nesc Information菜单的项目）的名称为command的name。
 
   <img src="/images/wiki/EclipsePluginDev/apperance.png" width="200" alt="效果图1">
 
