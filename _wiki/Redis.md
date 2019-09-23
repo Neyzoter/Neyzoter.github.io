@@ -761,9 +761,9 @@ redis 127.0.0.1:6379> PFCOUNT w3ckey
 
 Redis 发布订阅(pub/sub)是一种消息通信模式：发送者(pub)发送消息，订阅者(sub)接收消息。 
 
-<img src="image/wiki/Redis/sub.png" width=700 alt="订阅">
+<img src="image/wiki/Redis/sub.png" width="700" alt="订阅">
 
-<img src="image/wiki/Redis/pub.png" width=700 alt="发布">
+<img src="image/wiki/Redis/pub.png" width="700" alt="发布">
 
 **订阅者的运行**
 
