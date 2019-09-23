@@ -53,9 +53,25 @@ K8s的Master包括四个主要的组件：API Server、Controller、Scheduler �
 
 * **API Server**
 
-  用于处理API操作，组件之间一般不进行独立连接，依赖于API Server的消息传达。
+  用于处理API操作，组件之间一般不进行独立连接，依赖于API Server的消息传达。*本身在部署结构上可以水平拓展的组件。*
 
+* **Controller**
 
+  管理集群状态，如自动容器修复、自动水平扩张。*可进行热备的部署组件，只有一个激活。*
+
+* **Scheduler**
+
+  把一个用户提交的 Container，依据它对 CPU、对 memory 请求大小，找一台合适的节点，进行放置
+
+* **etcd**
+
+  高可用的分布式存储系统，API Server中所需要的原信息都被放置在etcd。
+
+### 1.2.3 Node
+
+Node在Kubernetes集群中运行业务负载，每个业务负载都会一Pod的形式运行。**一个Pod中运行一个或者多个容器，**而Kubelet是真正运行Pod的组件。Kubelet通过API Server接收到所需要Pod运行的状态，然后提交到Container Runtime组件中。
+
+<img src="image/wiki/k8s/structure_k8s_node_details.png" width="600" alt="包括Node细节的k8s架构">
 
 
 
