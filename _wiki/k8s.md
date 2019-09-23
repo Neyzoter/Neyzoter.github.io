@@ -23,7 +23,7 @@ Kubernetes = K8(个单词)s，希腊语，表示舵手。Kubernetes是一个自�
 
 Kubernetes调度器可以将用户提交的容器分配到Kubernetes管理的集群的某一个节点上。比如调度器会根据容器所需的CPU和内存来寻找较为空闲的机器，进行放置（placement）操作。比如下图中的正在调度的容器（红色）很有可能放置到第二个空闲的机器上。
 
-<img src="image/wiki/Redis/scheduling_example.png" width=700 alt="调度例子">
+<img src="image/wiki/k8s/scheduling_example.png" width=700 alt="调度例子">
 
 
 
