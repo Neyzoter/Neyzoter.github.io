@@ -73,7 +73,69 @@ Node在Kubernetes集群中运行业务负载，每个业务负载都会一Pod的
 
 <img src="image/wiki/k8s/structure_k8s_node_details.png" width="600" alt="包括Node细节的k8s架构">
 
+Storage Plugin完成存储操作，Network Plugin完成网络操作。
 
+### 1.2.4 部署过程
+
+* 1.UI或者CLI提交一个Pod给Kubernetes的API Server
+* 2.API Server将信息写入到存储系统etcd
+* 3.调度器（Scheduler）通过API Server的watch或者notification机制得到该消息，即一个Pod需要被调度
+* 4.Scheduler根据内存状态进行调度决策，并给API Server返回状态
+* 5.API Server将此次操作写入到etcd，并通知相应节点进行Pod的真正启动
+* 6.kubelet得到通知，调Container runtime来真正启动配置容器和容器的运行环境
+* 7.kubelet调度Storage Plugin存储存储，Network Plugin配置网络
+
+<img src="image/wiki/k8s/Run_Task_Process.webp" width="800" alt="Pod运行过程">
+
+## 1.3 K8s的核心概念
+
+### 1.3.1 Pod
+
+Pod是K8s的最小调度以及资源单元。用户可通过K8s的Pod API胜场Pod，让Kubernetes对Pod进行调度，即放到某一个节点上运行。一个Pod中会包含一个或者多个容器。一个Pod还包括Volume存储资源。
+
+<img src="image/wiki/k8s/Pod_structure.png" width="800" alt="Pod结构">
+
+**Pod给Pod内容器提供共享的运行环境，共享同一个网络环境（localhost）。**Pod和Pod之间，互相隔离。
+
+### 1.3.2 Volume
+
+Volume是卷，管理Kubernetes存储，可以访问文件目录。一个卷可以被挂载在Pod中一个或者多个容器的制定路劲下面。K8s的Volume支持很多存储插件，可以支持本地存储，如ceph、GlusterFS，云存储如阿里云云盘、AWS的云盘和Google的云盘。
+
+### 1.3.3 Deployment
+
+Deployment可以定义一组Pod的副本数目以及Pod版本，实现应用的真正管理，而Pod是组成Deployment的最小单元。
+
+Controller来维护Deployment中Pod的数目，帮助Deployment自动回复失败的Pod。
+
+<img src="image/wiki/k8s/Deployment_Pods.png" width="800" alt="Pod结构">
+
+### 1.3.4 Service
+
+Service提供一个或者多个Pod实例的稳定访问地址。
+
+实现Service由多种方式，K8s支持Cluster IP，比如kuber-proxy组网、nodePort、LoadBalancer。
+
+<img src="image/wiki/k8s/Service_Virtual_IP.png" width="800" alt="Service提供访问地址">
+
+### 1.3.5 Namespace
+
+Namespace用于实现集群内部的逻辑隔离，包括鉴权、资源管理。Kubernetes的每个资源，如Pod、Deployment、Service都属于一个Namespace，**同一个Namespace内的资源需要唯一命名**。Alibaba内部会有多个business units，每个之间都有视图上的隔离，并且在鉴权上不一样。
+
+<img src="image/wiki/k8s/Two_Namespace.png" width="800" alt="2个Namespace">
+
+### 1.3.6 K8s的API
+
+K8s的API由HTTP+JSON组成，通过HTTP访问，content的内容是JSON格式。
+
+以下是访问路劲和content内容。
+
+<img src="image/wiki/k8s/api_format.png" width="800" alt="api格式">
+
+**kind**表述要操作的资源。
+
+**Metadate**中包括Pod的名字，如nginx。
+
+**Spec**的status，表达该资源当前的状态，如正在被调度、running、terminates或者执行完毕。
 
 # 参考
 
