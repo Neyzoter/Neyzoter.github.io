@@ -12,6 +12,8 @@ keywords: Java后端, Redis
 
 ## 1.1 简介
 
+### 1.1.1 特点
+
 **Redis特点**
 
 - Redis支持数据的持久化，可以将内存中的数据保持在磁盘中，重启的时候可以再次加载进行使用。
@@ -24,6 +26,30 @@ keywords: Java后端, Redis
 - 丰富的数据类型 – Redis支持二进制案例的 Strings, Lists, Hashes, Sets 及 Ordered Sets 数据类型操作。
 - 原子 – Redis的所有操作都是原子性的，同时Redis还支持对几个操作全并后的原子性执行。
 - 丰富的特性 – Redis还支持 publish/subscribe, 通知, key 过期等等特性。
+
+### 1.1.2 Redis存储结构
+
+<img src="image/wiki/Redis/Redis_Hashmap.jpg" width="700" alt="Redis数据结构">
+
+考虑到数组越大，占用内存越多，所以限制数组的长度为n，有点数据通过链表的方式存储在某一个元素的链表下游。
+
+**Java8里头的HashMap在元素增长到一定程度时会从链表转成一颗红黑树，来减缓查找性能的下降**
+
+### 1.1.3 Redis的C/S架构
+
+Redis的Server是**单线程**服务器，基于**Event-Loop模式**来处理Client的请求，这一点和NodeJS很相似。
+
+Redis可以通过部署**集群**，提高带宽和处理能力。
+
+<img src="image/wiki/Redis/Redis_Cluster.jpg" width="700" alt="Redis集群">
+
+集群中的节点可以通过Master-Slaver模式实现高可用（一台宕机，其余可工作）和查询速率提升（Master可交任务给Slaver处理）：
+
+<img src="image/wiki/Redis/Redis_Cluster_Master_Slaver.jpg" width="700" alt="Redis的Master和Slaver模式">
+
+
+
+
 
 ## 1.2 安装
 
