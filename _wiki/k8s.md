@@ -43,7 +43,7 @@ Kubernetes会检查业务的负载，CPU负载过高，或者响应时间过长�
 
 K8s架构是一个典型的二层架构和server-client架构。Master作为中央的管控节点，会连接所有Node。UI、clients（CLI）这类组件**只**会和Master进行连接，把希望的状态或者想执行的命令下发给Master，Master会将命令和状态下发给相应的节点执行。
 
-<img src="/imagess/wiki/k8s/structure_k8s.png" width="600" alt="k8s架构">
+<img src="/images/wiki/k8s/structure_k8s.png" width="600" alt="k8s架构">
 
 ### 1.2.2 Master组件
 
