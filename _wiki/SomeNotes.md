@@ -342,7 +342,13 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
 * **Kafka中的broker、topic、partition的关系？**
 
-* 
+  broker是一个节点，topic是一个定义主题，partition是一个topic可以分为多个partition（在不同的broker中），不同producer可以给一个topic的不同partition（也就是不同broker）生产消息。
+
+* **消费组的作用？**
+
+  一个消费组内包含多个消费者，而订阅了一个topic后，topic内每个partition都会下发给订阅的消费组，**组内只有一个消费者消费**。一个消费者的多个消费者同时消费topic（的多个partition），提高带宽和处理能力。如下图为一个topic的P0-3，分别给不同的消费组发布消息，
+
+  <img src="/images/wiki/SomeNotes/consumer-groups.png" width="600" alt="Cluster">
 
 * **Kafka vs Redis？**
 
