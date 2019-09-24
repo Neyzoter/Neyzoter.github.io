@@ -29,7 +29,7 @@ keywords: Java后端, Redis
 
 ### 1.1.2 Redis存储结构
 
-<img src="image/wiki/Redis/Redis_Hashmap.jpg" width="700" alt="Redis数据结构">
+<img src="images/wiki/Redis/Redis_Hashmap.jpg" width="700" alt="Redis数据结构">
 
 考虑到数组越大，占用内存越多，所以限制数组的长度为n，有点数据通过链表的方式存储在某一个元素的链表下游。
 
@@ -41,11 +41,11 @@ Redis的Server是**单线程**服务器，基于**Event-Loop模式**来处理Cli
 
 Redis可以通过部署**集群**，提高带宽和处理能力。
 
-<img src="image/wiki/Redis/Redis_Cluster.jpg" width="700" alt="Redis集群">
+<img src="images/wiki/Redis/Redis_Cluster.jpg" width="700" alt="Redis集群">
 
 集群中的节点可以通过Master-Slaver模式实现高可用（一台宕机，其余可工作）和查询速率提升（Master可交任务给Slaver处理）：
 
-<img src="image/wiki/Redis/Redis_Cluster_Master_Slaver.jpg" width="700" alt="Redis的Master和Slaver模式">
+<img src="images/wiki/Redis/Redis_Cluster_Master_Slaver.jpg" width="700" alt="Redis的Master和Slaver模式">
 
 
 
@@ -787,9 +787,9 @@ redis 127.0.0.1:6379> PFCOUNT w3ckey
 
 Redis 发布订阅(pub/sub)是一种消息通信模式：发送者(pub)发送消息，订阅者(sub)接收消息。 
 
-<img src="image/wiki/Redis/sub.png" width="700" alt="订阅">
+<img src="images/wiki/Redis/sub.png" width="700" alt="订阅">
 
-<img src="image/wiki/Redis/pub.png" width="700" alt="发布">
+<img src="images/wiki/Redis/pub.png" width="700" alt="发布">
 
 **订阅者的运行**
 
