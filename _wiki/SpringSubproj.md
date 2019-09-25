@@ -456,7 +456,7 @@ public String addUser4(@PathVariable String username,@PathVariable String passwo
 
 ## 2.12 @Configuration和@Bean
 
-`@Configuration`用于启动容器，`@Bean`用于注册Bean对象。
+**`@Configuration`用于启动容器，`@Bean`用于注册Bean对象。**
 
 ### 2.12.1 @Configuration
 
