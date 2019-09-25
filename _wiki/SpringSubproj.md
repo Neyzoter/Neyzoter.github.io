@@ -454,6 +454,71 @@ public String addUser4(@PathVariable String username,@PathVariable String passwo
 }
 ```
 
+## 2.12 @Configuration和@Bean
+
+`@Configuration`用于启动容器，`@Bean`用于注册Bean对象。
+
+### 2.12.1 @Configuration
+
+@Configuration标注在类上，相当于把该类作为spring的xml配置文件中的`<beans>`，作用为：**配置spring容器(应用上下文)**
+
+```java
+package com.test.spring.support.configuration;
+
+@Configuration
+public class TestConfiguration {
+    public TestConfiguration(){
+        System.out.println("spring容器启动初始化。。。");
+    }
+}
+```
+
+相当于如下，还没有配置具体的Bean对象
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" xmlns:jdbc="http://www.springframework.org/schema/jdbc"  
+    xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:task="http://www.springframework.org/schema/task" xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd" default-lazy-init="false">
+    
+</beans>
+```
+
+### 2.12.2 @Bean
+
+@Bean标注在方法上(返回某个实例的方法)，等价于spring的xml配置文件中的`<bean>`，作用为：**注册bean对象**
+
+```java
+@Configuration
+public class TestConfiguration {
+        public TestConfiguration(){
+            System.out.println("spring容器启动初始化。。。");
+        }
+
+    //@Bean注解注册bean,同时可以指定初始化和销毁方法
+    //@Bean(name="testNean",initMethod="start",destroyMethod="cleanUp")
+    @Bean
+    @Scope("prototype")  //定义为原型作用域，见下方作用域解释
+    public TestBean testBean() {
+        return new TestBean();
+    }
+}
+```
+
+**Bean对象作用域**
+
+1.`singelton`（单例），则Spring IOC 容易只存在一个实例；
+
+2.`prototype`（原型），每一次请求（将其注入到另一个bean中，或者以程序的方式调用容器的getBean()方法）都会产生一个新的bean实例，相当与一个new的操作。
+
 # 3、使用Spring JPA
 
 ## 3.1 核心概念
@@ -1029,3 +1094,4 @@ OAuth 允许用户提供一个令牌给第三方网站，一个令牌对应一�
 
 ## 4.2 Spring Security
 
+Spring Security支持`Spring Security Kerberos`、`Spring Security OAuth`、`Spring Security SAML`。

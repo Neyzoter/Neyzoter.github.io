@@ -78,6 +78,85 @@ public class Singleton {
 
 ### 2.2.2 适配器模式
 
+**介绍**
+
+功能：有一个接口需要实现，但是我们现成的对象都不满足，需要加一层适配器来进行适配。适配器模式具体可分为，默认适配器模式、对象适配器模式、类适配器模式。
+
+* 默认适配器模式(Default Adapter)
+
+  ```java
+  // FileAlterationListener接口中定义了众多方法
+  public interface FileAlterationListener {
+      void onStart(final FileAlterationObserver observer);
+      void onDirectoryCreate(final File directory);
+      void onDirectoryChange(final File directory);
+      void onDirectoryDelete(final File directory);
+      void onFileCreate(final File file);
+      void onFileChange(final File file);
+      void onFileDelete(final File file);
+      void onStop(final FileAlterationObserver observer);
+  }
+  ```
+
+  而有时希望实现其中几个方法，而不是全部实现，但是接口的方法必须实现，比较麻烦。可以通过一个**适配器**将不需要的方法统一设置为空方法，这样所有继承适配器的方法可以单独实现某几个类。
+
+  ```java
+  public class FileAlterationListenerAdaptor implements FileAlterationListener {
+      public void onStart(final FileAlterationObserver observer) {    }
+      public void onDirectoryCreate(final File directory) {    }
+      public void onDirectoryChange(final File directory) {    }
+      public void onDirectoryDelete(final File directory) {    }
+      public void onFileCreate(final File file) {    }
+      public void onFileChange(final File file) {    }
+      public void onFileDelete(final File file) {    }
+      public void onStop(final FileAlterationObserver observer) {    }
+  }
+  ```
+
+  接着继承该方法，即可做到只实现最初接口中的某几个方法，
+
+  ```java
+  public class FileMonitor extends FileAlterationListenerAdaptor {
+      public void onFileCreate(final File file) {
+          // 文件创建
+          doSomething();
+      }
+      public void onFileDelete(final File file) {
+          // 文件删除
+          doSomething();
+      }
+  }
+  ```
+
+  
+
+  
+
+
+
+**使用场景**
+
+* Spring Security在配置资源安全和http安全时，分别有适配器——`ResourceServerConfigurerAdapter`和`AuthorizationServerConfigurerAdapter`。
+
+  ```java
+      @Configuration
+      @EnableResourceServer
+      protected static class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
+          @Override
+          public void configure(ResourceServerSecurityConfigurer resources) {
+              resources.resourceId(DEMO_RESOURCE_ID).stateless(true);
+          }
+          @Override
+          public void configure(HttpSecurity http) throws Exception {
+              http
+                      .authorizeRequests()
+                      .antMatchers("/order/**").authenticated();//配置order访问控制，必须认证过后才可以访问
+          }
+      }
+  ```
+
+  
+
 ### 2.2.3 桥梁模式
 
 ### 2.2.4 装饰模式
