@@ -1109,3 +1109,24 @@ OAuth 允许用户提供一个令牌给第三方网站，一个令牌对应一�
 ## 4.2 Spring Security
 
 Spring Security支持`Spring Security Kerberos`、`Spring Security OAuth`、`Spring Security SAML`。
+
+### 4.2.1 Spring Security介绍
+
+Java在正常servelet处理http的请求可能会经过很多的filter。Spring Security有一个FilterChainProxy的代理类，该类实现了servlet接口。
+
+<img src="/images/wiki/SpringSubproj/FiltersandProxy.webp" width="600" alt="Spring Security的filter chain">
+
+FilterChainProxy内部有一个`List<SecurityFilterChain> filterChains`，每个`SecurityFilterChain`也是一个chain，每个chain中有多个filter。每个`SecurityFilterChain`都会对应处理一个http请求（或者一个pattern，如`/foo/**`）。
+
+<img src="/images/wiki/SpringSubproj/FilterChain.webp" width="600" alt="Spring Security的filter chain">
+
+
+
+### 4.2.1 WebSecurityConfigurerAdapter
+
+@EnableWebSecurity注解以及WebSecurityConfigurerAdapter一起配合提供基于web的security，实现以下功能：
+
+- 要求用户在进入你的应用的任何URL之前都进行验证
+- 创建一个用户名是“user”，密码是“password”，角色是“ROLE_USER”的用户
+- 启用HTTP Basic和基于表单的验证
+- Spring Security将会自动生成一个登陆页面和登出成功页面
