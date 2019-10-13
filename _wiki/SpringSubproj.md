@@ -1078,6 +1078,18 @@ OAuth 允许用户提供一个令牌给第三方网站，一个令牌对应一�
 
 *补充*：OAuth 关注的是 authorization( 授权 ) ；而 OpenID 侧重的是 authentication （认证）。
 
+#### 4.1.5.5 OAuth 2.0的授权方式
+
+* 授权码模式(Authorization Code）
+
+* 简化模式（implicit）
+
+* 密码模式（Resource Owner Password Credentials）
+
+* 客户端模式（Client Credentials）
+
+  主要用于API认证，和用户无关
+
 ### 4.1.6 SAML、OAuth、OpenID的比较
 
 * **SAML**
@@ -1091,6 +1103,8 @@ OAuth 允许用户提供一个令牌给第三方网站，一个令牌对应一�
 * **OpenID**
 
   认证
+
+
 
 ## 4.2 Spring Security
 
