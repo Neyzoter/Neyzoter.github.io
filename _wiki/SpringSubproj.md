@@ -1122,7 +1122,7 @@ FilterChainProxy内部有一个`List<SecurityFilterChain> filterChains`，每个
 
 
 
-### 4.2.1 WebSecurityConfigurerAdapter
+### 4.2.2  WebSecurityConfigurerAdapter
 
 @EnableWebSecurity注解以及WebSecurityConfigurerAdapter一起配合提供基于web的security，实现以下功能：
 
@@ -1130,3 +1130,15 @@ FilterChainProxy内部有一个`List<SecurityFilterChain> filterChains`，每个
 - 创建一个用户名是“user”，密码是“password”，角色是“ROLE_USER”的用户
 - 启用HTTP Basic和基于表单的验证
 - Spring Security将会自动生成一个登陆页面和登出成功页面
+
+Springboot引入Spring-Security相关包时，会默认创建一个WebSecurityConfigurerAdapter，拦截所有的http请求（`/**`），且Order值为`SecurityProperties.BASIC_AUTH_ORDER`（可以通过为WebSecurityConfigurerAdapter设置Order，Order越低，优先级越高），并创建一些filter。
+
+<img src="/images/wiki/SpringSubproj/MorenFilter.webp" width="600" alt="Spring Security的filter">
+
+
+
+* WebSecurityConfigurerAdapter与ResourceServerConfigurerAdapter哪个生效？
+
+  WebSecurityConfigurerAdapter与ResourceServerConfigurerAdapter同时在的话且都配置了处理url为：`/api/**`，**默认是后者会生效**。因为继承ResourceServerConfigurerAdapter的类往往使用`@EnableResourceServer`，其中一个作用是Order设置为3,而继承WebSecurityConfigurerAdapter的类默认Order为100。继承ResourceServerConfigurerAdapter的类优先级更高。
+
+  我们每声明一个`*Adapter`类，都会产生一个filterChain。前面我们讲到一个request（匹配url）只能被一个filterChain处理，这就解释了为什么二者Adapter同时在的时候，前者默认为什么会失效的原因。
