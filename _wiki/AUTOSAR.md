@@ -1921,6 +1921,10 @@ org.artop.aal.examples.actions
 
 ## 9.1 AUTOSAR Blockset
 
+AUTOSAR Blockset 提供了用于 AUTOSAR 库例程和基础软件 (BSW) 服务（包括 NVRAM 和诊断）的模块和结构。通过将 BSW 服务与应用程序软件模型一起进行仿真，可以在不离开 Simulink 的情况下验证 AUTOSAR ECU 软件。
 
+### 9.1.1 对 AUTOSAR Classic 软件组件进行建模
+
+在 Simulink 中，使用默认 AUTOSAR 端口、接口和其他配置自动创建 AUTOSAR Classic 软件组件。
 
 # X.一些笔记
