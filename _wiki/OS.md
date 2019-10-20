@@ -94,13 +94,39 @@ graph TB;
 
 # 2.中断及系统调用
 
-## 2.1 加载程序
+## 2.1 BIOS
 
-<img src="/images/wiki/OS/bios_startup_intro.png" width="500" alt="外核">
+### 2.1.1 加载程序
 
-<img src="/images/wiki/OS/bootloader.png" width="500" alt="外核">
+<img src="/images/wiki/OS/bios_startup_intro.png" width="500" alt="bios启动介绍">
 
-## 2.2 BIOS系统调用
+实模式下最多访问1MB空间。**BIOS（启动）固件的功能**：
+
+* 基本输入输出的程序
+
+  完成从磁盘读数据、从键盘读输入
+
+* 系统设置信息
+
+  设置系统从哪里启动，如网络、磁盘等
+
+<img src="/images/wiki/OS/bootloader.png" width="500" alt="引导程序">
+
+具体的**加载过程**如下：
+
+* BIOS固件
+
+  1.将**磁盘**中的引导扇区（引导扇区的文件系统格式固定，使得BIOS认识）的**加载程序**加载到内存的0x7c00
+
+  2.跳转到CS:IP = 0000:7c00
+
+* 加载程序
+
+  3.将**操作系统**的代码和数据从硬盘（文件系统为加载程序认识）加载到**内存**
+
+  4.跳转到内存中的操作系统起始地址开始执行
+
+### 2.1.2 BIOS系统调用
 
 **只能在实模式下工作。**
 
