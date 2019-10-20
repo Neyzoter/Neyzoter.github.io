@@ -96,9 +96,9 @@ graph TB;
 
 ## 2.1 加载程序
 
-<img src="/images/wiki/OS/bios_startup_intro.png" width="400" alt="外核">
+<img src="/images/wiki/OS/bios_startup_intro.png" width="500" alt="外核">
 
-<img src="/images/wiki/OS/bootloader.png" width="400" alt="外核">
+<img src="/images/wiki/OS/bootloader.png" width="500" alt="外核">
 
 ## 2.2 BIOS系统调用
 
