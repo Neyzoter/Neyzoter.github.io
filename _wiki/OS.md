@@ -143,6 +143,8 @@ BIOS以中断调用的方式，提供了基本的IO功能：
 
 ## 2.2 系统启动流程
 
+### 2.2.1 系统启动流程
+
 在现有计算机中，可能有多个磁盘、系统，所以需要一个主引导分区，再由主引导分区指向特定的活动分区。
 
 ```
@@ -185,7 +187,7 @@ BIOS -> 主引导记录（主引导扇区代码） -> 活动分区的引导扇�
 
   *2.6 按指定顺序从软盘、硬盘或者光驱启动*
 
-* **3.主引导分区MBR**
+* **3.主引导分区MBR（Master Boot Record）**
 
   <img src="/images/wiki/OS/MBR.png" width="500" alt="主引导分区">
 
@@ -199,7 +201,7 @@ BIOS -> 主引导记录（主引导扇区代码） -> 活动分区的引导扇�
 
     描述分区状态和位置
 
-    每个分区描述信息占据16字节
+    每个分区描述信息占据16字节，**最多4个**
 
   * 结束标准
 
@@ -220,6 +222,73 @@ BIOS -> 主引导记录（主引导扇区代码） -> 活动分区的引导扇�
     跳转到加载程序**bootloader**
 
   * 结束标志
+
+### 2.3.1 系统启动规范
+
+* **BIOS**
+
+  * 固化到计算机主板上的程序
+
+  * 包括系统设置、自检程序和系统自启动程序
+  * BIOS-MBR（主引导记录，为了满足从几个分区中选择一个启动，最多4个，见上面解释）、BIOS-GPT（全局唯一标识表，在分区表中描述更多的分区结构）、PXE（满足从网络上加载内核，BIOS中需要加入通信栈）
+
+* **UEFI**
+  * 接口标准
+  * 在所有平台上一致的操作系统启动服务，只有可信的才会加载
+
+## 2.3 中断、异常和系统调用
+
+和内核 打交道的方法包括中断（来自硬件设备的处理请求）、异常（非法指令或者其他原因导致当前指令执行失败后的处理请求）、系统调用（应用程序主动向操作系统发出的服务请求），具体信息流见下图。
+
+<img src="/images/wiki/OS/kernel_interface.png" width="500" alt="中断、异常和系统调用">
+
+**异常处理可嵌套，就像中断可嵌套一样。**
+
+## 2.4 系统调用
+
+### 2.4.1 系统调用举例
+
+* **printf函数的系统调用过程**
+
+  printf为标准C库，其实C库是调用的内核的write()，并且有多个不同的write函数，实现指向文件等。
+
+  <img src="/images/wiki/OS/printf_system_call.png" width="700" alt="printf的系统调用过程">
+
+* **三种常用的应用程序变成接口**
+  * win32 API用于windows
+  * POSIX API用于POSIX-based systems（Unix、Linux、Mac OS X的所有版本）
+  * Java API用于Java虚拟机
+
+### 2.4.2 系统调用的实现
+
+系统调用接口根据**系统调用号**来维护表的索引，具体为应用程序调用系统调用接口，系统调用接口通过**软中断**来选择系统调用表的功能（每个功能对应一个编号）。
+
+**系统调用和函数调用的区别?**
+
+* 系统调用
+
+  INT和IRET（Int RETurn）指令用于系统调用。函数调用时，**堆栈切换（内核态和用户态使用不同的堆栈）和特权级的转换**。
+
+* 函数调用
+
+  CALL和RET用于常规调用，没有堆栈切换。
+
+## 2.5 系统调用实例
+
+```
+1. kern/trap/trapentry.S: alltraps()
+2. kern/trap/trap.c: trap()
+	tf->trapno == T_SYSCALL  // 发现是系统调用
+3. kern/syscall/syscall.c: syscall()
+	tf->tf_regs.reg_eax ==SYS_read   // 发现是系统调用的读取函数
+4. kern/syscall/syscall.c: sys_read()
+	从 tf->sp 获取 fd, buf, length   //参数
+5. kern/fs/sysfile.c: sysfile_read()
+	读取文件
+6. kern/trap/trapentry.S: trapret()  //返回
+```
+
+
 
 # 3.内存管理
 
@@ -267,3 +336,27 @@ X86-32指的是80386这种机器，是intel的32位机器，有四种运行模�
 **逻辑地址：**应用程序直接使用的地址空间。
 
 **段机制、页机制：**地址映射关系
+
+## 9.2 实验一 bootloader启动ucore os
+
+### 9.2.1 X86启动顺序
+
+启动和CS和EIP寄存器相关。
+
+<img src="/images/wiki/OS/IA32Intel_register.png" width="600" alt="IA32的寄存器">
+
+* 1.第一条指令
+
+  `Base + EIP = FFFF0000H + 0000FFF0H = FFFFFFF0H`
+
+  这是BIOS的EPROM (Erasable Programmable Read Only Memory) 所在地，通常第一条指令是长跳转指令（CS和EIP都会更新），跳转到BIOS代码中。
+
+* 2.BIOS
+
+  BIOS进行一些系统设置、自检程序和系统自启动程序，然后**加载存储设备的第一个扇区（主引导扇区 MBR）**的512个字节（**Bootloader**）到内存的0x7c00，CS:IP跳转到0x7c00的第一条指令开始执行。
+
+* 3.Bootloader
+
+  * 使能保护模式(protection mode) & 段机制(segment-level protection)
+  * 从硬盘上读取kernel in ELF 格式的ucore kernel（跟在MBR后面的扇区）并放到内存中固定位置
+  * 跳转到ucore OS的入口点（Entry Point）执行，控制权交给ucore
