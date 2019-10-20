@@ -100,6 +100,16 @@ hello.c          hello.i       hello.s       hello.o
 
     CALL和RET用于常规调用，没有堆栈切换。
 
+* **段机制是什么？**
+
+  <img src="/images/wiki/OS/segment_descriptors.png" width="600" alt="段机制">
+
+  段寄存器（如CS）指向段描述符，段描述符中包含了起始地址和大小。
+
+  <img src="/images/wiki/OS/segment_details.png" width="600" alt="段机制细节">
+
+  Offset（偏移量）是EIP，而段描述符中存放了起始地址Base Addr。**Base Addr是由CS或者是其他段寄存器所指出来的基址**。`Base Addr + Offset`得到线性地址，如果没有启动页机制，则线性地址就是物理地址。
+
 ## 2.2 Linux
 
 * **nohup和&的区别？**

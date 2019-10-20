@@ -357,6 +357,67 @@ X86-32指的是80386这种机器，是intel的32位机器，有四种运行模�
 
 * 3.Bootloader
 
-  * 使能保护模式(protection mode) & 段机制(segment-level protection)
-  * 从硬盘上读取kernel in ELF 格式的ucore kernel（跟在MBR后面的扇区）并放到内存中固定位置
+  * 使能保护模式(protection mode) & 段机制(segment-level protection)，见下方**段机制**
+  * 从硬盘上读取kernel in ELF 格式的ucore kernel（跟在MBR后面的扇区）并放到内存中固定位置，见下方**加载ELF格式的ucore kernel**说明
   * 跳转到ucore OS的入口点（Entry Point）执行，控制权交给ucore
+
+**段机制**
+
+<img src="/images/wiki/OS/segment_descriptors.png" width="600" alt="段机制">
+
+段寄存器（如CS）指向段描述符，段描述符中包含了起始地址和大小。
+
+<img src="/images/wiki/OS/segment_details.png" width="600" alt="段机制细节">
+
+在一个段寄存器Segment Register里面，会保存一块区域叫做段选择子Segment Selector。段选择子中包含Index，用于索引段描述符表Descriptor Table中的某一个段描述符，其中段描述符表地址、大小等信息由全局描述符表确定（具体见下方）。Offset（偏移量）是EIP，而段描述符中存放了起始地址Base Addr。**Base Addr是由CS或者是其他段寄存器所指出来的基址**。`Base Addr + Offset`得到线性地址，如果没有启动页机制，则线性地址就是物理地址。
+
+<img src="/images/wiki/OS/segment_descriptor_detail.png" width="600" alt="段描述符细节">
+
+以上是段描述符细节。
+
+<img src="/images/wiki/OS/segment_selector.png" width="600" alt="段选择子细节">
+
+以上是段寄存器中的段选择子的内部细节，包括全局描述符表（以GDT全局描述表为例，LDT意思是本地描述表）的地址、优先级（RPL），一般内核优先级为0（最高）、用户态的优先级为3。全局描述符表GDT中包含段描述符表（包含了所有的段描述符）地址，通过加载GDT来找到段描述符的起始地址（通过系统表寄存器System Table Register来实现CS、DS等段寄存器和段描述符的对应关系，存放在GDTR，见下方）。
+
+<img src="/images/wiki/OS/System_Table_Register.png" width="600" alt="系统表寄存器">
+
+
+
+**加载ELF格式的ucore kernel**
+
+```c
+// EFL头信息
+struct elfhdr {
+    uint magic;   // must equal ELF_MAGIC
+    uchar elf[12];
+    ushort type;
+    ushort machine;
+    uint version;
+    uint entry;   // program entry point (in va)
+    uint phoff;   // offset of the program header tables
+    uint shoff;
+    uint flags;
+    ushort ehsize;
+    ushort phentsize;
+    ushort phnum;   // number of program header tables
+    ushort shentsize;
+    ushort shnum;
+    ushort shstrndx;
+};
+```
+
+
+
+```c
+struct proghdr {
+uint type;   // segment type
+uint offset; // beginning of the segment in the file
+uint va;     // where this segment should be placed at
+uint pa;
+uint filesz;
+uint memsz;  // size of the segment in byte
+uint flags;
+uint align;
+};
+```
+
