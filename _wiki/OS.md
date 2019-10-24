@@ -394,12 +394,12 @@ struct elfhdr {
     ushort machine;
     uint version;
     uint entry;   // program entry point (in va)
-    uint phoff;   // offset of the program header tables
+    uint phoff;   // offset of the program header tables ，用于查找下下面结构体proghdr
     uint shoff;
     uint flags;
     ushort ehsize;
     ushort phentsize;
-    ushort phnum;   // number of program header tables
+    ushort phnum;   // number of program header tables ，用于查找下下面结构体proghdr
     ushort shentsize;
     ushort shnum;
     ushort shstrndx;
@@ -411,7 +411,7 @@ struct elfhdr {
 ```c
 struct proghdr {
 uint type;   // segment type
-uint offset; // beginning of the segment in the file
+uint offset; // beginning of the segment in the file，从哪个位置将代码段、数据段读取出来
 uint va;     // where this segment should be placed at
 uint pa;
 uint filesz;
@@ -421,3 +421,40 @@ uint align;
 };
 ```
 
+### 9.2.2 C函数调用的实现
+
+```assembly
+...
+pushal      ;保存当前函数的寄存器到堆栈
+pushl %eax  ;加法乘法指令的缺省寄存器
+push1 %ebx  ;在内存寻址时存放基地址
+push1 %ecx  ;是重复(REP)前缀指令和LOOP指令的内定计数器
+call foo
+popl %ecx
+popl %ebx
+pop1 %eax
+popal       ;弹出寄存器
+
+foo:
+	pushl %ebp    ;将上一个函数的EBP保存
+	mov %esp,%ebp ;将ESP保存到EBP，即本函数的EBP指向栈区域
+	...
+	popl %ebp
+	ret
+```
+
+<img src="/images/wiki/OS/C_call_1.png" width="400" alt="1">
+
+<img src="/images/wiki/OS/C_call_2.png" width="400" alt="2">
+
+<img src="/images/wiki/OS/C_call_3.png" width="400" alt="3">
+
+<img src="/images/wiki/OS/C_call_4.png" width="400" alt="4">
+
+<img src="/images/wiki/OS/C_call_5.png" width="400" alt="5">
+
+<img src="/images/wiki/OS/C_call_6.png" width="400" alt="6">
+
+<img src="/images/wiki/OS/C_call_7.png" width="400" alt="7">
+
+<img src="/images/wiki/OS/C_call_8.png" width="400" alt="8">
