@@ -458,3 +458,67 @@ foo:
 <img src="/images/wiki/OS/C_call_7.png" width="400" alt="7">
 
 <img src="/images/wiki/OS/C_call_8.png" width="400" alt="8">
+
+### 9.2.3 GCC内联汇编
+
+在C语言中使用汇编。比如加载全局描述符表LGDT，必须使用汇编。
+
+```assembly
+;asm
+movl $0xffff,%eax
+```
+
+```c
+//c
+asm("movl $0xffff,%%eax");
+```
+
+**CC汇编语法**
+
+```
+asm(assembler template
+	:output operands (optional)
+	:input operands  (optional)
+	:clobbers        (optional)
+)
+```
+
+**实例1**
+
+```c
+uint32_t cr0;
+// volatile：不优化
+// cr0-5：控制寄存器
+// %0：第一个用到的寄存器
+// r：任意寄存器，r0-r15
+// = ：被修饰的操作只写
+asm volatile ("movl %%cr0, %0\n" :"=r"(cr0));   //  输出到cr0
+cr0 |= 0x80000000;
+asm volatile ("movl %0, %%cr0\n" ::"r"(cr0));   //cr0变量复制给寄存器cr0
+```
+
+对应的汇编：
+
+```assembly
+movl %cr0, %ebx
+movl %ebx, 12(%esp)   ;12(%esp)表示局部变量
+orl $-2147483648, 12(%esp)
+movl 12(%esp), %eax
+movl %eax, %cr0
+```
+
+*补充*
+
+<img src="/images/wiki/OS/oprate_chara.png" width="400" alt="操作符">
+
+<img src="/images/wiki/OS/xiushifu.png" width="400" alt="修饰符">
+
+**实例2**
+
+```c
+long __res, arg1 = 2, arg2 = 22, arg3 = 222, arg4 = 233;
+__asm__ volatile ("int $0x80"   //软中断
+: "=a" (__res)   // 
+: "0" (11),"b" (arg1),"c" (arg2),"d" (arg3),"S" (arg4));
+```
+

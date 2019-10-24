@@ -110,6 +110,32 @@ hello.c          hello.i       hello.s       hello.o
 
   Offset（偏移量）是EIP，而段描述符中存放了起始地址Base Addr。**Base Addr是由CS或者是其他段寄存器所指出来的基址**。`Base Addr + Offset`得到线性地址，如果没有启动页机制，则线性地址就是物理地址。
 
+* **C函数调用的实现过程（压栈和出栈）**
+
+  以此函数为例：
+
+  ```assembly
+  ...
+  pushal      ;保存当前函数的寄存器到堆栈
+  pushl %eax  ;加法乘法指令的缺省寄存器
+  push1 %ebx  ;在内存寻址时存放基地址
+  push1 %ecx  ;是重复(REP)前缀指令和LOOP指令的内定计数器
+  call foo    ;call的时候，会把要返回的执行（下一条指令：popl %ecx）的地址也压栈，在下面图中的Return Address
+  popl %ecx
+  popl %ebx
+  pop1 %eax
+  popal       ;弹出寄存器
+  
+  foo:
+  	pushl %ebp    ;将上一个函数的EBP保存
+  	mov %esp,%ebp ;将ESP保存到EBP，即本函数的EBP指向栈区域
+  	...
+  	popl %ebp
+  	ret           ;将Return Address出栈，从Return Address继续执行
+  ```
+
+​	[说明](<http://neyzoter.cn/wiki/OS/#922-c%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E7%9A%84%E5%AE%9E%E7%8E%B0>)
+
 ## 2.2 Linux
 
 * **nohup和&的区别？**
