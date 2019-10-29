@@ -488,7 +488,7 @@ asm(assembler template
 ```c
 uint32_t cr0;
 // volatile：不优化
-// cr0-5：控制寄存器
+// cr0-4：控制寄存器
 // %0：第一个用到的寄存器
 // r：任意寄存器，r0-r15
 // = ：被修饰的操作只写
@@ -518,7 +518,31 @@ movl %eax, %cr0
 ```c
 long __res, arg1 = 2, arg2 = 22, arg3 = 222, arg4 = 233;
 __asm__ volatile ("int $0x80"   //软中断
-: "=a" (__res)   // 
-: "0" (11),"b" (arg1),"c" (arg2),"d" (arg3),"S" (arg4));
+: "=a" (__res)   // 将eax内容赋值给__res
+: "0" (11),"b" (arg1),"c" (arg2),"d" (arg3),"S" (arg4)); // "b" (arg1)：ar1数值赋值给寄存器ebx
+```
+
+等同于以下汇编：
+
+```assembly
+movl $11, %eax
+movl -28(%ebp), %ebx
+movl -24(%ebp), %ecx
+movl -20(%ebp), %edx
+movl -16(%ebp), %esi
+int  $0x80            ;软中断
+movl %eax, -12(%ebp)
+```
+
+*内联汇编中的一些简写补充*
+
+```
+a = %eax
+b = %ebx
+c = %ecx
+d = %edx
+S = %esi
+D = %edi
+0 = same as the first
 ```
 

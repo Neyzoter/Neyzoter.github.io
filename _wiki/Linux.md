@@ -2007,67 +2007,80 @@ print:foo.c bar.c
 
 * **shell前的`@`、`-`、`+`**
 
-1.makefile执行到某一行，都会打印改行命令，为了不打印命令，需要添加`@`
+  1.makefile执行到某一行，都会打印改行命令，为了不打印命令，需要添加`@`
 
-```makefile
-clean_all:
-	rm *.o
-	# 输出
-	# echo ">>>>>>>>  DONE  <<<<<<<"
-	# >>>>>>>>  DONE  <<<<<<<
-	echo ">>>>>>>>  DONE  <<<<<<<"
-	
-	# 输出
-	# >>>>>>>>  DONE  <<<<<<<
-	@echo ">>>>>>>>  DONE  <<<<<<<"
-```
+  ```makefile
+  clean_all:
+  	rm *.o
+  	# 输出
+  	# echo ">>>>>>>>  DONE  <<<<<<<"
+  	# >>>>>>>>  DONE  <<<<<<<
+  	echo ">>>>>>>>  DONE  <<<<<<<"
+  	
+  	# 输出
+  	# >>>>>>>>  DONE  <<<<<<<
+  	@echo ">>>>>>>>  DONE  <<<<<<<"
+  ```
 
-2.忽略错误需要添加`-`
+  2.忽略错误需要添加`-`
 
-3.只有某一些行被执行，其他行均为显示命令
+  3.只有某一些行被执行，其他行均为显示命令
 
-命令行前的`+`表示改行执行，其它没有`+`的行是显示命令而不执行
+  命令行前的`+`表示改行执行，其它没有`+`的行是显示命令而不执行
 
-* 等于号
+* **等于号**
 
-`=`：最基本的赋值
+  `=`：最基本的赋值
 
-`:=`：覆盖变量之前的值（`=`和`:=`的区别见**`:=`和`=`的区别**）
+  `:=`：覆盖变量之前的值（`=`和`:=`的区别见**`:=`和`=`的区别**）
 
-`?=`：变量为空，则赋值
+  `?=`：变量为空，则赋值
 
-`+=`：赋值添加到变量的后面
+  `+=`：赋值添加到变量的后面
 
-* obj-xxx
+* **obj-xxx**
 
-`obj-y`：编译进内核
+  `obj-y`：编译进内核
 
-`obj-m`：编译成模块
+  `obj-m`：编译成模块
 
-`obj-$(CONFIG_PPC) `中 ​`$(CONFIG_PPC)`表示一个变量
+  `obj-$(CONFIG_PPC) `中 ​`$(CONFIG_PPC)`表示一个变量
 
-```
-比如定义CONFIG_PPC=y
+  ```
+  比如定义CONFIG_PPC=y
+  
+  $(CONFIG_PPC)就是y
+  
+  obj-$(CONFIG_PPC) 就是 obj-y
+  ```
 
-$(CONFIG_PPC)就是y
+  ```makefile
+  # 目录下有一个名为foo.o的目标文件。foo.o将从foo.c或foo.S文件编译得到。
+  obj-y += foo.o
+  ```
 
-obj-$(CONFIG_PPC) 就是 obj-y
-```
+  ```makefile
+  # 如果foo.o要编译成一模块，那就要用obj-m了
+  # $(CONFIG_FOO)可以为y(编译进内核) 或m(编译成模块)
+  obj-$(CONFIG_FOO) += foo.o
+  ```
 
-```makefile
-# 目录下有一个名为foo.o的目标文件。foo.o将从foo.c或foo.S文件编译得到。
-obj-y += foo.o
-```
+* **`$(eval ($call  xxx) )`**
 
-```makefile
-# 如果foo.o要编译成一模块，那就要用obj-m了
-# $(CONFIG_FOO)可以为y(编译进内核) 或m(编译成模块)
-obj-$(CONFIG_FOO) += foo.o
-```
+  ```$(eval $(call xxx))```: 调用函数xxx, 其中的值作用到本mk文件
 
-* `$(eval ($call  xxx) )`
+* **`$`和`$$`使用**
 
-```$(eval $(call xxx))```: 调用函数xxx, 其中的值作用到本mk文件
+  ```makefile
+  # makefile中的var的值
+  $(var)
+  # shell命令中的变量var数值
+  $$(var)
+  ```
+
+  
+
+  
 
 ### 7.3.10 多目标
 
