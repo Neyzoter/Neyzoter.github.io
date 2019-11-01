@@ -271,11 +271,17 @@ Runtime Environment，是 AUTOSAR 虚拟功能总线（Virtual Function Bus，VF
 
 为了满足系统设计者所做的一些限制，应用程序组件能够在系统配置期间被映射到任何有效的 ECU 上。**RTE 负责确保这些（应用程序）组件能够通信，提供了在 AUTOSAR 软件组件间通信的基础服务。**
 
-# 7、Core 21.0.0学习
+# 7、App
 
-<img src="/images/wiki/AUTOSAR/Build_System_schematic.png" width="700 " alt="make架构">
+顶层应用层包括软件组件SWC和端口Ports两部分。
 
-## 7.1 工程架构
+<img src="/images/wiki/AUTOSAR/App_Component.png" width="600" alt="应用层功能">
+
+# 8、Core 21.0.0学习
+
+<img src="/images/wiki/AUTOSAR/Build_System_schematic.png" width="800" alt="make架构">
+
+## 8.1 工程架构
 
 **工程方案1.工程文件和Arctic Core分开**
 
@@ -374,7 +380,7 @@ Runtime Environment，是 AUTOSAR 虚拟功能总线（Virtual Function Bus，VF
      '--- cc_gcc.mk
 ```
 
-## 7.2 工程make
+## 8.2 工程make
 
 **make命令**
 
@@ -443,9 +449,9 @@ make BOARDDIR=mpc5516it BDIR=<anydir>[,<anydir>] all
 
 [顶层（core/下）的makefile会（进入目录`<anydir>/obj_<arch>`）调用core/scripts/rules.mk](<https://github.com/Neyzoter/autosar_core21.0.0>)
 
-## 7.3 模块相关代码
+## 8.3 模块相关代码
 
-### 7.3.1 EcuM
+### 8.3.1 EcuM
 
 `core/system/EcuM/src/EcuM_Generated_Types.h`：定义EcuM需要的(模块接口配置)数据结构。例子：
 
@@ -455,14 +461,14 @@ if defined(USE_SPI)
 endif
 ```
 
-### 7.3.2 OS任务
+### 8.3.2 OS任务
 
 在`GEN_TASK_HEAD`中定义所有任务
 
 ```c
 #define GEN_TASK_HEAD const OsTaskConstType  Os_TaskConstList[OS_TASK_CNT]
 ```
-### 7.3.3 初始化
+### 8.3.3 初始化
 
 *未完待续*
 
@@ -483,7 +489,7 @@ main["main()@/core/system<br>/Os/rtos/src/os_init.c"]  --> EcuM_Init["EcuM_Init(
 
 
 
-### 7.3.4 CAN调用过程
+### 8.3.4 CAN调用过程
 
 **说明1**：`Github`不支持`mermaid`请**将以下`mermaid`代码复制到**[在线`mermaid`查看器](<https://mermaidjs.github.io/mermaid-live-editor>)、`Typora`等软件查看具体流程图。
 
@@ -846,7 +852,7 @@ CanIf_Transmit --> Can_Write["Can_Write(txPduPtr->CanIfTxPduBufferRef-><br>CanIf
 Can_Write --> CAN_Transmit["CAN_Transmit(canHw,&TxMessage)<br>@stm32f10x_can.c"]
 ```
 
-### 7.3.5 运行OsBswTask
+### 8.3.5 运行OsBswTask
 
 *未完待续*
 
@@ -863,7 +869,7 @@ OsBswTask --> Can_MainFunction_Mode["Can_MainFunction_Mode()<br>"]
 	
 ```
 
-### 7.3.6 RTE设置PWM
+### 8.3.6 RTE设置PWM
 
 ```mermaid
 graph TB;
@@ -871,7 +877,7 @@ OsRteTask["OsRteTask()"] --> Rte_SwcReader_SwcReaderRunnable["Rte_SwcReader_SwcR
 Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 ```
 
-### 7.3.7 OsRteTask读取数据和设置灯PWM
+### 8.3.7 OsRteTask读取数据和设置灯PWM
 
 * 流程图
 
@@ -907,7 +913,7 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   `xxxx.c`（`Rte/src`）：定义执行器函数，具体进行Pwm占空比设置、Bsw主任务、IO操作等。
 
-### 7.3.8 OsStartUp任务
+### 8.3.8 OsStartUp任务
 
 * 流程
 
@@ -1141,7 +1147,7 @@ EcuM_StartupTwo --4.current_state == <br>ECUM_STATE_STARTUP_TWO--> EcuM_AL_Drive
 
   *不能在Can_Init的时候，单纯将CanConf_CanHardwareObject_CanHardwareObjectTx -1 输入到HTHmap下标，解释是发送的时候会检测是否对应，具体见上面**解释***
 
-### 7.3.9 RTE任务和BSW任务的通信模式如何联系
+### 8.3.9 RTE任务和BSW任务的通信模式如何联系
 
 **1.Rte任务初始化通信模式**
 
@@ -1178,7 +1184,7 @@ changeBswM_PduGroupSwitchActionPerformedTrue --BswM_PduGroupSwitchActionPerforme
 Com_IpduGroupControl --> changeBswM_PduGroupSwitchActionPerformedFalse["BswM_PduGroupSwitchActionPerformed = FALSE"]
 ```
 
-### 7.3.10 如何注册中断向量表
+### 8.3.10 如何注册中断向量表
 
 ```mermaid
 graph TB;
@@ -1193,7 +1199,7 @@ Os_IsrAddWithId --2.1--> addWithId["Os_VectorToIsr[isrPtr->vector + <br>IRQ_INTE
 Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry, isrPtr->vector, <br>isrPtr->type,  isrPtr->priority, <br>Os_ApplGetCore(isrPtr->appOwner) )<br>@irq.c<br>中断初始化使能"]
 ```
 
-### 7.3.11 OS任务调度
+### 8.3.11 OS任务调度
 
 * Os_AlarmCheck函数
 
@@ -1205,11 +1211,11 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
 
 
-## 7.4 顶层移植、配置和应用
+## 8.4 顶层移植、配置和应用
 
 路径：`\examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c`
 
-### 7.4.1 Os
+### 8.4.1 Os
 
 配置文件主要包括：`Os_Cfg.c`和`Os_Cfg.h`
 
@@ -1459,7 +1465,7 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   具体见代码注释。
 
-### 7.4.2 Com
+### 8.4.2 Com
 
 * `Com_Cfg.c`
 
@@ -1549,7 +1555,7 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
 **`IPdu`、`Arc_IPdu`和`Signal`的区别**：见**7.3.4 CAN调用过程**
 
-### 7.4.3 ComM
+### 8.4.3 ComM
 
 * `ComM_Cfg.c`
 
@@ -1573,7 +1579,7 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   `ComM_Config`的`extern`声明。
 
-### 7.4.4 BswM
+### 8.4.4 BswM
 
 * `BswM_Cfg.c`
 
@@ -1595,7 +1601,7 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   定义BswM需要用到的数据结构。
 
-### 7.4.5 EcuM
+### 8.4.5 EcuM
 
 - `EcuM_PBcfg.c`
 
@@ -1615,9 +1621,9 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   宏定义唤醒源对应数值、复位方式对应数值
 
-### 7.4.6 RTE
+### 8.4.6 RTE
 
-#### 7.4.6.1 Config
+#### 8.4.6.1 Config
 
 * `Rte`
 
@@ -1805,21 +1811,21 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
    宏定义，可以使得ArcCore RTE 集成Simulink SWC更加 简单，此文件不是AUTOSAR标准。
 
-#### 7.4.6.2 Contract
+#### 8.4.6.2 Contract
 
 * `Rte_xxxx.h`
 
   声明`xxxx.c`内的函数
 
-#### 7.4.6.3 MemMap
+#### 8.4.6.3 MemMap
 
 * `xxxx_MemMap.h`
 
   实现内存映射
 
-# 8.Artop
+# 9.Artop
 
-## 8.1 介绍
+## 9.1 介绍
 
 Artop基于Eclipse的EMF建模框架而构建，提供一些公共的基础功能，如所有工具均要用到的元模型实现，而将具体的应用功能留给工具开发商实现。（来自硕士论文《基于Artop的汽车电子软件架构工具的设计与实现》）
 
@@ -1833,7 +1839,7 @@ ARTOP针对AUTOSAR标准的XML文档，提供了专门的处理方法。其实�
 
 <img src="/images/wiki/AUTOSAR/Pg_artopcomponents_Internal.png" width="700" alt="Artop架构内部">
 
-### 8.1.1 子项目
+### 9.1.1 子项目
 
 |                             Name                             |                         Description                          | Status |
 | :----------------------------------------------------------: | :----------------------------------------------------------: | :----: |
@@ -1845,7 +1851,7 @@ ARTOP针对AUTOSAR标准的XML文档，提供了专门的处理方法。其实�
 
 [2019-8-15 Artop Demonstrator使用过程](<http://neyzoter.cn/2019/08/15/Record-Artop-Demo-Usage/>)
 
-### 8.1.2 三个文件
+### 9.1.2 三个文件
 
 `Artop Technology Demonstrator`、`Artop SDK`、`ARText SDK`
 
@@ -1865,23 +1871,23 @@ ARTOP针对AUTOSAR标准的XML文档，提供了专门的处理方法。其实�
 
   *什么是XText*：XText帮助程序员创建一套基于文本的小型领域特定语言（DSL），抑或是实现一门成熟的通用计算机程序设计语言。
 
-  ## 8.2 代码生成技术
+## 9.2 代码生成技术
 
-  **（1）面向属性编程（AOP）**
+**（1）面向属性编程（AOP）**
 
-  AOP通过在代码中添加元数据的方式来自动生成代码.
+AOP通过在代码中添加元数据的方式来自动生成代码.
 
-  优秀软件`xDoclet`，是一个经过拓展的Javadoc Doclet引擎，允许用户使用类似于JavaDoc标记之类的东西来向诸如类、方法和字段之类的语言特征中添加元数据，然后利用这些额外的元数据来生成相关文件。
+优秀软件`xDoclet`，是一个经过拓展的Javadoc Doclet引擎，允许用户使用类似于JavaDoc标记之类的东西来向诸如类、方法和字段之类的语言特征中添加元数据，然后利用这些额外的元数据来生成相关文件。
 
-  **（2）模板技术**
+**（2）模板技术**
 
-  代码生成要有一定文本结构的文件，使用文本模板工具。Velocity开源项目（Apache），基于Java的模板引擎，用户可以使用Velocity Template Language（VTL）的脚本语言来引用Java代码定义的对象，将对象的信息和模板的内容相结合生成代码文件。
+代码生成要有一定文本结构的文件，使用文本模板工具。Velocity开源项目（Apache），基于Java的模板引擎，用户可以使用Velocity Template Language（VTL）的脚本语言来引用Java代码定义的对象，将对象的信息和模板的内容相结合生成代码文件。
 
-## 8.2 Artop例程
+## 9.3 Artop例程
 
-### 8.2.1  org.artop.aal.examples.actions
+### 9.3.1  org.artop.aal.examples.actions
 
-#### 8.2.1.1 文件夹结构
+#### 9.3.1.1 文件夹结构
 
 ```
 org.artop.aal.examples.actions
@@ -1917,13 +1923,13 @@ org.artop.aal.examples.actions
                             `-- AutosarExampleActionProvider.java
 ```
 
-# 9.Matlab Simulink
+# 10.Matlab Simulink
 
-## 9.1 AUTOSAR Blockset
+## 10.1 AUTOSAR Blockset
 
 AUTOSAR Blockset 提供了用于 AUTOSAR 库例程和基础软件 (BSW) 服务（包括 NVRAM 和诊断）的模块和结构。通过将 BSW 服务与应用程序软件模型一起进行仿真，可以在不离开 Simulink 的情况下验证 AUTOSAR ECU 软件。
 
-### 9.1.1 对 AUTOSAR Classic 软件组件进行建模
+### 10.1.1 对 AUTOSAR Classic 软件组件进行建模
 
 在 Simulink 中，使用默认 AUTOSAR 端口、接口和其他配置自动创建 AUTOSAR Classic 软件组件。
 
