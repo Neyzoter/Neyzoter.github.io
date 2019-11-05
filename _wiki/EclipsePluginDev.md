@@ -962,7 +962,7 @@ CNF具有以下作用：
 
 
 
-## 19.3.2 定义XML模型内容拓展并关联CNF视图
+### 19.3.2 定义XML模型内容拓展并关联CNF视图
 
 CNF试图中展示XML模型内容，需两步：
 
@@ -1009,9 +1009,54 @@ CNF试图中展示XML模型内容，需两步：
 
   4.Id, 用于表示此内容扩展，这个 Id 将被 org.eclipse.ui.navigator.viewer 扩展点所引用，用于在 CNF 视图中显示这个Id代表的内容扩展的内容。
 
-  5.contentProvider 和 lableProvider，这两个属性的类用于提供树型 CNF 视图的节点内容以及标题和图标，这里设置的值是 XML 模型的内容提供类和标题提供类。这两个类在下一节将进一步介绍。
+  5.contentProvider 和 lableProvider，这两个属性的类用于提供树型 CNF 视图的节点内容以及标题和图标，这里设置的值是 XML 模型的内容提供类和标题提供类。
+
+  内容拓展中有两个重要的表达式**`<triggerPoints/>`**和**`<possibleChildren/>`**。
+
+    **triggerPoints**
+
+    用于标志CNF视图树上的哪一类型的节点匹配这个扩展点，也就是说 CNF 框架在 CNF 视图中找到相应的这一类型的节点时，这个内容扩展才被调用
+
+    ```xml
+    <triggerPoints>
+    <and>
+    <instanceof value="org.eclipse.core.resources.IResource"/> 
+    <test forcePluginActivation="true" property="com.ibm.developerwork.namespace"
+                value="http://www.ibm.com/developerwork"/>
+    </and>
+    </triggerPoints>
+    ```
+
+    `org.eclipse.core.resources.IResource`表示资源接口，`org.eclipse.core.resources.IFile`表示文件接口（继承自资源接口）……
+
+    **possibleChildren**
+
+    表示什么类型的节点才会被 XML 内容扩展作为子节点展示，并提供标题和图标。表达式必须是正确并且全面，否则有可能关联不到相应的节点。
+
+    ```xml
+    <possibleChildren>
+    <instanceof value="org.eclipse.wst.xml.core.internal.document.ElementImpl"/>
+    </possibleChildren>
+    ```
 
 * **关联拓展点到CNF视图**
 
-  
+  绑定 XML 内容扩展到 CNF 视图，这样才能在 CNF 视图中展示该内容扩展。
 
+  下面例子的`com.ibm.developerwork.transaction.based.tool.navigatorContent`如果和某一个`<navigatorContent/>`的id匹配，则实现viewer和content的匹配。
+
+  ```xml
+  <extension point="org.eclipse.ui.navigator.viewer">
+  <viewer viewerId="org.eclipse.ui.navigator.ProjectExplorer"/>
+  <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+  <includes>
+  <contentExtension pattern=
+                  "com.ibm.developerwork.transaction.based.tool.navigatorContent"/> 
+           </includes>
+  </viewerContentBinding> 
+  </extension>
+  ```
+
+### 19.3.3 XML文档结构
+
+在 Project Explorer 中展示 XML 文件的树型结构，也就是展示 XML 文档结构在 Project Explorer 的 TreeView 中，整个运行结构是一个模型-视图-控制器结构(MVC)。所以为了在树形结构中展示 XML 文档结构，需要一个 XML 模型，然后通过 ContentProvider 和 LableProvider 展示出来。ContentProvider 被 CNF 框架用来决定 CNF 视图 TreeView 中每一个节点的孩子节点。
