@@ -970,5 +970,48 @@ CNF试图中展示XML模型内容，需两步：
 
 2.关联该扩展点到相应的通用 CNF视图，意味着XML文档结构的内容可以展现在被关联的通用 CNF视图中
 
+* **内容拓展**
 
+  ```xml
+  <extension point="org.eclipse.ui.navigator.navigatorContent">
+  <navigatorContent
+  activeByDefault="true"
+          contentProvider="com.ibm.developerwork.xmlnavigator.XMLViewContentProvider"
+          id="com.ibm.developerwork.xmlnavigator.xmlcontent"
+          labelProvider="com.ibm.developerwork.xmlnavigator.XMLViewLabelProvider"
+          name="XML Content"
+          icon="icons/sample.gif"
+          priority="normal">
+  <triggerPoints>
+  <and> 
+  <instanceof value="org.eclipse.core.resources.IResource"/> 
+  <test forcePluginActivation="true" property="com.ibm.developerwork.namespace" 
+                     value="http://www.ibm.com/developerwork"/>
+  </and>
+  </triggerPoints>
+  <possibleChildren>
+  <instanceof value="org.eclipse.wst.xml.core.internal.document.ElementImpl"/>
+  </possibleChildren> 
+  </extension>
+  ```
+
+  名称为XML Content的拓展内容可以被使用，可以通过`Project Explorer->View Menu（一个小的向下的箭头） -> Filters and Customization... -> Content`查看所有的内容。
+
+  <img src="/images/wiki/EclipsePluginDev/Filters_Customizations.png" width="500" alt="content">
+
+  参数含义：
+
+  1.activeByDefault，表示在 eclipse 运行的时候，这个内容扩展是否默认是被激活的，也就是在上图的内容扩展列表中默认是处于选中状态的。XML 内容扩展设置为 true，表示默认情况下该内容扩展是激活的。
+
+  2.Icon，设置显示在 Project Explorer->Customize View->Content 列表中的内容扩展对应的图标，如上图例子中 XML 内容扩展所示的 。
+
+  3.Priority，该属性有多个用途，其中最重要的用途是决定在 CNF 视图中显示节点的相对位置。Priority 级别越高越靠近视图的顶部，级别越低就越靠近视图的底部。
+
+  4.Id, 用于表示此内容扩展，这个 Id 将被 org.eclipse.ui.navigator.viewer 扩展点所引用，用于在 CNF 视图中显示这个Id代表的内容扩展的内容。
+
+  5.contentProvider 和 lableProvider，这两个属性的类用于提供树型 CNF 视图的节点内容以及标题和图标，这里设置的值是 XML 模型的内容提供类和标题提供类。这两个类在下一节将进一步介绍。
+
+* **关联拓展点到CNF视图**
+
+  
 
