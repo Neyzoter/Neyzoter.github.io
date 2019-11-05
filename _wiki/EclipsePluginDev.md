@@ -886,3 +886,89 @@ public class Activator extends AbstractUIPlugin {
 
   <img src="/images/wiki/EclipsePluginDev/apperance2.png" width="450" alt="效果图2">
 
+# 19.资源管理器（Common Navigator）
+
+[构建 Eclipse 插件在 EMF 模型中浏览内容](https://www.ibm.com/developerworks/cn/opensource/os-eclipse-emf/)
+
+## 19.1 Navigator介绍
+
+CNF具有以下作用：
+
+1.集成视图，该框架提供了一套通用机制和架构，允许开发人员很方便的进行 CNF 视图的开发、集成和扩展。
+
+2.提高重用性，基于 CNF 框架可以扩展视图，这样就使得用户可以重用已有的 CNF 视图内容和操作，而不用进行重新的开发。另外用户可以开发自己的 CNF 视图，开发过程中可以重用大量已有的 CNF 视图内容，比如 Resource, Java 等视图中定义的内容，达到高重用性的目的。
+
+3.很高的灵活性，根据 CNF 框架，不同软件版本功能上的改进可以采取更灵活的方式进行，新的功能、新的菜单操作、新的展示内容可以很方便的集成进已有的 CNF 视图中。
+
+默认的Eclipse平台上有一个Project Explorer视图，就是基于CNF（Common Navigator Framework）开发的一个资源管理器视图。
+
+<img src="/images/wiki/EclipsePluginDev/Project_Explorer.png" width="450" alt="资源管理器">
+
+## 19.2 Navigator提供的拓展点
+
+| 拓展点                                    | 作用                                                         |
+| ----------------------------------------- | ------------------------------------------------------------ |
+| org.eclipse.ui.navigator.viewer           | 用来在透视图（Perspective）和扩展之间建立关系                |
+| org.eclipse.ui.navigator.navigatorContent | 用来提供模型，菜单以及过滤器等内容（导航内容扩展点，主要为视图提供显示内容） |
+| org.eclipse.ui.navigator.linkHelper       | 用来支持文件与资源管理器联动（提供编辑器和视图一种对应关系） |
+
+## 19.3 [拓展Project Explorer视图支持XML模型结构](https://www.ibm.com/developerworks/cn/opensource/os-cn-ecl-cnfext/index.html)
+
+可以拓展CNF来实现XML的模型结构解析：
+
+<img src="/images/wiki/EclipsePluginDev/CNF_XML_View.gif" width="450" alt="效果对比图">
+
+### 19.3.1 拓展Project Explorer CNF视图
+
+用 `plug-in manifest editor` 打开 META-INF->MANIFEST.MF 文件，在 Extensions 选项卡中：
+
+- 单击 Add
+- 在 Extension points 选项卡下面，选择 org.eclipse.ui.views
+- 创建类别：
+
+1. 右键单击 org.eclipse.ui.views 扩展
+2. 选择 New > Category
+3. 将ID设为 com.ibm.developerwork.xmlnavigator.xmlnvcategory
+4. 将名称设为 xml navigator category
+
+- 创建视图部件：
+
+1. 右键单击 org.eclipse.ui.views 扩展
+2. 选择 New > View
+3. 将 ID 设为com.ibm.developerwork.xmlnavigator.xmlnvview
+4. 将名称设为 XML Navigator View
+5. 将类设为 org.eclipse.ui.navigator.CommonNavigator
+6. 将类别设为 com.ibm.developerwork.xmlnavigator.xmlnvcategory
+
+- 保存对项目的修改
+
+如果用户只是扩展已有的 CNF 视图，只需要定义 CNF 视图的扩展点 ”org.eclipse.ui.navigator.viewer”，并把其中的 viewed 设置为要扩展的视图的插件 ID 即可。
+
+**Artop例程中**view在`org.artop.aal.example.explorer`这个子项目中。
+
+<img src="/images/wiki/EclipsePluginDev/explorer_autosar_view.png" width="600" alt="view">
+
+拓展viewer（用来在透视图（Perspective）和扩展之间建立关系）：
+
+```xml
+<extension point="org.eclipse.ui.navigator.viewer">
+<viewer viewerId="org.eclipse.ui.navigator.ProjectExplorer"/>
+</extension>
+```
+
+这里 viewerId 填写的是 Project Explorer 的 view part id，意味着我们是对已有的 Project Explorer CNF 视图进行扩展。如果要建立新的 CNF 视图，viewerId 填写新创建的 view part 的 id。如在Artop例程中将viewerId定义为`org.artop.aal.examples.explorer.views.autosarExplorer`。
+
+<img src="/images/wiki/EclipsePluginDev/Viewer_Set.png" width="700" alt="viewer">
+
+
+
+## 19.3.2 定义XML模型内容拓展并关联CNF视图
+
+CNF试图中展示XML模型内容，需两步：
+
+1.定义XML模型内容扩展，该内容扩展的作用是展示XML文档结构内容
+
+2.关联该扩展点到相应的通用 CNF视图，意味着XML文档结构的内容可以展现在被关联的通用 CNF视图中
+
+
+
