@@ -146,6 +146,12 @@ hello.c          hello.i       hello.s       hello.o
 
 ​	[说明](<http://neyzoter.cn/wiki/OS/#922-c%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E7%9A%84%E5%AE%9E%E7%8E%B0>)
 
+* **X86的A20 Gate是什么？有什么作用？**
+
+  寻址寄存器`segent:offset<(0xffff左移4位+0xffff)=1088KB`，最多可访问1088KB空间，比1MB大了一些。为了保持向下兼容，需要设置第20位（A20）地址一直为0，这样才能实现不超过1MB。在进入保护模式后，需要使用这一位（A20），又要打开使能这一位。
+
+  *参考*：[http://hengch.blog.163.com/blog/static/107800672009013104623747/](http://hengch.blog.163.com/blog/static/107800672009013104623747/)
+
 ## 2.2 Linux
 
 * **nohup和&的区别？**

@@ -58,7 +58,7 @@ keywords: assembly,X86
 
 * CS
 
-  **在一个段寄存器Segment Register里面，会保存16位的段选择子Segment Selector，用于结合GDTR来索引段描述符，下面各个段寄存器同**
+  **在一个段寄存器Segment Register里面，会保存16位的段选择子Segment Selector，用于结合GDTR来索引段描述符表中的段描述符，下面各个段寄存器同**
 
   代码段寄存器(Code Segment Register)，其值为代码段的段值
 
