@@ -56,7 +56,23 @@ keywords: assembly,X86
 
   是SP/BP的拓展，32位
 
+* CS
 
+  **在一个段寄存器Segment Register里面，会保存16位的段选择子Segment Selector，用于结合GDTR来索引段描述符，下面各个段寄存器同**
+
+  代码段寄存器(Code Segment Register)，其值为代码段的段值
+
+* DS
+
+  数据段寄存器(Data Segment Register)，其值为数据段的段值
+
+* ES
+
+  附加段寄存器(Extra Segment Register)，其值为附加数据段的段值
+
+* SS
+
+  堆栈段寄存器(Stack Segment Register)，其值为堆栈段的段值
 
 # 2.ARM
 

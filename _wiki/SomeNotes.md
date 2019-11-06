@@ -110,6 +110,16 @@ hello.c          hello.i       hello.s       hello.o
 
   Offset（偏移量）是EIP，而段描述符中存放了起始地址Base Addr。**Base Addr是由CS或者是其他段寄存器所指出来的基址**。`Base Addr + Offset`得到线性地址，如果没有启动页机制，则线性地址就是物理地址。
 
+* **为什么要段机制？**
+
+  以32位硬件为例，虽然任何一个寄存器都可以达到32位，但是但是为了**安全**起见，需要引入分段机制，通过段描述符（64位）的段物理首地址、段界限、段属性等描述来限制段的空间大小。
+
+* **段机制如何实现内存访问安全？**
+
+  <img src="/images/wiki/OS/run_priority.png" width="600" alt="段机制细节">
+
+  特权级数值越大，级别越低，图中MAX找出了CPL（当前活动代码段特权级，Current Privilege Level）和RPL（请求特权级，RPL保存在选择子的最低两位，Request Privilege Level）特权最低的一个，并与描述符特权级（描述符特权，描述对应段所属的特权等级，段本身能被访问的真正特权级，Descriptor Privilege Level）比较，优先级高于描述符特权级，则可以实现访问。
+
 * **C函数调用的实现过程（压栈和出栈）**
 
   以此函数为例：
