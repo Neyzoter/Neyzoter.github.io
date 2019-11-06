@@ -43,6 +43,7 @@ GoF
 
 ```java
 public class Singleton {
+    // static保证只加载一次，不会出现循环的问题
     private static final Singleton singleton = new Singleton(); //限制产生多个对象
     private Singleton(){
     }
@@ -59,12 +60,17 @@ public class Singleton {
 **使用场景**
 
 * 要求生成唯一序列号的环境；
-
 * 在整个项目中需要一个共享访问点或共享数据，例如一个 Web 页面上的计数 器，可以不用把每次刷新都记录到数据库中，使用单例模式保持计数器的值，并确 保是线程安全的；
-
 * 创建一个对象需要消耗的资源过多，如要访问 IO 和数据库等资源；
-
 * 需要定义大量的静态常量和静态方法（如工具类）的环境，可以采用单例模式 （当然，也可以直接声明为 static 的方式）。
+
+**具体场景**
+
+* Artop开发的时候Explorer的Activator就是一个单例。
+
+*为什么Singleton类内实例化自己不会循环？*
+
+因为static保证只加载一次（final变量、static变量等线程共用的东西存放在JVM方法区，只加载一次），不会出现循环的问题。
 
 ### 2.1.5建造者模式
 
@@ -134,7 +140,7 @@ public class Singleton {
 
 
 
-**使用场景**
+**具体场景**
 
 * Spring Security在配置资源安全和http安全时，分别有适配器——`ResourceServerConfigurerAdapter`和`AuthorizationServerConfigurerAdapter`。
 

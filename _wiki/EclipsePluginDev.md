@@ -28,11 +28,17 @@ Eclipse RCP（Rich Client Platform）是帮助开发者创建和部署*富客户
 
 ## 1.4 EMF技术
 
+[Eclipse资源地址](https://www.eclipse.org/modeling/emf/)
+
+[What every Eclipse developer should know about EMF](https://eclipsesource.com/blogs/tutorials/emf-tutorial/)
+
+### 1.4.1 EMF介绍
+
 EMF（Eclipse Modeling Framework，Eclipse建模框架）就是一项致力于简化建模工作（将实际生活中的例子抽象成Java对象来建立结构化的数据模型）的项目。包括：
 
 * **EMF**
 
-  EMF项目的核心框架，允许用户通过编写Java接口，从Rose导入UML类图等方法生成一个描述用户需要的数据模型的元模型（Meta Model）。元模型称为Ecore，描述数据模型中包含哪些**对象**，对象中有哪些**属性**和**方法**，以及这些**对象之间的关系**。
+  EMF项目的核心框架，允许用户通过编写Java接口，从Rose导入UML类图等方法生成一个描述用户需要的数据模型的元模型（Meta Model）。元模型称为[**Ecore**](https://download.eclipse.org/modeling/emf/emf/javadoc/2.9.0/org/eclipse/emf/ecore/package-summary.html#details)，描述数据模型中包含哪些**对象**，对象中有哪些**属性**和**方法**，以及这些**对象之间的关系**。
 
   <img src="/images/wiki/EclipsePluginDev/EMF_Process.png" width="500" alt="EMF原理">
 
@@ -43,6 +49,8 @@ EMF（Eclipse Modeling Framework，Eclipse建模框架）就是一项致力于�
 * **EMF CodeGen**
 
   用于从ECore中生成数据模型的代码。生成的数据模型代码除了包含数据模型的接口和实现外，还包含一个工厂类用于生成数据模型的实例，以及一个Package类型，其中包含了数据模型的元数据。同时，CodeGen也可以生成一个基于Eclipse RCP的编辑器，用来对数据模型的内容进行编辑。
+
+
 
 ## 1.5 GEF技术
 
