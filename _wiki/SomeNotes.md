@@ -152,6 +152,12 @@ hello.c          hello.i       hello.s       hello.o
 
   *参考*：[http://hengch.blog.163.com/blog/static/107800672009013104623747/](http://hengch.blog.163.com/blog/static/107800672009013104623747/)
 
+* **`.S`（大写）和`.s/asm`文件的区别？**
+
+  `.S`（大写）文件还需要进行预处理、汇编操作形成`.o`文件，`.asm/s`文件只需要汇编形成`.o`文件。
+
+  比如在ucore编译中，bootblock.S会生成bootblock.asm，再形成bootblock.o文件。
+
 ## 2.2 Linux
 
 * **nohup和&的区别？**

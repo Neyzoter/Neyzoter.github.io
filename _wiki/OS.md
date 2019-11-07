@@ -3,7 +3,7 @@ layout: wiki
 title: OS
 categories: OS
 description: 操作系统学习笔记
-keywords: OS, 操作系统
+keywords: OS， 操作系统
 ---
 
 # 1.操作系统结构
@@ -282,7 +282,7 @@ BIOS -> 主引导记录（主引导扇区代码） -> 活动分区的引导扇�
 3. kern/syscall/syscall.c: syscall()
 	tf->tf_regs.reg_eax ==SYS_read   // 发现是系统调用的读取函数
 4. kern/syscall/syscall.c: sys_read()
-	从 tf->sp 获取 fd, buf, length   //参数
+	从 tf->sp 获取 fd， buf， length   //参数
 5. kern/fs/sysfile.c: sysfile_read()
 	读取文件
 6. kern/trap/trapentry.S: trapret()  //返回
@@ -363,7 +363,7 @@ X86-32指的是80386这种机器，是intel的32位机器，有四种运行模�
 
 **段机制**
 
->只有在保护模式下才能使用分段存储管理机制。分段机制将内存划分成以起始地址和长度限制这两个二维参数表示的内存块,这些内存块就称之为段(Segment)。编译器把源程序编译成执行程序时用到的代码段、数据段、堆和栈等概念在这里可以与段联系起来,二者在含义上是一致的。
+>只有在保护模式下才能使用分段存储管理机制。分段机制将内存划分成以起始地址和长度限制这两个二维参数表示的内存块，这些内存块就称之为段(Segment)。编译器把源程序编译成执行程序时用到的代码段、数据段、堆和栈等概念在这里可以与段联系起来，二者在含义上是一致的。
 
 <img src="/images/wiki/OS/segment_descriptors.png" width="600" alt="段机制">
 
@@ -381,7 +381,7 @@ X86-32指的是80386这种机器，是intel的32位机器，有四种运行模�
 
 以上是段寄存器中的段选择子的内部细节，包括全局描述符表（以GDT全局描述表为例，LDT意思是本地描述表）的地址、优先级（RPL），一般内核优先级为0（最高）、用户态的优先级为3。全局描述符表GDT中包含段描述符表（包含了所有的段描述符）地址，通过**加载GDT来找到段描述符的起始地址**（通过系统表寄存器System Table Register来实现CS、DS等段寄存器和段描述符的对应关系，存放在GDTR，见下方）。
 
->GDT(Global	Descriptor	Table)和LDT(Local Descriptor	Table),每一张段表可以包含`8192	(2^13)`个描述符因而最多可以同时存在`2 * 2^13	=	2^14`个段。虽然保护模式下可以有这么多段,逻辑地址空间看起来很大,但实际上段并不能扩展物理地址空间,很大程度上各个段的地址空间是相互重叠的。目前所谓的64TB(2^(14+32)=2^46)逻辑地址空间是一个理论值,没有实际意义。在32位保护模式下,真正的物理空间仍然只有2^32字节那么大。注:在ucore lab中只用到了GDT,没有用LDT。
+>GDT(Global	Descriptor	Table)和LDT(Local Descriptor	Table)，每一张段表可以包含`8192	(2^13)`个描述符因而最多可以同时存在`2 * 2^13	=	2^14`个段。虽然保护模式下可以有这么多段，逻辑地址空间看起来很大，但实际上段并不能扩展物理地址空间，很大程度上各个段的地址空间是相互重叠的。目前所谓的64TB(2^(14+32)=2^46)逻辑地址空间是一个理论值，没有实际意义。在32位保护模式下，真正的物理空间仍然只有2^32字节那么大。注:在ucore lab中只用到了GDT，没有用LDT。
 
 <img src="/images/wiki/OS/System_Table_Register.png" width="600" alt="系统表寄存器">
 
@@ -391,17 +391,17 @@ X86-32指的是80386这种机器，是intel的32位机器，有四种运行模�
 
 **段描述符**
 
-在分段存储管理机制的保护模式下,每个段由如下三个参数进行定义:段基地址(Base Address)、段界限(Limit)和段属性(Attributes)。在ucore中的`kern/mm/mmu.h`中的`structsegdesc`数据结构中有具体的定义。
+在分段存储管理机制的保护模式下，每个段由如下三个参数进行定义:段基地址(Base Address)、段界限(Limit)和段属性(Attributes)。在ucore中的`kern/mm/mmu.h`中的`structsegdesc`数据结构中有具体的定义。
 
 <img src="/images/wiki/OS/segment_descriptor_detail.png" width="600" alt="段描述符细节">
 
 （1）段基地址
 
-规定线性地址空间中段的起始地址。在80386保护模式下,段基地址长32位。
+规定线性地址空间中段的起始地址。在80386保护模式下，段基地址长32位。
 
 （2）段界限
 
-规定段的大小。在80386保护模式下,段界限用20位表示,而且段界限可以是以字节为单位或以4K字节为单位。
+规定段的大小。在80386保护模式下，段界限用20位表示，而且段界限可以是以字节为单位或以4K字节为单位。
 
 （3）段属性
 
@@ -409,7 +409,7 @@ X86-32指的是80386这种机器，是intel的32位机器，有四种运行模�
 
 **全局描述符表**
 
-全局描述符表的是一个保存多个段描述符的“数组”,其**起始地址保存在全局描述符表寄存器GDTR中**。GDTR长48位,其中高32位为基地址,低16位为段界限。
+全局描述符表的是一个保存多个段描述符的“数组”，其**起始地址保存在全局描述符表寄存器GDTR中**。GDTR长48位，其中高32位为基地址，低16位为段界限。
 
 **选择子**
 
@@ -417,11 +417,11 @@ X86-32指的是80386这种机器，是intel的32位机器，有四种运行模�
 
 线性地址部分的选择子是用来选择哪个描述符表和在该表中索引一个描述符的。
 
-*索引*(Index)：在描述符表中从8192个描述符中选择一个描述符。处理器自动将这个索引值乘以8(描述符的长度),再加上描述符表的基址（存放在GDTR）来索引描述符表,从而选出一个合适的描述符。
+*索引*(Index)：在描述符表中从8192个描述符中选择一个描述符。处理器自动将这个索引值乘以8(描述符的长度)，再加上描述符表的基址（存放在GDTR）来索引描述符表，从而选出一个合适的描述符。
 
-*表指示位*(Table Indicator,TI):选择应该访问哪一个描述符表。0代表应该访问全局描述符表(GDT),1代表应该访问局部描述符表(LDT)。
+*表指示位*(Table Indicator，TI):选择应该访问哪一个描述符表。0代表应该访问全局描述符表(GDT)，1代表应该访问局部描述符表(LDT)。
 
-*请求特权级*(Requested Privilege Level,RPL):保护机制，说明如下：
+*请求特权级*(Requested Privilege Level，RPL):保护机制，说明如下：
 
 <img src="/images/wiki/OS/run_priority.png" width="600" alt="内存访问特权级检查过程">
 
@@ -481,7 +481,7 @@ popal       ;弹出寄存器
 
 foo:
 	pushl %ebp    ;将上一个函数的EBP保存
-	mov %esp,%ebp ;将ESP保存到EBP，即本函数的EBP指向栈区域
+	mov %esp，%ebp ;将ESP保存到EBP，即本函数的EBP指向栈区域
 	...
 	popl %ebp
 	ret
@@ -509,12 +509,12 @@ foo:
 
 ```assembly
 ;asm
-movl $0xffff,%eax
+movl $0xffff，%eax
 ```
 
 ```c
 //c
-asm("movl $0xffff,%%eax");
+asm("movl $0xffff，%%eax");
 ```
 
 **CC汇编语法**
@@ -527,6 +527,8 @@ asm(assembler template
 )
 ```
 
+*clobbers*：该字段为可选项，用于列出指令中涉及到的且没出现在output operands字段及input operands字段的那些寄存器。若寄存器被列入clobber-list，则等于是告诉gcc，这些寄存器可能会被内联汇编命令改写。因此，执行内联汇编的过程中，这些寄存器就不会被gcc分配给其它进程或命令使用。
+
 **实例1**
 
 ```c
@@ -536,19 +538,19 @@ uint32_t cr0;
 // %0：第一个用到的寄存器
 // r：任意寄存器，r0-r15
 // = ：被修饰的操作只写
-asm volatile ("movl %%cr0, %0\n" :"=r"(cr0));   //  输出到cr0
+asm volatile ("movl %%cr0， %0\n" :"=r"(cr0));   //  输出到cr0
 cr0 |= 0x80000000;
-asm volatile ("movl %0, %%cr0\n" ::"r"(cr0));   //cr0变量复制给寄存器cr0
+asm volatile ("movl %0， %%cr0\n" ::"r"(cr0));   //cr0变量复制给寄存器cr0
 ```
 
 对应的汇编：
 
 ```assembly
-movl %cr0, %ebx
-movl %ebx, 12(%esp)   ;12(%esp)表示局部变量
-orl $-2147483648, 12(%esp)
-movl 12(%esp), %eax
-movl %eax, %cr0
+movl %cr0， %ebx
+movl %ebx， 12(%esp)   ;12(%esp)表示局部变量
+orl $-2147483648， 12(%esp)
+movl 12(%esp)， %eax
+movl %eax， %cr0
 ```
 
 *补充*
@@ -560,22 +562,22 @@ movl %eax, %cr0
 **实例2**
 
 ```c
-long __res, arg1 = 2, arg2 = 22, arg3 = 222, arg4 = 233;
+long __res， arg1 = 2， arg2 = 22， arg3 = 222， arg4 = 233;
 __asm__ volatile ("int $0x80"   //软中断
 : "=a" (__res)   // 将eax内容赋值给__res
-: "0" (11),"b" (arg1),"c" (arg2),"d" (arg3),"S" (arg4)); // "b" (arg1)：ar1数值赋值给寄存器ebx
+: "0" (11)，"b" (arg1)，"c" (arg2)，"d" (arg3)，"S" (arg4)); // "b" (arg1)：ar1数值赋值给寄存器ebx
 ```
 
 等同于以下汇编：
 
 ```assembly
-movl $11, %eax
-movl -28(%ebp), %ebx
-movl -24(%ebp), %ecx
-movl -20(%ebp), %edx
-movl -16(%ebp), %esi
+movl $11， %eax
+movl -28(%ebp)， %ebx
+movl -24(%ebp)， %ecx
+movl -20(%ebp)， %edx
+movl -16(%ebp)， %esi
 int  $0x80            ;软中断
-movl %eax, -12(%ebp)
+movl %eax， -12(%ebp)
 ```
 
 *内联汇编中的一些简写补充*
@@ -589,4 +591,28 @@ S = %esi
 D = %edi
 0 = same as the first
 ```
+
+### 9.2.4 文件说明
+
+编译后在bin文件夹下会生成文件，包括：
+
+* ucore.img
+
+  被qemu访问的虚拟硬盘文件
+
+* kernel
+
+  ELF格式的toy ucore kernel执行文件，被嵌入到了ucore.img中
+
+* bootblock
+
+  虚拟的硬盘主引导扇区(512字节，可以看到bootblock文件大小为0x200字节，即500字节)，包含了bootloader执行代码，被嵌入到了ucore.img中。由bootasm.S（经过sign外部执行程序）生成，会指定启示地址为0x7c00。
+
+* sign
+
+  外部执行程序，用来生成虚拟的硬盘主引导扇区
+
+* `.S`和`.asm/s`的区别
+
+  `.S`（大写）文件还需要进行预处理、汇编等操作，`.asm/s`文件只需要汇编形成`.o`文件。
 
