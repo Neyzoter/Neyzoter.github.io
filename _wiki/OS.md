@@ -473,13 +473,14 @@ pushal      ;保存当前函数的寄存器到堆栈
 pushl %eax  ;加法乘法指令的缺省寄存器
 push1 %ebx  ;在内存寻址时存放基地址
 push1 %ecx  ;是重复(REP)前缀指令和LOOP指令的内定计数器
-call foo
+call foo    ;CALL指令内部其实还暗含了一个将返回地址(即CALL指令下一条指令的地址)压栈的动作(由硬件完成)
 popl %ecx
 popl %ebx
 pop1 %eax
 popal       ;弹出寄存器
 
 foo:
+	;几乎所有本地编译器都会在每个函数体之前插入类似如下的2条汇编指令
 	pushl %ebp    ;将上一个函数的EBP保存
 	mov %esp，%ebp ;将ESP保存到EBP，即本函数的EBP指向栈区域
 	...

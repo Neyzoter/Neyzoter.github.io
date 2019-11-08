@@ -158,6 +158,10 @@ hello.c          hello.i       hello.s       hello.o
 
   比如在ucore编译中，bootblock.S会生成bootblock.asm，再形成bootblock.o文件。
 
+* **`ebp = 10000`，`(uint32_t *) ebp + 1`等于？**
+
+  `(uint32_t *) ebp + 1 = 10004`，`(uint8_t *) ebp + 1 = 10001`，`(uint16_t *) ebp + 1 = 10002`
+
 ## 2.2 Linux
 
 * **nohup和&的区别？**

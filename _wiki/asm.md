@@ -52,6 +52,10 @@ keywords: assembly,X86
 
   基数指针寄存器，通过BP来寻找堆栈里数据或者地址。最经常被用作高级语言函数调用的"框架指针"(frame pointer)，在EBP上方分别是原来的EBP, 返回地址和参数. EBP下方则是临时变量。
 
+* IP
+
+  存放下一个CPU指令存放的内存地址
+
 * ESP/EBP
 
   是SP/BP的拓展，32位
@@ -72,7 +76,7 @@ keywords: assembly,X86
 
 * SS
 
-  堆栈段寄存器(Stack Segment Register)，其值为堆栈段的段值
+  堆栈段寄存器(Stack Segment Register)，其值为堆栈段的段值。
 
 # 2.ARM
 
