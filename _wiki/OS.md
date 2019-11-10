@@ -238,11 +238,77 @@ BIOS -> 主引导记录（主引导扇区代码） -> 活动分区的引导扇�
 
 ## 2.3 中断、异常和系统调用
 
+### 2.3.1 介绍
+
 和内核 打交道的方法包括中断（来自硬件设备的处理请求）、异常（非法指令或者其他原因导致当前指令执行失败后的处理请求）、系统调用（应用程序主动向操作系统发出的服务请求），具体信息流见下图。
 
 <img src="/images/wiki/OS/kernel_interface.png" width="500" alt="中断、异常和系统调用">
 
 **异常处理可嵌套，就像中断可嵌套一样。**
+
+### 2.3.2 中断描述符表的作用
+
+**（1）中断描述符表**
+
+中断向量和中断服务例程的对应关系主要是由IDT(中断描述符表)负责。操作系统在IDT中设置好各种中断向量对应的中断描述符,留待CPU在产生中断后查询对应中断服务例程的起始地址。而IDT本身的起始地址保存在IDTR寄存器中。同GDT一样,IDT是一个8字节的描述符数组,但IDT的第一项可以包含一个描述符。
+
+<img src="/images/wiki/OS/IDTR2IDT.png" width="400" alt="IDTR寄存器指向IDT的地址">
+
+LIDT和SIDT两条指令用于操作IDTR寄存器（一个6字节）。
+
+* LIDT(Load IDT Register)指令
+
+  使用一个包含线性地址基址和界限的内存操作数来加载IDT。
+
+* SIDT(Store IDT Register)指令
+
+  拷贝IDTR的基址和界限部分到一个内存地址。这条指令可以在任意特权级执行。
+
+在保护模式下,最多会存在256个Interrupt/Exception Vectors。范围`[0,31]`内的32个向量被异常Exception和NMI使用,但当前并非所有这32个向量都已经被使用,有几个当前没有被使用的,请不要擅自使用它们,它们被保留,以备将来可能增加新的Exception。
+
+**（2）IDT gate descriptors**
+
+Interrupts/Exceptions应该使用Interrupt Gate和Trap Gate，它们之间的唯一区别就是：当调用Interrupt Gate时，Interrupt会被CPU自动禁止；而调用Trap Gate时，CPU则不会去禁止或打开中断，而是保留它原来的样子。下面是三种门的结构，任务门没有使用。
+
+<img src="/images/wiki/OS/gates.png" width="400" alt="任务门、中断门、陷阱门格式">
+
+**（3）中断处理中硬件负责完成的工作**
+
+* 起始
+
+  从CPU收到中断事件后，打断当前程序或任务的执行，根据某种机制跳转到中断服务例程去执行的过程。
+
+  (1)CPU每次执行完一条指令，都会检查有无中断，如果有则会读取总线上的中断向量
+
+  (2)CPU根据得到的中断向量，到IDT中找到该中断向量的段选择子
+
+  (3)根据段选择子和GDTR寄存器中保存的段描述符起始地址，找到了相应的段描述符中，保存了中断服务函数的段基址和属性信息，基地址加上IDT中的Offset就得到了中断服务函数的地址。以下是IDT找到相应中断服务程序的过程：
+
+  <img src="/images/wiki/OS/IDT_GDT_Dest.png" width="500" alt="IDT结合GDT得到目标代码地址">
+
+  (4)CPU根据IDT的段选择子中的CPL和中断服务函数的GDT（段描述符）中的DPL确认是否发生了特权级的改变。比如当前程序处于用户态（ring3），而中断程序运行在内核态（ring0），意味着发生了特权级的转换。CPU会从当前的程序的TSS信息（该信息在内存中的起始地址存在TR寄存器中）里取得该程序的内核栈地址，即包括内核态的SS（堆栈段寄存器(Stack Segment Register)，其值为堆栈段的段值）和ESP寄存器（堆叠指标暂存器，存放栈的偏移地址，指向栈顶）。*CPU切换到相应的内核栈。*
+
+  <img src="/images/wiki/OS/Ring_Change.png" width="500" alt="IDT结合GDT得到目标代码地址">
+
+  (5)CPU保存被打断程序的现场（一些寄存器的值），比如用户态切换到了内核态，需要保存EFLAGS、CS、EIP、ERROR CODE(如果是有错误码的异常)信息
+
+  (6)CPU加载第一条指令
+
+* 结束
+
+  每个中断服务例程在有中断处理工作完成后需要通过IRET(或IRETD)指令恢复被打断的程序的执行。
+
+  (1)IRET指令执行，从内核栈弹出先前保存的被打断的程序的现场信息，如EFLAGS、CS、EIP
+
+  (2)如果存在特权级转换（内核态到用户态），则还需要从内核栈弹出用户态栈的SS和ESP，回到用户态的栈
+
+  (3)如果此次处理的是带有错误码的异常，CPU恢复先前程序的现场时，不会弹出错误码。这一步需要软件完成，相应的中断服务函数在掉用IRET返回之前，添加出栈代码主动弹出错误码。
+
+以下是优先级未切换和切换时的栈变换，
+
+<img src="/images/wiki/OS/Int_Before_After_Stack.png" width="500" alt="优先级未切换和切换时的栈变换">
+
+
 
 ## 2.4 系统调用
 
@@ -421,11 +487,11 @@ X86-32指的是80386这种机器，是intel的32位机器，有四种运行模�
 
 *表指示位*(Table Indicator，TI):选择应该访问哪一个描述符表。0代表应该访问全局描述符表(GDT)，1代表应该访问局部描述符表(LDT)。
 
-*请求特权级*(Requested Privilege Level，RPL):保护机制，说明如下：
+*请求特权级*(Requested Privilege Level，RPL)：保护机制，说明如下：
 
 <img src="/images/wiki/OS/run_priority.png" width="600" alt="内存访问特权级检查过程">
 
-数值越大，特权级越低，图中MAX找出了CPL（当前活动代码段特权级，Current Privilege Level）和RPL（请求特权级，RPL保存在选择子的最低两位，Request Privilege Level）特权最低的一个，并与描述符特权级（描述符特权，描述对应段所属的特权等级，段本身能被访问的真正特权级，Descriptor Privilege Level）比较，优先级高于描述符特权级，则可以实现访问。
+数值越大，特权级越低，图中MAX找出了CPL（当前活动代码段特权级，Current Privilege Level）和RPL（请求特权级，RPL保存在选择子的最低两位，Request Privilege Level）特权最低的一个，并与描述符特权级（描述符特权，描述对应段所属的特权等级，段本身能被访问的真正特权级，Descriptor Privilege Level）比较，优先级高于描述符特权级，则可以实现访问。**绿色，说明被调用的函数优先级（DPL）低于调用者的优先级（MAX(CPL, RPL)）；红色，说明优先级过低，需要输入密码？**
 
 **加载ELF格式的ucore kernel**
 
