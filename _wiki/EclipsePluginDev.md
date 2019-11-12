@@ -34,6 +34,8 @@ Eclipse RCP（Rich Client Platform）是帮助开发者创建和部署*富客户
 
 [EMF学习笔记](https://blog.csdn.net/u012521340/article/details/75043209)
 
+EMF技术对于AUTOSAR工具链的开发具有重要的意义，故我也专门创建了一个[EMF学习笔记](http://neyzoter.cn/wiki/EMF/)。
+
 ### 1.4.1 EMF介绍
 
 #### 1.4.1.1 统一代码、XML和UML
