@@ -86,9 +86,9 @@ scipy.signal.convolve(data)
 
 * hann窗口
 
-离散型窗函数w(n) = (sin(pi\*n/(N-1)))^2，其中窗口的长度为N+1，n为0到N-1整数。见下图hann函数和傅里叶变换。**时域卷积=频域相乘**
+  离散型窗函数`w(n) = (sin(pi\*n/(N-1)))^2`，其中窗口的长度为N+1，n为0到N-1整数。见下图hann函数和傅里叶变换。**时域卷积=频域相乘**
 
-<img src="/images/wiki/StaticAnalysis/hann.png" width="400" alt="hann函数和它的傅里叶变换" />
+  <img src="/images/wiki/StaticAnalysis/hann.png" width="400" alt="hann函数和它的傅里叶变换" />
 
 ### 滚动窗口
 滚动区间选取数据进行计算
@@ -104,6 +104,18 @@ alpha\*V+(1-alpha)\*theta
 ```python
 pd.Series.ewm()
 ```
+## 2.3 统计可视化
+
+### QQ图
+
+全称quantile-quantile plot，横坐标理论值，纵坐标采样值。
+
+* 正态分布QQ图
+
+  横坐标：标准正态分布的分位数
+
+  纵坐标：样本值
+
 # 3、数学背景
 
 ## 3.1 概率
@@ -137,3 +149,9 @@ pd.Series.ewm()
 假设`y`是文章种类，是一个枚举值；`x`是向量，表示文章中各个单词的出现次数。
 
 在拥有训练集的情况下，显然除了后验概率`P(y|x)`中的`x`来自一篇新文章无法得到，`p(x)`,`p(y)`,`p(x|y)`都是可以在抽样集合上统计出的。  
+
+## 3.2 分布函数和概率密度
+
+`F(x) = P{X<x}`
+
+F(x)：分布函数；P(x)：概率密度
