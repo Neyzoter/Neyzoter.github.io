@@ -36,6 +36,89 @@ Spark是个通用的集群计算框架，通过将大量数据集计算任务分
   ./bin/run-example SparkPi 10
   ```
 
+* 启动shell
+
+  ```ba
+  ./bin/spark-shell
+  ```
+
+* 为文件系统中的md文件创建一个新的RDD
+
+  ```bash
+  scala> val textFile = sc.textFile("README.md")
+  ```
+
+* 操作actions，从RDD返回值
+
+  ```bash
+  scala> textFile.count() # RDD 的数据条数
+  res0: Long = 126
+  
+  scala> textFile.first() # RDD 的第一行数据
+  res1: String = # Apache Spark
+  ```
+
+* 转换transformations，变成一个新的RDD并返回它的引用
+
+  使用filter来查找包含Spark文本的新的RDD，返回引用
+
+  ```bash
+  scala> val linesWithSpark = textFile.filter(line => line.contains("Spark")) # 返回一个新的RDD保存了所有含有Spark文本
+  linesWithSpark: spark.RDD[String] = spark.FilteredRDD@7dd4af09
+  
+  scala> linesWithSpark.count()  # 计算个数
+  res2: Long = 20
+  ```
+
+* 映射map，将得到的结果映射到一个新的RDD
+
+  ```bash
+  scala> var wordNum = textFile.map(line => line.split(" ").size)  # 计算每一行的单词数目，用空格隔开
+  wordNum: org.apache.spark.rdd.RDD[Int] = MapPartitionsRDD[3] at map at <console>:25
+  ```
+
+* reduce，找到单词数目最多的
+
+  ```bash
+  scala> wordNum.reduce((a,b) => if (a > b) a else b)
+  res3: Int = 22
+  ```
+
+  **`map` 和 `reduce` 的参数是 Scala 的函数串(闭包)，并且可以使用任何语言特性或者 Scala/Java 类库。**
+
+* scala调用Java函数库
+
+  ```bash
+  scala> import java.lang.Math
+  import java.lang.Math
+  
+  scala> wordNum.reduce((a,b) => Math.max(a,b))
+  res4: Int = 22
+  ```
+
+* 统计每个单词数量
+
+  ```bash
+  # 每个单词都是以看看k-v格式：(word, 1)
+  # 统计每个word的数目
+  scala> val wordCounts = textFile.flatMap(line => line.split(" ")).map(word => (word, 1)).reduceByKey((a, b) => a + b) # reduceByKey表示对同一种Key进行该操作
+  wordCounts: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[5] at reduceByKey at <console>:26
+  
+  # 显示收集单词的数量
+  wordCounts.collect()
+  res7: Array[(String, Int)] = Array((package,1), (this,1), (integration,1), (Python,2), (page](http://spark.apache.org/documentation.html).,1), (cluster.,1), (its,1), ([run,1), (There,1), (general,3), (have,1), (pre-built,1), (Because,1), (YARN,,1), (locally,2), (changed,1), (locally.,1), (sc.parallelize(1,1), (only,1), (several,1), (This,2), (basic,1), (Configuration,1), (learning,,1), (documentation,3), (first,1), (graph,1), (Hive,2), (info,1), (["Specifying,1), ("yarn",1), ([params]`.,1), ([project,1), (prefer,1), (SparkPi,2), (<http://spark.apache.org/>,1), (engine,1), (version,1), (file,1), (documentation,,1), (MASTER,1), (example,3), (["Parallel,1), (are,1), (params,1), (scala>,1), (DataFrames,,1), (provides,1), (refer,2), (configure,1), (Interactive,2), (R,,1), (can,7), (build,4),...
+  ```
+
+* 将数据集拉到集群内的内存缓存，重复访问时，提高访问速率
+
+  ```bash
+  scala> linesWithSpark.cache()
+  res8: linesWithSpark.type = MapPartitionsRDD[6] at filter at <console>:26
+  
+  scala> linesWithSpark.count()
+  res9: Long = 20
+  ```
+
   
 
 ## 2.2 SQL
@@ -58,7 +141,7 @@ Checkpoint 是用来容错的，当错误发生的时候，可以迅速恢复的
 
 ## 3.2 弹性分布式数据集
 
-RDD 是指能横跨集群所有节点进行并行计算的分区元素集合。RDDs 从 Hadoop 的文件系统中的一个文件中创建而来(或其他 Hadoop 支持的文件系统)，或者从一个已有的 Scala 集合转换得到。用户可以要求 Spark 将 RDD *持久化(persist)*到内存中，来让它在并行计算中高效地重用。最后，RDDs 能在节点失败中自动地恢复过来。
+RDD 是指能横跨集群所有节点进行并行计算的分区元素集合（Resilient Distributed Dataset，弹性分布式集合）。RDDs 从 Hadoop 的文件系统中的一个文件中创建而来(或其他 Hadoop 支持的文件系统)，或者从一个已有的 Scala 集合转换得到。用户可以要求 Spark 将 RDD *持久化(persist)*到内存中，来让它在并行计算中高效地重用。最后，RDDs 能在节点失败中自动地恢复过来。
 
 ## 3.3 共享变量
 
