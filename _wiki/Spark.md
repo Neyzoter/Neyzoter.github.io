@@ -206,6 +206,16 @@ $ ./bin/spark-shell --master local[4] --jars code.jar
     myRdd.map(MyFunctions.func1)
     ```
   
+    如果要传递某一个对象中的方法，需要传递整个对象到集群。比如，
+  
+    ```scala
+    class MyClass {
+      val field = "Hello"
+        // 调用MyClass对象的doStuff方法时，会将
+      def doStuff(rdd: RDD[String]): RDD[String] = { rdd.map(x => field + x) }
+    }
+    ```
+  
     
 
 ## 2.2 SQL
