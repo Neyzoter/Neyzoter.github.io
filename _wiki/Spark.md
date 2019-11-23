@@ -211,12 +211,109 @@ $ ./bin/spark-shell --master local[4] --jars code.jar
     ```scala
     class MyClass {
       val field = "Hello"
-        // 调用MyClass对象的doStuff方法时，会将
+        // 调用MyClass对象的doStuff方法时，需要将外部对象"Hello"引入
       def doStuff(rdd: RDD[String]): RDD[String] = { rdd.map(x => field + x) }
     }
     ```
   
+    为了避免这个问题，
     
+    ```scala
+    class MyClass {
+      val field = "Hello"
+        // 调用MyClass对象的doStuff方法时，需要将外部对象"Hello"引入
+      def doStuff(rdd: RDD[String]): RDD[String] = { 
+          var field_ = this.field;//复制 field 到一个本地变量而不是从外部访问它
+          rdd.map(x => field + x) 
+      }
+    }
+    ```
+    
+  * 使用键值对
+  
+      有一些操作（称为shuffle）只针对键值对
+  
+      `reduceByKey`操作对每一种Key单独进行操作，最典型的是统计文本的个数。
+  
+      `sortByKey`操作将键值对按照字母排序。
+  
+  * 一些transformation
+  
+      [部分中文总结](https://endymecy.gitbooks.io/spark-programming-guide-zh-cn/content/programming-guide/rdds/transformations.html)
+  
+      [RDD Scala](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) [PairRDDFunctions Scala](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions)
+  
+      [RDD Java](https://spark.apache.org/docs/latest/api/java/index.html?org/apache/spark/api/java/JavaRDD.html) [PairRDDFunctions Java](https://spark.apache.org/docs/latest/api/java/index.html?org/apache/spark/api/java/JavaPairRDD.html)
+  
+  * 一些Action
+  
+      [RDD Scala](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD) [PairRDDFunctions Scala](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions)
+  
+      [RDD Java](https://spark.apache.org/docs/latest/api/java/index.html?org/apache/spark/api/java/JavaRDD.html) [PairRDDFunctions Java](https://spark.apache.org/docs/latest/api/java/index.html?org/apache/spark/api/java/JavaPairRDD.html)
+  
+* **RDD持久化**
+
+  可以利用不同的存储级别存储每一个被持久化的RDD。使用方法是通过给`persist()`设置存储级别。
+
+  | Storage Level                              | Meaning                                                      |
+  | ------------------------------------------ | ------------------------------------------------------------ |
+  | `MEMORY_ONLY`                              | 将RDD作为非序列化的Java对象存储在jvm中。如果RDD不适合存在内存中，一些分区将不会被缓存，从而在每次需要这些分区时都需重新计算它们。这是系统默认的存储级别。 |
+  | `MEMORY_AND_DISK`                          | 将RDD作为非序列化的Java对象存储在jvm中。如果RDD不适合存在内存中，将这些不适合存在内存中的分区存储在磁盘中，每次需要时读出它们。 |
+  | `MEMORY_ONLY_SER`                          | 将RDD作为序列化的Java对象存储（每个分区一个byte数组）。这种方式比非序列化方式更节省空间，特别是用到快速的序列化工具时，但是会更耗费cpu资源—密集的读操作。 |
+  | `MEMORY_AND_DISK_SER`                      | 和MEMORY_ONLY_SER类似，但不是在每次需要时重复计算这些不适合存储到内存中的分区，而是将这些分区存储到磁盘中。 |
+  | `DISK_ONLY`                                | 仅仅将RDD分区存储到磁盘中                                    |
+  | `MEMORY_ONLY_2`, `MEMORY_AND_DISK_2`, etc. | 和上面的存储级别类似，但是复制每个分区到集群的两个节点上面   |
+  | `OFF_HEAP `(experimental)                  | 以序列化的格式存储RDD到[Tachyon](http://tachyon-project.org/)中。相对`于MEMORY_ONLY_SER`，`OFF_HEAP`减少了垃圾回收的花费，允许更小的执行者共享内存池。这使其在拥有大量内存的环境下或者多并发应用程序的环境中具有更强的吸引力。 |
+
+  *删除内存中的数据*
+
+  `RDD.unpersist()`方法
+
+  *如何选择存储级别？*
+
+  - 如果你的RDD适合默认的存储级别（`MEMORY_ONLY`），就选择默认的存储级别。因为这是cpu利用率最高的选项，会使RDD上的操作尽可能的快。
+  - 如果不适合用默认的级别，选择`MEMORY_ONLY_SER`。选择一个更快的序列化库提高对象的空间使用率，但是仍能够相当快的访问。
+  - 除非函数计算RDD的花费较大或者它们需要过滤大量的数据，不要将RDD存储到磁盘上，否则，重复计算一个分区就会和重磁盘上读取数据一样慢。
+  - 如果你希望更快的错误恢复，可以利用重复(replicated)存储级别。所有的存储级别都可以通过重复计算丢失的数据来支持完整的容错，但是重复的数据能够使你在RDD上继续运行任务，而不需要重复计算丢失的数据。
+  - 在拥有大量内存的环境中或者多应用程序的环境中，`OFF_HEAP`具有如下优势：
+    - 它运行多个执行者共享Tachyon中相同的内存池
+    - 它显著地减少垃圾回收的花费
+    - 如果单个的执行者崩溃，缓存的数据不会丢失
+
+### 2.1.4 共享变量
+
+#### 2.1.4.1 广播变量
+
+广播变量允许程序员缓存一个只读的变量在每台机器上面，而不是每个任务保存一份拷贝。利用广播变量，我们能够以一种更有效率的方式将一个大数据量输入集合的副本分配给每个节点。
+
+```scala
+// SparkContext.broadcast(v)方法从一个初始变量v中创建
+scala> val broadcastVar = sc.broadcast(Array(1, 2, 3))
+broadcastVar: spark.Broadcast[Array[Int]] = spark.Broadcast(b5c40191-a864-4c7d-b9bf-d87e1a4e787c)
+// 广播变量是v的一个包装变量，它的值可以通过value方法访问
+scala> broadcastVar.value
+res0: Array[Int] = Array(1, 2, 3)
+```
+
+**广播变量创建以后，我们就能够在集群的任何函数中使用它来代替变量v，这样我们就不需要再次传递变量v到每个节点上。另外，为了保证所有的节点得到广播变量具有相同的值，对象v不能在广播之后被修改。**
+
+#### 2.1.4.2 累加器
+
+累加器是一种只能通过关联操作进行“加”操作的变量，因此它能够高效的应用于并行操作中。
+
+```scala
+// 通过accumulator创建一个累加器
+scala> val accum = sc.accumulator(0, "My Accumulator")
+accum: spark.Accumulator[Int] = 0
+// 并行计算
+scala> sc.parallelize(Array(1, 2, 3, 4)).foreach(x => accum += x)
+...
+10/09/29 18:41:08 INFO SparkContext: Tasks finished in 0.317106 s
+scala> accum.value
+res2: Int = 10
+```
+
+
 
 ## 2.2 SQL
 
@@ -247,3 +344,7 @@ RDD 是指能横跨集群所有节点进行并行计算的分区元素集合（R
 ## 3.3 共享变量
 
 共享变量能被运行在并行计算中。默认情况下，当 Spark 运行一个并行函数时，这个并行函数会作为一个任务集在不同的节点上运行，它会把函数里使用的每个变量都复制搬运到每个任务中。有时，一个变量需要被共享到交叉任务中或驱动程序和任务之间。Spark支持两种共享变量：1.广播变量，用来所有节点的内存中缓存一个值；2.累加器(accumulators)，仅仅只能执行“添加(added)”操作，例如：记数器(counters)和求和(sums)。
+
+### 3.3.1 广播变量
+
+广播变量允许程序员缓存一个只读的变量在每台机器上面，而不是每个任务保存一份拷贝。
