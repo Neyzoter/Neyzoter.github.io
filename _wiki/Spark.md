@@ -30,6 +30,8 @@ Spark是个通用的集群计算框架，通过将大量数据集计算任务分
 
 ## 2.1 基础
 
+### 2.1.1 基础操作
+
 * 运行例子
 
   ```bash
@@ -119,7 +121,92 @@ Spark是个通用的集群计算框架，通过将大量数据集计算任务分
   res9: Long = 20
   ```
 
+
+### 2.1.2 初始化Spark
+
+```scala
+// 设置Spark Context的信息
+val conf = new SparkConf().setAppName(appName).setMaster(master)
+new SparkContext(conf)
+```
+
+**使用shell**
+
+在 Spark shell 中，有一个专有的 SparkContext 已经为你创建好。在变量中叫做 sc。可以用 `--master` 参数来设置 SparkContext 要连接的集群，用 `--jars` 来设置需要添加到 classpath 中的 JAR 包，如果有多个 JAR 包使用**逗号**分割符连接它们。
+
+```bash
+# 在一个拥有4核的环境运行spark-shell
+$ ./bin/spark-shell --master local[4]
+```
+
+```bash
+# 将jar加入到classpath
+$ ./bin/spark-shell --master local[4] --jars code.jar
+```
+
+### 2.1.3 弹性分布式数据集RDD
+
+* **并行集合**
+
+  ```scala
+  var data = Array(1,2,3,4,5)
+  var distData = sc.parallelize(data) // 并行集合
+  ```
+
+  并行集合一个很重要的参数是切片数(*slices*)，表示一个数据集切分的份数。Spark 会在集群上为每一个切片运行一个任务。你可以在集群上为每个 CPU 设置 2-4 个切片(slices)。正常情况下，Spark 会试着基于你的集群状况自动地设置切片的数目。然而，你也可以通过 `parallelize` 的第二个参数手动地设置(例如：`sc.parallelize(data, 10)`)。
+
+* **外部数据集**
+
+  * 读取文件
+
+    所有spark基于文件的方式，包括textFile，能很好支持文件目录，压缩过的文件和通配符。`textFile("/my/文件目录")`，`textFile("/my/文件目录/*.txt")` 和 `textFile("/my/文件目录/*.gz")`
+
+    `textFile`第二个可选参数来控制切片(*slices*)的数目。默认情况下，Spark 为每一个文件块(HDFS 默认文件块大小是 64M)创建一个切片(*slice*)。但是你也可以通过一个更大的值来设置一个更高的切片数目。注意，你不能设置一个小于文件块数目的切片值。
+
+  * 其他数据格式
+
+    `SparkContext.wholeTextFiles` 让你读取一个包含多个小文本文件的文件目录并且返回每一个(filename, content)对。与 `textFile` 的差异是：它记录的是每个文件中的每一行。
+
+    对于 [SequenceFiles](http://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapred/SequenceFileInputFormat.html)，可以使用 SparkContext 的 `sequenceFile[K, V]` 方法创建，K 和 V 分别对应的是 key 和 values 的类型。像 [IntWritable](http://hadoop.apache.org/docs/current/api/org/apache/hadoop/io/IntWritable.html) 与 [Text](http://hadoop.apache.org/docs/current/api/org/apache/hadoop/io/Text.html) 一样，它们必须是 Hadoop 的 [Writable](http://hadoop.apache.org/docs/current/api/org/apache/hadoop/io/Writable.html) 接口的子类。另外，对于几种通用的 Writables，Spark 允许你指定原声类型来替代。例如： `sequenceFile[Int, String]` 将会自动读取 IntWritables 和 Text。
+
+    `RDD.saveAsObjectFile` 和 `SparkContext.objectFile` 支持保存一个RDD，保存格式是一个简单的 Java 对象序列化格式。这是一种效率不高的专有格式，如 Avro，它提供了简单的方法来保存任何一个 RDD。
+
+* **RDD操作**
+
+  * 基本
+
+      RDD支持2中类型操作：transformations和actions，transformation表示从一个数据源创建一个新的RDD，actions表示计算操作，并返回数值。map就是一个transformation，reduce是一个action。**transformation是惰性的，只有action运行的时候才会进行计算。也就是说每次对一个RDD计算，都是需要先transformation，再进行action。如果为了提高action效率，可以将transformation后的RDD持久化到内存中。**
+
+      ```scala
+      // 创建一个RDD，因为惰性模式，没有立即计算，lines只是一个指向文件的指针
+      val lines = sc.textFile("data.txt")
+      // map是一个transformation，因为惰性模式，没有立即计算
+      val lineLengths = lines.map(s => s.length)
+      // reduce是一个action，spark将计算分成多个任务，并让他们运行在多个机器上
+      // 每台机器都运行自己的 map 部分和本地 reduce 部分。然后仅仅将结果返回给驱动程序。
+      val totalLength = lineLengths.reduce((a, b) => a + b)
+      ```
+
+      如果想要再次使用lineLengths，可以将其持久化到内存中，
+
+      ```scala
+      val lines = sc.textFile("data.txt")
+      val lineLengths = lines.map(s => s.length)
+      lineLengths.persist()// 后面action时，会持久化到内存中
+      val totalLength = lineLengths.reduce((a, b) => a + b)
+      ```
+
+  * 传递函数到spark
   
+    ```scala
+    object MyFunctions {
+      def func1(s: String): String = { ... }
+    }
+    
+    myRdd.map(MyFunctions.func1)
+    ```
+  
+    
 
 ## 2.2 SQL
 
@@ -143,6 +230,10 @@ Checkpoint 是用来容错的，当错误发生的时候，可以迅速恢复的
 
 RDD 是指能横跨集群所有节点进行并行计算的分区元素集合（Resilient Distributed Dataset，弹性分布式集合）。RDDs 从 Hadoop 的文件系统中的一个文件中创建而来(或其他 Hadoop 支持的文件系统)，或者从一个已有的 Scala 集合转换得到。用户可以要求 Spark 将 RDD *持久化(persist)*到内存中，来让它在并行计算中高效地重用。最后，RDDs 能在节点失败中自动地恢复过来。
 
+*RDD和持久化RDD的区别？*
+
+在 Spark 中，所有的转换(transformations)都是惰性(lazy)的，它们不会马上计算它们的结果。相反的，它们仅仅记录转换操作是应用到哪些基础数据集(例如一个文件)上的。转换仅仅在这个时候计算：当动作(action) 需要一个结果返回给驱动程序的时候。这个设计能够让 Spark 运行得更加高效。例如，我们可以实现：通过 `map` 创建一个新数据集在 `reduce` 中使用，并且仅仅返回 `reduce` 的结果给 driver，而不是整个大的映射过的数据集。默认情况下，每一个转换过的 RDD 会在每次执行动作(action)的时候重新计算一次。然而，你也可以使用 `persist` (或 `cache`)方法持久化(`persist`)一个 RDD 到内存中。在这个情况下，Spark 会在集群上保存相关的元素，在你下次查询的时候会变得更快。
+
 ## 3.3 共享变量
 
-共享变量能被运行在并行计算中。默认情况下，当 Spark 运行一个并行函数时，这个并行函数会作为一个任务集在不同的节点上运行，它会把函数里使用的每个变量都复制搬运到每个任务中。有时，一个变量需要被共享到交叉任务中或驱动程序和任务之间。
+共享变量能被运行在并行计算中。默认情况下，当 Spark 运行一个并行函数时，这个并行函数会作为一个任务集在不同的节点上运行，它会把函数里使用的每个变量都复制搬运到每个任务中。有时，一个变量需要被共享到交叉任务中或驱动程序和任务之间。Spark支持两种共享变量：1.广播变量，用来所有节点的内存中缓存一个值；2.累加器(accumulators)，仅仅只能执行“添加(added)”操作，例如：记数器(counters)和求和(sums)。
