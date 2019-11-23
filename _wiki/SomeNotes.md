@@ -301,7 +301,15 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
     - 它显著地减少垃圾回收的花费
     - 如果单个的执行者崩溃，缓存的数据不会丢失
 
-  Storage LevelMeaning`MEMORY_ONLY`将RDD作为非序列化的Java对象存储在jvm中。如果RDD不适合存在内存中，一些分区将不会被缓存，从而在每次需要这些分区时都需重新计算它们。这是系统默认的存储级别。`MEMORY_AND_DISK`将RDD作为非序列化的Java对象存储在jvm中。如果RDD不适合存在内存中，将这些不适合存在内存中的分区存储在磁盘中，每次需要时读出它们。`MEMORY_ONLY_SER`将RDD作为序列化的Java对象存储（每个分区一个byte数组）。这种方式比非序列化方式更节省空间，特别是用到快速的序列化工具时，但是会更耗费cpu资源—密集的读操作。`MEMORY_AND_DISK_SER`和MEMORY_ONLY_SER类似，但不是在每次需要时重复计算这些不适合存储到内存中的分区，而是将这些分区存储到磁盘中。`DISK_ONLY`仅仅将RDD分区存储到磁盘中`MEMORY_ONLY_2`, `MEMORY_AND_DISK_2`, etc.和上面的存储级别类似，但是复制每个分区到集群的两个节点上面`OFF_HEAP `(experimental)以序列化的格式存储RDD到[Tachyon](http://tachyon-project.org/)中。相对于MEMORY_ONLY_SER，OFF_HEAP减少了垃圾回收的花费，允许更小的执行者共享内存池。这使其在拥有大量内存的环境下或者多并发应用程序的环境中具有更强的吸引力。
+  | Storage Level                              | Meaning                                                      |
+  | ------------------------------------------ | ------------------------------------------------------------ |
+  | `MEMORY_ONLY`                              | 将RDD作为非序列化的Java对象存储在jvm中。如果RDD不适合存在内存中，一些分区将不会被缓存，从而在每次需要这些分区时都需重新计算它们。这是系统默认的存储级别。 |
+  | `MEMORY_AND_DISK`                          | 将RDD作为非序列化的Java对象存储在jvm中。如果RDD不适合存在内存中，将这些不适合存在内存中的分区存储在磁盘中，每次需要时读出它们。 |
+  | `MEMORY_ONLY_SER`                          | 将RDD作为序列化的Java对象存储（每个分区一个byte数组）。这种方式比非序列化方式更节省空间，特别是用到快速的序列化工具时，但是会更耗费cpu资源—密集的读操作。 |
+  | `MEMORY_AND_DISK_SER`                      | 和MEMORY_ONLY_SER类似，但不是在每次需要时重复计算这些不适合存储到内存中的分区，而是将这些分区存储到磁盘中。 |
+  | `DISK_ONLY`                                | 仅仅将RDD分区存储到磁盘中                                    |
+  | `MEMORY_ONLY_2`, `MEMORY_AND_DISK_2`, etc. | 和上面的存储级别类似，但是复制每个分区到集群的两个节点上面   |
+  | `OFF_HEAP `(experimental)                  | 以序列化的格式存储RDD到[Tachyon](http://tachyon-project.org/)中。相对于MEMORY_ONLY_SER，OFF_HEAP减少了垃圾回收的花费，允许更小的执行者共享内存池。这使其在拥有大量内存的环境下或者多并发应用程序的环境中具有更强的吸引力。 |
 
 ### 5.1.2 中间件
 
