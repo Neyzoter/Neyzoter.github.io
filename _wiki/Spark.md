@@ -321,6 +321,8 @@ res2: Int = 10
 
 ## 2.3 Spark Stream
 
+具体见[pdf](https://github.com/Neyzoter/Neyzoter.github.io/temp)
+
 Spark streaming是Spark核心API的一个扩展，它对实时流式数据的处理具有可扩展性、高吞吐量、可容错性等特点。
 
 <img src="/images/wiki/Spark/streaming-flow.png" width="700" alt="Stream效果" />
@@ -333,6 +335,8 @@ Spark Stream可以输出到[机器学习算法](https://spark.apache.org/docs/la
 
 程序从监听TCP套接字的数据服务器获取文本数据，然后计算文本中包含的单词数。
 
+[Java实现Spark接受Kafka数据流](https://github.com/apache/spark/blob/master/examples/src/main/java/org/apache/spark/examples/streaming/JavaDirectKafkaWordCount.java)
+
 ```scala
 import org.apache.spark._
 import org.apache.spark.streaming._
@@ -343,6 +347,20 @@ val ssc = new StreamingContext(conf, Seconds(1)) // 每1秒钟处理一次
 // 创建一个DStream
 // 可以通过KafkaUtils.createDirectStream创建来自kafka的数据流
 val lines = ssc.socketTextStream("localhost", 9999)
+// 将单词分割出来
+val words = lines.flatMap(_.split(" "))
+```
+
+```scala
+import org.apache.spark.streaming.StreamingContext._
+// Count each word in each batch
+val pairs = words.map(word => (word, 1))
+val wordCounts = pairs.reduceByKey(_ + _)
+// Print the first ten elements of each RDD generated in this DStream to the console
+wordCounts.print()
+// 开始DStream
+ssc.start()             // Start the computation
+ssc.awaitTermination()  // Wait for the computation to terminate
 ```
 
 
