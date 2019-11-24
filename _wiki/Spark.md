@@ -14,6 +14,10 @@ keywords: Spark, Java, Big Data, Machine Learning
 
 [Spark例程](http://spark.apache.org/examples.html)
 
+[configuration](https://spark.apache.org/docs/latest/configuration.html)
+
+[tuning](https://spark.apache.org/docs/latest/tuning.html)
+
 ## 1.2 介绍
 
 Spark是个通用的集群计算框架，通过将大量数据集计算任务分配到多台计算机上，提供高效内存计算。如果你熟悉Hadoop，那么你知道分布式计算框架要解决两个问题：如何分发数据和如何分发计算。Hadoop使用HDFS来解决分布式数据问题，MapReduce计算范式提供有效的分布式计算。类似的，Spark拥有多种语言的函数式编程API，提供了除map和reduce之外更多的运算符，这些操作是通过一个称作弹性分布式数据集(resilient distributed datasets, RDDs)的分布式数据框架进行的。
@@ -313,11 +317,37 @@ scala> accum.value
 res2: Int = 10
 ```
 
-
-
 ## 2.2 SQL
 
 ## 2.3 Spark Stream
+
+Spark streaming是Spark核心API的一个扩展，它对实时流式数据的处理具有可扩展性、高吞吐量、可容错性等特点。
+
+<img src="/images/wiki/Spark/streaming-flow.png" width="700" alt="Stream效果" />
+
+Spark Streaming支持一个高层的抽象，叫做离散流(`discretized stream`)或者`DStream`，它代表连续的数据流。DStream既可以利用从Kafka, Flume和Kinesis等源获取的输入数据流创建，也可以 在其他DStream的基础上通过高阶函数获得。在内部，DStream是由一系列RDDs组成。
+
+Spark Stream可以输出到[机器学习算法](https://spark.apache.org/docs/latest/mllib-guide.html)
+
+### 2.3.1 快速例子
+
+程序从监听TCP套接字的数据服务器获取文本数据，然后计算文本中包含的单词数。
+
+```scala
+import org.apache.spark._
+import org.apache.spark.streaming._
+import org.apache.spark.streaming.StreamingContext._
+// Create a local StreamingContext with two working thread and batch interval of 1 second
+val conf = new SparkConf().setMaster("local[2]").setAppName("NetworkWordCount")
+val ssc = new StreamingContext(conf, Seconds(1)) // 每1秒钟处理一次
+// 创建一个DStream
+// 可以通过KafkaUtils.createDirectStream创建来自kafka的数据流
+val lines = ssc.socketTextStream("localhost", 9999)
+```
+
+
+
+
 
 ## 2.4 MLib
 
@@ -344,7 +374,3 @@ RDD 是指能横跨集群所有节点进行并行计算的分区元素集合（R
 ## 3.3 共享变量
 
 共享变量能被运行在并行计算中。默认情况下，当 Spark 运行一个并行函数时，这个并行函数会作为一个任务集在不同的节点上运行，它会把函数里使用的每个变量都复制搬运到每个任务中。有时，一个变量需要被共享到交叉任务中或驱动程序和任务之间。Spark支持两种共享变量：1.广播变量，用来所有节点的内存中缓存一个值；2.累加器(accumulators)，仅仅只能执行“添加(added)”操作，例如：记数器(counters)和求和(sums)。
-
-### 3.3.1 广播变量
-
-广播变量允许程序员缓存一个只读的变量在每台机器上面，而不是每个任务保存一份拷贝。
