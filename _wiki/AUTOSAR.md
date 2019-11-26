@@ -220,7 +220,35 @@ Wireless Communication Hardware Abstraction
 
 ### 3.5.1 CAN Interface
 
-<img src="/images/wiki/AUTOSAR/Dependencies2OtherModules.bmp" width="700" alt="AUTOSAR CAN的依赖">
+名词解释在`SWS_CANInterface`文件的P14.
+
+数据接收和发送的函数调用过程见`SWS_CANInterface`文件的P68和P70
+
+流程图`SWS_CANInterface`文件的P129
+
+#### 3.5.1.1 CAN通信的依赖
+
+<img src="/images/wiki/AUTOSAR/Dependencies2OtherModules.png" width="700" alt="AUTOSAR CAN的依赖">
+
+#### 3.5.1.2 HOH
+
+HOH = Hardware object handles，用于发送（HTH）和接收（HRH），是CAN邮箱结构的抽象引用。CAN邮箱结构包含了CAN相关的参数，比如CanId，DLC和data。HOH用于作为调用CanDrv接口服务时的参数，用于CAN邮箱通信缓存区的标识。CanIf是HOH的用户，但是独立于硬件（？*原文*：The HOH is used as a parameter in the calls of CanDrv’s interface services and is provided by CanDrv’s configuration and used by CanDrv as identifier for communication buffers of the CAN mailbox.）。CanIf通过HOH的参数来调用CanDrv接口服务，和硬件抽象层保持了独立性。
+
+如果使用多个HRH，则每个HRH都要属于至少一个或者一组（fixed group）接收的`L-SDU`（CanRxPduIds）。一个HRH可以配置成：1.接收单个CanId数据（FullCAN）；2.接收一组单个CanIds（BasicCan），列表模式？；3.接收一个范围内Id的数据；4.接收所有数据。具体见下图。CanIf用户定义了多个PUD（3个接收，2个发送），分别交给CanIf使用。CanIf将PDU分成了3个通道，并和Can Driver的配置文件（在工程MultiCan中的Can_PBcfg.c）的HOH（HRH和HTH，`CanHardwareObjectConfig_CanController`结构体）关联。
+
+<img src="/images/wiki/AUTOSAR/HardwareObjectHandles.png" width="700" alt="AUTOSAR CAN的依赖">
+
+> HRH：Hardware Receive Handle，由Can Driver定义，每个HRH对应一个硬件对象（Hardware Object）。
+>
+> HTH：Hardware Transmit Handle，由Can Driver定义，每个HTH代表1个或者多个CAN硬件对象。
+
+#### 3.5.1.3 L-PDU和L-SDU
+
+
+
+> CAN L-PDU：CAN Protocol Data Unit，包括ID、数据长度、数据（SDU）
+>
+> CAN L-SDU：CAN Service Data Unit，表示CAN L-PDU传输的数据。
 
 ### 3.5.2 CAN Transceiver Driver
 
@@ -260,6 +288,22 @@ Diagnostic Com. Manager，在开发过程中，可用外部的诊断工具使用
 
 <img src="/images/wiki/AUTOSAR/useDCM.png" width="700 " alt="使用DCM">
 
+### 4.2.2 CAN TP
+
+TP = TransPort，CAN TP是PDUR和CanIf模块之间，主要用于对超过8字节的IPDU的分段和重组。CAN TP只由事件触发模式下运行。
+
+<img src="/images/wiki/AUTOSAR/AUTOSAR_COM_Stack.png" width="600 " alt="AUTOSAR通信协议栈">
+
+> `I-`：和AUTOSAR的交互层相关；`N-`：CanTp层相关，等同于OSI的网络层（加上IP）；`L-`：CanIf模块相关，等同于逻辑链路控制LLC（数据链路层MAC的上一层）。
+>
+> CAN N-PDU：CAN Transport layer的PDU，包括唯一的ID、数据长度和数据（协议控制信息、N-SDU或者一部分N-SDU）
+
+### 4.2.3 PDU Router
+
+PDUR = Protocal Data Unit Router
+
+PDUR通过识别IPDU的ID，将AUTOSAR COM和DCM IPDU部署为不同的通信协议（CAN、LIN、FlexRay等）。PDUR也用于确定一个传输协议是否已经被使用。当没有速率转换时，作为网关。
+
 ## 4.2 服务层架构
 
 ### 4.2.1 系统服务
@@ -293,9 +337,9 @@ Runtime Environment，是 AUTOSAR 虚拟功能总线（Virtual Function Bus，VF
 
 ### 8.1.1 CAN通信架构 
 
-**CAN通信栈：**
+**CAN通信栈**
 
-<img src="/images/wiki/AUTOSAR/CAN_Com_Stack.png" width="600" alt="CAN通信栈">
+<img src="/images/wiki/AUTOSAR/CAN_Com_Stack.png" width="450" alt="CAN通信栈">
 
 * **属性**
   * 通用网络管理接口（Generic NM Interface）只包含一个dispatcher（？）。可以实现同步（？）同一种或者不同类型的网络
@@ -306,7 +350,7 @@ Runtime Environment，是 AUTOSAR 虚拟功能总线（Virtual Function Bus，VF
 
 J1939协议栈拓展了CAN协议，用于重型车辆。
 
-<img src="/images/wiki/AUTOSAR/CAN_Com_Stack_Extention_J1939.png" width="600" alt="CAN通信栈拓展J1939">
+<img src="/images/wiki/AUTOSAR/CAN_Com_Stack_Extention_J1939.png" width="450" alt="CAN通信栈拓展J1939">
 
 **在CAN通信栈中，有两个传输一些模型——CanTp和J1939Tp，可以单独选择一个使用或者在不同的通道使用。**CanTp：ISO Diagnostics（DCM），PDU在标准CAN总线传输。J1939Tp：J1939 Diagnostics，PDU在J1939驱动的CAN总线传输。
 
@@ -1224,7 +1268,7 @@ changeBswM_PduGroupSwitchActionPerformedTrue --BswM_PduGroupSwitchActionPerforme
 Com_IpduGroupControl --> changeBswM_PduGroupSwitchActionPerformedFalse["BswM_PduGroupSwitchActionPerformed = FALSE"]
 ```
 
-### 9.3.11. 如何注册中断向量表
+### 9.3.11 如何注册中断向量表
 
 ```mermaid
 graph TB;
@@ -1974,3 +2018,7 @@ AUTOSAR Blockset 提供了用于 AUTOSAR 库例程和基础软件 (BSW) 服务�
 在 Simulink 中，使用默认 AUTOSAR 端口、接口和其他配置自动创建 AUTOSAR Classic 软件组件。
 
 # X.一些笔记
+
+## X.文件命名
+
+`General Specification of Basic Software Modules`文件中有定义，包括配置文件的c文件、h文件等。
