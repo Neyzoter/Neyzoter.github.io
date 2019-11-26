@@ -126,7 +126,7 @@ AUTOSAR XML序列化为AUTOSAR模型提供基于文件的持久化（persistence
 
 **使用二进制资源**
 
-XML相比于其他格式，非常冗长，导致AUTOSAR XML解析复杂和缓慢。Artop通过二进制格式解决该问题，空间占用降低至10%。该方法通过`IAutosarPrefenceConstants.PREF_USE_BINARY_RESOURCE`使能或者失能。
+XML相比于其他格式，非常冗长，导致AUTOSAR XML解析复杂和缓慢。Artop通过二进制格式解决该问题，空间占用降低至11.%。该方法通过`IAutosarPrefenceConstants.PREF_USE_BINARY_RESOURCE`使能或者失能。
 
 ### 1.5.3 拓展AUTOSAR模型
 
@@ -216,7 +216,17 @@ Wireless Communication Hardware Abstraction
 
 ## 3.5 通信硬件抽象
 
-Communication Hardware
+**Communication Hardware**
+
+### 3.5.1 CAN Interface
+
+<img src="/images/wiki/AUTOSAR/Dependencies2OtherModules.bmp" width="700" alt="AUTOSAR CAN的依赖">
+
+### 3.5.2 CAN Transceiver Driver
+
+
+
+### 3.5.3 Driver for ext. CAN ASIC
 
 
 
@@ -277,11 +287,41 @@ Runtime Environment，是 AUTOSAR 虚拟功能总线（Virtual Function Bus，VF
 
 <img src="/images/wiki/AUTOSAR/App_Component.png" width="600" alt="应用层功能">
 
-# 8、Core 21.0.0学习
+# 8、面向功能
+
+## 8.1 CAN
+
+### 8.1.1 CAN通信架构 
+
+**CAN通信栈：**
+
+<img src="/images/wiki/AUTOSAR/CAN_Com_Stack.png" width="600" alt="CAN通信栈">
+
+* **属性**
+  * 通用网络管理接口（Generic NM Interface）只包含一个dispatcher（？）。可以实现同步（？）同一种或者不同类型的网络
+  * CAN网络管理（CAN NM）专门用于CAN网络
+  * CAN状态管理（CAN State Manager）处理通信系统的开启和关闭。控制COM的不同选项，来发送PDU并管理信号超时。
+
+**J1939通信栈**
+
+J1939协议栈拓展了CAN协议，用于重型车辆。
+
+<img src="/images/wiki/AUTOSAR/CAN_Com_Stack_Extention_J1939.png" width="600" alt="CAN通信栈拓展J1939">
+
+**在CAN通信栈中，有两个传输一些模型——CanTp和J1939Tp，可以单独选择一个使用或者在不同的通道使用。**CanTp：ISO Diagnostics（DCM），PDU在标准CAN总线传输。J1939Tp：J1939 Diagnostics，PDU在J1939驱动的CAN总线传输。
+
+* **属性**
+  * 支持动态帧ID
+  * J1939 NM可以为每个ECU分配唯一的地址，但是不支持睡眠/唤醒操作和partial networking（？）的概念
+  * 提供 J1939诊断和对应操作。
+
+
+
+# 9、Core 21.0.0学习
 
 <img src="/images/wiki/AUTOSAR/Build_System_schematic.png" width="800" alt="make架构">
 
-## 8.1 工程架构
+## 9.1 工程架构
 
 **工程方案1.工程文件和Arctic Core分开**
 
@@ -380,7 +420,7 @@ Runtime Environment，是 AUTOSAR 虚拟功能总线（Virtual Function Bus，VF
      '--- cc_gcc.mk
 ```
 
-## 8.2 工程make
+## 9.2 工程make
 
 **make命令**
 
@@ -449,9 +489,9 @@ make BOARDDIR=mpc5516it BDIR=<anydir>[,<anydir>] all
 
 [顶层（core/下）的makefile会（进入目录`<anydir>/obj_<arch>`）调用core/scripts/rules.mk](<https://github.com/Neyzoter/autosar_core21.0.0>)
 
-## 8.3 模块相关代码
+## 9.3 模块相关代码
 
-### 8.3.1 EcuM
+### 9.3.1 EcuM
 
 `core/system/EcuM/src/EcuM_Generated_Types.h`：定义EcuM需要的(模块接口配置)数据结构。例子：
 
@@ -461,21 +501,21 @@ if defined(USE_SPI)
 endif
 ```
 
-### 8.3.2 OS任务
+### 9.3.2 OS任务
 
 在`GEN_TASK_HEAD`中定义所有任务
 
 ```c
 #define GEN_TASK_HEAD const OsTaskConstType  Os_TaskConstList[OS_TASK_CNT]
 ```
-### 8.3.3 初始化
+### 9.3.3 初始化
 
 *未完待续*
 
 ```mermaid
 graph LR;
 main["main()@/core/system<br>/Os/rtos/src/os_init.c"]  --> EcuM_Init["EcuM_Init()@/core/system<br>/EcuM/src/EcuM.c"]
-	EcuM_Init --1--> OS_CORE_IS_ID_MASTER["OS_CORE_IS_ID_MASTER(GetCoreID())<br>@/core/system/Os/rtos/inc/Os.h<br>如果多核,验证是否是主核<br>是主核运行2-10"]
+	EcuM_Init --1--> OS_CORE_IS_ID_MASTER["OS_CORE_IS_ID_MASTER(GetCoreID())<br>@/core/system/Os/rtos/inc/Os.h<br>如果多核,验证是否是主核<br>是主核运行2-11."]
 	EcuM_Init --2--> SetCurrentState["SetCurrentState(ECUM_STATE_STARTUP_ONE)<br>@/core/system/EcuM/src/EcuM_Main.c<br>切换为STARTUP_TWO状态"]
 	EcuM_Init --3--> EcuM_AL_DriverInitZero["EcuM_AL_DriverInitZero():初始化DET<br>@/core/system/EcuM/src/EcuM_Callout_Stubs.c<br>Ddefault Error Tracker(DET)初始化"]
 	EcuM_Init --4--> InitOS["InitOS()<br>@/core/system/Os/rtos/src/os_init.c<br>Os初始化,添加Task"]
@@ -484,12 +524,12 @@ main["main()@/core/system<br>/Os/rtos/src/os_init.c"]  --> EcuM_Init["EcuM_Init(
 	EcuM_Init --7--> EcuM_AL_DriverInitOne["EcuM_AL_DriverInitOne(EcuM_World.config)<br>@EcuM_Callout_Stubs.c<br>OsStar之前的驱动初始化<br>MCU (DEM) PORT DIO (GPT) (WDG) (WDGM) <br>(DMA) (ADC) BSWM (STBM) PWM (OCU) (SHELL) USART<br>(..)代表本工程不使用"]
 	EcuM_Init --8--> Mcu_GetResetReason["Mcu_GetResetReason()<br>@/core/mcal/Mcu/src/Mcu.c"<br>决定复位方式]
 	EcuM_Init --9--> EcuM_SelectShutdownTarget["EcuM_SelectShutdownTarget()<br>@/core/system/EcuM/src/EcuM.c<br>选择低功耗的模式??-EcuM_OFF or SLEEP"]
-	EcuM_Init --10--> StartOS["StartOs(EcuM_World.config->EcuMDefaultAppMode)<br>@/core/system/Os/rtos/src/os_init.c"]
+	EcuM_Init --11.--> StartOS["StartOs(EcuM_World.config->EcuMDefaultAppMode)<br>@/core/system/Os/rtos/src/os_init.c"]
 ```
 
 
 
-### 8.3.4 CAN调用过程
+### 9.3.4 CAN调用过程
 
 **说明1**：`Github`不支持`mermaid`请**将以下`mermaid`代码复制到**[在线`mermaid`查看器](<https://mermaidjs.github.io/mermaid-live-editor>)、`Typora`等软件查看具体流程图。
 
@@ -512,7 +552,7 @@ main["main()@/core/system<br>/Os/rtos/src/os_init.c"]  --> EcuM_Init["EcuM_Init(
 IPdu = &(ComConfig->ComIPdu[0]);
 // GET_Signal(SignalId)
 Signal = &(ComConfig->ComSignal[0]);
-// @ /examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3210c/Com_PbCfg.c
+// @ /examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3211.c/Com_PbCfg.c
  SECTION_POSTBUILD_DATA const Com_ConfigType ComConfiguration = {
 	.ComConfigurationId 			= 1,
 	.ComNofIPdus					= 2,
@@ -526,7 +566,7 @@ Signal = &(ComConfig->ComSignal[0]);
 	.ComGwSrcDesc					= ComGwSourceDescs,
 	.ComGwDestnDesc					= ComGwDestinationDescs
 };   
-// @ /examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3210c/Com_PbCfg.c
+// @ /examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3211.c/Com_PbCfg.c
 SECTION_POSTBUILD_DATA const ComIPdu_type ComIPdu[] = {	
 	{ // DoorStatusPdu  CAN接收
 		.ArcIPduOutgoingId			= PDUR_REVERSE_PDU_ID_PDURX,
@@ -580,7 +620,7 @@ SECTION_POSTBUILD_DATA const ComIPdu_type ComIPdu[] = {
 				.ComTxModeNumberOfRepetitions		= 0,
 				.ComTxModeRepetitionPeriodFactor	= 0,
 				.ComTxModeTimeOffsetFactor			= 0,
-				.ComTxModeTimePeriodFactor			= 10,
+				.ComTxModeTimePeriodFactor			= 11.,
 			},
 			.ComTxModeFalse = {
 				.ComTxModeMode						= COM_NONE,
@@ -607,7 +647,7 @@ SECTION_POSTBUILD_DATA const ComSignal_type * const ComIPduSignalRefs_DoorStatus
 	NULL
 };
 
-// @ /examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3210c/Com_PbCfg.c
+// @ /examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3211.c/Com_PbCfg.c
 SECTION_POSTBUILD_DATA const ComSignal_type ComSignal[] = {
     { // DoorStatus
         .ComHandleId                = ComConf_ComSignal_DoorStatus,
@@ -722,9 +762,9 @@ INSTALL_HANDLERS --> ISR_INSTALL_ISR2["ISR_INSTALL_ISR2(名称, _can_name ## _Rx
 ISR_INSTALL_ISR2 --_can_name ## _Rx0Isr -> Can_1_Rx0Isr作为中断入口--> __ISR_INSTALL_ISR2["__ISR_INSTALL_ISR2(...)添加到中断向量表<br>@/core/include/isr.h"]
 __ISR_INSTALL_ISR2 --中断触发--> Can_1_Rx0Isr["Can_1_Rx0Isr()@Can_stm32.c"]
 Can_1_Rx0Isr --> Can_RxIsr["Can_RxIsr((int)CAN_CTRL_1,CAN_FIFO0)<br>@Can_stm32.c"]
-Can_RxIsr --> CAN_Receive["CAN_Receive(canHw,fifo, &RxMessage):<br>读取fifo中数据到RxMessage<br>@stm32f10x_can.c"]
+Can_RxIsr --> CAN_Receive["CAN_Receive(canHw,fifo, &RxMessage):<br>读取fifo中数据到RxMessage<br>@stm32f11.x_can.c"]
 Can_RxIsr --> CanIf_RxIndication["CanIf_RxIndication(...,(uint8 *)&RxMessage.Data[0])<br>@/core/communication/CanIf/src/CanIf.c"]
-CanIf_RxIndication --> CanIfUserRxIndications["CanIfUserRxIndications[3]()<br>@/examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3210c/CanIf_Cfg.c"]
+CanIf_RxIndication --> CanIfUserRxIndications["CanIfUserRxIndications[3]()<br>@/examples/CanCtrlPwm/CanCtrlPwm/config/stm32_stm3211.c/CanIf_Cfg.c"]
 CanIfUserRxIndications --> PduR_CanIfRxIndication["PduR_CanIfRxIndication()@/core/communication/PduR/src/PduR_CanIf.c"]
 PduR_CanIfRxIndication --> PduR_LoIfRxIndication["PduR_LoIfRxIndication(pduId(0), pduInfoPtr, 0x01)<br>@/core/communication/PduR/src/PduR_Logic.c"]
 PduR_LoIfRxIndication --> PduR_ARC_RxIndication[" PduR_ARC_RxIndication(pduId, pduInfoPtr, serviceId)<br>@PduR_Logic.c"]
@@ -832,7 +872,7 @@ Com_SendSignal --> Com_Misc_TriggerTxOnConditions["Com_Misc_TriggerTxOnCondition
 	PduR_ARC_Transmit -.-> PduR_ARC_RouteTransmit["PduR_ARC_Transmit(destination, PduInfo)<br>@/core/communication/PduR/src/PduR_Routing.c"]
 	PduR_ARC_RouteTransmit -.-> CanIf_Transmit["CanIf_Transmit(destination->DestPduId, pduInfo)<br>@/core/communication/CanIf/src/CanIf.c"]
 	CanIf_Transmit -.-> Can_Write["Can_Write(txPduPtr->CanIfTxPduBufferRef-><br>CanIfBufferHthRef->CanIfHthIdSymRef, &canPdu)<br>@/core/mcal/Can/src/Can_stm32.c"]
-	Can_Write -.-> CAN_Transmit["CAN_Transmit(canHw,&TxMessage)<br>@stm32f10x_can.c"]
+	Can_Write -.-> CAN_Transmit["CAN_Transmit(canHw,&TxMessage)<br>@stm32f11.x_can.c"]
 ```
 
 2.周期性从IPdu发送CAN数据
@@ -849,10 +889,10 @@ PduR_UpTransmit -->PduR_ARC_Transmit["PduR_ARC_Transmit(pduId, pduInfoPtr, servi
 PduR_ARC_Transmit --> PduR_ARC_RouteTransmit["PduR_ARC_Transmit(destination, PduInfo)<br>@/core/communication/PduR/src/PduR_Routing.c"]
 PduR_ARC_RouteTransmit --> CanIf_Transmit["CanIf_Transmit(destination->DestPduId, pduInfo)<br>@/core/communication/CanIf/src/CanIf.c"]
 CanIf_Transmit --> Can_Write["Can_Write(txPduPtr->CanIfTxPduBufferRef-><br>CanIfBufferHthRef->CanIfHthIdSymRef, &canPdu)<br>@/core/mcal/Can/src/Can_stm32.c"]
-Can_Write --> CAN_Transmit["CAN_Transmit(canHw,&TxMessage)<br>@stm32f10x_can.c"]
+Can_Write --> CAN_Transmit["CAN_Transmit(canHw,&TxMessage)<br>@stm32f11.x_can.c"]
 ```
 
-### 8.3.5 运行OsBswTask
+### 9.3.5 运行OsBswTask
 
 *未完待续*
 
@@ -869,7 +909,7 @@ OsBswTask --> Can_MainFunction_Mode["Can_MainFunction_Mode()<br>"]
 	
 ```
 
-### 8.3.6 RTE设置PWM
+### 9.3.6 RTE设置PWM
 
 ```mermaid
 graph TB;
@@ -877,7 +917,7 @@ OsRteTask["OsRteTask()"] --> Rte_SwcReader_SwcReaderRunnable["Rte_SwcReader_SwcR
 Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 ```
 
-### 8.3.7 OsRteTask读取数据和设置灯PWM
+### 9.3.7 OsRteTask读取数据和设置灯PWM
 
 * 流程图
 
@@ -913,7 +953,7 @@ Rte_SwcReader_SwcReaderRunnable --> swcReaderRunnable["swcReaderRunnable()"]
 
   `xxxx.c`（`Rte/src`）：定义执行器函数，具体进行Pwm占空比设置、Bsw主任务、IO操作等。
 
-### 8.3.8 OsStartUp任务
+### 9.3.8 OsStartUp任务
 
 * 流程
 
@@ -1147,7 +1187,7 @@ EcuM_StartupTwo --4.current_state == <br>ECUM_STATE_STARTUP_TWO--> EcuM_AL_Drive
 
   *不能在Can_Init的时候，单纯将CanConf_CanHardwareObject_CanHardwareObjectTx -1 输入到HTHmap下标，解释是发送的时候会检测是否对应，具体见上面**解释***
 
-### 8.3.9 RTE任务和BSW任务的通信模式如何联系
+### 9.3.9 RTE任务和BSW任务的通信模式如何联系
 
 **1.Rte任务初始化通信模式**
 
@@ -1184,7 +1224,7 @@ changeBswM_PduGroupSwitchActionPerformedTrue --BswM_PduGroupSwitchActionPerforme
 Com_IpduGroupControl --> changeBswM_PduGroupSwitchActionPerformedFalse["BswM_PduGroupSwitchActionPerformed = FALSE"]
 ```
 
-### 8.3.10 如何注册中断向量表
+### 9.3.11. 如何注册中断向量表
 
 ```mermaid
 graph TB;
@@ -1199,11 +1239,11 @@ Os_IsrAddWithId --2.1--> addWithId["Os_VectorToIsr[isrPtr->vector + <br>IRQ_INTE
 Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry, isrPtr->vector, <br>isrPtr->type,  isrPtr->priority, <br>Os_ApplGetCore(isrPtr->appOwner) )<br>@irq.c<br>中断初始化使能"]
 ```
 
-### 8.3.11 OS任务调度
+### 9.3.11 OS任务调度
 
 * Os_AlarmCheck函数
 
-  Os_AlarmCheck函数按照OS的系统时钟运行，周期由变量OsTickFreq决定，在CanCtrlPwm中，定义为1000（us），即Os_AlarmCheck每1ms运行一次。在Os_AlarmCheck函数中，会进行每个ALARM时间是否到达，到达则运行相关动作。
+  Os_AlarmCheck函数按照OS的系统时钟运行，周期由变量OsTickFreq决定，在CanCtrlPwm中，定义为11.00（us），即Os_AlarmCheck每1ms运行一次。在Os_AlarmCheck函数中，会进行每个ALARM时间是否到达，到达则运行相关动作。
 
   *如何判断ALARM时间是否到达？*
 
@@ -1211,11 +1251,11 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
 
 
-## 8.4 顶层移植、配置和应用
+## 9.4 顶层移植、配置和应用
 
-路径：`\examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3210c`
+路径：`\examples\CanCtrlPwm\CanCtrlPwm\config\stm32_stm3211.c`
 
-### 8.4.1 Os
+### 9.4.1 Os
 
 配置文件主要包括：`Os_Cfg.c`和`Os_Cfg.h`
 
@@ -1283,10 +1323,10 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   ```c
   GEN_ALARM_AUTOSTART(  // 命名方式  Os_AlarmAutoStart_ ## _id，可以通过GEN_ALARM_AUTOSTART_NAME获取
-  				ALARM_ID_OsRteAlarm100ms,  // _id，0,1,...
+  				ALARM_ID_OsRteAlarm11.0ms,  // _id，0,1,...
   				ALARM_AUTOSTART_RELATIVE,
-  				100,                      //ALARM周期
-  				100,                      //循环周期
+  				11.0,                      //ALARM周期
+  				11.0,                      //循环周期
   				OSDEFAULTAPPMODE );
   
   GEN_ALARM_AUTOSTART(
@@ -1297,10 +1337,10 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
   				OSDEFAULTAPPMODE );
   
   GEN_ALARM_HEAD = {
-  	GEN_ALARM(	ALARM_ID_OsRteAlarm100ms,  //对应于上面生成的ALARM
-  				"OsRteAlarm100ms",
+  	GEN_ALARM(	ALARM_ID_OsRteAlarm11.0ms,  //对应于上面生成的ALARM
+  				"OsRteAlarm11.0ms",
   				COUNTER_ID_OsRteCounter,  //对应生成的计数器的id
-  				GEN_ALARM_AUTOSTART_NAME(ALARM_ID_OsRteAlarm100ms), //指向ALARM_AUTOSTART变量
+  				GEN_ALARM_AUTOSTART_NAME(ALARM_ID_OsRteAlarm11.0ms), //指向ALARM_AUTOSTART变量
   				ALARM_ACTION_SETEVENT,    //设置事件
   				TASK_ID_OsRteTask,     //任务ID @ Os_Cfg.h
   				EVENT_MASK_OsMainEvent,
@@ -1445,7 +1485,7 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
   );
   ```
 
-  **（10）中断——ISRS**
+  **（11.）中断——ISRS**
 
   ```c
   #if (!defined(CFG_TC2XX) && !defined(CFG_TC3XX)) // Table Os_VectorToIsr is not used for Aurix architecture.
@@ -1465,7 +1505,7 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   具体见代码注释。
 
-### 8.4.2 Com
+### 9.4.2 Com
 
 * `Com_Cfg.c`
 
@@ -1498,7 +1538,7 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   `COM_MAX_N_GROUP_SIGNALS`：信号组（类型为`Com_Arc_GroupSignal_type`）个数
 
-  `一些通错误编号`：`COM_INVALID_PDU_ID(104)`、`COM_INVALID_SIGNAL_ID(109)`等
+  `一些通错误编号`：`COM_INVALID_PDU_ID(11.4)`、`COM_INVALID_SIGNAL_ID(11.9)`等
 
   **`信号ID`**：如
 
@@ -1555,7 +1595,7 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
 **`IPdu`、`Arc_IPdu`和`Signal`的区别**：见**7.3.4 CAN调用过程**
 
-### 8.4.3 ComM
+### 9.4.3 ComM
 
 * `ComM_Cfg.c`
 
@@ -1579,7 +1619,7 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   `ComM_Config`的`extern`声明。
 
-### 8.4.4 BswM
+### 9.4.4 BswM
 
 * `BswM_Cfg.c`
 
@@ -1601,7 +1641,7 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   定义BswM需要用到的数据结构。
 
-### 8.4.5 EcuM
+### 9.4.5 EcuM
 
 - `EcuM_PBcfg.c`
 
@@ -1621,9 +1661,9 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
   宏定义唤醒源对应数值、复位方式对应数值
 
-### 8.4.6 RTE
+### 9.4.6 RTE
 
-#### 8.4.6.1 Config
+#### 9.4.6.1 Config
 
 * `Rte`
 
@@ -1811,21 +1851,21 @@ Os_IsrAddWithId --2.2--> Irq_EnableVector2["Irq_EnableVector2<br>( isrPtr->entry
 
    宏定义，可以使得ArcCore RTE 集成Simulink SWC更加 简单，此文件不是AUTOSAR标准。
 
-#### 8.4.6.2 Contract
+#### 9.4.6.2 Contract
 
 * `Rte_xxxx.h`
 
   声明`xxxx.c`内的函数
 
-#### 8.4.6.3 MemMap
+#### 9.4.6.3 MemMap
 
 * `xxxx_MemMap.h`
 
   实现内存映射
 
-# 9.Artop
+# 10.Artop
 
-## 9.1 介绍
+## 10.1 介绍
 
 Artop基于Eclipse的EMF建模框架而构建，提供一些公共的基础功能，如所有工具均要用到的元模型实现，而将具体的应用功能留给工具开发商实现。（来自硕士论文《基于Artop的汽车电子软件架构工具的设计与实现》）
 
@@ -1839,7 +1879,7 @@ ARTOP针对AUTOSAR标准的XML文档，提供了专门的处理方法。其实�
 
 <img src="/images/wiki/AUTOSAR/Pg_artopcomponents_Internal.png" width="700" alt="Artop架构内部">
 
-### 9.1.1 子项目
+### 10.1.1 子项目
 
 |                             Name                             |                         Description                          | Status |
 | :----------------------------------------------------------: | :----------------------------------------------------------: | :----: |
@@ -1851,7 +1891,7 @@ ARTOP针对AUTOSAR标准的XML文档，提供了专门的处理方法。其实�
 
 [2019-8-15 Artop Demonstrator使用过程](<http://neyzoter.cn/2019/08/15/Record-Artop-Demo-Usage/>)
 
-### 9.1.2 三个文件
+### 10.1.2 三个文件
 
 `Artop Technology Demonstrator`、`Artop SDK`、`ARText SDK`
 
@@ -1871,7 +1911,7 @@ ARTOP针对AUTOSAR标准的XML文档，提供了专门的处理方法。其实�
 
   *什么是XText*：XText帮助程序员创建一套基于文本的小型领域特定语言（DSL），抑或是实现一门成熟的通用计算机程序设计语言。
 
-## 9.2 代码生成技术
+## 10.2 代码生成技术
 
 **（1）面向属性编程（AOP）**
 
@@ -1883,11 +1923,11 @@ AOP通过在代码中添加元数据的方式来自动生成代码.
 
 代码生成要有一定文本结构的文件，使用文本模板工具。Velocity开源项目（Apache），基于Java的模板引擎，用户可以使用Velocity Template Language（VTL）的脚本语言来引用Java代码定义的对象，将对象的信息和模板的内容相结合生成代码文件。
 
-## 9.3 Artop例程
+## 10.3 Artop例程
 
-### 9.3.1  org.artop.aal.examples.actions
+### 10.3.1  org.artop.aal.examples.actions
 
-#### 9.3.1.1 文件夹结构
+#### 10.3.1.1 文件夹结构
 
 ```
 org.artop.aal.examples.actions
@@ -1923,13 +1963,13 @@ org.artop.aal.examples.actions
                             `-- AutosarExampleActionProvider.java
 ```
 
-# 10.Matlab Simulink
+# 11.Matlab Simulink
 
-## 10.1 AUTOSAR Blockset
+## 11.1 AUTOSAR Blockset
 
 AUTOSAR Blockset 提供了用于 AUTOSAR 库例程和基础软件 (BSW) 服务（包括 NVRAM 和诊断）的模块和结构。通过将 BSW 服务与应用程序软件模型一起进行仿真，可以在不离开 Simulink 的情况下验证 AUTOSAR ECU 软件。
 
-### 10.1.1 对 AUTOSAR Classic 软件组件进行建模
+### 11.1.1 对 AUTOSAR Classic 软件组件进行建模
 
 在 Simulink 中，使用默认 AUTOSAR 端口、接口和其他配置自动创建 AUTOSAR Classic 软件组件。
 
