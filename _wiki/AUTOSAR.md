@@ -300,9 +300,29 @@ TP = TransPort，CAN TP是PDUR和CanIf模块之间，主要用于对超过8字�
 
 ### 4.2.3 PDU Router
 
-PDUR = Protocal Data Unit Router
+PDUR = Protocal Data Unit Router。PDUR通过识别IPDU的ID，将AUTOSAR COM和DCM IPDU部署为不同的通信协议（CAN、LIN、FlexRay等）。PDUR也用于确定一个传输协议是否已经被使用。当没有速率转换时，作为网关。PDUR是AUTOSAR通信结构的中心，见下图。
 
-PDUR通过识别IPDU的ID，将AUTOSAR COM和DCM IPDU部署为不同的通信协议（CAN、LIN、FlexRay等）。PDUR也用于确定一个传输协议是否已经被使用。当没有速率转换时，作为网关。
+<img src="/images/wiki/AUTOSAR/PDURModuleStructure.png" width="600 " alt="PDUR和其他模块的关系">
+
+PDUR模块包含两个部分：
+
+* **PDUR routing tables**
+
+  静态路由表描述了每个IPDU打包成某一中通信协议（CAN、LIN等）的NPDU。路由表可以在Post-build后更新（在运行时更新？）或者选择初始化PDU的时候选择。
+
+* **PDUR引擎**
+
+  * 实现IPDU的打包到NPDU
+  * 将IPDU的ID打包到目标空间（比如`PduR_Transmit`函数到`CanIf_Transmit`函数，`PduR_CanIfTxConfirmation`函数到`Com_TxConfirmation`函数）
+  * **提供最小路由能力，即使PDUR路由表损坏或者没有编程也可以通过DCM来激活ECU的Bootloader**。
+
+PDUR模块可以实现多种传输方式：
+
+<img src="/images/wiki/AUTOSAR/PDUR_Cast_type.png" width="600 " alt="PDUR的传输方式">
+
+> FF：First Frame, 首帧，传输协议术语（Transport Protocol term）
+>
+> CF：Consecutive Frame, 连续帧，传输协议术语（Transport Protocol term）
 
 ## 4.2 服务层架构
 
