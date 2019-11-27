@@ -300,6 +300,10 @@ TP = TransPort，CAN TP是PDUR和CanIf模块之间，主要用于对超过8字�
 
 ### 4.2.3 PDU Router
 
+PDUR流程图在`SWS_PDURouter.pdf`文件P87
+
+PDUR配置内容在`SWS_PDURouter.pdf`文件P108
+
 PDUR = Protocal Data Unit Router。PDUR通过识别IPDU的ID，将AUTOSAR COM和DCM IPDU部署为不同的通信协议（CAN、LIN、FlexRay等）。PDUR也用于确定一个传输协议是否已经被使用。当没有速率转换时，作为网关。PDUR是AUTOSAR通信结构的中心，见下图。
 
 <img src="/images/wiki/AUTOSAR/PDURModuleStructure.png" width="600 " alt="PDUR和其他模块的关系">
@@ -320,9 +324,11 @@ PDUR模块可以实现多种传输方式：
 
 <img src="/images/wiki/AUTOSAR/PDUR_Cast_type.png" width="600 " alt="PDUR的传输方式">
 
-> FF：First Frame, 首帧，传输协议术语（Transport Protocol term）
+> SF：Single Frame，单帧，传输协议术语（Transport Protocol term）
 >
-> CF：Consecutive Frame, 连续帧，传输协议术语（Transport Protocol term）
+> FF：First Frame, 首帧，传输协议术语
+>
+> CF：Consecutive Frame, 连续帧，传输协议术语
 
 ## 4.2 服务层架构
 
@@ -915,6 +921,10 @@ const Rte_CDS_LightActuator LightActuator_frontLightActuator = {
   对于CanCtrlPwm工程而言，在OsRteTask任务中将数据放到IPDU中，在从OsBswTask通过CAN周期性发送出去
 
   1.OsRteTask任务中将数据放到IPDU中
+  
+  `EcuMWorld.config = EcuMConfig@EcuM_PBcfg.c`在函数`EcuM_Init()@EcuM.c`中配置，具体语句是`EcuM_World.config = EcuM_DeterminePbConfiguration();`
+  
+  ` EcuM_AL_DriverInitTwo(EcuM_World.config)`被调用，用于Com初始化`Com_Init`，也就是给`Com_ConfigType * ComConfig`赋值为ComConfiguration。
 
 ```mermaid
 graph TB;
@@ -927,7 +937,7 @@ Rte_lightManager_InteriorLightManagerMain --MAIN--> ..
 
 Rte_lightManager_InteriorLightManagerMain --POST--> Rte_Write_InteriorLightManager_lightManager_LightStatusOnCommMedia_message["Rte_Write_InteriorLightManager_lightManager_<br>LightStatusOnCommMedia_message(...)<br>@/Rte/Config/Rte_Internal_InteriorLightManager.c"]
 Rte_Write_InteriorLightManager_lightManager_LightStatusOnCommMedia_message --> Com_SendSignal["Com_SendSignal(ComConf_ComSignal_<br>LightStatus, &value)<br>@/core/communication/Com/src/Com_Com.c"]
-Com_SendSignal --> Com_Misc_WriteSignalDataToPdu["Com_Misc_WriteSignalDataToPdu(...)<br>@/core/communication/Com/src/Com_misc.c"]
+Com_SendSignal --> Com_Misc_WriteSignalDataToPdu["Com_Misc_WriteSignalDataToPdu(...)<br>@/core/communication/Com/src/Com_misc.c<br>在这里将数据放到了PDU存储空间<br>ComConfiguration@Com_PBcfg.h"]
 Com_SendSignal --> Com_Misc_TriggerTxOnConditions["Com_Misc_TriggerTxOnConditions(...)<br>@Com_misc.c<br>对于CanCtrlPwm工程不从此步直接发送数据<br>而是从OsBswTask任务Com_MainFunctionTx发送数据<br>下面程序（虚线）未执行"]
 	Com_Misc_TriggerTxOnConditions -.-> Com_Misc_TriggerIPDUSend["Com_Misc_TriggerIPDUSend(pduHandleId)<br>@Com_misc.c"]
 	Com_Misc_TriggerIPDUSend -.-> PduR_ComTransmit["PduR_ComTransmit(IPdu->ArcIPduOutgoingId,<br> &PduInfoPackage)<br>@/core/communication/PduR/src/PduR_Com.c"]
