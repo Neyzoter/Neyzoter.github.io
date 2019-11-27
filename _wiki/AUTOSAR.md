@@ -385,7 +385,31 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
   * J1939 NM可以为每个ECU分配唯一的地址，但是不支持睡眠/唤醒操作和partial networking（？）的概念
   * 提供 J1939诊断和对应操作。
 
+### 8.1.2 CAN通信流程
 
+下面流程只关注CAN相关内容，其他内容略过。
+
+* **第一阶段：EcuM初始化**
+
+  整个系统从`int main(void)@os_init.c`开始，调用`EcuM_Init`。`EcuM_Init`函数会给`EcuM_World.config` 赋值（`EcuM_World.config = EcuM_DeterminePbConfiguration()`），指向了后期`OsStartupTask`任务需要使用的所有配置参数（一个结构体`EcuMConfig@EcuM_PBcfg.c`）。
+
+* **第二阶段：Os启动**
+
+  `OsStartupTask`任务调用（运行1次）`EcuM_StartupTwo`函数，进而调用`EcuM_AL_DriverInitTwo(EcuM_World.config)`来初始化COM、CanIf等软件模块（*注*：`EcuM_AL_DriverInitOne`在第一阶段完成，初始化PORT、USART等硬件相关内容）。CanCtrlPwm工程使用到的模块包括：`BSWM CAN CANIF CANSM COM COMM CRC DET DIO ECUM_FIXED IOHWAB KERNEL MCU OS_DEBUG PDUR PORT PWM RAMLOG RTE USART`
+
+  以下是`EcuM_AL_DriverInitTwo(const EcuM_ConfigType* ConfigPtr)`中的CAN通信相关内容：
+
+  * `CanTrcv_Init`函数 - `USE_CANTRCV`
+
+    CAN收发器，目前没有用到
+
+  * `Can_Init`函数 - `USE_CAN`
+
+    `Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)`初始化CAN（`PostBuildConfig@EcuM_PBHeader.c`中定义了BSWM、CAN、CANIF、CANNM、CANTP、COM、COMM、PDUR、CANTRCV、FIM信息，其中`CanConfigPtr`指向`CanConfigData@Can_PBcfg.c`）
+
+* **第三阶段：任务周期运行**
+
+  
 
 # 9、Core 21.0.0学习
 
