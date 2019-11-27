@@ -462,7 +462,7 @@ Interrupts/Exceptions应该使用Interrupt Gate和Trap Gate，它们之间的唯
 
   取决于分配单元大小是否要取整
 
-<img src="/images/wiki/OS/memory_structure.png" width="800" alt="内存管理">
+<img src="/images/wiki/OS/memory_structure.png" width="500" alt="内存管理">
 
 ### 3.3.2 动态分区分配
 
@@ -597,7 +597,7 @@ Interrupts/Exceptions应该使用Interrupt Gate和Trap Gate，它们之间的唯
 
 * 段访问机制
 
-  段表示访问方式和存储数据等属性相同的一段地址空间，对应一个连续的内存块，若干个段组成进程逻辑地址空间
+  **段表示访问方式和存储数据等属性相同的一段地址空间**，对应一个连续的内存块，若干个段组成进程逻辑地址空间
 
   * 段访问
 
@@ -606,6 +606,8 @@ Interrupts/Exceptions应该使用Interrupt Gate和Trap Gate，它们之间的唯
     <img src="/images/wiki/OS/SectionAccess.png" width="700" alt="段访问">
 
 ### 3.4.2 页式存储管理
+
+用户程序的地址空间被划分成若干固定大小的区域，称为“页”，相应地，内存空间分成若干个物理块，页和块的大小相等。可将用户程序的任一页放在内存的任一块中，实现了离散分配。
 
 * **页帧**（帧、物理页面，Frame，Page Frame）
 
@@ -629,11 +631,11 @@ Interrupts/Exceptions应该使用Interrupt Gate和Trap Gate，它们之间的唯
   * 随着进程运行，页表动态变换，也就是会给进程动态分配空间
   * 页表基址寄存器（PTBR, Page Table Base Register）保存了页表的基址。
 
-  
-
   页表项除了包含物理页面页号，也包含存在位、修改位、引用位。
 
-  <img src="/images/wiki/OS/PageTableDetails.png" width="700" alt="页表项包含的内容">
+  <img src="/images/wiki/OS/PageTableDetails.png" width="450" alt="页表项包含的内容">
+
+
 
 ### 3.4.3 快表和多级页表
 
@@ -655,6 +657,72 @@ Interrupts/Exceptions应该使用Interrupt Gate和Trap Gate，它们之间的唯
   * 减少每级页表的长度
 
   <img src="/images/wiki/OS/K_Pages.png" width="700" alt="多级页表">
+  
+  下面是一个简单的二级页表实例，因特尔芯片的CR3寄存器中存储起始位置PTBR。
+  
+  <img src="/images/wiki/OS/2seqFrameExample.png" width="700" alt="2级页表">
+
+### 3.4.4 反置页表
+
+对于大地址空间（64bits）系统，多级页表变得繁琐，因为需要多次访问地址空间。和多级页表的区别：
+
+> 多级页表相当于给某一块区域设置了搜索方式，而反置页表是一个页表项对应一个帧。
+
+下面是反置页表查询过程，通过hash实现，如果发生冲突，则查找链表中的下一个。
+
+<img src="/images/wiki/OS/ConvertPageTableSearch.png" width="700" alt="反置页表">
+
+冲突解决：hash后找到了一个pid为1的页表项，但是不正确，此时查找链表的下一个页表项，可以验证是正确的。见下图。
+
+<img src="/images/wiki/OS/ConvertPageTableCrash.png" width="700" alt="反置页表冲突解决">
+
+**几种页表的总结**
+
+* 快表
+
+  通过缓存机制，减少对页表的访问
+
+* 多级页表
+
+  多级减少页表的大小，但是页表过多可能造成越来越多的浪费。
+
+* 反置页表
+
+  也是为了减小页表，但是不像多级页表，反置页表占用空间少。
+
+  比如，
+
+  > 物理内存大小: `4096*4096=4K*4KB=16 MB`
+  >
+  > 页面大小: `4096 bytes = 4KB`
+  >
+  > 页帧数:` 4096 = 4K`
+  >
+  > 页寄存器使用的空间 (假设每个页寄存器占8字节):`8*4096=32 Kbytes`
+  >
+  > 页寄存器带来的额外开销: `32K/16M = 0.2%` (大约)
+  >
+  > 虚拟内存的大小： 任意
+
+## 3.5 段页式存储管理
+
+段式存储在内存保护方面有优势，页式存储在内存利用和优化转移到后备存储方面有优势。
+
+* **段页式存储管理**
+
+  在段式存储管理基础上，**给每个段加一级页表**，具体访问过程如下：
+
+  <img src="/images/wiki/OS/Segment_Page_Mem_Manage.png" width="700" alt="段页式存储管理">
+
+  可以将段表指向相同的页表基址，则实现**进程间的段分享**，如下图：
+
+  <img src="/images/wiki/OS/Segment_Page_Share_Mem.png" width="700" alt="段页式实现进程间内存共享">
+
+  
+
+  
+
+
 
 # 4.进程及线程
 
