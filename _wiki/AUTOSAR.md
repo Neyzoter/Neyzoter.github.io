@@ -246,7 +246,7 @@ HOH = Hardware object handles，用于发送（HTH）和接收（HRH），是CAN
 
 
 
-> CAN L-PDU：CAN Protocol Data Unit，包括ID、数据长度、数据（SDU）
+> CAN L-PDU：CAN Protocol Data Unit，包括ID、数据长度、数据（SDU），应该是CAN总线上完整的一帧数据（包括帧头和数据）
 >
 > CAN L-SDU：CAN Service Data Unit，表示CAN L-PDU传输的数据。
 
@@ -407,9 +407,31 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
     `Can_Init(ConfigPtr->PostBuildConfig->CanConfigPtr)`初始化CAN（`PostBuildConfig@EcuM_PBHeader.c`中定义了BSWM、CAN、CANIF、CANNM、CANTP、COM、COMM、PDUR、CANTRCV、FIM信息，其中`CanConfigPtr`指向`CanConfigData@Can_PBcfg.c`）
 
+  * `CanIf_Init` - `USE_CANIF`
+
+    `CanIf_Init(ConfigPtr->PostBuildConfig->CanIfConfigPtr)@CanIf.c`初始化CanIf（`PostBuildConfig@EcuM_PBHeader.c`的`CanIfConfigPtr`指向`CanIf_Config@CanIf_PBcfg.c`）
+
+    
+
 * **第三阶段：任务周期运行**
 
-  
+
+
+### 8.1.3 CAN关键配置参数
+
+* 通用配置
+
+  `EcuM_AL_DriverInitOne`调用`Mcu_Init@Mcu_stm32.c`实现时钟初始化（`参数@Mcu_PBcfg.c`），调用`Port_Init@Port_stm32.c`实现引脚配置如remap、pin、port（`参数@Port_PBcfg.c`）
+
+* CAN硬件配置
+
+  CAN相关配置（`Can_Init@Can_stm32.c`），检查CAN个数是否匹配、CAN中断、波特率、HTH，会用到`Can_cfg.h`和`Can_PBcfg.c`中的参数。
+
+* CAN HOH配置
+
+  `Can_Init@Can_stm32.c`中定义每个要使用到的CAN HTH（一个CAN可以有多个）
+
+  的`Can_Global.CanHTHMap[hoh->CanObjectId].CanControllerRef`和`Can_Global.CanHTHMap[hoh->CanObjectId].CanHOHRef`
 
 # 9、Core 21.0.0学习
 
