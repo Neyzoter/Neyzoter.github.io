@@ -232,6 +232,8 @@ Wireless Communication Hardware Abstraction
 
 #### 3.5.1.2 HOH
 
+定义在`Can_PBcfg.c`中。
+
 HOH = Hardware object handles，用于发送（HTH）和接收（HRH），是CAN邮箱结构的抽象引用。CAN邮箱结构包含了CAN相关的参数，比如CanId，DLC和data。HOH用于作为调用CanDrv接口服务时的参数，用于CAN邮箱通信缓存区的标识。CanIf是HOH的用户，但是独立于硬件（？*原文*：The HOH is used as a parameter in the calls of CanDrv’s interface services and is provided by CanDrv’s configuration and used by CanDrv as identifier for communication buffers of the CAN mailbox.）。CanIf通过HOH的参数来调用CanDrv接口服务，和硬件抽象层保持了独立性。
 
 如果使用多个HRH，则每个HRH都要属于至少一个或者一组（fixed group）接收的`L-SDU`（CanRxPduIds）。一个HRH可以配置成：1.接收单个CanId数据（FullCAN）；2.接收一组单个CanIds（BasicCan），列表模式？；3.接收一个范围内Id的数据；4.接收所有数据。具体见下图。CanIf用户定义了多个PUD（3个接收，2个发送），分别交给CanIf使用。CanIf将PDU分成了3个通道，并和Can Driver的配置文件（在工程MultiCan中的Can_PBcfg.c）的HOH（HRH和HTH，`CanHardwareObjectConfig_CanController`结构体）关联。
@@ -360,6 +362,8 @@ Runtime Environment，是 AUTOSAR 虚拟功能总线（Virtual Function Bus，VF
 # 8、面向功能
 
 ## 8.1 CAN
+
+几个重点函数和文件：`EcuM_AL_DriverInitTwo@EcuM_Callout_Stubs.c`（初始化CAN、CanIf、CanSM等）、`EcuMConfig@EcuM_PBcfg.c`（`EcuM_World.config`指向的参数）
 
 ### 8.1.1 CAN通信架构 
 
@@ -889,6 +893,10 @@ PduR_ARC_RouteRxIndication --> Com_RxIndication["Com_RxIndication(destination->D
 Com_RxIndication --> memcpy["memcpy(Arc_IPdu->ComIPduDataPtr, <br>PduInfoPtr->SduDataPtr, IPdu->ComIPduSize)<br>ComIPduDataPtr指向接收到的数据"]
 Com_RxIndication --> Com_Misc_RxProcessSignals["Com_Misc_RxProcessSignals():<br>会抛出Event(放在一个列表里)"]
 ```
+
+下图是CAN中断后发生的函数调用情况（`SWS_CANInterface.pdf`  P139 Receive indication (interrupt mode)）
+
+<img src="/images/wiki/AUTOSAR/Receive_indication_interrupt_mode.png" width = "800" alt = "中断接收模式">
 
 2.OsBswTask将IPDU数据拷贝到DEFERRED_IPDU中
 
