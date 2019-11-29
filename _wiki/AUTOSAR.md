@@ -446,12 +446,22 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
     PDU实体在COM配置，大小由`COM_MAX_BUFFER_SIZE`配置（总大小，包括所有通道），配置的时候按照`ComIPdu.ComIPduSize@Com_PbCfg.c`的大小逐个配置。比如：
 
     ```
-    	|--------------|------------------|   Com_Arc_Buffer
-    	|              |
-    发送通道开始    接收通道开始
+    	|--------------|------------|------------|   Com_Arc_Buffer
+    	|              |            |
+    发送通道开始  Deferred Buffer  接收通道开始
     ```
 
+    如果IPDU是`COM_DEFERRED`（使用Deferred Buffer缓存数据）且`COM_RECEIVE`（接收模式），则要专门分配一段Deferred Buffer区域
+
+* 重要的标志
+
+  * `ComIPdu[i].ArcIPduOutgoingId`
+
     
+
+  * `ComSignal[i].ComHandleId`
+
+    `ComSignal[i]`的成员包含在`ComIPdu[i].ArcIPduOutgoingId`中。
 
 # 9、Core 21.0.0学习
 
@@ -918,7 +928,7 @@ Com_RxIndication --> Com_Misc_RxProcessSignals["Com_Misc_RxProcessSignals():<br>
 
 <img src="/images/wiki/AUTOSAR/PDUR_2_COM.png" width = "800" alt = "IPDU从CanIf到COM">
 
-
+`Com_RxIndication`实现了将中断中的数据（通过结构体pduInfo指向了中断中的数据、数据长度等内容，pduInfo交给`Com_RxIndication`处理，而不是直接处理中断中的数据）拷贝到Buffer中。此时，可以通过抛出信号更新的事件（要使用到`ComSignal@Com_PbCfg.c`），供其他的任务来进行处理。
 
 2.OsBswTask将IPDU数据拷贝到DEFERRED_IPDU中
 
