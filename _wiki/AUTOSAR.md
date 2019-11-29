@@ -248,7 +248,7 @@ HOH = Hardware object handles，用于发送（HTH）和接收（HRH），是CAN
 
 
 
-> CAN L-PDU：CAN Protocol Data Unit，包括ID、数据长度、数据（SDU），应该是CAN总线上完整的一帧数据（包括帧头和数据）
+> CAN L-PDU：CAN Protocol Data Unit，包括ID、数据长度、数据（SDU），应该是CAN总线上完整的一帧数据（包括帧头和数据），在MultiCan工程中是`RxMessage`。
 >
 > CAN L-SDU：CAN Service Data Unit，表示CAN L-PDU传输的数据。
 
@@ -314,11 +314,11 @@ PDUR模块包含两个部分：
 
 * **PDUR routing tables**
 
-  静态路由表描述了每个IPDU打包成某一中通信协议（CAN、LIN等）的NPDU。路由表可以在Post-build后更新（在运行时更新？）或者选择初始化PDU的时候选择。
+  静态路由表描述了每个IPDU打包成某一中通信协议（CAN、LIN等）。路由表可以在Post-build后更新（在运行时更新？）或者选择初始化PDU的时候选择。
 
 * **PDUR引擎**
 
-  * 实现IPDU的打包到NPDU
+  * **实现IPDU的打包到目的地**，如上层（Upper Layer）COM、DCM、LDCOM等、接口模块（IF Module）CANIF、LINIF、FRIF等、传输协议层（TP）CANTP、LINTP等，具体见`ARC_PduR_ModuleType`的具体定义。具体分发位置（接收）`PduR_ARC_RxIndication`和（发送）**后续补充**
   * 将IPDU的ID打包到目标空间（比如`PduR_Transmit`函数到`CanIf_Transmit`函数，`PduR_CanIfTxConfirmation`函数到`Com_TxConfirmation`函数）
   * **提供最小路由能力，即使PDUR路由表损坏或者没有编程也可以通过DCM来激活ECU的Bootloader**。
 
@@ -894,9 +894,15 @@ Com_RxIndication --> memcpy["memcpy(Arc_IPdu->ComIPduDataPtr, <br>PduInfoPtr->Sd
 Com_RxIndication --> Com_Misc_RxProcessSignals["Com_Misc_RxProcessSignals():<br>会抛出Event(放在一个列表里)"]
 ```
 
-下图是CAN中断后发生的函数调用情况（`SWS_CANInterface.pdf`  P139 Receive indication (interrupt mode)）
+下图是CAN中断后发生的第一步：CanIf实现从`L-PDU`到`I-PDU`（`SWS_CANInterface.pdf`  P139 Receive indication (interrupt mode)）
 
-<img src="/images/wiki/AUTOSAR/Receive_indication_interrupt_mode.png" width = "800" alt = "中断接收模式">
+<img src="/images/wiki/AUTOSAR/Receive_indication_interrupt_mode.png" width = "800" alt = "CanIf实现从LPDU到IPDU">
+
+下图是CAN中断后发生的第2步：IPDU从Canif到PDUR，再到COM（`SWS_PDURouter.pdf`  P88 CanIf module I-PDU reception）：
+
+<img src="/images/wiki/AUTOSAR/RPDUR_2_COM.png" width = "800" alt = "IPDU从CanIf到COM">
+
+
 
 2.OsBswTask将IPDU数据拷贝到DEFERRED_IPDU中
 
