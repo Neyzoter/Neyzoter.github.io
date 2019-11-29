@@ -431,11 +431,27 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
   CAN相关配置（`Can_Init@Can_stm32.c`），检查CAN个数是否匹配、CAN中断、波特率、HTH，会用到`Can_cfg.h`和`Can_PBcfg.c`中的参数。
 
-* CAN HOH配置
+* CAN IF配置
 
   `Can_Init@Can_stm32.c`中定义每个要使用到的CAN HTH（一个CAN可以有多个）
 
   的`Can_Global.CanHTHMap[hoh->CanObjectId].CanControllerRef`和`Can_Global.CanHTHMap[hoh->CanObjectId].CanHOHRef`
+
+* PDUR配置
+
+* COM配置
+
+  * PDU配置
+
+    PDU实体在COM配置，大小由`COM_MAX_BUFFER_SIZE`配置（总大小，包括所有通道），配置的时候按照`ComIPdu.ComIPduSize@Com_PbCfg.c`的大小逐个配置。比如：
+
+    ```
+    	|--------------|------------------|   Com_Arc_Buffer
+    	|              |
+    发送通道开始    接收通道开始
+    ```
+
+    
 
 # 9、Core 21.0.0学习
 
@@ -900,7 +916,7 @@ Com_RxIndication --> Com_Misc_RxProcessSignals["Com_Misc_RxProcessSignals():<br>
 
 下图是CAN中断后发生的第2步：IPDU从Canif到PDUR，再到COM（`SWS_PDURouter.pdf`  P88 CanIf module I-PDU reception）：
 
-<img src="/images/wiki/AUTOSAR/RPDUR_2_COM.png" width = "800" alt = "IPDU从CanIf到COM">
+<img src="/images/wiki/AUTOSAR/PDUR_2_COM.png" width = "800" alt = "IPDU从CanIf到COM">
 
 
 
