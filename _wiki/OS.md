@@ -1049,3 +1049,74 @@ D = %edi
 
   `.S`（大写）文件还需要进行预处理、汇编等操作，`.asm/s`文件只需要汇编形成`.o`文件。
 
+## 9.3 实验二 物理内存管理
+
+### 9.2.1 X86保护模式中的特权级
+
+* **特权级**
+
+  利用X86硬件实现内存保护，下面是Intel支持的特权级共4个，一般只需要用到内核态的Level0和用户态的Level3即可。
+
+  <img src="/images/wiki/OS/Protection_Ring.png" width="500" alt="特权级保护环">
+
+  *特权级区别？*
+
+  一些指令（如修改页表、响应中断、访问内核数据）只能在ring0
+
+  访问数据段、访问页、进入中断服务例程（ISRs）会检查特权级。
+
+  *特权级表示？*
+
+  * 段选择子
+
+    <img src="/images/wiki/OS/Selector_with_RPL_CPL.png" width="400" alt="段选择子的RPL和CPL">
+
+    RPL：段寄存器 DS、ES、FS、GS的低两位，指向数据段
+
+    CPL：段寄存器 CS，指向程序段（*注*：SS指向堆栈段，CS指向程序段，两者特权级是一样的，比如内核态SS CPL是0，SS需要指向特权级为ring0的堆栈）
+
+  * 段描述符
+
+    <img src="/images/wiki/OS/Segment_Descriptor_DPL.png" width="400" alt="段描述符的DPL">
+
+    DPL：段描述符，门描述符（当中断发生时必须先访问这些“门”，进而进入相应的程序）
+
+  *访问门和访问段时候的区别？*
+
+  访问门：满足`CPL<=DPL[门] && CPL >= DPL[段]`，`CPL >= DPL[段]`使得低优先级程序可以访问高优先级段（比如内核态的数据）。
+
+  访问段：`MAX(CPL, RPL) <= DPL`
+
+  *实现特权级跳转*
+
+  * ring0到ring3
+
+    ring0内核态进入中断后，将ring3用户态的信息更新到栈中，调用IRET将信息弹出栈，进而能进入用户态。如下图所示：
+
+    <img src="/images/wiki/OS/Kernel2UserState_Stack.png" width="600" alt="内核态ring0到用户态ring3的栈设置">
+
+  * ring3到ring0
+
+    使用软中断/trap来从ring3到ring0，ring3进入中断后，将内核态信息更新到栈中，调用IRET将信息出栈，进而能进入内核态。
+
+    <img src="/images/wiki/OS/User2Kernel_Stack.png" width="600" alt="用户态ring3到内核态ring0设置">
+
+  *实现特权级转换的时候，如何知道堆栈地址在哪里？*
+
+  **一块内存地址空间中有一块区域保存任务状态段Task State Segment，其中保存了不同特权级的栈地址，可以通过TSS描述符来找到这块TSS，从而知道EIP（SS:ESP）地址。**
+
+  <img src="/images/wiki/OS/TSS.png" width="600" alt="任务状态段">
+
+  下面是如何通过一个任务寄存器找到TSS的描述符，进而找到TSS。
+
+  <img src="/images/wiki/OS/Find_TSS.png" width="600" alt="任务状态段">
+
+  具体的设置方式是：
+
+  ```
+  分配TSS空间 -> 初始化TSS -> 段描述符表中添加TSS描述符 -> 设置TSS的选择子（也就是上述任务寄存器）
+  ```
+
+* **内存管理单元MMU**
+
+  将虚拟地址空间映射到分散的物理地址空间

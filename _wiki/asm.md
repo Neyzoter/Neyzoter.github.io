@@ -68,11 +68,15 @@ keywords: assembly,X86
 
 * DS
 
-  数据段寄存器(Data Segment Register)，其值为数据段的段值
+  数据段寄存器(Data Segment Register)，其值为数据段的段值，指向当前运行着的程序的数据段
 
 * ES
 
-  附加段寄存器(Extra Segment Register)，其值为附加数据段的段值
+  附加段寄存器(Extra Segment Register)，其值为附加数据段的段值，通常跟DI一起用来做指针使用. DS:SI和ES:DI配对时通常用来执行一些字符串操作
+
+* GS和FS
+
+  段寄存器，没有处理器定义的目的，而是由操作系统运行它们来赋予目的。
 
 * SS
 
