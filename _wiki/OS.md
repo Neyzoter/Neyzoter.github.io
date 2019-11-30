@@ -1145,6 +1145,8 @@ D = %edi
 
 **页数据结构创建**
 
+*可参考清华`ucore_os_docs.pdf`P149 以页为单位管理物理内存*
+
 1.创建一块free页管理列表（以`free_area_t`类型数据开头），列表中包含多个可以使用的连续内存空间块的信息（page来描述），这个page占用了连续内存空间的第一页
 
 ```c
@@ -1156,12 +1158,32 @@ struct Page {
 };
 
 typedef struct {
-    list_entry_t free_list;         // the list header
-    unsigned int nr_free;           // # of free pages in this free list
+    list_entry_t free_list;         // 列表头
+    unsigned int nr_free;           // 共有多少个列表
 } free_area_t;
 ```
 
 下图是free_list链接多个page的视图（`free_list`和`page_link`双向链接）：
 
 <img src="/images/wiki/OS/free_list.jpeg" width="500" alt="freelist链接多个page">
+
+2.分配一块n个页的区域给一个页表引用
+
+查找方法较多，以搜索到的首个page为例。搜索page1，发现page1后面跟着多于n个的页，那么就可以将前面n个页分配给页表引用（连续的线性地址）。剩下的一些页，重新创建一个以page4开头的连续内存空间。page4加入到free页管理列表，并将page1从列表中删除（因为已经被使用了）。
+
+<img src="/images/wiki/OS/free_page_And_Used_page.jpeg" width="500" alt="一些空间被引用了，一些还在free列表中">
+
+**操作系统如何给进程分配段表和页表？**
+
+* 分页机制
+
+  操作系统会为每个进程或任务建立一个页表（这个页表可能是一级的也可能是多级的）。整个操作系统中有多个进程在运行，那么系统就会有多个页表。页表在内存中的存储位置由寄存器CR3给出。
+
+* 分段机制
+
+  操作系统会为每个进程或任务建立一个段表（段描述符，一般不用多级），用于记录数据段、代码段等各类段在内存中的具体位置。
+
+* 段页式机制
+
+  一般一个进程或任务，操作系统会给其建立一个段表，而段表中的每个段又会对应一个页表，也就是说，段页式机制的每个进程有一个段表，有多个页表。
 
