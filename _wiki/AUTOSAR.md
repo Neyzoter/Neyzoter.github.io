@@ -332,13 +332,39 @@ PDUR模块可以实现多种传输方式：
 >
 > CF：Consecutive Frame, 连续帧，传输协议术语
 
-## 4.2 服务层架构
-
-### 4.2.1 系统服务
+## 4.3 系统服务
 
 System Services
 
 <img src="/images/wiki/AUTOSAR/SystemServices.png" width="700 " alt="服务层架构">
+
+### 4.3.1 BswM
+
+
+
+### 4.3.2 EcuM
+
+以EcuM为中心，系统启动分为3大步：OS启动前配置（StartPreOS Sequence）、OS启动后的配置（StartPostOS Sequence）、任务正式运行。
+
+<img src="/images/wiki/AUTOSAR/PhaseOfEcuManager.png" width="700" alt="EcuM启动过程">
+
+* PreOS
+
+  <img src="/images/wiki/AUTOSAR/StartPreOS_Sequence.png" width="700" alt="OS启动前的配置">
+
+  操作说明见下图，
+
+  <img src="/images/wiki/AUTOSAR/PreOS_Things.png" width="700" alt="OS启动前的其他配置">
+
+  PreOs阶段初始化了两类，
+
+  <img src="/images/wiki/AUTOSAR/Block0and1_Init.png" width="700" alt="第0和1阶段初始化内容">
+
+* PostOS
+
+  `OsStartupTask`任务调用（运行1次）`EcuM_StartupTwo`函数
+
+  
 
 # 5、BSW-复杂驱动层
 
@@ -393,11 +419,13 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
 下面流程只关注CAN相关内容，其他内容略过。
 
-* **第一阶段：EcuM初始化**
+* **第一阶段：OS启动前配置**
 
   整个系统从`int main(void)@os_init.c`开始，调用`EcuM_Init`。`EcuM_Init`函数会给`EcuM_World.config` 赋值（`EcuM_World.config = EcuM_DeterminePbConfiguration()`），指向了后期`OsStartupTask`任务需要使用的所有配置参数（一个结构体`EcuMConfig@EcuM_PBcfg.c`）。
 
-* **第二阶段：Os启动**
+  
+
+* **第二阶段：Os启动后配置**
 
   `OsStartupTask`任务调用（运行1次）`EcuM_StartupTwo`函数，进而调用`EcuM_AL_DriverInitTwo(EcuM_World.config)`来初始化COM、CanIf等软件模块（*注*：`EcuM_AL_DriverInitOne`在第一阶段完成，初始化PORT、USART等硬件相关内容）。CanCtrlPwm工程使用到的模块包括：`BSWM CAN CANIF CANSM COM COMM CRC DET DIO ECUM_FIXED IOHWAB KERNEL MCU OS_DEBUG PDUR PORT PWM RAMLOG RTE USART`
 
