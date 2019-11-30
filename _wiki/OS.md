@@ -718,8 +718,10 @@ Interrupts/Exceptions应该使用Interrupt Gate和Trap Gate，它们之间的唯
 
   <img src="/images/wiki/OS/Segment_Page_Share_Mem.png" width="700" alt="段页式实现进程间内存共享">
 
-  
+  **具体参考实验课程设计的实验二。**
 
+  
+  
   
 
 
@@ -1053,70 +1055,113 @@ D = %edi
 
 ### 9.2.1 X86保护模式中的特权级
 
-* **特权级**
+利用X86硬件实现内存保护，下面是Intel支持的特权级共4个，一般只需要用到内核态的Level0和用户态的Level3即可。
 
-  利用X86硬件实现内存保护，下面是Intel支持的特权级共4个，一般只需要用到内核态的Level0和用户态的Level3即可。
+<img src="/images/wiki/OS/Protection_Ring.png" width="500" alt="特权级保护环">
 
-  <img src="/images/wiki/OS/Protection_Ring.png" width="500" alt="特权级保护环">
+**特权级区别？**
 
-  *特权级区别？*
+一些指令（如修改页表、响应中断、访问内核数据）只能在ring0
 
-  一些指令（如修改页表、响应中断、访问内核数据）只能在ring0
+访问数据段、访问页、进入中断服务例程（ISRs）会检查特权级。
 
-  访问数据段、访问页、进入中断服务例程（ISRs）会检查特权级。
+**特权级表示**
 
-  *特权级表示？*
+* 段选择子
 
-  * 段选择子
+  <img src="/images/wiki/OS/Selector_with_RPL_CPL.png" width="400" alt="段选择子的RPL和CPL">
 
-    <img src="/images/wiki/OS/Selector_with_RPL_CPL.png" width="400" alt="段选择子的RPL和CPL">
+  RPL：段寄存器 DS、ES、FS、GS的低两位，指向数据段
 
-    RPL：段寄存器 DS、ES、FS、GS的低两位，指向数据段
+  CPL：段寄存器 CS，指向程序段（*注*：SS指向堆栈段，CS指向程序段，两者特权级是一样的，比如内核态SS CPL是0，SS需要指向特权级为ring0的堆栈）
 
-    CPL：段寄存器 CS，指向程序段（*注*：SS指向堆栈段，CS指向程序段，两者特权级是一样的，比如内核态SS CPL是0，SS需要指向特权级为ring0的堆栈）
+* 段描述符
 
-  * 段描述符
+  <img src="/images/wiki/OS/Segment_Descriptor_DPL.png" width="400" alt="段描述符的DPL">
 
-    <img src="/images/wiki/OS/Segment_Descriptor_DPL.png" width="400" alt="段描述符的DPL">
+  DPL：段描述符，门描述符（当中断发生时必须先访问这些“门”，进而进入相应的程序）
 
-    DPL：段描述符，门描述符（当中断发生时必须先访问这些“门”，进而进入相应的程序）
+**访问门和访问段时候的区别**
 
-  *访问门和访问段时候的区别？*
+访问门：满足`CPL<=DPL[门] && CPL >= DPL[段]`，`CPL >= DPL[段]`使得低优先级程序可以访问高优先级段（比如内核态的数据）。
 
-  访问门：满足`CPL<=DPL[门] && CPL >= DPL[段]`，`CPL >= DPL[段]`使得低优先级程序可以访问高优先级段（比如内核态的数据）。
+访问段：`MAX(CPL, RPL) <= DPL`
 
-  访问段：`MAX(CPL, RPL) <= DPL`
+*实现特权级跳转*
 
-  *实现特权级跳转*
+* ring0到ring3
 
-  * ring0到ring3
+  ring0内核态进入中断后，将ring3用户态的信息更新到栈中，调用IRET将信息弹出栈，进而能进入用户态。如下图所示：
 
-    ring0内核态进入中断后，将ring3用户态的信息更新到栈中，调用IRET将信息弹出栈，进而能进入用户态。如下图所示：
+  <img src="/images/wiki/OS/Kernel2UserState_Stack.png" width="600" alt="内核态ring0到用户态ring3的栈设置">
 
-    <img src="/images/wiki/OS/Kernel2UserState_Stack.png" width="600" alt="内核态ring0到用户态ring3的栈设置">
+* ring3到ring0
 
-  * ring3到ring0
+  使用软中断/trap来从ring3到ring0，ring3进入中断后，将内核态信息更新到栈中，调用IRET将信息出栈，进而能进入内核态。
 
-    使用软中断/trap来从ring3到ring0，ring3进入中断后，将内核态信息更新到栈中，调用IRET将信息出栈，进而能进入内核态。
+  <img src="/images/wiki/OS/User2Kernel_Stack.png" width="600" alt="用户态ring3到内核态ring0设置">
 
-    <img src="/images/wiki/OS/User2Kernel_Stack.png" width="600" alt="用户态ring3到内核态ring0设置">
+**实现特权级转换的时候，如何知道堆栈地址在哪里**
 
-  *实现特权级转换的时候，如何知道堆栈地址在哪里？*
+**一块内存地址空间中有一块区域保存任务状态段Task State Segment，其中保存了不同特权级的栈地址，可以通过TSS描述符来找到这块TSS，从而知道EIP（SS:ESP）地址。**
 
-  **一块内存地址空间中有一块区域保存任务状态段Task State Segment，其中保存了不同特权级的栈地址，可以通过TSS描述符来找到这块TSS，从而知道EIP（SS:ESP）地址。**
+<img src="/images/wiki/OS/TSS.png" width="600" alt="任务状态段">
 
-  <img src="/images/wiki/OS/TSS.png" width="600" alt="任务状态段">
+下面是如何通过一个任务寄存器找到TSS的描述符，进而找到TSS。
 
-  下面是如何通过一个任务寄存器找到TSS的描述符，进而找到TSS。
+<img src="/images/wiki/OS/Find_TSS.png" width="600" alt="任务状态段">
 
-  <img src="/images/wiki/OS/Find_TSS.png" width="600" alt="任务状态段">
+具体的设置方式是：
 
-  具体的设置方式是：
+```
+分配TSS空间 -> 初始化TSS -> 段描述符表中添加TSS描述符 -> 设置TSS的选择子（也就是上述任务寄存器）
+```
 
-  ```
-  分配TSS空间 -> 初始化TSS -> 段描述符表中添加TSS描述符 -> 设置TSS的选择子（也就是上述任务寄存器）
-  ```
+### 9.2.2 内存管理单元MMU
 
-* **内存管理单元MMU**
+将虚拟地址空间映射到分散的物理地址空间
 
-  将虚拟地址空间映射到分散的物理地址空间
+**页机制过程**
+
+页机制通过CR0的第31位（PG）来启动。
+
+下图中，线性地址Linear Address是段机制产生的地址。线性地址高10位用来索引页目录中的页目录（CR3寄存器保存页目录基址）入口PDE，也就是页表的基址，再通过线性地址中间10位索引页表，得到页的基址，最后12位（4K空间）是在页中找到对应的物理地址空间。*注意*：页表项保存的是线性地址。
+
+<img src="/images/wiki/OS/Page_Mechanism.png" width="500" alt="页机制">
+
+**建立页表**
+
+```
+创建一个目录页 -> 初始化/清除分配好的页 -> 将0xC0000000-OxF8000000（虚拟地址）映射到0x00000000-0x38000000（物理地址） -> 将0x00000000-Ox00100000（虚拟地址）映射到0x00000000-0x00100000（物理地址） -> 设置CR3寄存器（目录页基址）和CR0的PG（启动页机制） -> 更新GDT -> 取消将0x00000000-Ox00100000（虚拟地址）映射到0x00000000-0x00100000（物理地址）
+```
+
+**段页式机制**
+
+1.逻辑地址通过段选择子选择全局描述符表中的段描述符得到某一个段的基址，并加上Offset来得到对应的线性地址。*注意*：线性地址其实也是虚的，只是一个数字，而不对应物理空间。
+
+2.线性地址会被拆分Dir、Table和Offset三部分，经过页机制找到对应的物理地址空间。
+
+<img src="/images/wiki/OS/Segment_Page_Mechanism.png" width="700" alt="段页式机制">
+
+**页数据结构创建**
+
+1.创建一块free页管理列表（以`free_area_t`类型数据开头），列表中包含多个可以使用的连续内存空间块的信息（page来描述），这个page占用了连续内存空间的第一页
+
+```c
+struct Page {
+    int ref;        // 页被页表引用的次数
+    uint32_t flags;// 物理页的状态标记：被保留（已经被使用，不会存在于free页管理列表中）、可被使用
+    unsigned int property;// 连续内存空间块的大小
+    list_entry_t page_link;// 连接其他的page和free_list
+};
+
+typedef struct {
+    list_entry_t free_list;         // the list header
+    unsigned int nr_free;           // # of free pages in this free list
+} free_area_t;
+```
+
+下图是free_list链接多个page的视图（`free_list`和`page_link`双向链接）：
+
+<img src="/images/wiki/OS/free_list.jpeg" width="500" alt="freelist链接多个page">
+
