@@ -364,6 +364,8 @@ System Services
 
   `OsStartupTask`任务调用（运行1次）`EcuM_StartupTwo`函数
 
+  <img src="/images/wiki/AUTOSAR/StartPostOS_Sequencea.png" width="700" alt="StartPostOS_Sequencea">
+
   
 
 # 5、BSW-复杂驱动层
