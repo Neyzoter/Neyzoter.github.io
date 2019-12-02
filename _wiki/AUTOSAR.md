@@ -445,11 +445,9 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
     `CanIf_Init(ConfigPtr->PostBuildConfig->CanIfConfigPtr)@CanIf.c`初始化CanIf（`PostBuildConfig@EcuM_PBHeader.c`的`CanIfConfigPtr`指向`CanIf_Config@CanIf_PBcfg.c`）
 
-    
-
 * **第三阶段：任务周期运行**
 
-
+  具体见20191202（实际开会日期20191201）组会[PPT]( https://pan.baidu.com/s/1md7710WDP5BE_jhbBgvvCw)，提取码: gjbb。
 
 ### 8.1.3 CAN关键配置参数
 
@@ -459,7 +457,29 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
 * CAN硬件配置
 
-  CAN相关配置（`Can_Init@Can_stm32.c`），检查CAN个数是否匹配、CAN中断、波特率、HTH，会用到`Can_cfg.h`和`Can_PBcfg.c`中的参数。
+  CAN相关配置（`Can_Init@Can_stm32.c`），检查CAN个数是否匹配、CAN中断、波特率、HTH，会用到`Can_cfg.h`和`Can_PBcfg.c`中的参数。下面列出一些重要的配置参数和说明：
+
+  * `CAN_ARC_CTRL_CONFIG_CNT @ Can_Cfg.h`
+
+    CAN配置个数，配2个就要设置为2，进而遍历下面的`CanControllerConfigData`来配置每个CAN。
+
+  * `Can_ControllerConfigType CanControllerConfigData[] @ Can_PBcfg.c`
+
+    每个CAN都要配置一个`Can_ControllerConfigType`类型的结构体，包括：
+
+    1. 两个CAN的哪一个`CanControllerId`
+
+    2. HOH配置信息`Can_Arc_Hoh`
+
+    3. 使用的哪个FIFO `Can_Arc_Fifo`
+
+    4. 默认的波特率`CanControllerDefaultBaudrate`，默认波特率必须在后面的`CanControllerSupportedBaudrates`中存在，`Can_ChangeBaudrate`设置波特率的时候会在`Can_CheckBaudrate`中校验，并通过`CanControllerDefaultBaudrate`找到`CanControllerSupportedBaudrates`中所有支持的波特率配置信息中的一个来进行CAN的波特率改变，**CAN运行时候也可以通过`Can_ChangeBaudrate`实现波特率的修改**
+
+    5. 多个波特率的配置信息（进而可以计算出bs1、bs2、sjw、CAN_Prescaler等）`CanControllerSupportedBaudrates`
+
+    6. 支持多少种波特率`CanControllerSupportedBaudratesCount`，和上面的`CanControllerSupportedBaudrates`波特率及其配置信息数目相同。
+
+    *注：CAN默认使用掩码模式*
 
 * CAN IF配置
 
