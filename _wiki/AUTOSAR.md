@@ -451,13 +451,15 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
 ### 8.1.3 CAN关键配置参数
 
+对于修改的内容，我都在代码中使用了`[MULTICAN CFG CHANGE]`标记来注明修改过的地方。
+
 * 通用配置
 
   `EcuM_AL_DriverInitOne`调用`Mcu_Init@Mcu_stm32.c`实现时钟初始化（`参数@Mcu_PBcfg.c`），调用`Port_Init@Port_stm32.c`实现引脚配置如remap、pin、port（`参数@Port_PBcfg.c`）
 
-* CAN硬件配置
+* CAN硬件配置（**`Can_stm32`和英飞凌结构不同，直接使用EB生成的**）
 
-  CAN相关配置（`Can_Init@Can_stm32.c`），检查CAN个数是否匹配、CAN中断、波特率、HTH，会用到`Can_cfg.h`和`Can_PBcfg.c`中的参数。下面列出一些重要的配置参数和说明：
+  CAN相关配置（`Can_Init @ Can_stm32.c`），检查CAN个数是否匹配、CAN中断、波特率、HTH，会用到`Can_cfg.h`和`Can_PBcfg.c`中的参数。下面列出一些重要的配置参数和说明：
 
   * `CAN_ARC_CTRL_CONFIG_CNT @ Can_Cfg.h`
 
@@ -475,19 +477,31 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
     4. 默认的波特率`CanControllerDefaultBaudrate`，默认波特率必须在后面的`CanControllerSupportedBaudrates`中存在，`Can_ChangeBaudrate`设置波特率的时候会在`Can_CheckBaudrate`中校验，并通过`CanControllerDefaultBaudrate`找到`CanControllerSupportedBaudrates`中所有支持的波特率配置信息中的一个来进行CAN的波特率改变，**CAN运行时候也可以通过`Can_ChangeBaudrate`实现波特率的修改**
 
-    5. 多个波特率的配置信息（进而可以计算出bs1、bs2、sjw、CAN_Prescaler等）`CanControllerSupportedBaudrates`
+    5. 多个波特率的配置信息（进而可以计算出bs1、bs2、sjw、`CAN_Prescaler`等）`CanControllerSupportedBaudrates`
 
     6. 支持多少种波特率`CanControllerSupportedBaudratesCount`，和上面的`CanControllerSupportedBaudrates`波特率及其配置信息数目相同。
 
-    *注：CAN默认使用掩码模式*
+    *注：CAN默认使用掩码模式，可以通过软件ID滤波*
+    
+  * `Can_SupportedBaudrates_CanController @ Can_PBcfg.c`
+
+    支持的波特率，每个波特率为一个结构体，包括波特率`CanControllerBaudRate`和其他信息（进而可以计算出bs1、bs2、sjw、`CAN_Prescaler`等）。`Can_ChangeBaudrate`设置波特率的时候会通过对比设置的波特率和`CanControllerBaudRate`来查找对应的波特率设置结构体。
+
+  * `CanHardwareObjectConfig_CanController @ Can_PBcfg.c`
+
+    定义接收和发送的HOH（HRH和HTH）。在EB配置中，TX的CanObjectId必须高于RX。
 
 * CAN IF配置
 
-  `Can_Init@Can_stm32.c`中定义每个要使用到的CAN HTH（一个CAN可以有多个）
+  CANIF相关配置（`CanIf_Init @ CanIf.c`）
 
-  的`Can_Global.CanHTHMap[hoh->CanObjectId].CanControllerRef`和`Can_Global.CanHTHMap[hoh->CanObjectId].CanHOHRef`
+  * `CANIF_PUBLIC_TX_BUFFERING @ CanIf_Cfg.h`
+
+    开启发送L-PDU缓存区，每次`CanIf_Init()`需要初始化每个分配到CANIF的Transmit L-PDU Buffer（`req SWS_CANIF_00387`）。
 
 * PDUR配置
+
+  
 
 * COM配置
 
