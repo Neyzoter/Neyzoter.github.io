@@ -781,7 +781,8 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 * **单例模式中在类内定义自己的对象为什么不会循环？**
 
   final变量、static变量等线程共用的东西存放在JVM方法区，只加载一次，不会出现循环的问题。
-
+  
+  
 # 8.计算机语言
 
 ## 8.1 Java
@@ -853,7 +854,173 @@ ORM 就是通过实例对象的语法，完成关系型数据库的操作的技�
 
     <img src="/images/wiki/SomeNotes/upperBounds.png" width="600" alt="extends">
 
+* **synchronized的几种用法？**
+
+  *注意：*所有的非静态同步方法用的都是同一把锁——实例对象本身；所有的静态同步方法用的也是同一把锁——类对象本身
+
+  * 同步普通方法
+  
+    ```java
+    /**
+     * 用在普通方法，只针对单例（一个实例）有效，如果不是单例，锁会失效
+     */
+    private synchronized void synchronizedMethod() {
+        System.out.println("synchronizedMethod");
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+  }
+    ```
+
+  * 同步this**实例**（功能和同步普通方法一致）
+  
+    ```java
+    /**
+     * 用在this，锁住当前实例
+     */
+    private void synchronizedThis() {
+        synchronized (this) {
+            System.out.println("synchronizedThis");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+          }
+        }
+  }
+    ```
+  
+  * 同步静态方法
+  
+    ```java
+    /**
+     * 用在静态方法，对于所有的实例，只有一个线程能获取锁进入这个方法（锁住了类）
+     */
+    private synchronized static void synchronizedStaticMethod() {
+        System.out.println("synchronizedStaticMethod");
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    ```
+  
+  * 同步类
+  
+    ```java
+    /**
+     * 用在类，其他类
+     */
+    private void synchronizedClass() {
+        synchronized (TestSynchronized.class) {
+            System.out.println("synchronizedClass");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     
+    /**
+     * 用在类，自己这个类
+     */
+    private void synchronizedGetClass() {
+        synchronized (this.getClass()) {
+            System.out.println("synchronizedGetClass");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    ```
+
+* **Java范型如何实现数据类型安全检查？**
+
+  如何没有范型，则需要通过Object类来实现。如果传入了两个不同的对象，比如比较方法输入Integer对象和String对象，就无法比较，但是在编译的过程中是无法发现错误的。比如
+
+  * Object实现范型
+
+      ```java
+      public class NoGeneric {
+          private Object ob;
+          public NoGeneric(Object ob) {
+              this.ob = ob;
+          }
+          public Object getOb() {
+              return this.ob;
+          }
+          public void setOb(Object ob) {
+              this.ob = ob;
+          }
+      }
+      ```
+
+      ```java
+      NoGeneric intOb = new NoGeneric(new Integer(88));
+      NoGeneric strOb = new NoGeneric("123");
+      // 不会报错
+      if (intOb == strOb) {
+          ...
+      }
+      ```
+
+  * Java范型
+  
+    ```java
+    public class Generic<T> {
+        private T ob;
+        public Generic(T ob) {
+            this.ob = ob;
+        }
+        public T getOb() {
+            return this.ob;
+        }
+        public void setOb(T ob) {
+            this.ob = ob;
+        }
+    }
+    ```
+  
+    ```java
+    Generic<Integer> intOb = new Generic<>(new Integer(88));
+    Generic<String> strOb = new Generic<>("123");
+    // 报错，类型不同
+    if (intOb == strOb) {
+        ...
+    }
+    ```
+  
+* **Java范型中的`?`和T的区别**（待补充）
+
+  1. T可以确保多个参数类型的一致性，两个`?`却不能
+
+     ```java
+     // 参数中的两个T指向同一种数据类型
+     public <T extends Number> void test(List<T> dest, List<T> src) {
+         
+     }
+     // 两个？所指数据类型可以不同
+     public void test(List<? extends Number> dest, List<? extends Number> src) {
+         
+     }
+     ```
+
+  2. T可以多重限定，也就是可以是多个类型的共同子类，`?`不可以
+
+     ```java
+     // T需要是Number和String的共同子类
+     public <T extends Number & String> void test(List<T> dest, List<T> src) {
+         
+     }
+     ```
+
+     
 
 ## 8.2 Python
 
