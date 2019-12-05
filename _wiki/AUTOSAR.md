@@ -493,11 +493,86 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
 * CAN IF配置
 
-  CANIF相关配置（`CanIf_Init @ CanIf.c`）
+  CANIF相关配置（`CanIf_Init @ CanIf.c`），包括后期运行使用到的参数。在`CanIf_Init @ CanIf.c`中初始化了非常少量的内容，因为`CANIF_PUBLIC_PN_SUPPORT`、`CANIF_PUBLIC_WAKEUP_CHECK_VALIDATION_SUPPORT`、`CANIF_PUBLIC_TX_BUFFERING`、`CANIF_ARC_TRANSCEIVER_API`等都没开。*收发器目前搁置，需要对应特定的芯片。*
 
   * `CANIF_PUBLIC_TX_BUFFERING @ CanIf_Cfg.h`
 
     开启发送L-PDU缓存区，每次`CanIf_Init()`需要初始化每个分配到CANIF的Transmit L-PDU Buffer（`req SWS_CANIF_00387`）。
+    
+  * `HrhRxPdu_CanIfHrhCfg @ CanIf_Cfg.h `
+
+    `CanIf_RxPduConfigType`数据类型的数组变量`HrhRxPdu_CanIfHrhCfg`连接了下面的MCAL和上层服务层模块，比如PDUR、CANTP、J1939TP、XCP等。具体见下面的成员变量，
+
+    ```c
+    SECTION_POSTBUILD_DATA const CanIf_RxPduConfigType HrhRxPdu_CanIfHrhCfg[] = {
+    	{
+    		.CanIfCanRxPduId 			= PDUR_PDU_ID_PDURX,  // 指定下一个模块的PDU编号，在对应模块中定义
+        	.CanIfCanRxPduLowerCanId 	= 1,   // [scc] CAN ID下界
+        	.CanIfCanRxPduUpperCanId 	= 1,   // [scc] CAN ID上界
+        	.CanIfCanRxPduDlc 			= 8,   // [scc] 字节长度
+        	.CanIdIsExtended	 		= false, // [scc] 标准帧或者拓展帧
+        	.CanIfUserRxIndication 		= PDUR_CALLOUT,  // [scc] 指定CanIf向上输出到PDUR，还有其他的CANNM、CANTP、J1939TP
+    	},
+    };
+    ```
+
+    **具体的CANIF分发流程（`CanIf_RxIndication @ CanIf.c`）：**
+
+    1. 寻找CAN数据ID对应的配置信息，即`HrhRxPdu_CanIfHrhCfg`数组中的一个
+
+       具体实现方式见下方`CANIF过滤方式 @ CanIf_Cfg.h`。
+
+    2. 根据配置信息的`CanIfUserRxIndication`成员找到对应的下一个模块
+
+       `CanIfUserRxIndications[rxPduCfgPtr->CanIfUserRxIndication](rxPduCfgPtr->CanIfCanRxPduId, &pduInfo);`其中`CanIfUserRxIndications`是一个包含了很多模块调用函数指针结构体，见下面代码
+
+       ```c
+       const CanIfUserRxIndicationType CanIfUserRxIndications[] = {
+       #if defined(USE_CANNM)	
+       	CanNm_RxIndication,
+       #else
+       	NULL,
+       #endif	
+       #if defined(USE_CANTP)	
+       	CanTp_RxIndication,
+       #else
+       	NULL,
+       #endif
+       #if defined(USE_J1939TP)
+       	J1939Tp_RxIndication,
+       #else
+       	NULL,
+       #endif
+       #if defined(USE_PDUR)	
+       	PduR_CanIfRxIndication,
+       #else
+       	NULL,
+       #endif
+       #if defined(USE_XCP)	
+       	Xcp_CanIfRxIndication,
+       #else
+       	NULL,
+       #endif	
+       	Arc_T1_Rx_Cbk,
+       
+       };
+       ```
+
+       举例而言，我们这边配置了`PDUR_CALLOUT`，调用了PDUR模块。具体实现见`XXX_CALLOUT @ CanIf_Cfg.h`。
+
+  * `CANIF过滤方式 @ CanIf_Cfg.h`
+
+    CANIF可以针对CAN数据的ID来搜索对应的配置信息（即`HrhRxPdu_CanIfHrhCfg`数组中的一个
+
+    ），进而找到下一个要分发的模块。具体的查询模式包括两种，线性查找模式
+
+    `CANIF_PRIVATE_SOFTWARE_FILTER_TYPE_LINEAR`和二分查找模式`CANIF_PRIVATE_SOFTWARE_FILTER_TYPE_BINARY`，在二分查找模式中需要将`HrhRxPdu_CanIfHrhCfg`数组的成员按照CAN ID上下界大小来排序，进而可以使用二分查找配置信息。
+
+    具体如何配置：`#define CANIF_PRIVATE_SOFTWARE_FILTER_TYPE_LINEAR`或者`#define CANIF_PRIVATE_SOFTWARE_FILTER_TYPE_BINARY`即可。
+
+  * `XXX_CALLOUT @ CanIf_Cfg.h`
+
+    `CANNM_CALLOUT`、`CANTP_CALLOUT`、`J1939TP_CALLOUT`、`PDUR_CALLOUT`、`XCP_CALLOUT`等定义了CANIF传输信息到下一个模块所对应的编号。
 
 * PDUR配置
 
