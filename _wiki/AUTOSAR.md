@@ -453,11 +453,11 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
 对于修改的内容，我都在代码中使用了`[MULTICAN CFG CHANGE]`标记来注明修改过的地方。
 
-* 通用配置
+* **通用配置**
 
   `EcuM_AL_DriverInitOne`调用`Mcu_Init@Mcu_stm32.c`实现时钟初始化（`参数@Mcu_PBcfg.c`），调用`Port_Init@Port_stm32.c`实现引脚配置如remap、pin、port（`参数@Port_PBcfg.c`）
 
-* CAN硬件配置（**`Can_stm32`和英飞凌结构不同，直接使用EB生成的**）
+* **CAN硬件配置**（**`Can_stm32`和英飞凌结构不同，直接使用EB生成的**）
 
   CAN相关配置（`Can_Init @ Can_stm32.c`），检查CAN个数是否匹配、CAN中断、波特率、HTH，会用到`Can_cfg.h`和`Can_PBcfg.c`中的参数。下面列出一些重要的配置参数和说明：
 
@@ -491,7 +491,7 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
     定义接收和发送的HOH（HRH和HTH）。在EB配置中，TX的CanObjectId必须高于RX。
 
-* CAN IF配置
+* **CAN IF配置**
 
   CANIF相关配置（`CanIf_Init @ CanIf.c`），包括后期运行使用到的参数。在`CanIf_Init @ CanIf.c`中初始化了非常少量的内容，因为`CANIF_PUBLIC_PN_SUPPORT`、`CANIF_PUBLIC_WAKEUP_CHECK_VALIDATION_SUPPORT`、`CANIF_PUBLIC_TX_BUFFERING`、`CANIF_ARC_TRANSCEIVER_API`等都没开。*收发器目前搁置，需要对应特定的芯片。*
 
@@ -564,7 +564,7 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
     CANIF可以针对CAN数据的ID来搜索对应的配置信息（即`HrhRxPdu_CanIfHrhCfg`数组中的一个
 
-    ），进而找到下一个要分发的模块。具体的查询模式包括两种，线性查找模式
+    ），进而找到下一个要分发的模块（详细过程见`HrhRxPdu_CanIfHrhCfg @ CanIf_Cfg.h ）。具体的查询模式包括两种，线性查找模式
 
     `CANIF_PRIVATE_SOFTWARE_FILTER_TYPE_LINEAR`和二分查找模式`CANIF_PRIVATE_SOFTWARE_FILTER_TYPE_BINARY`，在二分查找模式中需要将`HrhRxPdu_CanIfHrhCfg`数组的成员按照CAN ID上下界大小来排序，进而可以使用二分查找配置信息。
 
@@ -572,13 +572,35 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
   * `XXX_CALLOUT @ CanIf_Cfg.h`
 
-    `CANNM_CALLOUT`、`CANTP_CALLOUT`、`J1939TP_CALLOUT`、`PDUR_CALLOUT`、`XCP_CALLOUT`等定义了CANIF传输信息到下一个模块所对应的编号。
+    `CANNM_CALLOUT`、`CANTP_CALLOUT`、`J1939TP_CALLOUT`、`PDUR_CALLOUT`、`XCP_CALLOUT`等定义了CANIF传输信息到下一个模块所对应的编号（详细过程见`HrhRxPdu_CanIfHrhCfg @ CanIf_Cfg.h `）。`CanIfUserRxIndications`这个函数指针结构体中包含了很多模块的调用函数，顺序分别是CanNm、CanTp、J1939Tp、PduR、Xcp，所以`CANNM_CALLOUT`、`CANTP_CALLOUT`、`J1939TP_CALLOUT`、`PDUR_CALLOUT`、`XCP_CALLOUT`分别定义为0、1、2、3、4，进而可以搜索到对应模块。
 
-* PDUR配置
+  * `CanIfInitConfig @ CanIf_PBCfg.c`
+
+    有用到吗？
+
+    ```c
+    SECTION_POSTBUILD_DATA const CanIf_InitConfigType CanIfInitConfig =
+    {
+    	.CanIfConfigSet 					= 0, // Not used  
+    	.CanIfNumberOfCanRxPduIds 			= 1, // [scc] CAN 接收PDU个数
+    	.CanIfNumberOfCanTXPduIds 			= 1, // [scc] CAN 发送PDU个数
+    	.CanIfNumberOfDynamicCanTXPduIds	= 0, // Not used
+    	.CanIfNumberOfTxBuffers				= 1,
+    
+    	// Containers
+    	.CanIfBufferCfgPtr					= CanIfBufferCfgData,
+    	.CanIfHohConfigPtr 					= CanIfHohConfigData,
+    	.CanIfTxPduConfigPtr 				= CanIfTxPduConfigData,
+    };
+    ```
+
+    
+
+* **PDUR配置**
 
   
 
-* COM配置
+* **COM配置**
 
   * PDU配置
 
@@ -592,7 +614,7 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
     如果IPDU是`COM_DEFERRED`（使用Deferred Buffer缓存数据）且`COM_RECEIVE`（接收模式），则要专门分配一段Deferred Buffer区域
 
-* 重要的标志
+* **重要的标志**
 
   * `ComIPdu[i].ArcIPduOutgoingId`
 
