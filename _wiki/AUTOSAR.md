@@ -447,7 +447,21 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
 * **第三阶段：任务周期运行**
 
-  具体见20191202（实际开会日期20191201）组会[PPT]( https://pan.baidu.com/s/1md7710WDP5BE_jhbBgvvCw)，提取码: gjbb。
+  **CAN数据接收**
+  
+  数据接收内容，具体见20191202（实际开会日期20191201）组会[PPT]( https://pan.baidu.com/s/1md7710WDP5BE_jhbBgvvCw)，提取码: gjbb。
+  
+  **CAN数据发送**
+  
+  以PWM控制为例。
+  
+  * RTE任务调用PWM设置管理任务，实现数据获取、处理和CAN发送
+  
+    具体分为PRE、MAIN和POST三部分，PRE主要实现将CAN数据从COM的数据缓存区获取PWM信息（`Com_ReceiveSignal @ Rte_Internal_PwmSetManager.c`）；MAIN实现接受到的数据处理，并保存到相关数据结构中；POST实现将处理后的数据放到BUFF中，供其他的SWC使用，并且将该数值发送到CAN总线（`Com_SendSignal(ComConf_ComSignal_PwmDutyOut, &value) @ Rte_Internal_PwmSetManager.c`），以反馈给其他ECU。
+  
+  * `Com_SendSignal @ Com_Com.c`
+  
+    `Com_SendSignal`有两个参数，第一个是信号ID（用于找到具体的PDU），第二个是要发送的数据指针，主要实现的是将数据放到PDU中，共后期BSW任务发送。在数据放到PDU之前，还会判断PDUBuffer是否正在被使用，如果是，则返回BUSY。
 
 ### 8.1.3 CAN关键配置参数
 
@@ -602,6 +616,24 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
 * **COM配置**
 
+  `Com_Init @ Com.c`对COM模块进行初始化。在`Com_Init`函数中会对每个COM模块的IPDU进行配置（具体配配置信息为`ComIPdu @ Com_PbCfg.c`，**和`ArcIPud`是一一对应的**，所以在配置的时候通过`GET_IPdu(i)`和`GET_ArcIPdu(i)`分别得到IPDU配置信息、包含`ComSignal`和`ComIPdu`的`Arc_IPdu`）。
+
+  * `ComIPdu @ Com_PbCfg.c`
+
+  * `COM_MAX_N_IPDUS @ Com_Cfg.h`
+
+    定义`Com_Arc_IPdu @ Com.c`（指针`Com_Arc_Config.ComIPdu`指向该空间）的长度，有几个IPDU就定义为几，和Com_PbCfg.c中的ComIPdu数组中结构体数目相同。
+
+  * `Com_Arc_Config.ComIPdu @ Com.c`（非用户配置）
+
+    `Com_Arc_Config.ComIPdu`指向了`Com_Arc_IPdu @ Com.c`，而`Com_Arc_IPdu`定义为`static Com_Arc_IPdu_type Com_Arc_IPdu[COM_MAX_N_IPDUS]`。
+
+    配置信息包括：
+
+    1. *`Arc_IPdu->Com_Arc_DynSignalLength`*：动态信号长度，`Com_ReceiveDynSignal(Com_SignalIdType SignalId, void* SignalDataPtr, uint16* Length) @ Com_Com.c`和`Com_SendDynSignal(Com_SignalIdType SignalId, const void* SignalDataPtr, uint16 Length) @ Com_Com.c`会用到该动态信号长度，分别实现接收动态信号和发送动态信号。
+    2. *`Arc_IPdu->Com_Arc_IpduRxDMControl`*：boolean，是否开启接受Deadline Monitor，截止日期监控
+    3. *`Arc_IPdu->Com_Arc_TxIPduTimers.ComTxDMTimer`*：DM的发送计时监视器。
+
   * PDU配置
 
     PDU实体在COM配置，大小由`COM_MAX_BUFFER_SIZE`配置（总大小，包括所有通道），配置的时候按照`ComIPdu.ComIPduSize@Com_PbCfg.c`的大小逐个配置。比如：
@@ -612,7 +644,7 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
     发送通道开始  Deferred Buffer  接收通道开始
     ```
 
-    如果IPDU是`COM_DEFERRED`（使用Deferred Buffer缓存数据）且`COM_RECEIVE`（接收模式），则要专门分配一段Deferred Buffer区域
+    如果IPDU是`COM_DEFERRED`（使用Deferred Buffer缓存数据）且`COM_RECEIVE`（接收模式），则要专门分配一段Deferred Buffer区域。
 
 * **重要的标志**
 
