@@ -632,7 +632,7 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
       枚举类型`Com_IPduSignalProcessingMode`，包括`COM_IMMEDIATE`和`COM_DEFERRED`。`COM_IMMEDIATE`表示将数据立即处理，而不拷贝到Deferred Buffer，`COM_DEFERRED`表示需要先将数据拷贝到Deferred Buffer，再进行相应的处理。
 
-      <img src="/images/wiki/AUTOSAR/DeferredBuffer.png" width="300" alt="DeferredBuffer的作用">
+      <img src="/images/wiki/AUTOSAR/DeferredBuffer.png" width="200" alt="DeferredBuffer的作用">
 
     * `ComIPduSize`
 
@@ -762,7 +762,7 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
     定义`Com_Arc_IPdu @ Com.c`（指针`Com_Arc_Config.ComIPdu`指向该空间）和`Com_BufferPduState @ Com.c`的长度，有几个IPDU就定义为几，和`ComIPdu @ Com_PbCfg.c`数组中结构体数目相同。
 
-    *注：*`Com_BufferPduState`用于管理IPDU的Buffer当前的位置和是否被锁定，结构如下：
+    *注：*`Com_BufferPduState`用于管理IPDU的Buffer当前的位置和是否被锁定（*[Q] 具体的作用是什么？*），在`Com_Init @ Com.c`中初始化，结构如下：
 
     ```c
     typedef struct {
