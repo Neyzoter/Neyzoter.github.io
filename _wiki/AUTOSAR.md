@@ -620,9 +620,51 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
   * `ComIPdu @ Com_PbCfg.c`
 
+    * `ArcIPduOutgoingId`
+
+    * `ComRxIPduCallout`
+
+    * `ComTxIPduCallout`
+
+    * `ComTriggerTransmitIPduCallout`
+
+    * `ComIPduSignalProcessing`
+
+      枚举类型`Com_IPduSignalProcessingMode`，包括`COM_IMMEDIATE`和`COM_DEFERRED`。`COM_IMMEDIATE`表示将数据立即处理，而不拷贝到Deferred Buffer，`COM_DEFERRED`表示需要先将数据拷贝到Deferred Buffer，再进行相应的处理。
+
+      <img src="/images/wiki/AUTOSAR/DeferredBuffer.png" width="300" alt="DeferredBuffer的作用">
+
+    * `ComIPduSize`
+
+      存储通信数据的单个IPDU存储空间大小。`Com_Init @ Com.c` 函数会根据`ComIPduSize`来分配每个IPDU的大小。比如，下图
+
+      <img src="/images/wiki/AUTOSAR/Arc_IPDU_Alloc.png" width="600" alt="IPDU如何分配">
+
+      `ComIPduSize`配置为64bytes，那么单个IPDU会配置专门用于数据刚接收时存放的空间`IPdu_Rx`、开启信号组后（在Arcore中，未开启）需要配置的`Shadow_Buff_Rx`和`Deferred_IPdu`。
+
+    * `ComIPduDirection`
+
+      枚举类型`Com_IPduDirection`，包括`COM_RECEIVE`（IPDU用于接收数据）和`COM_SEND`（IPDU用于发送数据）。
+
     * `ComIPduSignalRef`
 
       指向Signal结构体数组（可以包含多个Signal）。
+
+    * `ComIPduGroupRefs`
+
+      **具体作用待进一步确认。**指向一个`ComIPduGroup_type`类型数组，只包含一个`ComIPduGroupHandleId`。
+
+    * `ComTxIPdu`
+
+      1. `ComTxIPduMinimumDelayFactor`：
+      2. `ComTxIPduUnusedAreasDefault`：发送的IPDU赋初始，一般配置为0
+      3. `ComTxIPduClearUpdateBit`：定义什么时候IPDU更新update标志位（接收的IPDU不需要配置），使用枚举类型`ComTxIPduClearUpdateBitType`
+      4. `ComTxModeTrue`：
+         1. `ComTxModeMode`：发送模式配置，枚举类型`ComTxModeModeType`，包括`COM_DIRECT`、`COM_MIXED`、`COM_NONE`、`COM_PERIODIC`。接收的IPDU配置为`COM_NONE`。
+         2. `ComTxModeNumberOfRepetitions`
+         3. `ComTxModeRepetitionPeriodFactor`
+         4. `ComTxModeTimeOffsetFactor`
+         5. `ComTxModeTimePeriodFactor`
 
     * 其他省略
 
@@ -638,9 +680,98 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
       可以找到COM中对应的IPDU
 
+    * `ComFirstTimeoutFactor`
+
+      **待进一步确定作用**。在`Com_Init`中判断`ComTimeoutFactor`大于0而且该IPDU是`COM_RECEIVE`，用`ComFirstTimeoutFactor`给`Arc_Signal->Com_Arc_DeadlineCounter`赋值。如果是`COM_SEND`，则需要用下面的`ComTimeoutFactor`赋值。
+
+    * `ComNotification`
+
+    * `ComTimeoutFactor`
+
+      **待进一步确定作用**。在`Com_Init`中判断`ComTimeoutFactor`大于0而且该IPDU是`COM_SEND`，用`ComTimeoutFactor`给`Arc_IPdu->Com_Arc_TxDeadlineCounter`赋值。
+
+    * `ComTimeoutNotification`
+
+    * `ComErrorNotification`
+
+    * `ComTransferProperty`
+
+      包括`COM_PENDING`、`COM_TRIGGERED`、`COM_TRIGGERED_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE`等枚举类型。**具体作用待进一步确定**。
+
+    * `ComUpdateBitPosition`和`ComSignalArcUseUpdateBit`
+
+      在`Com_Init @ Com.c`中给IPDU清零，即
+
+      ```c
+      #define CLEARBIT(dest,bit)	( *( (uint8 *)dest    + (bit / 8) ) &= ~(uint8)(1u << (bit % 8u)) )
+      if (TRUE == Signal->ComSignalArcUseUpdateBit) {
+          CLEARBIT(Arc_IPdu->ComIPduDataPtr, Signal->ComUpdateBitPosition);
+      }
+      ```
+
+      `CLEARBIT`函数是将低3位（0至7）作为清零位，高位作为偏移位，即是8的几倍就针对dest地址加几的地址空间进行清零。
+
+    * `ComSignalInitValue`
+
+      初始化数值（指向一个空间），`Com_Init @ Com.c`会调用`Com_Misc_WriteSignalDataToPdu @ Com_misc.c`，并将`ComSignalInitValue`作为参数来对IPDU初始化，初始化的长度由`ComBitSize`决定。
+
+    * `ComBitPosition`
+
+      用于定位数据存放在IPDU的哪一位开始。比如，`ComBitPosition = 8`（一般都是0）
+
+      ```
+      ComBitPosition / 8 = 1，也就是index = 1
+      |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-...-|-|-|  共64bytes
+        |
+      index
+      ```
+
+      不过一般都是将`ComBitPosition`配置为0。
+
+    * `ComBitSize`
+
+      数据位数，数据存入IPDU时拷贝这么多空间，即`memcmp(pduBufferBytes, SignalDataPtr, ComBitSize)`。`ComBitSize`大小决定了以`ComSignalInitValue`为起始地址，向后拷贝的空间大小。比如，
+
+      ```
+      ComBitSize = 32,  ComBitPosition = 0
+      |----|  ComSignalInitValue（-表示1个byte）
+      |----------------....---| IPDU
+      ```
+
+      
+
+    * `ComSignalEndianess`
+
+      大小端模式，枚举类型`ComSignalEndianess_type`，包括`COM_BIG_ENDIAN`、`COM_LITTLE_ENDIAN`、`COM_OPAQUE`。
+
+    * `ComSignalType`
+
+      数据类型，分为8位、16位、32位等。如果想要1个字节1个字节的赋值，则配置为`COM_UINT8_N`（多个uint8）；如果是其他的只需要赋值一个数值如16位的、32位的，则填对应位数，这样会直接给IPDU赋初值1个数。具体见`Com_Misc_WriteSignalDataToPdu @ Com_misc.c`实现方法。
+
+      举例，*如何实现配置8个字节（CAN数据帧）？*
+
+      ```c
+      ComSignalInitValue = // 指向一块8字节的初始值空间
+      ComBitSize = 8 * 8 (64) // CAN一帧8个字节
+      ComSignalType = COM_UINT8_N  // N个bytes的形式
+      ```
+
+      *[Q]那么如何将数据提取出来呢？*
+
   * `COM_MAX_N_IPDUS @ Com_Cfg.h`
 
-    定义`Com_Arc_IPdu @ Com.c`（指针`Com_Arc_Config.ComIPdu`指向该空间）的长度，有几个IPDU就定义为几，和`ComIPdu @ Com_PbCfg.c`数组中结构体数目相同。
+    定义`Com_Arc_IPdu @ Com.c`（指针`Com_Arc_Config.ComIPdu`指向该空间）和`Com_BufferPduState @ Com.c`的长度，有几个IPDU就定义为几，和`ComIPdu @ Com_PbCfg.c`数组中结构体数目相同。
+
+    *注：*`Com_BufferPduState`用于管理IPDU的Buffer当前的位置和是否被锁定，结构如下：
+
+    ```c
+    typedef struct {
+        PduLengthType currentPosition;
+        boolean locked;
+    } Com_BufferPduStateType;
+    ```
+
+    
 
   * `COM_MAX_N_SIGNALS @ Com_Cfg.h`
 
