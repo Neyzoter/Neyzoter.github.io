@@ -933,7 +933,7 @@ Interrupts/Exceptions应该使用Interrupt Gate和Trap Gate，它们之间的唯
 
   *时钟和改进的时钟页面置换算法是否有Belady现象？*
   
-* **抖动和**
+* **抖动和负载控制**
 
   * **抖动**（thrashing）
 

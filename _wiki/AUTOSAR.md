@@ -511,16 +511,16 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
   * `CANIF_PUBLIC_TX_BUFFERING @ CanIf_Cfg.h`
 
-    开启发送L-PDU缓存区，每次`CanIf_Init()`需要初始化每个分配到CANIF的Transmit L-PDU Buffer（`req SWS_CANIF_00387`）。
+    开启发送L-PDU缓存区，每次`CanIf_Init()`需要初始化每个分配到CANIF的Transmit L-PDU Buffer（`req SWS_CANIF_00387`）。目前可设置为`STD_OFF`。
     
-  * `HrhRxPdu_CanIfHrhCfg @ CanIf_Cfg.h `
+  * `HrRxPdu_CanIfHrhCfg @ CanIf_Cfg.h `
 
     `CanIf_RxPduConfigType`数据类型的数组变量`HrhRxPdu_CanIfHrhCfg`连接了下面的MCAL和上层服务层模块，比如PDUR、CANTP、J1939TP、XCP等。具体见下面的成员变量，
 
     ```c
     SECTION_POSTBUILD_DATA const CanIf_RxPduConfigType HrhRxPdu_CanIfHrhCfg[] = {
     	{
-    		.CanIfCanRxPduId 			= PDUR_PDU_ID_PDURX,  // 指定下一个模块的PDU编号，在对应模块中定义
+    		.CanIfCanRxPduId 			= PDUR_PDU_ID_PDURX,  // 指定下一个模块的PDU编号，在对应模块中定义，如果下一个是PDUR，可以用来决定RoutingPath
         	.CanIfCanRxPduLowerCanId 	= 1,   // [scc] CAN ID下界
         	.CanIfCanRxPduUpperCanId 	= 1,   // [scc] CAN ID上界
         	.CanIfCanRxPduDlc 			= 8,   // [scc] 字节长度
@@ -573,12 +573,21 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
        ```
 
        举例而言，我们这边配置了`PDUR_CALLOUT`，调用了PDUR模块。具体实现见`XXX_CALLOUT @ CanIf_Cfg.h`。
+       
+    3. 输入PduId来实现下一步分发（具体见**PDUR配置**）
+
+       以CanIf发送到PDUR为例，CanIf调用`PduR_CanIfRxIndication(PduIdType PduId, NotifResultType Result, uint8 serviceId) @ PduR_Logic.c`，并会输入参数`CanIfCanRxPduId`（见上方）作为PduId，从而可以找到PduR配置的分发路径。实现的代码如下：
+
+       ```c
+       PduRConfig->RoutingPaths[PduId]->PduRDestPdus[i]
+       ...
+       ```
 
   * `CANIF过滤方式 @ CanIf_Cfg.h`
 
     CANIF可以针对CAN数据的ID来搜索对应的配置信息（即`HrhRxPdu_CanIfHrhCfg`数组中的一个
 
-    ），进而找到下一个要分发的模块（详细过程见`HrhRxPdu_CanIfHrhCfg @ CanIf_Cfg.h ）。具体的查询模式包括两种，线性查找模式
+    ），进而找到下一个要分发的模块（详细过程见`HrhRxPdu_CanIfHrhCfg @ CanIf_Cfg.h` ）。具体的查询模式包括两种，线性查找模式
 
     `CANIF_PRIVATE_SOFTWARE_FILTER_TYPE_LINEAR`和二分查找模式`CANIF_PRIVATE_SOFTWARE_FILTER_TYPE_BINARY`，在二分查找模式中需要将`HrhRxPdu_CanIfHrhCfg`数组的成员按照CAN ID上下界大小来排序，进而可以使用二分查找配置信息。
 
@@ -612,7 +621,15 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
 * **PDUR配置**
 
-  
+  * `PduR_Config @ PduR_PbCfg.c`
+
+    * `PduRConfigurationId`
+
+    * `RoutingPaths`
+
+      `RoutingPaths`包含了PDUR的分发多个条分发路径，可以通过`PduR_ARC_RxIndication`输入的PduId来确定具体的路径。
+
+      举例来说，CanIf调用`PduR_CanIfRxIndication(PduIdType PduId, NotifResultType Result, uint8 serviceId) @ PduR_Logic.c`，并会输入参数`CanIfCanRxPduId`（见上方）作为PduId，从而可以找到PduR配置的分发路径。
 
 * **COM配置**
 
