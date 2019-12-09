@@ -449,7 +449,9 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
   **CAN数据接收**
   
-  数据接收内容，具体见20191202（实际开会日期20191201）组会[PPT]( https://pan.baidu.com/s/1md7710WDP5BE_jhbBgvvCw)，提取码: gjbb。
+  数据接收内容，具体见[20191202（实际开会日期20191201）组会PPT]( https://pan.baidu.com/s/1md7710WDP5BE_jhbBgvvCw)，提取码: gjbb。
+  
+  数据接受内容补充，具体见[20191209（实际开会日期20191208）组会PPT](https://pan.baidu.com/s/1zjRfCDSHshnJWYLAdtZgKQ)（含动图），提取码：3kz0 
   
   **CAN数据发送**
   
@@ -462,10 +464,24 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
   * `Com_SendSignal @ Com_Com.c`
   
     `Com_SendSignal`有两个参数，第一个是信号ID（用于找到具体的PDU），第二个是要发送的数据指针，主要实现的是将数据放到PDU中，共后期BSW任务发送。在数据放到PDU之前，还会判断PDUBuffer是否正在被使用，如果是，则返回BUSY。
+  
+    * `Com_Misc_WriteSignalDataToPdu`
+  
+      将数据放到PDU Buffer中。参数包括`SignalDataPtr`（数据源）、`signalType`（信号数据类型，对应`ComSignalType @ ConSignal` ，比如32位数据`COM_UINT32`、N个字节数据`COM_UINT8_N`等，我们真正使用的时候，CAN数据帧中有多中数据，所以采用`COM_UINT8_N`）、`comIPduDataPtr`（IPDU Buffer起始地址，即`Arc_IPdu->ComIPduDataPtr`）、`bitPosition`（对应`ComBitPosition @ Com_PbCfg.c`，实现将数据放到相对于IPDU Buffer起始位置增加OFFSET的位置）、`bitSize`（对应`ComBitSize @ Com_PbCfg.c `，表示存多少bits的数据，一般对于CAN而言就是64bits，共8bytes）、`endian`（大小端）、`dataChanged`（数据最后有没有存放进去，用于后面触发TX条件，进而真正的发送任务（当然也可以直接发送，具体见下方`Com_Misc_TriggerTxOnConditions`）能够识别到该改变来进行实际的发送）。
+  
+    * `Com_Misc_TriggerTxOnConditions`
+  
+      实现TX条件触发，可以在内部或者其他任务识别到该改变来进行实际的发送。参数包括`ComIPduHandleId`（对应IPDU的ID，进而可以找到特定的IPDU位置）、`dataChanged`（上一步传下来的数据，要发送的数据是否存进去了）、`ComTransferProperty`（对应`ComTransferProperty @ Com_PbCfg.c`，指定TX条件触发类型）。
+  
+      `Com_Misc_TriggerTxOnConditions`函数内部
+  
+  * ``
 
 ### 8.1.3 CAN关键配置参数
 
-对于修改的内容，我都在代码中使用了`[MULTICAN CFG CHANGE]`标记来注明修改过的地方。
+我使用了`[MULTI CAN NEED CHANGE]`标记来注明需要修改的地方。
+
+于此同时，在修改代码的时候，使用`[MULTI CAN CHANGE]`来标注代码修改了哪些地方。
 
 * **通用配置**
 
@@ -504,16 +520,46 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
   * `CanHardwareObjectConfig_CanController @ Can_PBcfg.c`
 
     定义接收和发送的HOH（HRH和HTH）。在EB配置中，TX的CanObjectId必须高于RX。
+    
+    * `CanObjectId`
+    
+      HOH的ID号，用于后期索引CanIf的配置信息。比如，在MultiCan这个工程中，第一个hrh的配置为，
+    
+      ```c
+      	{
+      		.CanObjectId	=	CanConf_CanHardwareObject_CanHardwareObjectRx,//CanHardwareObjectRx,
+      		.CanHandleType	=	CAN_ARC_HANDLE_TYPE_BASIC,  //[scc] 分为Basic和Full，Basic：接收一组单个Can Id数据，应该是列表模式；Full：接收单个Can Id数据
+      		.CanIdType		=	CAN_ID_TYPE_STANDARD,
+      		.CanObjectType	=	CAN_OBJECT_TYPE_RECEIVE,
+      		.CanHwFilterCode =  0x0,
+      		.CanHwFilterMask =	0x0,
+      		
+      		.Can_Arc_EOL	= 	0   // [scc] 此处表示配置没有结束，在Can_Init中根据Can_Arc_EOL是否等于1来判断一个CAN是否配置完毕
+      		
+      	},
+      ```
+    
+      在中断到来时，调用CanIf的接口`CanIf_RxIndication(Can_HwHandleType hrh, Can_IdType canId, uint8 canDlc,const uint8 *canSduPtr)`，其中hrh参数为`CanObjectId`。`CanIf_RxIndication @ CanIf.c`会先通过`CanIfHohConfigData->CanHohToCanIfHrhMap`来找到要使用的HOH的配置信息的索引，在通过该索引找到HOH的配置信息。
 
 * **CAN IF配置**
 
   CANIF相关配置（`CanIf_Init @ CanIf.c`），包括后期运行使用到的参数。在`CanIf_Init @ CanIf.c`中初始化了非常少量的内容，因为`CANIF_PUBLIC_PN_SUPPORT`、`CANIF_PUBLIC_WAKEUP_CHECK_VALIDATION_SUPPORT`、`CANIF_PUBLIC_TX_BUFFERING`、`CANIF_ARC_TRANSCEIVER_API`等都没开。*收发器目前搁置，需要对应特定的芯片。*
+
+  * `CanIf_Config @ CanIf_PBCfg.c`
+
+    总体的CanIf配置信息
+
+    * `InitCofig`
+    * `CanIfTransceiverConfig`
+    * `Arc_ChannelConfig`
 
   * `CANIF_PUBLIC_TX_BUFFERING @ CanIf_Cfg.h`
 
     开启发送L-PDU缓存区，每次`CanIf_Init()`需要初始化每个分配到CANIF的Transmit L-PDU Buffer（`req SWS_CANIF_00387`）。目前可设置为`STD_OFF`。
     
   * `HrRxPdu_CanIfHrhCfg @ CanIf_Cfg.h `
+
+    `[MULTI CAN NEED CHANGE]`
 
     `CanIf_RxPduConfigType`数据类型的数组变量`HrhRxPdu_CanIfHrhCfg`连接了下面的MCAL和上层服务层模块，比如PDUR、CANTP、J1939TP、XCP等。具体见下面的成员变量，
 
@@ -523,7 +569,7 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
     		.CanIfCanRxPduId 			= PDUR_PDU_ID_PDURX,  // 指定下一个模块的PDU编号，在对应模块中定义，如果下一个是PDUR，可以用来决定RoutingPath
         	.CanIfCanRxPduLowerCanId 	= 1,   // [scc] CAN ID下界
         	.CanIfCanRxPduUpperCanId 	= 1,   // [scc] CAN ID上界
-        	.CanIfCanRxPduDlc 			= 8,   // [scc] 字节长度
+        	.CanIfCanRxPduDlc 			= 8,   // [scc] 字节长度，在中断到来后会调用canDlc < rxPduCfgPtr->CanIfCanRxPduDlc来判断是否出错
         	.CanIdIsExtended	 		= false, // [scc] 标准帧或者拓展帧
         	.CanIfUserRxIndication 		= PDUR_CALLOUT,  // [scc] 指定CanIf向上输出到PDUR，还有其他的CANNM、CANTP、J1939TP
     	},
@@ -599,8 +645,14 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
   * `CanIfInitConfig @ CanIf_PBCfg.c`
 
-    有用到吗？
+    在`CanIf_RxIndication @ CanIf.c`中用`CanIfInitConfig`找到特定的HRH。比如，`CanIfInitConfig`中的一条语句：
 
+    ```c
+    CanIf_ConfigPtr->InitConfig->CanIfHohConfigPtr->CanIfHrhConfig[CanIf_ConfigPtr->InitConfig->CanIfHohConfigPtr->CanHohToCanIfHrhMap[hrh]]
+    ```
+    
+    这里的`InitConfig`指向`CanIfInitConfig`，而hrh参数是CAN中断调用了`CanIfInitConfig`后输入的hrh编号。
+    
     ```c
     SECTION_POSTBUILD_DATA const CanIf_InitConfigType CanIfInitConfig =
     {
@@ -610,14 +662,14 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
     	.CanIfNumberOfDynamicCanTXPduIds	= 0, // Not used
     	.CanIfNumberOfTxBuffers				= 1,
     
-    	// Containers
+  	// Containers
     	.CanIfBufferCfgPtr					= CanIfBufferCfgData,
     	.CanIfHohConfigPtr 					= CanIfHohConfigData,
     	.CanIfTxPduConfigPtr 				= CanIfTxPduConfigData,
     };
     ```
-
     
+    具体而言，在中断到来时，Can中断服务函数调用CanIf的接口`CanIf_RxIndication(Can_HwHandleType hrh, Can_IdType canId, uint8 canDlc,const uint8 *canSduPtr)`，其中hrh参数为`CanObjectId`。`CanIf_RxIndication @ CanIf.c`会先通过`CanIfHohConfigData->CanHohToCanIfHrhMap`来找到要使用的HOH的配置信息的索引，在通过该索引找到HOH的配置信息。
 
 * **PDUR配置**
 
@@ -659,6 +711,8 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
       `ComIPduSize`配置为64bytes，那么单个IPDU会配置专门用于数据刚接收时存放的空间`IPdu_Rx`、开启信号组后（在Arcore中，未开启）需要配置的`Shadow_Buff_Rx`和`Deferred_IPdu`。
 
+      **其实对于CAN而言只需要8bytes即可**。
+
     * `ComIPduDirection`
 
       枚举类型`Com_IPduDirection`，包括`COM_RECEIVE`（IPDU用于接收数据）和`COM_SEND`（IPDU用于发送数据）。
@@ -674,13 +728,29 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
     * `ComTxIPdu`
 
       1. `ComTxIPduMinimumDelayFactor`：
+
       2. `ComTxIPduUnusedAreasDefault`：发送的IPDU赋初始，一般配置为0
+
       3. `ComTxIPduClearUpdateBit`：定义什么时候IPDU更新update标志位（接收的IPDU不需要配置），使用枚举类型`ComTxIPduClearUpdateBitType`
+
       4. `ComTxModeTrue`：
+
+         `[MULTI CAN NEED CHANGE]`
+
          1. `ComTxModeMode`：发送模式配置，枚举类型`ComTxModeModeType`，包括`COM_DIRECT`、`COM_MIXED`、`COM_NONE`、`COM_PERIODIC`。接收的IPDU配置为`COM_NONE`。
+
+            `COM_PERIODIC`：周期性发送，其他任务调用`Com_MainFunctionTx`
+
+            `COM_DIRECT`和`COM_MIXED`：在`Com_Misc_TriggerTxOnConditions`中会判断`COM_DIRECT`和`COM_MIXED`，貌似会直接发出去，而`COM_PERIODIC`是周期性发送的，由其他任务实现
+
          2. `ComTxModeNumberOfRepetitions`
+
+            一个数据重复发送的次数，一般配置为0。
+
          3. `ComTxModeRepetitionPeriodFactor`
+
          4. `ComTxModeTimeOffsetFactor`
+
          5. `ComTxModeTimePeriodFactor`
 
     * 其他省略
@@ -713,7 +783,9 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
     * `ComTransferProperty`
 
-      包括`COM_PENDING`、`COM_TRIGGERED`、`COM_TRIGGERED_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE`等枚举类型。**具体作用待进一步确定**。
+      包括`COM_PENDING`、`COM_TRIGGERED`、`COM_TRIGGERED_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE`等枚举类型。
+
+      触发发送条件的时候，调用`Com_Misc_TriggerTxOnConditions(uint16 pduHandleId, boolean dataChanged, ComTransferPropertyType transferProperty) @ Com_misc.c`，`ComTransferProperty`作为该参数来实现触发TX，如果`transferProperty`是`COM_TRIGGERED`、`COM_TRIGGERED_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE`其中一个，而且`ComTxModeMode @ Com_PbCfg.c`是`COM_DIRECT`或者`COM_MIXED`，可以直接发送（所谓直接发送指的是，`Com_SendSignal`函数调用了`Com_Misc_TriggerTxOnConditions`直接发送数据），而不需要经过其他的任务。
 
     * `ComUpdateBitPosition`和`ComSignalArcUseUpdateBit`
 
@@ -727,6 +799,8 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
       ```
 
       `CLEARBIT`函数是将低3位（0至7）作为清零位，高位作为偏移位，即是8的几倍就针对dest地址加几的地址空间进行清零。
+
+      `ComSignalArcUseUpdateBit`如果是`True`，则会启用这一功能，将这一位作为signal更新位，如果有数据要发送，则会通过`Com_SendSignal @ Com_Com.c`中的`SETBIT(comIPduDataPtr, Signal->ComUpdateBitPosition)`来对特定位进行设置。
 
     * `ComSignalInitValue`
 
@@ -755,13 +829,15 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
       |----------------....---| IPDU
       ```
 
-      
+      这里4bytes（32位）的数据拷贝到IPDU Buffer中，也就是说其实只用了4个byte，CAN数据帧其实有8个byte。
 
     * `ComSignalEndianess`
 
       大小端模式，枚举类型`ComSignalEndianess_type`，包括`COM_BIG_ENDIAN`、`COM_LITTLE_ENDIAN`、`COM_OPAQUE`。
 
     * `ComSignalType`
+
+      `[MULTI CAN NEED CHANGE]`
 
       数据类型，分为8位、16位、32位等。如果想要1个字节1个字节的赋值，则配置为`COM_UINT8_N`（多个uint8）；如果是其他的只需要赋值一个数值如16位的、32位的，则填对应位数，这样会直接给IPDU赋初值1个数。具体见`Com_Misc_WriteSignalDataToPdu @ Com_misc.c`实现方法。
 
@@ -775,7 +851,11 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
       *[Q]那么如何将数据提取出来呢？*
 
+      一股脑8bytes全部取出来，再进行拆分。
+
   * `COM_MAX_N_IPDUS @ Com_Cfg.h`
+
+    `[MULTI CAN NEED CHANGE]`
 
     定义`Com_Arc_IPdu @ Com.c`（指针`Com_Arc_Config.ComIPdu`指向该空间）和`Com_BufferPduState @ Com.c`的长度，有几个IPDU就定义为几，和`ComIPdu @ Com_PbCfg.c`数组中结构体数目相同。
 
@@ -788,13 +868,13 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
     } Com_BufferPduStateType;
     ```
 
-    
-
   * `COM_MAX_N_SIGNALS @ Com_Cfg.h`
 
     定义Com_Arc_Signal @ Com.c的长度，有几个信号就定义为几，和`ComSignal @ Com_PbCfg.c`数组中结构体数目相同。
 
   * `COM_MAX_BUFFER_SIZE @ Com_Cfg.h`
+
+    `[MULTI CAN NEED CHANGE]`
 
     所有IPDU大小，用于创建`Com_Arc_Buffer @ Com.c`。所有的IPDU都是在`Com_Init @ Com.c`中初始化，即`Com_Arc_Config.ComIPdu->ComIPduDataPtr`（`Com_Arc_Config.ComIPdu`指向`Com_Arc_IPdu`数组）指针指向`Com_Arc_Buffer`数组的某一个uint8空间作为该IPDU的开始。具体见下面的*PDU配置*部分。
 
@@ -807,6 +887,8 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
     1. *`Arc_IPdu->Com_Arc_DynSignalLength`*：动态信号长度，`Com_ReceiveDynSignal(Com_SignalIdType SignalId, void* SignalDataPtr, uint16* Length) @ Com_Com.c`和`Com_SendDynSignal(Com_SignalIdType SignalId, const void* SignalDataPtr, uint16 Length) @ Com_Com.c`会用到该动态信号长度，分别实现接收动态信号和发送动态信号。
     2. *`Arc_IPdu->Com_Arc_IpduRxDMControl`*：boolean，是否开启接受Deadline Monitor，截止日期监控
     3. *`Arc_IPdu->Com_Arc_TxIPduTimers.ComTxDMTimer`*：DM的发送计时监视器。
+    4. `Arc_IPdu->Com_Arc_TxIPduTimers.ComTxModeTimePeriodTimer`：提供COM周期数据发送功能，每次调用`Com_ProcessMixedOrPeriodicTxMode @ Com_Sched.c`都会递减，直到等于0，而且`Arc_IPdu->Com_Arc_TxIPduTimers.ComTxIPduMinimumDelayTimer`有需要等于0，就会发送数据。`Com_ProcessMixedOrPeriodicTxMode`也会给这两个变量赋一个初值。
+    5. `Arc_IPdu->Com_Arc_TxIPduTimers.ComTxIPduMinimumDelayTimer`:只有延时达到才会发送（也就是给发送周期限定了一个最小的间隔）。每次调用`Com_MainFunctionTx @ Com_Sched.c` 都会递减，`Com_MainFunctionTx @ Com_Sched.c` 还会调用`Com_ProcessMixedOrPeriodicTxMode @ Com_Sched.c`。
 
   * `ComConfiguration @ Com_PbCfg.c`
 
