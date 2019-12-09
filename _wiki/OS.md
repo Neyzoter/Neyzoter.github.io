@@ -1410,3 +1410,60 @@ typedef struct {
 
   一般一个进程或任务，操作系统会给其建立一个段表，而段表中的每个段又会对应一个页表（由段描述符得到的线性地址分割为页目录、页表索引和Offset，页目录每一项加上页表索引就是页表中的某一个页基址），也就是说，段页式机制的每个进程有一个段表，有多个页表。
 
+## 9.4 实验三 虚存管理
+
+### 9.4.1 虚存管理总体框架
+
+* 完成初始化虚拟内存管理机制：IDE 硬盘读写，缺页异常处理
+
+  `@ kern_init`函数。
+
+* 设置虚拟页空间和物理页帧空间，表述不在物理内存中的“合法”虚拟页
+
+  `mm_struct @ vmm.h`和`vma_struct @ vmm.h`两个结构体。
+
+* 完善建立页表映射、页访问异常处理操作等函数实现
+
+  `do_pgfault @ vmm.c`
+
+* 执行访存测试，查看建立的页表项是否能够正确完成虚实地址映射
+
+* 执行访存测试，查看是否正确描述了虚拟内存页在物理内存中还是在硬盘上
+
+* 执行访存测试，查看是否能够正确把虚拟内存页在物理内存和硬盘之间进行传递
+
+* 执行访存测试，查看是否正确实现了页面替换算法等
+
+  `check_vmm @ vmm.c`测试vma的结构体、pgfault、页置换算法（`swap.c/h`）。
+
+### 9.4.2 关键数据结构
+
+`vma_struct @ \kern\mm\vmm.h`和`mm_struct @ \kern\mm\vmm.h`，mm用于管理一系列vma（使用同一个页目录PDT，Page Directory Table），而vma全称是虚拟**连续**存储区域（Virtual continuous Memory Area）
+
+<img src="/images/wiki/OS/vma_mm_struct.png" width="600" alt="关键数据结构">
+
+具体代码如下：
+
+```c
+// the virtual continuous memory area(vma), [vm_start, vm_end), 
+// addr belong to a vma means  vma.vm_start<= addr <vma.vm_end 
+// [scc] 合法的用户使用空间
+struct vma_struct {
+    struct mm_struct *vm_mm; // the set of vma using the same PDT 
+    uintptr_t vm_start;      // start addr of vma      
+    uintptr_t vm_end;        // end addr of vma, not include the vm_end itself
+    uint32_t vm_flags;       // flags of vma
+    list_entry_t list_link;  // linear list link which sorted by start addr of vma
+};
+
+// the control struct for a set of vma using the same PDT
+struct mm_struct {
+    list_entry_t mmap_list;        // linear list link which sorted by start addr of vma
+    struct vma_struct *mmap_cache; // current accessed vma, used for speed purpose
+    pde_t *pgdir;                  // the PDT of these vma
+    int map_count;                 // the count of these vma
+    void *sm_priv;                   // the private data for swap manager
+};
+
+```
+
