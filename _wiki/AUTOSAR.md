@@ -457,6 +457,8 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
   
   以PWM控制为例。
   
+  （1）RTE任务阶段
+  
   * RTE任务调用PWM设置管理任务，实现数据获取、处理和CAN发送
   
     具体分为PRE、MAIN和POST三部分，PRE主要实现将CAN数据从COM的数据缓存区获取PWM信息（`Com_ReceiveSignal @ Rte_Internal_PwmSetManager.c`）；MAIN实现接受到的数据处理，并保存到相关数据结构中；POST实现将处理后的数据放到BUFF中，供其他的SWC使用，并且将该数值发送到CAN总线（`Com_SendSignal(ComConf_ComSignal_PwmDutyOut, &value) @ Rte_Internal_PwmSetManager.c`），以反馈给其他ECU。
@@ -467,15 +469,39 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
   
     * `Com_Misc_WriteSignalDataToPdu`
   
-      将数据放到PDU Buffer中。参数包括`SignalDataPtr`（数据源）、`signalType`（信号数据类型，对应`ComSignalType @ ConSignal` ，比如32位数据`COM_UINT32`、N个字节数据`COM_UINT8_N`等，我们真正使用的时候，CAN数据帧中有多中数据，所以采用`COM_UINT8_N`）、`comIPduDataPtr`（IPDU Buffer起始地址，即`Arc_IPdu->ComIPduDataPtr`）、`bitPosition`（对应`ComBitPosition @ Com_PbCfg.c`，实现将数据放到相对于IPDU Buffer起始位置增加OFFSET的位置）、`bitSize`（对应`ComBitSize @ Com_PbCfg.c `，表示存多少bits的数据，一般对于CAN而言就是64bits，共8bytes）、`endian`（大小端）、`dataChanged`（数据最后有没有存放进去，用于后面触发TX条件，进而真正的发送任务（当然也可以直接发送，具体见下方`Com_Misc_TriggerTxOnConditions`）能够识别到该改变来进行实际的发送）。
+      将数据放到PDU Buffer中。参数包括`SignalDataPtr`（数据源）、`signalType`（信号数据类型，对应`ComSignalType @ ConSignal` ，比如32位数据`COM_UINT32`、N个字节数据`COM_UINT8_N`等，我们真正使用的时候，CAN数据帧中有多中数据，所以采用`COM_UINT8_N`）、`comIPduDataPtr`（IPDU Buffer起始地址，即`Arc_IPdu->ComIPduDataPtr`）、`bitPosition`（对应`ComBitPosition @ Com_PbCfg.c`，实现将数据放到相对于IPDU Buffer起始位置增加OFFSET的位置）、`bitSize`（对应`ComBitSize @ Com_PbCfg.c `，表示存多少bits的数据，一般对于CAN而言就是64bits，共8bytes）、`endian`（大小端）、`dataChanged`（表示数据最后有没有存放进去）。
   
     * `Com_Misc_TriggerTxOnConditions`
   
-      实现TX条件触发，可以在内部或者其他任务识别到该改变来进行实际的发送。参数包括`ComIPduHandleId`（对应IPDU的ID，进而可以找到特定的IPDU位置）、`dataChanged`（上一步传下来的数据，要发送的数据是否存进去了）、`ComTransferProperty`（对应`ComTransferProperty @ Com_PbCfg.c`，指定TX条件触发类型）。
+      实现条件触发，可以在内部直接发送或者其他任务周期性发送。参数包括`ComIPduHandleId`（对应IPDU的ID，进而可以找到特定的IPDU位置）、`dataChanged`（上一步传下来的数据，要发送的数据是否存进去了）、`ComTransferProperty`（对应`ComTransferProperty @ Com_PbCfg.c`，指定TX条件触发类型）。
   
-      `Com_Misc_TriggerTxOnConditions`函数内部
+      *如何实现数据的直接发送和周期性发送？*见`ComTransferProperty`
   
-  * ``
+  （2）BSW任务阶段
+  
+  * `Com_MainFunctionTx @ Com_Sched.c`
+  
+    本函数会遍历所有IPDU，依次将数据发送出去。对于`ComTxModeMode @ Com_PbCfg.c = COM_DIRECT`的配置直接发送，。对于`ComTxModeMode @ Com_PbCfg.c = COM_PERIODIC||COM_MIXED`的配置需要周期性发送，也就是BSW任务周期的倍数（通过`ComTxModeTimePeriodFactor @ Com_PbCfg.c`配置）。
+  
+  * `PduR_ARC_Transmit @ PduR_Logic.c`
+  
+    本函数内部可以找到路径`RoutingPaths[PduId] @ PduR_PbCfg.c`，然后通过for循环来对这条路径配置的多个目的地来进行分发。
+  
+    ```c
+    for (uint8 i = 0; route->PduRDestPdus[i] != NULL; i++){
+        const PduRDestPdu_type * destination = route->PduRDestPdus[i];
+        status = PduR_ARC_RouteTransmit(destination, PduInfo);// 数据发送
+        if( (PDUR_E_REJECTED == totalStatus) || (PDUR_E_REJECTED == status)) {
+        totalStatus = PDUR_E_REJECTED;
+        } else if(PDUR_E_OK == status) {
+        totalStatus = PDUR_E_OK;
+        } else {
+        /* Rejected */
+        }
+    }
+    ```
+  
+    
 
 ### 8.1.3 CAN关键配置参数
 
@@ -665,11 +691,21 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
   	// Containers
     	.CanIfBufferCfgPtr					= CanIfBufferCfgData,
     	.CanIfHohConfigPtr 					= CanIfHohConfigData,
-    	.CanIfTxPduConfigPtr 				= CanIfTxPduConfigData,
+    	.CanIfTxPduConfigPtr 				= CanIfTxPduConfigData, // 发送PDU配置信息
     };
     ```
     
     具体而言，在中断到来时，Can中断服务函数调用CanIf的接口`CanIf_RxIndication(Can_HwHandleType hrh, Can_IdType canId, uint8 canDlc,const uint8 *canSduPtr)`，其中hrh参数为`CanObjectId`。`CanIf_RxIndication @ CanIf.c`会先通过`CanIfHohConfigData->CanHohToCanIfHrhMap`来找到要使用的HOH的配置信息的索引，在通过该索引找到HOH的配置信息。
+    
+    * `CanIfTxPduConfigPtr`指向`CanIfTxPduConfigData`
+    
+      `[MULTI CAN NEED CHANGE]`
+    
+      1. *`CanIfTxPduId`*：如果CANIF无法发送，比如设置为`CANIF_GET_OFFLINE_ACTIVE`或者`CANIF_GET_OFFLINE_ACTIVE_RX_ONLINE`，则通过这个`CanIfTxPduId`来将信息反馈给`PDUR->COM`
+      2. *`CanIfCanTxPduIdCanId`*：发送CAN的数据帧ID
+      3. *`CanIfCanTxPduIdDlc`*：CAN数据帧长度
+      4. *`CanIfTxPduIdCanIdType`*：CAN数据帧ID的类型，包括`CANIF_CAN_ID_TYPE_29`、`CANIF_CAN_FD_ID_TYPE_29`、`CANIF_CAN_ID_TYPE_11`、`CANIF_CAN_FD_ID_TYPE_11`。
+      5. *`CanIfUserTxConfirmation`*：PDUR调用了`CanIf_Transmit`后，（如果无法发送，比如设置为`CANIF_GET_OFFLINE_ACTIVE`或者`CANIF_GET_OFFLINE_ACTIVE_RX_ONLINE`）会反馈信息给PDUR
 
 * **PDUR配置**
 
@@ -787,6 +823,19 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
       触发发送条件的时候，调用`Com_Misc_TriggerTxOnConditions(uint16 pduHandleId, boolean dataChanged, ComTransferPropertyType transferProperty) @ Com_misc.c`，`ComTransferProperty`作为该参数来实现触发TX，如果`transferProperty`是`COM_TRIGGERED`、`COM_TRIGGERED_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE`其中一个，而且`ComTxModeMode @ Com_PbCfg.c`是`COM_DIRECT`或者`COM_MIXED`，可以直接发送（所谓直接发送指的是，`Com_SendSignal`函数调用了`Com_Misc_TriggerTxOnConditions`直接发送数据），而不需要经过其他的任务。
 
+      如果是`COM_PENDING`则要通过其他的任务来发送，比如`ComTxModeMode @ Com_PbCfg.c`配置成`COM_PERIODIC`，则可以在BSW Main任务中调用`Com_MainFunctionTx @ Com_Sched`来周期性或者直接（实际上还是周期性，只是周期和BSW Main任务的周期相同）发送数据。具体为如下代码：
+
+      ```c
+      /* If IPDU has periodic or mixed transmission mode.*/
+      if ( (txModePtr->ComTxModeMode == COM_PERIODIC)
+          || (txModePtr->ComTxModeMode == COM_MIXED) ) {
+          Com_ProcessMixedOrPeriodicTxMode(i,dmTimeOut);
+          /* If IPDU has direct transmission mode.*/
+      } else if (txModePtr->ComTxModeMode == COM_DIRECT) {
+          Com_ProcessDirectTxMode(i,dmTimeOut);
+      }
+      ```
+
     * `ComUpdateBitPosition`和`ComSignalArcUseUpdateBit`
 
       在`Com_Init @ Com.c`中给IPDU清零，即
@@ -887,8 +936,8 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
     1. *`Arc_IPdu->Com_Arc_DynSignalLength`*：动态信号长度，`Com_ReceiveDynSignal(Com_SignalIdType SignalId, void* SignalDataPtr, uint16* Length) @ Com_Com.c`和`Com_SendDynSignal(Com_SignalIdType SignalId, const void* SignalDataPtr, uint16 Length) @ Com_Com.c`会用到该动态信号长度，分别实现接收动态信号和发送动态信号。
     2. *`Arc_IPdu->Com_Arc_IpduRxDMControl`*：boolean，是否开启接受Deadline Monitor，截止日期监控
     3. *`Arc_IPdu->Com_Arc_TxIPduTimers.ComTxDMTimer`*：DM的发送计时监视器。
-    4. `Arc_IPdu->Com_Arc_TxIPduTimers.ComTxModeTimePeriodTimer`：提供COM周期数据发送功能，每次调用`Com_ProcessMixedOrPeriodicTxMode @ Com_Sched.c`都会递减，直到等于0，而且`Arc_IPdu->Com_Arc_TxIPduTimers.ComTxIPduMinimumDelayTimer`有需要等于0，就会发送数据。`Com_ProcessMixedOrPeriodicTxMode`也会给这两个变量赋一个初值。
-    5. `Arc_IPdu->Com_Arc_TxIPduTimers.ComTxIPduMinimumDelayTimer`:只有延时达到才会发送（也就是给发送周期限定了一个最小的间隔）。每次调用`Com_MainFunctionTx @ Com_Sched.c` 都会递减，`Com_MainFunctionTx @ Com_Sched.c` 还会调用`Com_ProcessMixedOrPeriodicTxMode @ Com_Sched.c`。
+    4. *`Arc_IPdu->Com_Arc_TxIPduTimers.ComTxModeTimePeriodTimer`*：提供COM周期数据发送功能，每次调用`Com_ProcessMixedOrPeriodicTxMode @ Com_Sched.c`都会递减，直到等于0，而且`Arc_IPdu->Com_Arc_TxIPduTimers.ComTxIPduMinimumDelayTimer`有需要等于0，就会发送数据。`Com_ProcessMixedOrPeriodicTxMode`也会给这两个变量赋一个初值。
+    5. *`Arc_IPdu->Com_Arc_TxIPduTimers.ComTxIPduMinimumDelayTimer`*:只有延时达到才会发送（也就是给发送周期限定了一个最小的间隔）。每次调用`Com_MainFunctionTx @ Com_Sched.c` 都会递减，`Com_MainFunctionTx @ Com_Sched.c` 还会调用`Com_ProcessMixedOrPeriodicTxMode @ Com_Sched.c`。
 
   * `ComConfiguration @ Com_PbCfg.c`
 
