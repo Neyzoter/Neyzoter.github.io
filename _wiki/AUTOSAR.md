@@ -236,7 +236,7 @@ Wireless Communication Hardware Abstraction
 
 HOH = Hardware object handles，用于发送（HTH）和接收（HRH），是CAN邮箱结构的抽象引用。CAN邮箱结构包含了CAN相关的参数，比如CanId，DLC和data。HOH用于作为调用CanDrv接口服务时的参数，用于CAN邮箱通信缓存区的标识。CanIf是HOH的用户，但是独立于硬件（？*原文*：The HOH is used as a parameter in the calls of CanDrv’s interface services and is provided by CanDrv’s configuration and used by CanDrv as identifier for communication buffers of the CAN mailbox.）。CanIf通过HOH的参数来调用CanDrv接口服务，和硬件抽象层保持了独立性。
 
-如果使用多个HRH，则每个HRH都要属于至少一个或者一组（fixed group）接收的`L-SDU`（CanRxPduIds）。一个HRH可以配置成：1.接收单个CanId数据（FullCAN）；2.接收一组单个CanIds（BasicCan），列表模式？；3.接收一个范围内Id的数据；4.接收所有数据。具体见下图。CanIf用户定义了多个PUD（3个接收，2个发送），分别交给CanIf使用。CanIf将PDU分成了3个通道，并和Can Driver的配置文件（在工程MultiCan中的Can_PBcfg.c）的HOH（HRH和HTH，`CanHardwareObjectConfig_CanController`结构体）关联。
+如果使用多个HRH，则每个HRH都要属于至少一个或者一组（fixed group）接收的`L-SDU`（CanRxPduIds）。一个HRH可以配置成：1.接收单个CanId数据（FullCAN）；2.接收一组单个CanIds（BasicCan），列表模式？；3.接收一个范围内Id的数据；4.接收所有数据。具体见下图。CanIf用户定义了多个PUD（3个接收，2个发送），分别交给CanIf使用。CanIf将PDU分成了3个通道（**maybe每个硬件can对应一个Channel**），并和Can Driver的配置文件（在工程MultiCan中的`Can_PBcfg.c`）的HOH（HRH和HTH，`CanHardwareObjectConfig_CanController`结构体）关联。
 
 <img src="/images/wiki/AUTOSAR/HardwareObjectHandles.png" width="700" alt="AUTOSAR CAN的依赖">
 
@@ -576,8 +576,24 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
     总体的CanIf配置信息
 
     * `InitCofig`
+
+      存放初始化信息， 比如收发个数、TX的Buffer个数等，引用`CanIfInitConfig @ CanIf_PBCfg.c`。
+
     * `CanIfTransceiverConfig`
+
+      CANIF的收发器配置。
+
     * `Arc_ChannelConfig`
+
+      存放CanIf的通道配置，目前来看一个硬件CAN对应一个通道，引用`CanIf_Arc_ChannelConfig @ CanIf_PBCfg.c`。
+
+  * `CanIfInitConfig @ CanIf_PBCfg.c`
+
+    
+
+  * `CanIf_Arc_ChannelConfig @ CanIf_PBCfg.c`
+
+    
 
   * `CANIF_PUBLIC_TX_BUFFERING @ CanIf_Cfg.h`
 
