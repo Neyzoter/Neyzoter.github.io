@@ -1467,3 +1467,59 @@ struct mm_struct {
 
 ```
 
+### 9.4.3 缺页异常处理
+
+1. `vector14 @ vector.S`
+
+   中断向量表找到特定的入口，将中断号入栈，然后调用`__alltraps`。
+
+2. `__alltraps @ trapentry.S`
+
+   将必要的寄存器入栈，然后调用`trap`。
+
+3. `trap @ trap.c`
+
+   调用`trap_dispatch`
+
+4. `trap_dispatch @ trap.c`
+
+   根据`vector14 @ vector.S`入栈的中断号来进行特定的处理，这里是缺页错误编号。
+
+5. `pgfault_handler @ trap.c`
+
+   调用`do_pgfault`
+
+6. `do_pgfault @ vmm.c`
+
+   <img src="/images/wiki/OS/Page_Fault_Error.png" width="600" alt="页访问异常">
+
+### 9.4.4 页置换机制
+
+* 应该换出哪些页
+
+  * `check_swap @ swap.c`
+
+  * 如何建立虚拟页和磁盘扇区的对应关系
+
+    PTE（页表入口, Page Table Entry），如果页表的标志位为0，表示虚拟页和物理页没有对应关系，需要从磁盘扇区读取，而磁盘扇区的地址保存位置就是物理页保存的问题，实现复用。
+
+    ```
+    swap_entry_t
+    |----------------------|----------|--|
+         offset              reserved   0
+         24bits              7bits      1bit
+    ```
+
+* 何时进行页置换
+
+  * 换入
+
+    `check_swap -> page fault -> do_pgfault`
+
+  * 换出
+
+    主动策略
+
+    被动策略（ucore）
+
+    在ucore通过Page结构体来实现空闲页的管理。
