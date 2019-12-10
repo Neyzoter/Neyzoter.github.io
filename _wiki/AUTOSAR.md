@@ -589,17 +589,30 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
   * `CanIfInitConfig @ CanIf_PBCfg.c`
 
-    
+    `[MULTI CAN NEED CHANGE]`
+
+    * *`CanIfConfigSe`*：未使用
+    * *`CanIfNumberOfCanRxPduIds`*：接收的CAN数据帧ID（范围）个数，对应为`CanIf_RxPduConfigType HrhRxPdu_CanIfHrhCfg @ CanIf_PBCfg.c`中的RX配置信息个数。
+    * *`CanIfHohConfigPtr`*：保存了HOH信息，指向`CanIf_InitHohConfigType CanIfHohConfigData @ CanIf_PBCfg.c`
+    * *`CanIfNumberOfCanTXPduIds`*：发送的CAN数据帧ID及配置信息个数，对应为`CanIf_TxPduConfigType CanIfTxPduConfigData @ CanIf_PBCfg.c`中TX配置信息个数。
+    * *`CanIfTxPduConfigPtr`*：保存了发送的CAN数据帧ID及配置信息，指向`CanIf_TxPduConfigType CanIfTxPduConfigData`。
+    * *`CanIfNumberOfDynamicCanTXPduIds`*：未使用
+    * *`CanIfNumberOfTxBuffers`*：未使用。`CANIF_PUBLIC_TX_BUFFERING`设置为`STD_ON`才会在`CanIf_Init`中对该Buffer进行初始化（map）和使用。
+    * *`CanIfBufferCfgPtr`*：未使用。`CANIF_PUBLIC_TX_BUFFERING`设置为`STD_ON`才会在`CanIf_Init`中对该Buffer进行初始化（map）和使用。
 
   * `CanIf_Arc_ChannelConfig @ CanIf_PBCfg.c`
 
-    
+    // TODO
 
-  * `CANIF_PUBLIC_TX_BUFFERING @ CanIf_Cfg.h`
+  * `CanIf_InitHohConfigType CanIfHohConfigData @ CanIf_PBCfg.c`
 
-    开启发送L-PDU缓存区，每次`CanIf_Init()`需要初始化每个分配到CANIF的Transmit L-PDU Buffer（`req SWS_CANIF_00387`）。目前可设置为`STD_OFF`。
-    
-  * `HrRxPdu_CanIfHrhCfg @ CanIf_Cfg.h `
+    //TODO
+
+  * `CanIf_TxPduConfigType CanIfTxPduConfigData @ CanIf_PBCfg.c`
+
+    //TODO
+
+  * `CanIf_RxPduConfigType HrhRxPdu_CanIfHrhCfg @ CanIf_Cfg.h `
 
     `[MULTI CAN NEED CHANGE]`
 
@@ -670,6 +683,10 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
        PduRConfig->RoutingPaths[PduId]->PduRDestPdus[i]
        ...
        ```
+
+  * `CANIF_PUBLIC_TX_BUFFERING @ CanIf_Cfg.h`
+
+    开启发送L-PDU缓存区，每次`CanIf_Init()`需要初始化每个分配到CANIF的Transmit L-PDU Buffer（`req SWS_CANIF_00387`）。目前可设置为`STD_OFF`。
 
   * `CANIF过滤方式 @ CanIf_Cfg.h`
 
