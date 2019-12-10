@@ -238,7 +238,7 @@ HOH = Hardware object handles，用于发送（HTH）和接收（HRH），是CAN
 
 如果使用多个HRH，则每个HRH都要属于至少一个或者一组（fixed group）接收的`L-SDU`（CanRxPduIds）。一个HRH可以配置成：1.接收单个CanId数据（FullCAN）；2.接收一组单个CanIds（BasicCan），列表模式？；3.接收一个范围内Id的数据；4.接收所有数据。具体见下图。CanIf用户定义了多个PUD（3个接收，2个发送），分别交给CanIf使用。CanIf将PDU分成了3个通道（**maybe每个硬件can对应一个Channel**），并和Can Driver的配置文件（在工程MultiCan中的`Can_PBcfg.c`）的HOH（HRH和HTH，`CanHardwareObjectConfig_CanController`结构体）关联。
 
-<img src="/images/wiki/AUTOSAR/HardwareObjectHandles.png" width="700" alt="AUTOSAR CAN的依赖">
+<img src="/images/wiki/AUTOSAR/HardwareObjectHandles.png" width="700" alt="AUTOSAR CANIF Channel Group">
 
 > HRH：Hardware Receive Handle，由Can Driver定义，每个HRH对应一个硬件对象（Hardware Object）。
 >
@@ -600,9 +600,20 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
     * *`CanIfNumberOfTxBuffers`*：未使用。`CANIF_PUBLIC_TX_BUFFERING`设置为`STD_ON`才会在`CanIf_Init`中对该Buffer进行初始化（map）和使用。
     * *`CanIfBufferCfgPtr`*：未使用。`CANIF_PUBLIC_TX_BUFFERING`设置为`STD_ON`才会在`CanIf_Init`中对该Buffer进行初始化（map）和使用。
 
-  * `CanIf_Arc_ChannelConfig @ CanIf_PBCfg.c`
+  * `CanIf_Arc_ChannelConfigType CanIf_Arc_ChannelConfig @ CanIf_PBCfg.c`
 
-    // TODO
+    CanIf的Channel信息。见下图：
+
+    <img src="/images/wiki/AUTOSAR/HardwareObjectHandles.png" width="700" alt="AUTOSAR AUTOSAR CANIF Channel Group">
+
+    每一个硬件CAN都对应一个CanIf Channel（`CANIF_CHANNEL_CNT @ CanIf.h`定义CanIf Chennel个数 `[MULTI CAN NEED CHANGE]`），进而上层可以进行相应的控制和状态管理。
+
+    * *`CanControllerId`*：CanController的编号，在`Can_Cfg.h`中 定义。
+    * *`NofTxBuffers`*：未使用
+    * `TxBufferRefList`：未使用
+    * *`CanIfCtrlWakeUpSupport`*：设置为`STD_OFF`
+    * *`CanIfCtrlWakeUpSrc`*
+    * *`CanIfCtrlPnFilterSet`*：`STD_OFF`
 
   * `CanIf_InitHohConfigType CanIfHohConfigData @ CanIf_PBCfg.c`
 
