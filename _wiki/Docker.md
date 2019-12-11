@@ -301,6 +301,12 @@ $ docker start CONTAINER_ID/CONTAINER_NAME
 $ docker rm CONTAINER_ID/CONTAINER_NAME
 ```
 
+**将host的端口映射到容器**
+
+```bash
+$ docker run --network=host <repo>
+```
+
 # 4.Docker镜像使用
 
 当运行容器时，使用的镜像如果在本地不存在，docker会自动从docker镜像仓库中下载，默认从Docker Hub镜像源下载。
