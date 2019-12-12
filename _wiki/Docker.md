@@ -307,6 +307,14 @@ $ docker rm CONTAINER_ID/CONTAINER_NAME
 $ docker run --network=host <repo>
 ```
 
+**Docker挂在host的目录，实现容器访问host的文件**
+
+```bash
+$ docker run --network=host -v /etc:/etc neyzoter/rcloud:latest
+```
+
+
+
 # 4.Docker镜像使用
 
 当运行容器时，使用的镜像如果在本地不存在，docker会自动从docker镜像仓库中下载，默认从Docker Hub镜像源下载。
@@ -342,6 +350,8 @@ $ docker pull ubuntu:13.10
 ```
 
 ## 4.3 创建自己的镜像
+
+### 4.3.1 Dockerfile
 
 当我们从docker镜像仓库中下载的镜像不能满足我们的需求时，我们可以通过以下两种方式对镜像进行更改。
 
@@ -393,6 +403,22 @@ $ docker images
 ### docker tag 镜像ID，这里是 860c279d2fec ,用户名称、镜像源名(repository name)和新的标签名(tag)。
 $ docker tag 860c279d2fec youj/centos:dev
 ```
+
+### 4.3.2 Docker Push
+
+```bash
+# 登录到docker hub
+$ docker login
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: neyzoter
+Password:XXXXX
+# 给本地的image打tag
+$ docker tag hello-world:latest hello-world:v2
+# push到docker hub
+$ docker push hello-world:v2
+```
+
+
 
 ## 4.4 Docker容器连接
 
