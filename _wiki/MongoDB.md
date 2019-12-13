@@ -467,7 +467,7 @@ title:eval("/"+title+"/i")    # 等同于 title:{$regex:title,$Option:"$i"}
 
 使用`$regex`操作符时，需要注意下面几个问题:
 
-- i，m，x，s可以组合使用，例如:`{name:{$regex:/j*k/,​$options:"si"}}`
+- i，m，x，s可以组合使用，例如:`{name:{$regex:/j*k/,$options:"si"}}`
 - 在设置索弓}的字段上进行正则匹配可以提高查询速度，而且当正则表达式使用的是前缀表达式时，查询速度会进一步提高，例如:`{name:{$regex: /^joe/}`
 
 ## 1.4 索引
@@ -962,8 +962,15 @@ mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][
 1、打开27017防火墙
 
 ```
+# 打开
 $ sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 27017 -j ACCEPT
+# 查看所有防火墙规则
+sudo iptables -L
+# 比如27017在第1条规则，删除规则实现方法如下
+sudo iptable -D INPUT 1
 ```
+
+
 
 2、打开mongod并对所有ip开放
 
