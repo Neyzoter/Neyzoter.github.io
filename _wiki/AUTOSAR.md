@@ -863,9 +863,11 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
 
     * `ComTransferProperty`
 
+      *发送*
+
       包括`COM_PENDING`、`COM_TRIGGERED`、`COM_TRIGGERED_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE`等枚举类型。
 
-      触发发送条件的时候，调用`Com_Misc_TriggerTxOnConditions(uint16 pduHandleId, boolean dataChanged, ComTransferPropertyType transferProperty) @ Com_misc.c`，`ComTransferProperty`作为该参数来实现触发TX，如果`transferProperty`是`COM_TRIGGERED`、`COM_TRIGGERED_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE`其中一个，而且`ComTxModeMode @ Com_PbCfg.c`是`COM_DIRECT`或者`COM_MIXED`，可以直接发送（所谓直接发送指的是，`Com_SendSignal`函数调用了`Com_Misc_TriggerTxOnConditions`直接发送数据），而不需要经过其他的任务。
+      触发发送条件的时候，调用`Com_Misc_TriggerTxOnConditions(uint16 pduHandleId, boolean dataChanged, ComTransferPropertyType transferProperty) @ Com_misc.c`，`ComTransferProperty`作为该参数来实现触发TX，如果`transferProperty`是`COM_TRIGGERED`、`COM_TRIGGERED_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE_WITHOUT_REPETITION`、`COM_TRIGGERED_ON_CHANGE`其中一个，而且`ComTxModeMode @ Com_PbCfg.c`是`COM_DIRECT`或者`COM_MIXED`，可以直接发送（所谓直接发送指的是，`Com_SendSignal`函数调用了`Com_Misc_TriggerTxOnConditions`直接发送数据），而不需要经过其他的任务。实际上就是BSW任务的周期为发送周期。
 
       如果是`COM_PENDING`则要通过其他的任务来发送，比如`ComTxModeMode @ Com_PbCfg.c`配置成`COM_PERIODIC`，则可以在BSW Main任务中调用`Com_MainFunctionTx @ Com_Sched`来周期性或者直接（实际上还是周期性，只是周期和BSW Main任务的周期相同）发送数据。具体为如下代码：
 
@@ -879,6 +881,12 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
           Com_ProcessDirectTxMode(i,dmTimeOut);
       }
       ```
+
+      **`ComTransferProperty`是和`ComIPdu`的`ComTxModeMode`配合使用的，具体见`Com_Misc_TriggerTxOnConditions @ Com_misc.c`函数**
+
+      *接收*
+
+      
 
     * `ComUpdateBitPosition`和`ComSignalArcUseUpdateBit`
 
@@ -988,23 +996,23 @@ J1939协议栈拓展了CAN协议，用于重型车辆。
     COM模块总的配置信息。具体包括：
 
     * `ComConfigurationId`
-    
+
       COM模块配置信息的ID
-    
+
     * `ComNofIPdus`
 
       IPDU的个数，和`ComIPdu @ Com_PbCfg.c`结构体数组中的结构体数目对应，在`Com_Init`函数中会判断ComIPdu个数是否超过了这个数字
-    
+
     * `ComNofSignals`
-    
+
       COM模块信号个数，和`ComSignal @ Com_PbCfg.c`结构体数组中的信号结构体数目对应。
-    
+
     * `ComIPdu`（见上方说明）
-    
+
     * `ComSignal`（见上方说明）
-    
+
     * 其他省略
-    
+
   * PDU配置
 
     PDU实体在`Com_Init @ Com.c`配置，大小由`COM_MAX_BUFFER_SIZE`配置（总大小，包括所有通道），配置的时候按照`ComIPdu.ComIPduSize @ Com_PbCfg.c`的大小逐个配置。比如：
