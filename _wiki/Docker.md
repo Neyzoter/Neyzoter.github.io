@@ -325,6 +325,17 @@ $ docker stop CONTAINER_ID
 $ docker container prune
 ```
 
+**镜像导出和导入**
+
+```bash
+# OPTION可以是-o，表示导出到文件
+$ docker save [OPTIONS] IMAGE [IMAGE...]
+$ docker save -o ./rcloud.tar neyzoter/rcloud:1.0.0
+# 导入到docker
+$docker load  < file_name.tar
+$ docker load < ./rcloud.tar
+```
+
 
 
 # 4.Docker镜像使用
