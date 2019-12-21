@@ -313,6 +313,18 @@ $ docker run --network=host <repo>
 $ docker run --network=host -v /etc:/etc neyzoter/rcloud:latest
 ```
 
+**Docker停止一个容器**
+
+```bash
+$ docker stop CONTAINER_ID
+```
+
+**DOCKER清楚所有停止的容器**
+
+```bash
+$ docker container prune
+```
+
 
 
 # 4.Docker镜像使用
