@@ -6,7 +6,88 @@ description: Git 常用操作记录。
 keywords: Git, 版本控制
 ---
 
+# 1.Git基础
+
+## 1.1 Git技术
+
+* **Git直接记录快照，而非差异比较**
+
+  Git区别于其他版本控制系统，每次提交更新，或者在Git中保存状态时，主要对当时的全部文件制作一个快照并保存快照。如果文件没有修改，Git不再重新存储该文件，而是只保留一个链接指向之前存储的文件。
+
+* **Git保证完整性**
+
+  Git中所有数据在存储前都计算校验和，然后以校验和来引用，不可能在Git不知情时更改任何文件内容或者目录内容。计算机制为SHA-1散列，由40个十六进制组成的字符串。
+
+* **Git管理文件的三种状态**
+
+  1. 已提交（committed）
+
+     数据已经安全地保存在本地数据库中
+
+  2. 已修改（modified）
+
+     修改了文件，但还没保存到数据库中。
+
+  3. 已暂存（staged）
+
+     对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。
+
+## 1.2 Git配置
+
+* **Git配置文件**
+
+  1. `/etc/gitconfig`
+
+     包含系统上每个用户及他们仓库的通用配置
+
+  2. `~/.gitconfig`或者`~/.config/git/config`
+
+     当前用户的配置，通过 传递`--global`选项来让Git读写该文件
+
+  3. Git仓库目录中的`config`文件（`.git/config`）
+
+     针对Git仓库（代码）的配置
+
+  **每一级别覆盖上一级别的配置，即`.git/config`会覆盖`/etc/gitconfig`。**
+
+* **用户信息**
+
+  每个Git提交都会使用此信息，并且写入到每一次提交，不可更改。
+
+  ```bash
+  # --global表示该命令只需要运行一次，之后所有操作都会使用此信息
+  $ git config --global user.name "John Doe"
+  $ git config --global user.email johndoe@example.com
+  ```
+
+* **检查配置信息**
+
+  ```bash
+  $ git config --list
+  user.name=Neyzoter
+  user.email=sonechaochao@gmail.com
+  push.default=matching
+  ```
+
+* **获取帮助**
+
+  ```bash
+  # 获取帮助的3种方式
+  $ git help <verb>
+  $ git <verb> --help
+  $ man git-<verb>
+  ```
+
+## 1.3 简单操作
+
+
+
+# 2.Git使用
+
+
+
 ### git实现文件夹和github上的repository关联
+
 1、cd 文件夹         
 
 2、生成本地的git管理
@@ -21,7 +102,7 @@ git init
 
 ```
 git add . 
-```    
+```
 
 这里可设置特定的文件名，也可以全部都上传。
 
