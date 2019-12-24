@@ -34,52 +34,261 @@ keywords: Git, 版本控制
 
 ## 1.2 Git配置
 
-* **Git配置文件**
+### 1.2.1 **Git配置文件**
 
-  1. `/etc/gitconfig`
+1. `/etc/gitconfig`
 
-     包含系统上每个用户及他们仓库的通用配置
+   包含系统上每个用户及他们仓库的通用配置
 
-  2. `~/.gitconfig`或者`~/.config/git/config`
+2. `~/.gitconfig`或者`~/.config/git/config`
 
-     当前用户的配置，通过 传递`--global`选项来让Git读写该文件
+   当前用户的配置，通过 传递`--global`选项来让Git读写该文件
 
-  3. Git仓库目录中的`config`文件（`.git/config`）
+3. Git仓库目录中的`config`文件（`.git/config`）
 
-     针对Git仓库（代码）的配置
+   针对Git仓库（代码）的配置
 
-  **每一级别覆盖上一级别的配置，即`.git/config`会覆盖`/etc/gitconfig`。**
+**每一级别覆盖上一级别的配置，即`.git/config`会覆盖`/etc/gitconfig`。**
 
-* **用户信息**
+### 1.2.2 **用户信息**
 
-  每个Git提交都会使用此信息，并且写入到每一次提交，不可更改。
+每个Git提交都会使用此信息，并且写入到每一次提交，不可更改。
 
-  ```bash
-  # --global表示该命令只需要运行一次，之后所有操作都会使用此信息
-  $ git config --global user.name "John Doe"
-  $ git config --global user.email johndoe@example.com
-  ```
+```bash
+# --global表示该命令只需要运行一次，之后所有操作都会使用此信息
+$ git config --global user.name "John Doe"
+$ git config --global user.email johndoe@example.com
+```
 
-* **检查配置信息**
+### 1.2.3 **检查配置信息**
 
-  ```bash
-  $ git config --list
-  user.name=Neyzoter
-  user.email=sonechaochao@gmail.com
-  push.default=matching
-  ```
+```bash
+$ git config --list
+user.name=Neyzoter
+user.email=sonechaochao@gmail.com
+push.default=matching
+```
 
-* **获取帮助**
+### 1.2.4 **获取帮助**
 
-  ```bash
-  # 获取帮助的3种方式
-  $ git help <verb>
-  $ git <verb> --help
-  $ man git-<verb>
-  ```
+**[ATTENTION]**
+
+```bash
+# 获取帮助的3种方式
+$ git help <verb>
+$ git <verb> --help
+$ man git-<verb>
+```
 
 ## 1.3 简单操作
 
+### 1.3.1 **现有目录初始化仓库**
+
+该命令创建一个名为`.git`的子目录，包含初始化仓库中所有的必须文件。
+
+```bash
+# 初始化仓库
+$ git init
+# 跟踪文件
+$ git add *.c
+$ git LICENSE
+# 提交文件，-m表示message
+$ git commit -m "update"
+```
+
+### 1.3.2 **克隆现有仓库**
+
+**git clone默认配置下远程Git仓库中的每个文件的每个版本都被拉取下来。**
+
+```bash
+# 克隆远程仓库
+$ git clone [url]
+# 克隆远程仓库并自定义仓库名为DIR_NAME
+$ git clone [url] [DIR_NAME]
+```
+
+### 1.3.3 **更新仓库**
+
+**已跟踪文件指被纳入了版本控制的文件。上一次快照中有文件的记录，工作一段时间后，文件状态处于未修改、已修改或者已放入暂存区。初次克隆某个仓库的时候,工作目录中的所有文件都属于已跟踪文件,并处于未修改状态。**文件变化周期如下图所示，
+
+<img src="/images/wiki/Git/Git_Periods.png" width="700" alt="Git仓库文件变化周期" />
+
+1. **检查当前文件状态**
+
+    **[ATTENTION]**
+    
+    ```bash
+    # git status会输出当前所在分支、更改的文件、未跟踪的文件
+    $ git status
+    On branch master
+    Your branch is up-to-date with 'origin/master'.
+    Changes not staged for commit:
+(use "git add <file>..." to update what will be committed)
+      (use "git checkout -- <file>..." to discard changes in working directory)
+
+      modified:   _wiki/git.md
+    Untracked files:
+            (use "git add <file>..." to include in what will be committed)
+          
+      images/wiki/Git/
+    ```
+
+    git add 既可以将未跟踪文件暂存，也可以将修改的文件暂存，也就是上图中的`Add the file`和`Stage the file`。** 如果一个文件处于Staged暂存，还未Committed提交，再次修改后，该文件会处于两种状态，即未修改和暂存。如果再次add，则Git会存储当前一次修改。
+
+2. **状态简览**
+
+    **[ATTENTION]**
+
+    ```bash
+    $ git status -s
+     M README          # M在右侧，在工作区修改了，但是未暂存
+    MM Rakefile        # 暂存过，但是又被修改了
+    A lib/git.rb       # A表示未被跟踪的文件添加到了暂存区
+    M lib/simplegit.rb # M在左侧，已经暂存
+    ?? LICENSE.txt     # ??表示未被跟踪的文件
+    ```
+
+3. **忽略文件**
+
+    `.gitignore`文件中存放文件忽略规则。
+
+4. **查看已暂存和未暂存的修改**
+
+    **[ATTENTION]**
+
+    ```bash
+    # 工作目录下当前文件和暂存区域快照之间的差异，即修改后未暂存的变化内容
+    $ git diff
+    # 已暂存的将要添加到下次提交的内容
+    $ git diff --cached
+    $ git diff --staged   # Git 1.6.1及更高版本，和--cached效果相同
+    ```
+
+    **git diff 本身只显示尚未暂存的改动,而不是自上次提交以来所做的所有改动。 所以有时候你一下子暂
+    存了所有更新过的文件后,运行 git diff 后却什么也没有,就是这个原因。**
+
+5. **提交更新**
+
+   ```bash
+   # 使用默认的文本编辑器输入提交的说明
+   $ git commit
+   # 修改默认编辑器，一般是vim或者emacs
+   $ git config --global core.editor
+   # 直接在命令行添加说明
+   $ git commit -m "update"
+   ```
+
+6. **跳过暂存，即add**
+
+   **[ATTENTION]**可以通过commit来直接提交修改的**已经跟踪的**文件。
+
+   ```bash
+   # 把所有已经跟踪过的文件暂存起来一并提交
+   $ git commit -a
+   ```
+
+7. **移除文件**
+
+   ```bash
+   # 首先删除文件
+   $ rm PROJECTS.md
+   # 然后从暂存区移除已跟踪文件
+   $ git rm PROJECTS.md
+   # 如果删除之前修改过并且已经放到暂存区（还未提交）的文件
+   # git为了防止误删还没有添加到快照的数据，这样的数据不会被Git恢复
+   $ git rm -f PROJECTS.md
+   # 移除暂存区文件，但仍然将文件保留在目录中
+   $ git rm --cached PROJECTS.md
+   ```
+
+8. **移动文件**
+
+   Git不显示跟踪文件移动操作，如果在Git中重命名了某个文件，仓库中存储的元数据不会体现这是一次改名操作（体现为删除文件和跟踪一个未被跟踪的文件）。
+
+   ```bash
+   $ git mv file_from file_lo*
+   ```
+
+### 1.3.4 **查看提交历史**
+
+**[ATTENTION] 查看提交历史、查看每次提交内容的差异。**
+
+> 什么是作者和提交者？作者：实际作出修改的人，提交者：最后将工作成果提交给仓库的人。比如甲为项目发布补丁，然后乙将甲的补丁并入项目，在甲是作者，乙是提交者。具体见分布式Git。
+
+```bash
+# 查看提交历史
+$ git log
+# 查看每次提交的内容差异
+$ git log -p
+# 仅显示最近两次提交
+$ git log -p -2
+# 每次提交的简略统计信息，比如修改的文件、添加还是删除等
+$ git log --stat
+# 更加漂亮的log
+$ git log --pretty=oneline # 在一行内显示提交
+49e7e6bb20dc668891f778e2c38dd5443e06b3ee update
+95e89b97f323916342543d557513fd5f2b314db4 update os
+$ git log --pretty=short # 简短
+commit 49e7e6bb20dc668891f778e2c38dd5443e06b3ee
+Author: Neyzoter <sonechaochao@gmail.com>
+
+update
+
+commit 95e89b97f323916342543d557513fd5f2b314db4
+Author: Neyzoter <sonechaochao@gmail.com>
+
+update os
+$ git log --pretty=full # 所有信息，不包括时间
+commit 49e7e6bb20dc668891f778e2c38dd5443e06b3ee
+Author: Neyzoter <sonechaochao@gmail.com>
+Commit: Neyzoter <sonechaochao@gmail.com>
+
+update
+
+commit 95e89b97f323916342543d557513fd5f2b314db4
+Author: Neyzoter <sonechaochao@gmail.com>
+Commit: Neyzoter <sonechaochao@gmail.com>
+
+update os
+$ git log --pretty=fuller # 所有信息，包括时间
+commit 49e7e6bb20dc668891f778e2c38dd5443e06b3ee
+Author:     Neyzoter <sonechaochao@gmail.com>
+AuthorDate: Mon Dec 23 22:11:17 2019 +0800
+Commit:     Neyzoter <sonechaochao@gmail.com>
+CommitDate: Mon Dec 23 22:11:17 2019 +0800
+
+update
+
+commit 95e89b97f323916342543d557513fd5f2b314db4
+Author:     Neyzoter <sonechaochao@gmail.com>
+AuthorDate: Sun Dec 22 20:03:06 2019 +0800
+Commit:     Neyzoter <sonechaochao@gmail.com>
+CommitDate: Sun Dec 22 20:03:06 2019 +0800
+
+update os
+```
+
+### 1.3.5 **撤销操作**
+
+**[ATTENTION]**
+
+* **取消提交**
+
+    ```bash
+    # 尝试重新提交，上一次删除
+    $ git commit --amend
+    ```
+    
+    举例
+    
+    ```bash
+    $ git commit -m 'initial commit'
+    $ git add forgotten_file
+    $ git commit --amend
+    # 最后只有第二次提交有效
+    ```
+    
+    
 
 
 # 2.Git使用
@@ -403,7 +612,7 @@ git reset 5234ab MainActivity.java
 
 #### 设置全局 hooks
 
-```sh
+​```sh
 git config --global core.hooksPath C:/Users/mazhuang/git-hooks
 ```
 
