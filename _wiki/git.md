@@ -284,10 +284,24 @@ update os
     ```bash
     $ git commit -m 'initial commit'
     $ git add forgotten_file
-    $ git commit --amend
-    # 最后只有第二次提交有效
+    $ git commit --amend -m "amend commit"
+    # 最后只有第二次提交amend commit有效
     ```
     
+* **取消暂存的文件**
+
+    ```bash
+    # 将文件恢复到未暂存的状态，只修改暂存区
+    $ git reset HEAD <file>
+    ```
+
+* **取消对文件的修改**
+
+    ```bash
+    # 将文件恢复到上次提交的状态
+    $ git checkout -- <file>
+    ```
+
     
 
 
