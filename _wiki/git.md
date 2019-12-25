@@ -297,12 +297,170 @@ update os
 
 * **取消对文件的修改**
 
+    **[ATTENTION]**
+    
     ```bash
     # 将文件恢复到上次提交的状态
-    $ git checkout -- <file>
+$ git checkout -- <file>
+    ```
+    
+
+### 1.3.6 远程仓库的使用
+
+* **查看远程仓库**
+
+  ```bash
+  # 列出指定的每个远程服务器简写
+  $ git remote
+  origin
+  
+  # 显示需要读写远程仓库使用的 Git 保存的简写与其对应的 URL
+  $ git remote -v
+  origin	git@github.com:Neyzoter/Neyzoter.github.io.git (fetch)
+  origin	git@github.com:Neyzoter/Neyzoter.github.io.git (push)
+  # 如果有多个远程仓库，则会显示如下
+  bakkdoor https://github.com/bakkdoor/grit (fetch)
+  bakkdoor https://github.com/bakkdoor/grit (push)
+  cho45    https://github.com/cho45/grit (fetch)
+  cho45    https://github.com/cho45/grit (push)
+  defunkt  https://github.com/defunkt/grit (fetch)
+  defunkt  https://github.com/defunkt/grit (push)
+  koke     git://github.com/koke/grit.git (fetch)
+  koke     git://github.com/koke/grit.git (push)
+  origin   git@github.com:mojombo/grit.git (fetch)
+  origin   git@github.com:mojombo/grit.git (push)
+  ```
+
+* **添加远程仓库**
+
+  `git remote add <shortname> <url>`添加一个新的远程Git仓库
+
+  ```bash
+  # 添加远程仓库
+  $ git remote add pb https://github.com/paulboone/ticgit
+  $ git remote -v
+  origin https://github.com/schacon/ticgit (fetch)
+  origin https://github.com/schacon/ticgit (push)
+  pb https://github.com/paulboone/ticgit (fetch)
+  pb https://github.com/paulboone/ticgit (push)
+  ```
+
+* **从远程仓库抓取**
+
+  ```bash
+  # schacon可以拉取paulboone中有，而schacon没有的内容
+  # paulboone可以在本地通过pb/master访问到，可以合并到自己的某个分支中
+  $ git fetch pb
+  # 从远程仓库抓取
+  $ git fetch [remote-name]
+  # 抓取克隆（或者上一次抓取）后新推送的所有工作
+  $ git fetch origin
+  # 自动抓取然后合并到当前分支
+  $ git pull
+  ```
+
+* **推送到远程仓库**
+
+  ```bash
+  # 推送到上游
+  $ git push [remote-name] [branch-name]
+  $ git push origin master
+  ```
+
+### 1.3.7 打标签
+
+**[ATTENTION]**
+
+* **列出标签**
+
+  ```bash
+  # 列出所有标签
+  $ git tag
+  # 列出匹配标签
+  $ git tag -l 'v	.8.5*'
+  v1.8.5
+  v1.8.5-rc0
+  v1.8.5-rc1
+  v1.8.5-rc2
+  v1.8.5-rc3
+  v1.8.5.1
+  v1.8.5.2
+  v1.8.5.3
+  v1.8.5.4
+  v1.8.5.5
+  ```
+
+* **创建标签**
+
+  标签分为两种类型：附注标签（存储在Git数据库中的一个完整对象）和轻量标签（特定提交的引用）
+
+  * 附注标签
+
+    ```bash
+    # 创建辅助标签
+    $ git tag -a v1.4 -m "my version 1.4"
+    # 查看标签
+    $ git tag
+    v0.1
+    v1.3
+    v1.4
+    # 查看标签细节
+    $ git show v1.4
+    tag v1.4
+    Tagger: Ben Straub <ben@straub.cc>
+    Date:
+    Sat May 3 20:19:12 2014 -0700
+    my version 1.4
+    commit ca82a6dff817ec66f44342007202690a93763949
+    Author: Scott Chacon <schacon@gee-mail.com>
+    Date:
+    Mon Mar 17 21:52:11 2008 -0700
+     
+    changed the version number
     ```
 
-    
+  * 轻量标签
+
+    轻量标签本质上是将提交校验和存储到一个文件中——没有保存任何其他信息。
+
+    ```bash
+    # 创建轻量标签
+    $ git tag v1.4-lw
+    $ git tag
+    v0.1
+    v1.3
+    v1.4
+    v1.4-lw
+    v1.5
+    # 使用git show来查看该tag，信息较少
+    $ git show v1.4-lw
+    commit ca82a6dff817ec66f44342007202690a93763949
+    Author: Scott Chacon <schacon@gee-mail.com>
+    Date:
+    Mon Mar 17 21:52:11 2008 -0700
+     
+    changed the version numbe
+    ```
+
+* **后期打标签**
+
+  ```bash
+  $ git log --pretty=oneline
+  15027957951b64cf874c3557a0f3547bd83b3ff6 Merge branch 'experiment'
+  a6b4c97498bd301d84096da251c98a07c7723e65 beginning write support
+  0d52aaab4479697da7686c15f77a3d64d9165190 one more thing
+  6d52a271eda8725415634dd79daabbc4d9b6008e Merge branch 'experiment'
+  0b7434d86859cc7b8c3d5e1dddfed66ff742fcbc added a commit function
+  4682c3261057305bdd616e23b64b0857d832627b added a todo file
+  166ae0c4d3f420721acbb115cc33848dfcc2121a started write support
+  9fceb02d0ae598e95dc970b74767f19372d61af8 updated rakefile
+  964f16d36dfccde844893cac5b347e7b3d44abbc commit the todo
+  8a5cbc430f1a9c3d00faaeffd07798508422908a updated readme
+  # 给9fceb02...提交打标签
+  $ git tag -a v1.2 9fceb02
+  ```
+
+  
 
 
 # 2.Git使用
@@ -626,7 +784,7 @@ git reset 5234ab MainActivity.java
 
 #### 设置全局 hooks
 
-​```sh
+```sh
 git config --global core.hooksPath C:/Users/mazhuang/git-hooks
 ```
 
@@ -634,7 +792,7 @@ git config --global core.hooksPath C:/Users/mazhuang/git-hooks
 
 比如想要设置在 commit 之前如果检测到没有从服务器同步则不允许 commit，那在以上目录下建立文件 pre-commit，内容如下：
 
-```sh
+​```sh
 #!/bin/sh
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
