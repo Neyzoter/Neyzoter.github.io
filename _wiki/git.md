@@ -465,7 +465,49 @@ $ git checkout -- <file>
 
 # 2.Git使用
 
+## 2.1 合并分支到master
 
+1. 本地拉取/创建分支
+
+   ```bash
+   $ git checkout -b multican
+   ```
+
+2. 开发完成后，提交到远程分支
+
+   ```bash
+   $ git add .
+   $ git commit -m "multican add"
+   $ git push -u origin multican
+   ```
+
+3. 返回master
+
+   ```bash
+   $ git checkout master
+   ```
+
+4. 把本地分支合并到master
+
+   ```bash
+   $ git merge multican
+   ```
+
+5. 添加标签
+
+   测试merge后的代码无误后，可以添加标签，表示此次提交为某一个重要的版本。
+
+   ```bash
+   $ git tag -a v1.1 -m "multican add"
+   ```
+
+6. 本地master同步到远程
+
+   ```bash
+   $ git push origin master
+   ```
+
+   
 
 ### git实现文件夹和github上的repository关联
 
