@@ -59,5 +59,34 @@ AUTOSAR的通信是其最复杂的部分之一，其中CAN在汽车上有大量�
 7. 上层SWC应用pwmSetActuator可以通过RTE从RteBuff中读取pwmValueDeal存放的数据，进而存放到和pwmSetActuator自身绑定的结构体成员变量`actuator.duty.value`中，对应第⑥ 步；
 8. 上层SWC应用pwmSetActuator可以通过RTE从`actuator.duty.value`中读取PWM设置数据，并通过回调函数来设置PWM占空比（回调函数的形式在AUTOSAR中成为CS模式，即客户端服务器模式，前面获取数据的过程成为RS模式，即接收者发送者模式）。
 
+*说明：目前SWC都放在RTE任务中周期性运行，BSW任务也作为一个任务周期性运行。后期考虑将SWC分任务运行。*
+
 目前设计的CAN通信信息流都是`CAN Driver -> CANIF -> PDUR -> COM`（接收）、`COM -> PDUR -> CANIF -> CAN Driver`（发送）的流程。
 
+# 3.CAN通信信息流
+
+上一章节说明了一个简单的系统是如何工作的，但是CAN数据具体如何在BSW中流通未进行详细说明。这一部分对于整个代码来说也是较大的一块工作量。下面就进行CAN通信信息流的详细说明。
+
+## 3.1 CAN数据接收
+
+### 3.1.1 CAN Driver到CAN IF
+
+
+
+### 3.1.2 CAN IF到PDUR
+
+
+
+### 3.1.3 PDUR到COM
+
+
+
+### 3.1.4 BSW任务和COM
+
+
+
+### 3.1.5 SWC任务和COM
+
+
+
+## 3.2 CAN数据发送
