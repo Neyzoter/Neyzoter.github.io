@@ -95,15 +95,37 @@ AUTOSAR的通信是其最复杂的部分之一，其中CAN在汽车上有大量�
 
 ### 3.2.1 CAN Driver到CAN IF
 
+我们以IPDU1为例，也就是ID为`0x200`的CAN数据帧。IPDU1对应的HRH1有2个过滤规则，除了IPDU1的`0x200`，还有IPDU2的`0x201`。
 
+CAN控制器接收到CAN数据后，会进入中断，对于并根据硬件滤波器设置的数值可以对应到HRH1，也就是`0x2XX`。CAN中断会调用CAN IF模块接口`CanIf_RxIndication( Can_HwHandleType Hrh, Can_IdType CanId, uint8 CanDlc, const uint8 *CanSduPtr ) @ CanIf.c`。Hrh参数可以**索引**到CAN IF模块中对应的HRH过滤规则集合（在本例程中为结构题`CanIf_RxPduConfigType HrhRxPdu_CanIfHrhCfg1 @ CanIf_PBCfg.c`，HRH1共有2个过滤规则）。
+
+`CanIf_RxIndication`函数内首先进行CAN IF模块设置的过滤规则搜索。过滤规则分为两种方式——`binarySearch`（二分查找）、`linearSearch`（线性查找）。从字面上就可以理解为，`binarySearch`使用二分查找的方法找到过滤规则集合中的某一个规则，而`linearSearch`使用线性查找的方法找到过滤规则集合中的某一个规则。需要注意的是，使用`binarySearch`时，HRH过滤规则集合中的过滤规则必须是从小到大排列。由于单个HRH的过滤规则很少，我们本次使用线性查找方法。
+
+CAN数据帧的ID是`0x200`，`linearSearch`可以搜索到对应的`0x200`过滤规则。
+
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/CanDriver2CanIf.png" width="700" alt="CAN Driver 到 CAN IF" />
 
 ### 3.2.2 CAN IF到PDUR
 
+上一步找到了CAN数据帧对应的过滤规则，在过滤过则中，还会定义下一个模块是什么（通过定义回调函数编号实现）、对应下一个模块中的PDU编号是什么、CAN数据帧长度、标准帧还是拓展帧等。
 
+根据上述定义的回调函数编号`PDUR_CALLOUT(=3)`，搜索到CAN IF模块的`CanIfUserRxIndications @ CanIf_Cfg.c`第3个接口，也就是PDUR模块的面向CAN IF模块的接口`PduR_CanIfRxIndication(PduIdType pduId, PduInfoType* pduInfoPtr) @ PduR_CanIf.c`。`pduId`可以搜索到PDUR模块中的某一条路径。对于ID为`0x200`的CAN数据帧来说，对应了PDUR模块的Path1。
+
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/CANIF2PDUR.png" width="700" alt="CAN IF到PDUR" />
 
 ### 3.2.3 PDUR到COM
 
+上一步找到了CAN数据帧对应的PDUR模块中的Path1，其中定义了源模块（此处是CANIF）、源PDU ID（此处是CAN IF模块中规则的编号）、PDUR的目的PDU定义（包括目的模块、目的PDU ID等）。
 
+上一小节提到的`PduR_CanIfRxIndication`函数最终会调用PDUR模块的`PduR_ARC_RxIndication(PduIdType PduId, const PduInfoType* PduInfo, uint8 serviceId) @ PduR_Logic.c`。该函数根据Path1定义的目的模块（本例程是COM模块）找到了下一个模块COM的接口`Com_RxIndication(PduIdType RxPduId, PduInfoType* PduInfoPtr) @ Com_Com.c`。`Com_RxIndication`会将CAN数据帧拷贝到缓存区中，也就是[简单系统——CAN控制PWM](#2.简单系统——CAN控制PWM)的`IPdu_Rx`缓存区。
+
+COM模块会对IPDU进行管理。比如对于IPDU1，有3个信号空气悬挂压力、左侧气囊压力和制动开关。那么在COM中，对应该IPDU会设置3个信号配置信息，如下图所示。
+
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/PDUR2COM.png" width="700" alt="PDUR到COM" />
+
+具体而言，每个信号定义了信号ID、所在IPDU的ID、初始化数值、在IPDU中的起始位置、信号长度、数据类型等。上层的SWC可以直接通过信号ID来索引拿到对应的信号数据。
+
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Signal_Define_IPDU1.png" width="600" alt="信号具体定义" />
 
 ### 3.2.4 BSW任务和COM
 
