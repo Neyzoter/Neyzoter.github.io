@@ -46,7 +46,7 @@ AUTOSAR的通信是其最复杂的部分之一，其中CAN在汽车上有大量�
 
 # 2.简单系统——CAN控制PWM
 
-我们以一个CAN控制PWM的系统为例来解释CAN通信和上层应用如何合作运行，如下图所示。
+我们以一个CAN控制PWM的系统（CanCtrlPwm子工程）为例来解释CAN通信和上层应用如何合作运行，如下图所示。
 
 <img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Global_System.png" width="700" alt="CAN控制PWM的系统框图" />
 
@@ -57,36 +57,52 @@ AUTOSAR的通信是其最复杂的部分之一，其中CAN在汽车上有大量�
 5. 上层SWC应用pwmValueDeal再通过RTE读取`manager.msg.value`中的PWM设置数据，进行处理后，进而存放到`manager.duty.value`，对应图中的第② ③ ④ 步；
 6. 为了让执行器pwmSetActuator能够拿到处理后的数据`manager.duty.value`，上层SWC应用pwmValueDeal再通过RTE将`manager.duty.value`存放到RteBuff中，对应图中的第⑤步，**不同SWC间的通信都通过Buff来实现**；另外，pwmValueDeal还将`manager.duty.value`存放到CAN的发送缓存区`IPdu_Tx`，BSW任务会将其发送出去，对应图中的第⑤步；
 7. 上层SWC应用pwmSetActuator可以通过RTE从RteBuff中读取pwmValueDeal存放的数据，进而存放到和pwmSetActuator自身绑定的结构体成员变量`actuator.duty.value`中，对应第⑥ 步；
-8. 上层SWC应用pwmSetActuator可以通过RTE从`actuator.duty.value`中读取PWM设置数据，并通过回调函数来设置PWM占空比（回调函数的形式在AUTOSAR中成为CS模式，即客户端服务器模式，前面获取数据的过程成为RS模式，即接收者发送者模式）。
+8. 上层SWC应用pwmSetActuator可以通过RTE从`actuator.duty.value`中读取PWM设置数据，并通过回调函数来设置PWM占空比（回调函数的形式在AUTOSAR中成为CS模式，即客户端服务器模式，前面获取数据的过程成为RS模式，即接收者发送者模式），对应第⑦ ⑧ ⑨步。
 
-*说明：目前SWC都放在RTE任务中周期性运行，BSW任务也作为一个任务周期性运行。后期考虑将SWC分任务运行。*
+*说明1：目前SWC都放在RTE任务中周期性运行，BSW任务也作为一个任务周期性运行。后期考虑将SWC分任务运行。*
 
-目前设计的CAN通信信息流都是`CAN Driver -> CANIF -> PDUR -> COM`（接收）、`COM -> PDUR -> CANIF -> CAN Driver`（发送）的流程。
+*说明2：这个简单的系统只使用了1路CAN，而且IPDU和信号也非常简单。下一章节设计的multican则包含了多个CAN、多个IPDU、IPDU可能还包含了多个信号Signal。*
+
+*说明3：目前设计的CAN通信信息流都是`CAN Driver -> CANIF -> PDUR -> COM`（接收）、`COM -> PDUR -> CANIF -> CAN Driver`（发送）的流程。*
 
 # 3.CAN通信信息流
 
-上一章节说明了一个简单的系统是如何工作的，但是CAN数据具体如何在BSW中流通未进行详细说明。这一部分对于整个代码来说也是较大的一块工作量。下面就进行CAN通信信息流的详细说明。
+上一章节说明了一个简单的系统是如何工作的，但是CAN数据具体如何在BSW中流通未进行详细说明。这一部分对于整个代码来说也是较大的一块工作量。在修改代码（[master主分支](https://nescar.coding.net/p/SORL-Example/d/SORL-Example/git)，[multican分支](https://nescar.coding.net/p/SORL-Example/d/SORL-Example/git/tree/multican)）的过程中，和CAN通信相关的修改内容均进行了备注，并且带有标签`[MULTICAN]`，可以使用VSCode全局搜索查看。需要说明的是本部分对`multican`子工程进行配置说明，而不是简单系统CanCtrlPwm。下面就进行CAN通信信息流的详细说明。
 
-## 3.1 CAN数据接收
+## 3.1 CAN控制器介绍和信号定义
 
-### 3.1.1 CAN Driver到CAN IF
+目前共配置2个CAN控制器（英飞凌芯片共 3个CAN控制器），每个CAN控制器包含3个HRH（接收的Handler）和3个HTH（发送的Handler），对应配置了不同的ID类型（标准帧或者拓展帧）、ID掩码（进而HRH可以对应接受某一些数据帧）等。具体配置信息如下所示，共12个HOH（6个HRH和6个HTH），该配置功能通过EB实现。
 
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/HRHandHTH.png" width="800" alt="CAN接收和发送Handler" />
 
+CAN数据分为接收和发送两部分，
 
-### 3.1.2 CAN IF到PDUR
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Receive_IPDUs.png" width="700" alt="CAN接收信号定义" />
 
-
-
-### 3.1.3 PDUR到COM
-
-
-
-### 3.1.4 BSW任务和COM
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Transmit_IPDUs.png" width="700" alt="CAN发送信号定义" />
 
 
 
-### 3.1.5 SWC任务和COM
+## 3.2 CAN数据接收
+
+### 3.2.1 CAN Driver到CAN IF
 
 
 
-## 3.2 CAN数据发送
+### 3.2.2 CAN IF到PDUR
+
+
+
+### 3.2.3 PDUR到COM
+
+
+
+### 3.2.4 BSW任务和COM
+
+
+
+### 3.2.5 SWC任务和COM
+
+
+
+## 3.3 CAN数据发送
