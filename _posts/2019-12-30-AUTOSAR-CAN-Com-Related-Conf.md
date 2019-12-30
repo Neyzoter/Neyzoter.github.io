@@ -117,7 +117,7 @@ CAN数据帧的ID是`0x200`，`linearSearch`可以搜索到对应的`0x200`过�
 
 上一步找到了CAN数据帧对应的PDUR模块中的Path1，其中定义了源模块（此处是CANIF）、源PDU ID（此处是CAN IF模块中规则的编号）、PDUR的目的PDU定义（包括目的模块、目的PDU ID等）。
 
-上一小节提到的`PduR_CanIfRxIndication`函数最终会调用PDUR模块的`PduR_ARC_RxIndication(PduIdType PduId, const PduInfoType* PduInfo, uint8 serviceId) @ PduR_Logic.c`。该函数根据Path1定义的目的模块（本例程是COM模块）找到了下一个模块COM的接口`Com_RxIndication(PduIdType RxPduId, PduInfoType* PduInfoPtr) @ Com_Com.c`。`Com_RxIndication`会将CAN数据帧拷贝到缓存区中，也就是[简单系统——CAN控制PWM](#2.简单系统——CAN控制PWM)的`IPdu_Rx`缓存区。
+上一小节提到的`PduR_CanIfRxIndication`函数最终会调用PDUR模块的`PduR_ARC_RxIndication(PduIdType PduId, const PduInfoType* PduInfo, uint8 serviceId) @ PduR_Logic.c`。该函数根据Path1定义的目的模块（本例程是COM模块）找到了下一个模块COM的接口`Com_RxIndication(PduIdType RxPduId, PduInfoType* PduInfoPtr) @ Com_Com.c`。`Com_RxIndication`会将CAN数据帧拷贝到缓存区中，也就是**简单系统——CAN控制PWM**的`IPdu_Rx`缓存区。
 
 COM模块会对IPDU进行管理。比如对于IPDU1，有3个信号空气悬挂压力、左侧气囊压力和制动开关。那么在COM中，对应该IPDU会设置3个信号配置信息，如下图所示。
 
@@ -129,10 +129,20 @@ COM模块会对IPDU进行管理。比如对于IPDU1，有3个信号空气悬挂�
 
 ### 3.2.4 BSW任务和COM
 
+CAN中断将数据放到COM的缓存区`IPdu_Rx`后，可以再设置一个对应的缓存区，专门用于存放`IPdu_Rx`中的数据，我们命名其为`Deferred_IPdu`。**设置`Deferred_IPdu的原因：`**由于中断到来的时间不确定，所以上层从IPDU缓存区`IPdu_Rx`获取数据的时候，必须将中断关闭（进入临界区）。如果上层太多次直接从`IPdu_Rx`获取数据，就会造成对中断极大的影响，所以需要一个任务统一将`IPdu_Rx`数据先拷贝到`Deferred_IPdu`（此时需要进入临界区），供大家一块使用。
 
+上述统一将`IPdu_Rx`数据先拷贝到`Deferred_IPdu`的任务是`OsBswTask @ BSWMainFunctionTask.c`，如下图所示。
+
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/COM_Storage_BSW_Task.png" width="700" alt="BSW任务将数据拷贝到Deferred IPDU" />
+
+本项目将IPDU的单个缓存区都设置成了8个字节，那么对于接收而言，共7个IPDU，所以共`7 * 8 * 2 = 112个字节`。公式中的`2`表示一个 IPDU包括`IPdu_Rx`和`Deferred_IPdu`一对；对于发送而言，共6个IPDU，所以共`6 * 8 = 48个字节`，总发送和接收共160个字节。
+
+具体过程是，COM接收到PDUR分发的数据存放在`IPdu_Rx`缓存区中，然后BSW任务将`IPdu_Rx`缓存区中的数据拷贝到`Deferred_IPdu`缓存区（此时需要进入临界区，不能被CAN中断打断，否则读取数据可能不对），而SWC取`Deferred_IPdu`缓存区中的数据不需要进入临界区。
 
 ### 3.2.5 SWC任务和COM
 
+SWC应用目前都放在RTE任务里，周期性执行。某一些SWC需要获取CAN数据，具体是通过函数`Com_ReceiveSignal(Com_SignalIdType SignalId, void* SignalDataPtr) @ Com_Com.c`实现的。第一个参数`SignalId`是信号编号，即在**CAN控制器配置和信号定义**已经定义，第二个参数`SignalDataPtr`是数据读出来后存放的位置。比如需要获取制动开关信号，则调用函数`Com_ReceiveSignal(ComConf_ComSignal_BrakeStatus_RX, &brakestatus)`。
 
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/HRHandHTH.jpeg" width="800" alt="CAN接收和发送Handler" />
 
 ## 3.3 CAN数据发送
