@@ -71,19 +71,23 @@ AUTOSAR的通信是其最复杂的部分之一，其中CAN在汽车上有大量�
 
 ## 3.1 CAN控制器配置和信号定义
 
-目前共配置2个CAN控制器（英飞凌芯片共 3个CAN控制器），每个CAN控制器包含3个HRH（接收的Handler）和3个HTH（发送的Handler），对应配置了不同的ID类型（标准帧或者拓展帧）、ID掩码（进而HRH可以对应接受某一些数据帧）等。具体配置信息如下所示，共12个HOH（6个HRH和6个HTH），其中HRH0配置为可以接收ID为`0x1XX`（XX表示掩码设置为0，不关心）的CAN数据帧，HRH1接受ID为`0x2XX`的CAN数据帧，HRH2接受ID为`0x3XX`的CAN数据帧，HRH3接受ID为`0x4XX`的CAN数据帧，HRH4接受ID为`0x5XX`的CAN数据帧，HRH5接受ID为`0x6XX`的CAN数据帧（掩码在下图中未体现）。该配置文件通过EB软件生成。
+* **CAN控制器配置**
 
-<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/HRHandHTH.jpeg" width="800" alt="CAN接收和发送Handler" />
+  目前共配置2个CAN控制器（英飞凌芯片共 3个CAN控制器），每个CAN控制器包含3个HRH（接收的Handler）和3个HTH（发送的Handler），对应配置了不同的ID类型（标准帧或者拓展帧）、ID掩码（进而HRH可以对应接受某一些数据帧）等。具体配置信息如下所示，共12个HOH（6个HRH和6个HTH），其中HRH0配置为可以接收ID为`0x1XX`（XX表示掩码设置为0，不关心）的CAN数据帧，HRH1接受ID为`0x2XX`的CAN数据帧，HRH2接受ID为`0x3XX`的CAN数据帧，HRH3接受ID为`0x4XX`的CAN数据帧，HRH4接受ID为`0x5XX`的CAN数据帧，HRH5接受ID为`0x6XX`的CAN数据帧（掩码在下图中未体现）。该配置文件通过EB软件生成。
 
-CAN数据分为接收和发送两部分。
+  <img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/HRHandHTH.jpeg" width="800" alt="CAN接收和发送Handler" />
 
-接收过程中，在CAN IF模块过滤时，共设置7个接收的PDU ID规则（ID分别是`0x100`、`0x200`、`0x201`、`0x300`、`0x400`、`0x500`、`0x600`），除了HRH1对应2个之外，其他HRH都只接收一个PDU。CAN IF过滤后，体现在通信服务层中的PDUR和COM模块的IPDU，也是共7个。为了体现出信号的概念，在IPDU1中定义了3个信号，也就是说这一CAN数据帧中包含了3个信号——空气悬挂压力、左侧气囊压力、制动开关。具体见下图。
+* **信号定义**
 
-<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Receive_IPDUs.png" width="700" alt="CAN接收信号定义" />
+  CAN数据分为接收和发送两部分。
 
-发送过程中，在COM模块中共设置了6个IPDU，和HTH一一对应，ID分别为`0x10`、`0x11`、`0x12`、`0x13`、`0x14`、`0x15`。为了体现出信号的概念，在IPDU7中定义了3个阀的6个PWM信号（每个阀有2个PWM控制），其余的IPDU都只包含1个信号。具体见下图。
+  接收过程中，在CAN IF模块过滤时，共设置7个接收的PDU ID规则（ID分别是`0x100`、`0x200`、`0x201`、`0x300`、`0x400`、`0x500`、`0x600`），除了HRH1对应2个之外，其他HRH都只接收一个PDU。CAN IF过滤后，体现在通信服务层中的PDUR和COM模块的IPDU，也是共7个。为了体现出信号的概念，在IPDU1中定义了3个信号，也就是说这一CAN数据帧中包含了3个信号——空气悬挂压力、左侧气囊压力、制动开关。具体见下图。
 
-<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Transmit_IPDUs.png" width="700" alt="CAN发送信号定义" />
+  <img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Receive_IPDUs.png" width="700" alt="CAN接收信号定义" />
+
+  发送过程中，在COM模块中共设置了6个IPDU，和HTH一一对应，ID分别为`0x10`、`0x11`、`0x12`、`0x13`、`0x14`、`0x15`。为了体现出信号的概念，在IPDU7中定义了3个阀的6个PWM信号（每个阀有2个PWM控制），其余的IPDU都只包含1个信号。具体见下图。
+
+  <img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Transmit_IPDUs.png" width="700" alt="CAN发送信号定义" />
 
 
 
