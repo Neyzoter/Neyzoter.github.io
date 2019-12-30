@@ -125,7 +125,7 @@ COM模块会对IPDU进行管理。比如对于IPDU1，有3个信号空气悬挂�
 
 具体而言，每个信号定义了信号ID、所在IPDU的ID、初始化数值、在IPDU中的起始位置、信号长度、数据类型等。上层的SWC可以直接通过信号ID来索引拿到对应的信号数据。
 
-<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Signal_Define_IPDU1.png" width="600" alt="信号具体定义" />
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Signal_Define_IPDU1.png" width="700" alt="信号具体定义" />
 
 ### 3.2.4 BSW任务和COM
 
