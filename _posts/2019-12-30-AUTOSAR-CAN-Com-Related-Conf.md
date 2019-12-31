@@ -143,6 +143,6 @@ CAN中断将数据放到COM的缓存区`IPdu_Rx`后，可以再设置一个对�
 
 SWC应用目前都放在RTE任务里，周期性执行。某一些SWC需要获取CAN数据，具体是通过函数`Com_ReceiveSignal(Com_SignalIdType SignalId, void* SignalDataPtr) @ Com_Com.c`实现的。第一个参数`SignalId`是信号编号，即在**CAN控制器配置和信号定义**已经定义，第二个参数`SignalDataPtr`是数据读出来后存放的位置。比如需要获取制动开关信号，则调用函数`Com_ReceiveSignal(ComConf_ComSignal_BrakeStatus_RX, &brakestatus)`。
 
-<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/HRHandHTH.jpeg" width="800" alt="CAN接收和发送Handler" />
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Singal_Example.png" width="700" alt="IPDU可以包含多个信号" />
 
 ## 3.3 CAN数据发送
