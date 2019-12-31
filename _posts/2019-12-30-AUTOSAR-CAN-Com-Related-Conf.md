@@ -167,7 +167,7 @@ SWC任务会将数据写入到对应IPDU的信号区域。以HTH1的诊断状态
 
 ### 3.3.2 BSW任务和COM
 
-BSW任务周期性调用`Com_MainFunctionTx @ Com_Sched.c`。**BSW周期发送数据的流程**：`Com_MainFunctionTx`函数一次就会将每个发送IPDU计数器减小1，在COM模块中配置了不同发送IPDU的发送周期`ComTxModeTimePeriodFactor`（计数器初始值），如果计数器等于0则发送数据。需要注意的是，还可以设置最小的发送延时`ComTxIPduMinimumDelayFactor`。
+BSW任务周期性调用`Com_MainFunctionTx @ Com_Sched.c`。**BSW周期发送数据的流程**：`Com_MainFunctionTx`函数一次就会将每个发送IPDU计数器减小1，在COM模块中配置了不同发送IPDU的发送周期`ComTxModeTimePeriodFactor`（计数器初始值），如果计数器等于0则发送数据。需要注意的是，还可以设置最小的发送延时`ComTxIPduMinimumDelayFactor`。下图仅作为示意图，和multican工程无直接关系。
 
 <img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/BSW2COM2PDUR.png" width="700" alt="BSW任务发送数据" />
 
