@@ -8,6 +8,8 @@ keywords: 汽车电子, AUTOSAR, CAN
 
 # 1.AUTOSAR的CAN通信介绍
 
+[CAN通信相关配置资源](https://pan.baidu.com/s/1T5XBiUWna3J3EI5AfY3VFg) 提取码: wjr8
+
 AUTOSAR的通信是其最复杂的部分之一，其中CAN在汽车上有大量的应用，故对CAN通信进行介绍、配置和实验。
 
 下图是AUTOSAR的通信框图。整个图贯穿了基础软件层（Basic SoftWare layer, BSW）的MCAL、硬件抽象层和系统服务层。
@@ -127,6 +129,10 @@ COM模块会对IPDU进行管理。比如对于IPDU1，有3个信号空气悬挂�
 
 <img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Signal_Define_IPDU1.png" width="700" alt="信号具体定义" />
 
+*COM的IPDU配置和信号配置*
+
+COM的配置文件中配置了`ComIPdu`（IPDU的配置信息）和`ComSignal`（信号的配置信息），一个IPDU可以包含1个或者多个信号。而COM还会维护一个`Com_Arc_Config`，为每个IPDU和Signal维护`Arc_IPdu`和`Arc_Signal`，`Arc_IPdu`中存放了IPDU缓存区、Deferred缓存区、发送IPDU定时器等信息。COM工作的时候，会以`Arc_IPdu`来管理对应的IPDU。
+
 ### 3.2.4 BSW任务和COM
 
 CAN中断将数据放到COM的缓存区`IPdu_Rx`后，可以再设置一个对应的缓存区，专门用于存放`IPdu_Rx`中的数据，我们命名其为`Deferred_IPdu`。**设置`Deferred_IPdu的原因：`**由于中断到来的时间不确定，所以上层从IPDU缓存区`IPdu_Rx`获取数据的时候，必须将中断关闭（进入临界区）。如果上层太多次直接从`IPdu_Rx`获取数据，就会造成对中断极大的影响，所以需要一个任务统一将`IPdu_Rx`数据先拷贝到`Deferred_IPdu`（此时需要进入临界区），供大家一块使用。
@@ -146,3 +152,37 @@ SWC应用目前都放在RTE任务里，周期性执行。某一些SWC需要获�
 <img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Singal_Example.png" width="700" alt="IPDU可以包含多个信号" />
 
 ## 3.3 CAN数据发送
+
+CAN数据发送的配置和接收类似，下面进行简略说明。
+
+### 3.3.1 SWC任务和COM
+
+SWC任务会将数据写入到对应IPDU的信号区域。以HTH1的诊断状态为例。具体通过函数`Com_SendSignal(Com_SignalIdType SignalId, const void *SignalDataPtr) @ Com_Com.c`实现的。第一个参数`SignalId`是信号编号，即在**CAN控制器配置和信号定义已经定义**，`SignalDataPtr`是数据源。
+
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Diagnosis_Status.png" width="700" alt="诊断状态信号的定义" />
+
+调用该函数后，会将数据拷贝到对应的IPDU缓存区。
+
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/Copy2IPduTx.png" width="700" alt="拷贝到缓存区" />
+
+### 3.3.2 BSW任务和COM
+
+BSW任务周期性调用`Com_MainFunctionTx @ Com_Sched.c`。**BSW周期发送数据的流程**：`Com_MainFunctionTx`函数一次就会将每个发送IPDU计数器减小1，在COM模块中配置了不同发送IPDU的发送周期`ComTxModeTimePeriodFactor`（计数器初始值），如果计数器等于0则发送数据。需要注意的是，还可以设置最小的发送延时`ComTxIPduMinimumDelayFactor`。
+
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/BSW2COM2PDUR.png" width="700" alt="BSW任务发送数据" />
+
+### 3.3.3 COM到PDUR
+
+COM的配置信息中配置了发送IPDU的管理信息，比如IPDU发送周期（该周期是调用`Com_MainFunctionTx`函数的次数，如配置为10，则调用函数10次后发送数据）、IPDU数据长度、接收或者发送等，具体见代码。
+
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/COM2PDUR.png" width="700" alt="COM到PDUR" />
+
+### 3.3.4 PDUR到CAN IF
+
+PDUR模块在发送的时候也作为一个分发的角色，每个IPDU都有对应的Path，进而索引到对应CAN IF模块中配置的HTH和对应CAN数据帧ID等信息。
+
+<img src="/images/posts/2019-12-30-AUTOSAR-CAN-Com-Related-Conf/PDUR2CANIF2CANDriver.png" width="700" alt="PDUR到CANIF再到CANDriver" />
+
+### 3.3.5 CAN IF到CAN Driver
+
+CAN IF模块中包含每个发送IPDU的配置信息，比如CAN数据帧ID、标准帧或者拓展帧等。CAN IF模块会调用`Can_Write`来将数据发送出去。
