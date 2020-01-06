@@ -282,7 +282,7 @@ Services Layer，BSW最高层，**（任务）为应用、RTE和BSW提供基础�
 
 Communication Services
 
-<img src="/images/wiki/AUTOSAR/ComService.png" width="700 " alt="通信服务架构">
+<img src="/images/wiki/AUTOSAR/ComService.png" width="700" alt="通信服务架构">
 
 ### 4.2.1 DCM
 
@@ -292,15 +292,52 @@ Diagnostic Com. Manager，在开发过程中，可用外部的诊断工具使用
 
 ### 4.2.2 CAN TP
 
+#### 4.2.2.1 ISO 15765介绍
+
 TP = TransPort，CAN TP是PDUR和CanIf模块之间，主要用于对超过8字节的IPDU的分段和重组。CAN TP只由事件触发模式下运行。
 
-<img src="/images/wiki/AUTOSAR/AUTOSAR_COM_Stack.png" width="600 " alt="AUTOSAR通信协议栈">
+<img src="/images/wiki/AUTOSAR/AUTOSAR_COM_Stack.png" width="600" alt="AUTOSAR通信协议栈">
 
 > `I-`：和AUTOSAR的交互层相关；`N-`：CanTp层相关，等同于OSI的网络层（加上IP）；`L-`：CanIf模块相关，等同于逻辑链路控制LLC（数据链路层MAC的上一层）。
 >
 > CAN N-PDU：CAN Transport layer的PDU，包括唯一的ID、数据长度和数据（协议控制信息、N-SDU或者一部分N-SDU）
 
-### 4.2.3 PDU Router
+CANTP基于ISO 15765标准实现，同J1939类似。以下是两者的对比：
+
+<img src="/images/wiki/AUTOSAR/15765ToJ1939.jpeg" width="700" alt="15765和J1939的对比">
+
+### 4.2.3 J1939TP
+
+#### 4.2.3.1 J1939介绍
+
+J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路层和传输层，主要包括两个传输层协议变种：
+
+1. BAM (Broadcast Announce Message)用于广播信息；
+2. CMDT (Connection Mode Data Transfer)用于点对点连接。
+
+传输协议功能是数据链路层的一部分，主要完成消息的拆装和重组以及连接管理。长度大于8字节的消息无法使用单个CAN数据帧来传输，因此必须被拆为很多个小的数据包，然后根据标准使用单个的数据帧对这个长消息进行多帧传输，这就要求接收方必须能够接收这些单个的数据帧，然后在重组成原始的消息。
+
+
+
+* **传输协议连接管理消息**
+
+  参考`SAE J1939-21.pdf`的`5.10.3` 传输协议连接管理消息。
+
+#### 4.2.3.2 J1939TP
+
+AUTOSAR的J1939Tp模块的目的是分段和重组长度超过8个字节的J1939 PGN（N-SDU），对应`J1939-21`标准（）。
+
+<img src="/images/wiki/AUTOSAR/J1939TP_Transmit_Receive.png" width="600" alt="J1939协议的收发">
+
+以下是J1939TP的文件结构，
+
+<img src="/images/wiki/AUTOSAR/J1939TP_FileStructure.png" width="700" alt="J1939TP的文件结构">
+
+
+
+
+
+### 4.2.4 PDU Router
 
 PDUR流程图在`SWS_PDURouter.pdf`文件P87
 
