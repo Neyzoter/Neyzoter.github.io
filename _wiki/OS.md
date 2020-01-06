@@ -1180,7 +1180,7 @@ Interrupts/Exceptions应该使用Interrupt Gate和Trap Gate，它们之间的唯
 
   * 内核将相同状态的进程的PCB放置在同一队列
 
-    <img src="/images/wiki/OS/pcb_queue.png" width="600" alt="进程切换">
+    <img src="/images/wiki/OS/pcb_queue.png" width="600" alt="PCB队列管理">
 
     
 
