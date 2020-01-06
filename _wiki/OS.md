@@ -1156,9 +1156,33 @@ Interrupts/Exceptions应该使用Interrupt Gate和Trap Gate，它们之间的唯
 
 ## 4.3 进程控制
 
-<img src="/images/wiki/OS/ProcessSwitch.png" width="600" alt="进程切换">
+### 4.3.1 进程切换
 
+* **进程切换**
 
+  1. 暂停当前运行进程，从运行状态变成其他状态
+  2. 调度另一个进程从就绪状态变成运行状态
+
+  <img src="/images/wiki/OS/ProcessSwitch.png" width="600" alt="进程切换">
+
+* **进程切换的要求**
+  1. 切换前，保存进程上下文
+  2. 切换后，恢复进程上下文
+  3. 快速切换
+* **进程 生命周期的信息**
+  1. 寄存器（PC、SP、...）
+  2. CPU状态
+  3. 内存地址空间
+
+* **进程控制块PCB：内核的进程状态记录**
+
+  * 内核为每个进程维护了对应的进程控制块（PCB)
+
+  * 内核将相同状态的进程的PCB放置在同一队列
+
+    <img src="/images/wiki/OS/pcb_queue.png" width="600" alt="进程切换">
+
+    
 
 # 5.处理机调度
 
