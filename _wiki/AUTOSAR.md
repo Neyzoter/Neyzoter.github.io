@@ -385,17 +385,17 @@ J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路�
 
     在传输没有错误的情况下,有两种关闭连接的情形。第一种是在发送给全局目标地址时,第二种是在发送给一个指定目标地址时。
 
-  > **TP.CM**: 传输协议——连接管理
+  > **`TP.CM`**: 传输协议——连接管理
   >
-  > **TP.CM_RTS**: 连接模式下的请求发送(指定目标地址)
+  > **`TP.CM_RTS`**: 连接模式下的请求发送(指定目标地址)
   >
-  > **TP.CM_CTS**: 连接模式下的准备发送(指定目标地址)
+  > **`TP.CM_CTS`**: 连接模式下的准备发送(指定目标地址)
   >
-  > **TP.CM_EndofMsgAck**: 消息结束应答(指定目标地址)
+  > **`TP.CM_EndofMsgAck`**: 消息结束应答(指定目标地址)
   >
-  > **TP.CM_Abort**: 放弃连接(指定目标地址)
+  > **`TP.CM_Abort`**: 放弃连接(指定目标地址)
   >
-  > **TP.CM_BAM**: 广播公告消息(全局目标地址)
+  > **`TP.CM_BAM`**: 广播公告消息(全局目标地址)
   >
   > —— SAE J1939-21.pdf
 
@@ -437,17 +437,39 @@ J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路�
 
 #### 4.2.3.2 J1939TP
 
-AUTOSAR的J1939Tp模块的目的是分段和重组长度超过8个字节的J1939 PGN（`N-SDU`），对应`J1939-21`标准。
+* **介绍**
 
-<img src="/images/wiki/AUTOSAR/J1939TP_Transmit_Receive.png" width="600" alt="J1939协议的收发">
+  AUTOSAR的J1939Tp模块的目的是分段和重组长度超过8个字节的J1939 PGN（`N-SDU`），对应`J1939-21`标准。
 
-以下是J1939TP的文件结构，
+  <img src="/images/wiki/AUTOSAR/J1939TP_Transmit_Receive.png" width="600" alt="J1939协议的收发">
 
-<img src="/images/wiki/AUTOSAR/J1939TP_FileStructure.png" width="700" alt="J1939TP的文件结构">
+  以下是J1939TP的文件结构，
 
-需要的我们自己完成的文件：`J1939Tp_Cfg.h`、`J1939Tp_MemMap.h`、`J1939Tp_Lcfg.c`、`J1939Tp_PBcfg.c`。`J1939Tp_Lcfg.c`可以不需要，将所有的结构体都放在`J1939Tp_PBcfg.c`。
+  <img src="/images/wiki/AUTOSAR/J1939TP_FileStructure.png" width="700" alt="J1939TP的文件结构">
 
+  需要的我们自己完成的文件：`J1939Tp_Cfg.h`、`J1939Tp_MemMap.h`、`J1939Tp_Lcfg.c`、`J1939Tp_PBcfg.c`。`J1939Tp_Lcfg.c`可以不需要，将所有的结构体都放在`J1939Tp_PBcfg.c`。
 
+* **接收处理流程**
+
+  * Direct PG
+
+    <img src="/images/wiki/AUTOSAR/J1939_Direct_PG.png" width="700" alt="8字节数据帧，不需要分帧">
+
+    `PduR_J1939TpStartOfReception @ PduR_Logic.c`实现了COM模块的Buffer请求。
+
+  * BAM广播
+
+    <img src="/images/wiki/AUTOSAR/J1939Tp_BAM.png" width="700" alt="BAM">
+
+  * CMDT点对点通信
+
+    <img src="/images/wiki/AUTOSAR/J1939Tp_CMDT.png" width="700" alt="CMDT">
+
+* **发送处理流程**
+
+  见`pecification of a Transport Layer for SAE J1939`。
+
+**注意 1**：J1939Tp需要运行函数`J1939Tp_MainFunction @ J1939Tp.c`，设计成一个任务或者使用`SCHM`模块来调度。
 
 
 
