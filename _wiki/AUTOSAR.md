@@ -294,7 +294,7 @@ Diagnostic Com. Manager，在开发过程中，可用外部的诊断工具使用
 
 #### 4.2.2.1 CAN TP模块和ISO 15765介绍
 
-[**注意：ISO 15765标准的缩写及其他说明见具体文件。**](https://pan.baidu.com/s/1Vy2mn1k4xJG7x9cj2S7Cyw) 提取码: syab
+[**注意：ISO 15765标准的缩写及其他说明见具体文件（重点是ISO_15765-2文件）。**](https://pan.baidu.com/s/1Vy2mn1k4xJG7x9cj2S7Cyw) 提取码: syab
 
 TP = TransPort，CAN TP是PDUR和CanIf模块之间，主要用于对超过8字节的IPDU的分段和重组。CAN TP只由事件触发模式下运行。
 
@@ -354,7 +354,7 @@ CANTP基于ISO 15765标准实现，同J1939类似。以下是两者的对比：
 
 #### 4.2.3.1 J1939TP模块和J1939介绍
 
-[**注意：J1939标准见具体文件**](https://pan.baidu.com/s/1ZWDB5Aqi6R0FLEqlthiiNQ) 提取码: p4ra
+[**注意：J1939标准见具体文件（重点是J1939-21文件）**](https://pan.baidu.com/s/1ZWDB5Aqi6R0FLEqlthiiNQ) 提取码: p4ra
 
 J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路层和传输层，主要包括两个传输层协议变种：
 
@@ -369,13 +369,15 @@ J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路�
 
 #### 4.2.3.2 J1939TP
 
-AUTOSAR的J1939Tp模块的目的是分段和重组长度超过8个字节的J1939 PGN（N-SDU），对应`J1939-21`标准（）。
+AUTOSAR的J1939Tp模块的目的是分段和重组长度超过8个字节的J1939 PGN（`N-SDU`），对应`J1939-21`标准。
 
 <img src="/images/wiki/AUTOSAR/J1939TP_Transmit_Receive.png" width="600" alt="J1939协议的收发">
 
 以下是J1939TP的文件结构，
 
 <img src="/images/wiki/AUTOSAR/J1939TP_FileStructure.png" width="700" alt="J1939TP的文件结构">
+
+需要的我们自己完成的文件：`J1939Tp_Cfg.h`、`J1939Tp_MemMap.h`、`J1939Tp_Lcfg.c`、`J1939Tp_PBcfg.c`。`J1939Tp_Lcfg.c`可以不需要，将所有的结构体都放在`J1939Tp_PBcfg.c`。
 
 
 
