@@ -314,7 +314,7 @@ CANTP基于ISO 15765标准实现，同J1939类似。以下是两者的对比：
 
   * `N_AI`
 
-    用于标记对等网络实体间的通信，具体而言是确定信息发送者和接收者的源地址(`N_SA`)、目标地址(`N_TA`)、目标地址类型(`N_TAtype`)、网络地址拓展(`N_AE`)。
+    用于标记对等网络实体间的通信，具体而言是确定信息发送者和接收者的源地址(`N_SA`)、目标地址(`N_TA`)、目标地址类型(`N_TAtype`)、网络地址拓展(`N_AE`)。**对于拓展协议，`N_SA`、`N_TA`可能会放在CAN标准协议的数据部分的第0个字节，比如拓展CF帧第0字节会放`N_SA`（告诉接收者我是谁，以便控制数据发送速率），其他拓展帧第0字节会放`N_TA`**
 
   * `N_CPI`
 
@@ -330,7 +330,25 @@ CANTP基于ISO 15765标准实现，同J1939类似。以下是两者的对比：
 
     存放数据
 
-  
+#### 4.2.2.2 CAN TP模块工作流程
+
+**1. 单帧**
+
+下图是一个CAN IF模块将数据发送到CAN TP模块，CAN TP模块组织管理CAN数据帧（单帧SF）的过程。
+
+<img src="/images/wiki/AUTOSAR/CanIf2CanTp2PduR_Example.png" width="800" alt="单帧过程">
+
+`PduR_<LoTp>StartOfReception @ PduR_CanTp.c`用于向上层COM模块请求Buffer。
+
+`PduR_<LoTp>CopyRxData @ PduR_Logic.c`用于拷贝数据到COM模块的Buffer，并将剩余可用Buffer空间写入到参数（调用者提供）。
+
+**2. 多帧**
+
+下图是一个CAN IF模块将数据发送到CAN TP模块，CAN TP模块组织管理CAN数据帧（多帧，包括首帧FF和连续帧CF）的过程。
+
+<img src="/images/wiki/AUTOSAR/CanIf2CanTp2PduR_FF_CF.png" width="800" alt="多帧过程">
+
+拷贝过程类似单帧，区别是多帧管理的时候，会有`currentPosition`来指明目前Buffer已经用掉了多少，下次连续帧过来时，拷贝到可利用的Buffer空间（从`currentPosition`开始）。
 
 ### 4.2.3 J1939TP
 
