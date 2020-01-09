@@ -450,28 +450,36 @@ J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路�
 
 * **J1939的信息交互流程**
 
-  *注意：*每个数据帧间会设置最大间隔，具体实现为：
+  *注意：*
+
+  1. 每个数据帧间会设置最大间隔，具体实现为：
 
   `J1939Tp_Internal_StartTimer(&(ChannelInfoPtr->RxState->TimerInfo), J1939TP_T1_TIMEOUT_MS) @ J1939Tp.c`。
 
+  2. 我的观点：J1939Tp中，BAM和CMDT不能同时支持DIRECT，所以不要同时配置这两种类型。
+
   * CMDT点对点
-
+  
     <img src="/images/wiki/AUTOSAR/CMDT_Diagram.png" width="800" alt="CMDT过程">
-
+  
       1. `CM_RTS`：我有3个数据帧，共16字节数据
       2. `CM_CTS`：好的，你先发2个数据帧过来
       3. `CM_DT`：发送2次，共14个字节数据
-      4. `CM_CTS`：再发1个过来
+    4. `CM_CTS`：再发1个过来
       5. `CM_DT`：发送1次，共2个字节数据
-    
+  
   * BAM广播
-
-    <img src="/images/wiki/AUTOSAR/BAM_Diagram.png" width="800" alt="BAM过程">
-
+  
+  <img src="/images/wiki/AUTOSAR/BAM_Diagram.png" width="800" alt="BAM过程">
+  
     1. `CM_BAM`：我有16个字节数据，大家准备好
     2. `DT`：发送3次，共16字节数据
-
-    
+  
+  * DIRECT直接发送
+  
+    不需要用到`TP.CM`和`TP.DT`数据帧，源地址往往包含在CAN数据帧ID中
+  
+    <img src="/images/wiki/AUTOSAR/DIRECT_Diagram.png" width="800" alt="BAM过程">
 
 #### 4.2.3.2 J1939TP技术
 
