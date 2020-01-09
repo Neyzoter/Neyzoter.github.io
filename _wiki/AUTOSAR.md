@@ -399,6 +399,21 @@ J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路�
   >
   > —— SAE J1939-21.pdf
 
+
+  ```
+  CM_RTS
+  byte: |    0     |    1     |    2     |    3     |    4     |    5     |
+  data: |----------|----------|----------|----------|----------|----------|
+            16            PDU字节长度        数据帧个数
+            
+  CM_CTS
+  byte: |    0     |    1     |    2     |    3     |    4     |    5     |
+  data: |----------|----------|----------|----------|----------|----------|
+             17     NumPackets NextPacketSeqNum         255        255
+  说明：NumPackets：发送者在下一个CTS发送之前，可以发送的数据帧个数
+       NextPacketSeqNum：下一个数据帧的序列号
+  ```
+
   
 
 * **传输协议连接管理消息**
@@ -435,6 +450,10 @@ J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路�
 
 * **J1939的信息交互流程**
 
+  *注意：*每个数据帧间会设置最大间隔，具体实现为：
+
+  `J1939Tp_Internal_StartTimer(&(ChannelInfoPtr->RxState->TimerInfo), J1939TP_T1_TIMEOUT_MS) @ J1939Tp.c`。
+
   * CMDT点对点
 
     <img src="/images/wiki/AUTOSAR/CMDT_Diagram.png" width="800" alt="CMDT过程">
@@ -443,13 +462,14 @@ J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路�
       2. `CM_CTS`：好的，你先发2个数据帧过来
       3. `CM_DT`：发送2次，共14个字节数据
       4. `CM_CTS`：再发1个过来
-      5. `DT`：发送1次，共2个字节数据
+      5. `CM_DT`：发送1次，共2个字节数据
     
   * BAM广播
 
     <img src="/images/wiki/AUTOSAR/BAM_Diagram.png" width="800" alt="BAM过程">
 
-    1.
+    1. `CM_BAM`：我有16个字节数据，大家准备好
+    2. `DT`：发送3次，共16字节数据
 
     
 
