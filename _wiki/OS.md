@@ -1182,11 +1182,89 @@ Interrupts/Exceptions应该使用Interrupt Gate和Trap Gate，它们之间的唯
 
     <img src="/images/wiki/OS/pcb_queue.png" width="600" alt="PCB队列管理">
 
-    
+### 4.3.2 进程创建
+
+#### 4.3.2.1 fork和exec介绍
+
+Unix进程创建系统调用：`fork/exec`
+
+* `fork()`把一个进程复制成二个进程
+
+  `parent(old PID)`，`child(new PID)`
+
+  1. 复制父进程的所有变量和内存
+
+  2. 复制父进程的所有CPU寄存器（有一个寄存器例外）
+
+  3. 返回值
+
+     子进程的`fork`返回0
+
+     父进程的`fork`返回子进程标识符
+
+     `fork`返回值可方便后续使用，子进程可使用`getpid()`获取PID
+
+  <img src="/images/wiki/OS/Process_copy.png" width="600" alt="进程复制">
+
+* `exec()`用新程序来重写当前进程
+
+  PID没有改变
+
+    ```c
+    int childPid = fork();  // 创建子进程
+    if(childPid == 0) {   // 子进程的PID是0
+        exec("program", argc, argv0, )
+    }
+    ```
+  
+
+以下是fork的处理过程：
+
+<img src="/images/wiki/OS/fork_diagram.png" width="1000" alt="fork过程">
+
+#### 4.3.2.2 创建进程和线程举例
+
+* **空闲进程的创建**
+
+  `/kern-ucore/process/proc.c`
+
+  ```
+  idelproc           proc_init()
+     |
+  分配idelproc需要的资源    alloc_proc() -> kmalloc()
+     |
+  初始化idelproc进程控制块  alloc_proc()
+     |
+  完成idelproc的初始化    proc_init()
+  ```
+
+* **创建第一个内核线程**
+
+  `/kern-ucore/process/proc.c`
+
+  ```
+  initproc           proc_init()
+     |
+  初始化trapframe      kernel thread()tf   -> do_fork()  -> copy_thread()
+     |
+  初始化initproc      alloc_proc()
+     |
+  初始化内核堆栈        setup_stack()
+     |
+  内存共享             copy_stack()
+     |
+  把initproc放到就绪队列  
+     |
+  唤醒initproc
+  ```
+
+  
 
 # 5.处理机调度
 
-State_Manager.png
+<img src="/images/wiki/OS/State_Manager.png" width="600" alt="PCB队列管理">
+
+
 
 # 6.同步互斥
 
