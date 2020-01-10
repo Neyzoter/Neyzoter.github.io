@@ -1258,7 +1258,75 @@ Unix进程创建系统调用：`fork/exec`
   唤醒initproc
   ```
 
+#### 4.3.2.3 如何减小fork开销
+
+fork需要拷贝父进程，其实这一步后期并没有作用。
+
+在Linux中可以使用`vfork()`：
+
+* 创建进程时，不再创建一个同样的内存映像
+* 一些时候称为轻量级fork() 
+* 子进程应该几乎立即调用exec()
+* 现在使用 Copy on Write  (COW) 技术
+
+### 4.3.3 进程加载
+
+ucore的`exec()`实现
+
+* `sys_exec`
+
+  获取创建进程的参数
+
+* `do_execve`
+
   
+
+* `load_icode`
+
+  解析可执行文件格式
+
+### 4.3.4 等待和回收
+
+* **父进程等待子进程**
+
+  `wait()`系统调用用于父进程等待子进程的结束
+
+  * 有子进程存活时，父进程进入等待状态，等待子进程的返回结果(当某子进程调用exit()时,唤醒父进程，将exit()返回值作为父进程中wait的返回值)
+  * 有僵尸子进程（子进程已经`exit`，但是还没有被父进程处理）等待时，wait()立即返回其中一个值
+  * 无子进程存活时，wait()立刻返回
+
+* **进程的有序终止**
+
+  进程结束执行时调用`exit()`，完成进程资源回收
+
+  * 将调用参数作为进程的“结果“
+  * 关闭所有打开的文件等占用资源
+  * 释放内存
+  * 释放大部分进程相关的内核数据结构
+  * 检查是否父进程是存活着的（如存活，保留结果的值直到父进程需要它，进入僵尸（zombie/defunct）状态；如果没有，它释放所有的数据结构，进程结果）
+  * 清理所有等待的僵尸进程
+
+* **其他进程控制系统调用**
+
+  * 优先级控制
+
+    `nice()`指定进程的初始优先级
+
+    Unix系统中进程优先级会随执行时间而衰减
+
+  * 进程调度等待
+
+    `ptrace()`允许一个进程控制另一个进程的执行
+
+    设置断点和查看寄存器
+
+  * 定时
+
+    `sleep()`让进程在定时器的等待队列中等待指定时间
+
+  几个系统调用在状态转化图中的位置（从父进程的角度）：
+
+  <img src="/images/wiki/OS/syscall_in_state_change.png" width="550" alt="几个系统调用在状态转化图中的位置">
 
 # 5.处理机调度
 
@@ -1836,3 +1904,85 @@ struct mm_struct {
     被动策略（ucore）
 
     在ucore通过Page结构体来实现空闲页的管理。
+
+## 9.5 实验四 进程和线程
+
+### 9.5.1 总体流程
+
+* **定义关键数据结构**
+
+  1. 线程控制块
+
+  2. 线程控制快列表
+
+* **环境初始化并执行内核线程**
+
+  1. 虚拟内存初始化
+
+  2. 内核线程初始化
+
+  3. 创建内核线程
+
+  4. 切换内核线程
+
+### 9.5.2 关键数据结构
+
+```c
+struct proc_struct {
+    enum proc_state state;                      // 当前运行的状态，动态
+    int pid;                                    // 进程ID
+    int runs;                                   // the running times of Proces
+    uintptr_t kstack;                           // 内核堆栈
+    volatile bool need_resched;                 // bool value: need to be rescheduled to release CPU?
+    struct proc_struct *parent;                 // the parent process
+    struct mm_struct *mm;                       // Process's memory management field
+    struct context context;                     // 上下文，即一堆寄存器EIP、ESP等
+    struct trapframe *tf;                       // Trap frame for current interrupt
+    uintptr_t cr3;                              // 指定页表，对于内核线程而言，和进程共享页表
+    uint32_t flags;                             // Process flag
+    char name[PROC_NAME_LEN + 1];               // 进程名称
+    list_entry_t list_link;                     // 进程链表
+    list_entry_t hash_link;                     // 进程hash表
+    int exit_code;                              // exit code (be sent to parent proc)
+    uint32_t wait_state;                        // waiting state
+    struct proc_struct *cptr, *yptr, *optr;     // relations between processes
+};
+// 控制诸多VMA
+struct mm_struct {
+    list_entry_t mmap_list;        // linear list link which sorted by start addr of vma
+    struct vma_struct *mmap_cache; // current accessed vma, used for speed purpose
+    pde_t *pgdir;                  // the PDT of these vma
+    int map_count;                 // the count of these vma
+    void *sm_priv;                 // the private data for swap manager
+    int mm_count;                  // the number ofprocess which shared the mm
+    lock_t mm_lock;                // mutex for using dup_mmap fun to duplicat the mm
+};
+// virtual continuous memory area
+// 虚拟连续内存空间
+struct vma_struct {
+    struct mm_struct *vm_mm; // the set of vma using the same PDT 
+    uintptr_t vm_start;      //    start addr of vma    
+    uintptr_t vm_end;        // end addr of vma
+    uint32_t vm_flags;       // flags of vma
+    list_entry_t list_link;  // linear list link which sorted by start addr of vma
+};
+```
+
+### 9.5.3 创建第0个内核线程
+
+```
+initproc           proc_init()
+   |
+初始化trapframe      kernel thread()tf   -> do_fork()  -> copy_thread()
+   |
+初始化initproc      alloc_proc()
+   |
+初始化内核堆栈        setup_stack()
+   |
+内存共享             copy_stack()
+   |
+把initproc放到就绪队列  
+   |
+唤醒initproc
+```
+
