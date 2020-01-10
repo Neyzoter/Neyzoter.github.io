@@ -1244,18 +1244,19 @@ Unix进程创建系统调用：`fork/exec`
 
   ```
   initproc           proc_init()
+  initproc           proc_init()
      |
-  初始化trapframe      kernel thread()tf   -> do_fork()  -> copy_thread()
+  初始化trapframe      kernel thread() （tf设置   -> do_fork()见下方  )
      |
   初始化initproc      alloc_proc()
      |
-  初始化内核堆栈        setup_stack()
+  初始化内核堆栈        setup_kstack()
      |
-  内存共享             copy_stack()
+  内存拷贝             copy_stack()
      |
-  把initproc放到就绪队列  
+  把initproc放到就绪队列  加入到hash表、链表
      |
-  唤醒initproc
+  唤醒initproc        wakeup_proc()
   ```
 
 #### 4.3.2.3 如何减小fork开销
@@ -1968,21 +1969,43 @@ struct vma_struct {
 };
 ```
 
+* **mm**
+
+  >内存管理的信息,包括内存映射列表、页表指针等。mm成员变量在lab3中用于虚存管理。但在实际OS中,内核线程常驻内存,不需要考虑swap	page问题,在lab5中涉及到了用户进程,才考虑进程用户内存空间的swap	page问题,mm才会发挥作用。所以在lab4中mm对于内核线程就没有用了,这样内核线程的`proc_struct`的成员变量`mm=0`是合理的。`mm`里有个很重要的项`pgdir`,记录的是该进程使用的一级页表的物理地址。由于`mm=NULL`,所以在`proc_struct`数据结构中需要有一个代替`pgdir`项来记录页表起始地址,这就是`proc_struct`数据结构中的`cr3`成员变量。
+
+* **context**
+
+  > 进程的上下文,用于进程切换(参见`switch.S`，将本线程的上下文保存，将下一个线程的上下文加载)。在	uCore中,所有的进程在内核中也是相对独立的(例如独立的内核堆栈以及上下文等等)。使用context保存寄存器的目的就在于在内核态中能够进行上下文之间的切换。实际利用context进行上下文切换的函数是在`kern/process/switch.S`中定义`switch_to`。
+
+* **tf**
+
+  全称trap frame，中断帧
+
+  >中断帧的指针,总是指向内核栈的某个位置:当进程从用户空间跳到内核空间时,中断帧记录了进程在被中断前的状态。当内核需要跳回用户空间时,需要调整中断帧以恢复让进程继续执行的各寄存器值。除此之外,uCore内核允许嵌套中断。因此为了保证嵌套中断发生时`tf`总是能够指向当前的`trapframe`,uCore在内核栈上维护了`tf`的链,可以参考`trap.c::trap`函数做进一步的了解。
+
+* **cr3**
+
+  页表地址
+
+* **kstack**
+
+  > 每个线程都有一个内核栈,并且位于内核地址空间的不同位置。对于内核线程,该栈就是运行时的程序使用的栈;而对于用户进程,该栈是发生特权级改变的时候使保存被打断的硬件信息用的栈。
+
 ### 9.5.3 创建第0个内核线程
 
 ```
 initproc           proc_init()
    |
-初始化trapframe      kernel thread()tf   -> do_fork()  -> copy_thread()
+初始化trapframe      kernel thread() （tf设置   -> do_fork()见下方  )
    |
 初始化initproc      alloc_proc()
    |
-初始化内核堆栈        setup_stack()
+初始化内核堆栈        setup_kstack()
    |
-内存共享             copy_stack()
+内存拷贝             copy_stack()
    |
-把initproc放到就绪队列  
+把initproc放到就绪队列  加入到hash表、链表
    |
-唤醒initproc
+唤醒initproc        wakeup_proc()
 ```
 
