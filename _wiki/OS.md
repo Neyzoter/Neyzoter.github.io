@@ -1906,7 +1906,7 @@ struct mm_struct {
 
     在ucore通过Page结构体来实现空闲页的管理。
 
-## 9.5 实验四 进程和线程
+## 9.5 实验四 内核线程管理
 
 ### 9.5.1 总体流程
 
@@ -2009,3 +2009,105 @@ initproc           proc_init()
 唤醒initproc        wakeup_proc()
 ```
 
+## 9.6 实验五 用户进程管理
+
+实验一到四都是在内核态中运行，而本次用户进程管理是需要在用户态中进行。
+
+### 9.6.1 总体介绍
+
+* **给应用程序需要一个用户运行环境**
+  1. 进程管理：加载、复制（fork）、生命周期、系统调用（得到操作系统服务）
+  2. 内存管理：用户态虚拟内存
+* **构造出第一个用户进程**
+  1. 建立用户代码/数据段（之前都是内核的）
+  2. 创建内核线程
+  3. 创建用户进程的进程控制块（壳）
+  4. 填写用户进程的内容（肉）
+  5. 执行用户进程（在用户态执行）
+  6. 完成系统调用（调用操作系统服务）
+  7. 结束用户进程，资源回收
+
+### 9.6.2 进程的内存布局
+
+在实验五中，还不能做到将文件系统中ELF加载来运行，而是和操作系统一块加载，然后创建进程，并在该进程中运行程序。
+
+<img src="/images/wiki/OS/Kernel_VM.png" width="600" alt="内核进程">
+
+<img src="/images/wiki/OS/User_VM.png" width="600" alt="用户进程">
+
+### 9.6.3 执行ELF格式的二进制代码
+
+* **删除原来的内存空间**`do_execve @ proc.c`
+
+  ```c
+  if (mm != NULL) {
+      lcr3(boot_cr3);
+      if (mm_count_dec(mm) == 0) {
+          exit_mmap(mm);
+          put_pgdir(mm);
+          mm_destroy(mm);
+      }
+      current->mm = NULL;
+  }
+  ```
+
+* **加载代码** `load_icode() @ proc.c`
+	
+	```c
+	if ((ret = load_icode(binary, size)) != 0) {
+	    goto execve_exit;
+	}
+	```
+	
+	* 创建新的内存空间
+	
+	  ```c
+	  if ((mm = mm_create()) == NULL) {
+	      goto bad_mm;
+	  }
+	  if (setup_pgdir(mm) != 0) {
+	      goto bad_pgdir_cleanup_mm;
+	  }
+	  ```
+	
+	* 遍历ELF的各种段，并设置代码空间
+	
+	  具体见代码
+	
+	  1. 设置各个虚存空间的可读可写情况
+	  2. 拷贝ELF的内容到上述空间
+	  3. BSS段清空
+	
+	* 设置用户堆栈
+	
+	  上述代码空间中不包含用户堆栈，需要为该进程分配用户堆栈
+	
+	* 加载新的页表
+	
+	* 设置trapframe
+	
+	  可用于用户和内核空间之间的转换时，保存不同态的信息。下面是内核态到用户态的寄存器变化情况，此时需要将内核态信息保存下来。
+	
+	  <img src="/images/wiki/OS/Kernel2USER.png" width="450" alt="内核态到用户态转化时候寄存器保存和设置">
+
+### 9.6.4 进程复制
+
+`do_fork()`的过程
+
+```
+分配新的proc    alloc_proc()
+   |
+分配kernel stack   setup_kstack()
+   |
+复制父进程内存    copy_mm() 、 copy_range()
+   |
+设置trapfame & context    copy_thread()
+   |
+其他操作
+   |
+返回PID（子进程是0）
+```
+
+### 9.6.5 Copy-on-write机制
+
+在没有写的时候，子进程和父进程共用空间；如果有写操作，则将该部分独立开来。
