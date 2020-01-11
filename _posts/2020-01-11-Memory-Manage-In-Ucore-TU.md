@@ -19,13 +19,30 @@ ucore操作系统是清华大学计算机系为了课程需求而维护的一个
 
 ## 2.1 虚拟内存管理结构体
 
+### 2.1.1 虚拟连续内存空间
+
+```c
+// the virtual continuous memory area(vma)
+struct vma_struct {
+    struct mm_struct *vm_mm; // 使用同一个PDT（页目录表，可以看作一级页表）的vma集合
+    uintptr_t vm_start;      // 一个连续地址的虚拟内存空间（vma）的开始地址
+    uintptr_t vm_end;        // 一个连续地址的虚拟内存空间的结束地址
+    uint32_t vm_flags;       // flags of vma
+    list_entry_t list_link;  // 一个双向链表,按照从小到大的顺序把一系列用vma_struct表示的虚拟内存空间链接起来
+};
+```
+
+
+
+### 2.1.1 顶层管理结构体 `mm_struct`
+
 ucore操作系统的每个进程都会拥有一个`mm_struct`，具体如下，
 
 ```c
 struct mm_struct {
-    list_entry_t mmap_list;        // linear list link which sorted by start addr of vma
+    list_entry_t mmap_list;        // 双向链表头,链接了所有属于同一页目录表的虚拟内存空间
     struct vma_struct *mmap_cache; // current accessed vma, used for speed purpose
-    pde_t *pgdir;                  // vma虚拟内存区域的PDT页目录表，用于索引表
+    pde_t *pgdir;                  // vma虚拟内存空间的PDT页目录表，用于索引页表
     int map_count;                 // vma的个数
     void *sm_priv;                 // the private data for swap manager
     int mm_count;                  // the number ofprocess which shared the mm
@@ -33,4 +50,20 @@ struct mm_struct {
     int locked_by;                 // the lock owner process's pid
 };
 ```
+
+`mm_struct`定义了页表目录（可以找到变量存储空间）、vma（虚拟内存空间）、vma数目等，是一个进程管理其内存空间的总体结构。
+
+在ucore中可以使用`mm_create() @ /kern/mm/vmm.c`来创建`mm_struct`，主要是对结构体变量的初始化。不过，`pgdir`还没有分配。
+
+### 2.1.2 同一目录表的虚拟内存空间管理
+
+`mm_struct.mmap_list`是一个双向链表头,链接了所有属于同一页目录表的虚拟内存空间。
+
+### 2.1.2 页目录 `pde_t`初始化
+
+在ucore中使用`setup_pgdir(struct proc_struct *proc) @ proc.c`来进行mm中的`pde_t pgdir`初始化。`pgdir`是页目录表的基地址，通过`pgdir`可以找到一个二级页表，进而映射到物理空间（具体说明见下方补充）。**`pgdir`需要分配一个页来保存页目录表。**
+
+*补充：PDE（Page Directory Entry）、PTE（Page Table Entry）找到的内存空间是一个**4KB连续物理空间的基址**。*
+
+<img src="/images/wiki/OS/Page_Mechanism.png" width="500" alt="页机制">
 
