@@ -22,6 +22,8 @@ ucore操作系统是清华大学计算机系为了课程需求而维护的一个
 
 ### 2.1.1 虚拟连续内存空间
 
+ucore通过`vma_struct`数据结构来管理一个虚拟**连续**内存空间（空间大小必须是一个页的整数倍），下面是其具体定义：
+
 ```c
 // the virtual continuous memory area(vma)
 struct vma_struct {
@@ -33,7 +35,9 @@ struct vma_struct {
 };
 ```
 
+如果我们定义两个`vma_struct`对应的结构体变量，则这两个结构体变量分别管理两段虚拟连续内存空间。
 
+<img src="/images/posts/2020-01-11-Memory-Manage-In-Ucore-TU/VmaMM.png" width="700" alt="vma、mm管理虚拟内空间">
 
 ### 2.1.2 顶层管理结构体 `mm_struct`
 
