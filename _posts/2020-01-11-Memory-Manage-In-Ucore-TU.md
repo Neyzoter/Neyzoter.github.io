@@ -1,8 +1,8 @@
 ---
 layout: post
-title: 清华ucore操作系统的内存管理数据结构解析
+title: 清华ucore操作系统的内存管理解析
 categories: OS
-description: 清华ucore操作系统的内存管理数据结构解析
+description: 清华ucore操作系统的内存管理解析
 keywords: OS, 清华, ucore
 ---
 
@@ -17,4 +17,20 @@ ucore操作系统是清华大学计算机系为了课程需求而维护的一个
 
 # 2.ucore操作系统内存管理
 
+## 2.1 虚拟内存管理结构体
+
+ucore操作系统的每个进程都会拥有一个`mm_struct`，具体如下，
+
+```c
+struct mm_struct {
+    list_entry_t mmap_list;        // linear list link which sorted by start addr of vma
+    struct vma_struct *mmap_cache; // current accessed vma, used for speed purpose
+    pde_t *pgdir;                  // vma虚拟内存区域的PDT页目录表，用于索引表
+    int map_count;                 // vma的个数
+    void *sm_priv;                 // the private data for swap manager
+    int mm_count;                  // the number ofprocess which shared the mm
+    semaphore_t mm_sem;            // mutex for using dup_mmap fun to duplicat the mm 
+    int locked_by;                 // the lock owner process's pid
+};
+```
 
