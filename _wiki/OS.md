@@ -2111,9 +2111,13 @@ text版本
 	* 创建新的内存空间
 	
 	  ```c
+	  // [LAB5 SCC] 申请进程的内存管理数据结构mm所需内存空间,并对mm进行初始化
 	  if ((mm = mm_create()) == NULL) {
 	      goto bad_mm;
 	  }
+	  // [LAB5 SCC] 申请一个页目录表所需的一个页大小的内存空间,
+	  //        并把描述ucore内核虚空间映射的内核页表(boot_pgdir所指)的内容拷贝到此新目录表中,
+	  //        最后让mm->pgdir指向此页目录表
 	  if (setup_pgdir(mm) != 0) {
 	      goto bad_pgdir_cleanup_mm;
 	  }
