@@ -8,6 +8,7 @@ keywords: OS, 清华, ucore
 
 > 原创
 >
+> 未完待续
 
 # 1.ucore操作系统
 
@@ -34,7 +35,7 @@ struct vma_struct {
 
 
 
-### 2.1.1 顶层管理结构体 `mm_struct`
+### 2.1.2 顶层管理结构体 `mm_struct`
 
 ucore操作系统的每个进程都会拥有一个`mm_struct`，具体如下，
 
@@ -55,11 +56,11 @@ struct mm_struct {
 
 在ucore中可以使用`mm_create() @ /kern/mm/vmm.c`来创建`mm_struct`，主要是对结构体变量的初始化。不过，`pgdir`还没有分配。
 
-### 2.1.2 同一目录表的虚拟内存空间管理
+### 2.1.3 同一目录表的虚拟内存空间管理
 
 `mm_struct.mmap_list`是一个双向链表头,链接了所有属于同一页目录表的虚拟内存空间。
 
-### 2.1.2 页目录 `pde_t`初始化
+### 2.1.4 页目录 `pde_t`初始化
 
 在ucore中使用`setup_pgdir(struct proc_struct *proc) @ proc.c`来进行mm中的`pde_t pgdir`初始化。`pgdir`是页目录表的基地址，通过`pgdir`可以找到一个二级页表，进而映射到物理空间（具体说明见下方补充）。**`pgdir`需要分配一个页来保存页目录表。**
 
