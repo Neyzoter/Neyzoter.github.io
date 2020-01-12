@@ -2037,7 +2037,7 @@ initproc           proc_init()
 
 **bootloader内存空间配置文件为`tool/boot.ld`，内核虚拟内存空间配置文件为`tool/kernel.ld`，用户态虚拟内存空间配置文件为`tool/user.ld`**
 
-text版本
+虚拟空间映射的text版本，此处看到KERNBASE是0xC0000000但是我们看到`kernel.ld`文件设置的是`. = 0xC0100000;`。原因是在对应到物理地址空间，低地址还有Bootloader占用的1MB空间，恰好是`0x100000`。
 
 ```
 /* *

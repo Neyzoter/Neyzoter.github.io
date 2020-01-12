@@ -20,6 +20,42 @@ ucore操作系统是清华大学计算机系为了课程需求而维护的一个
 
 ## 2.1 虚拟内存管理结构体
 
+### 2.1.1 空闲区域管理
+
+在ucore初始化pmm（Physical Memory Manage）的时候（`pmm_init @ /kern/mm/pmm.c`）：
+
+1. 初始化物理内存页管理器框架`pmm_manager`，包括给pmm设置一些默认的处理函数
+
+   ```c
+   const struct pmm_manager default_pmm_manager = {
+       .name = "default_pmm_manager",
+       .init = default_init,        // 初始化free_area_t结构体对应结构体变量
+       .init_memmap = default_init_memmap,  // 初始化物理页，即将可利用的物理内存空间（页）加入到free_area_t管理的空闲页管理链表中，在此之前会进行物理地址探测，找出可以使用的区域
+       .alloc_pages = default_alloc_pages, // 
+       .free_pages = default_free_pages,
+       .nr_free_pages = default_nr_free_pages,
+       .check = default_check,
+   };
+   ```
+
+2. 初始化页
+
+   也就是将可使用的**页对应的页表**加入到`free_area_t`管理的链表中，即有一个`free_area_t`结构体变量，多个`list_entry_t`。
+
+    ```c
+    // 该结构体用于管理没有被使用的内存空间
+    typedef struct {
+        list_entry_t free_list;         // 未被使用的内存列表头
+        unsigned int nr_free;           // 未被使用的页数目
+    } free_area_t;
+    struct list_entry {
+        struct list_entry *prev, *next;
+    };
+    typedef struct list_entry list_entry_t;
+    ```
+
+
+
 ### 2.1.1 虚拟连续内存空间
 
 ucore通过`vma_struct`数据结构来管理一个虚拟**连续**内存空间（空间大小必须是一个页的整数倍），下面是其具体定义：
@@ -64,9 +100,23 @@ struct mm_struct {
 
 ### 2.1.3 页目录初始化
 
-在ucore中使用`setup_pgdir(struct proc_struct *proc) @ proc.c`来进行`mm_struct`中的`pde_t pgdir`初始化。`setup_pgdir`会进一步调用KADDR来通过内核分配空间。
+在ucore中使用`setup_pgdir(struct proc_struct *proc) @ proc.c`来进行`mm_struct`中的`pde_t pgdir`初始化。
 
-`pgdir`是页目录表的基地址，通过`pgdir`可以找到一个二级页表，进而映射到物理空间（具体说明见下方补充）。**`pgdir`需要分配一个页来保存页目录表。**
+`pgdir`是页目录表的基地址，通过`pgdir`可以找到一个页表，进而映射到物理空间（具体说明见下方补充）。**`pgdir`需要分配一个页来保存页目录表。**
+
+```
+/**
+* PDE2和PDE3...指向的PT省略
+* 
+* |   PTE    |            |    PT1   |
+* |---PDE1---|  ---.      |---PTE1---|
+* |---PDE2---|     |      |---PTE2---|
+* |---PDE3---|     |      |---PTE3---|
+* |----------|     '----->|----------|
+* */
+```
+
+
 
 *补充：PDE（Page Directory Entry）、PTE（Page Table Entry）找到的内存空间是一个**4KB连续物理空间的基址**。*
 
