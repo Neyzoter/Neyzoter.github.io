@@ -563,7 +563,25 @@ J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路�
 
         超时则重置通道，并发送连接断开信息
 
+#### 4.2.3.3 J1939TP的配置
 
+* **Channels、PGs和Relations**
+
+  J1939TP顶层的配置结构体是`J1939Tp_ConfigType`，如下
+
+  ```c
+  typedef struct {
+      const J1939Tp_RxPduInfoRelationsType* RxPduRelations;
+      const J1939Tp_ChannelType*            Channels;
+      const J1939Tp_PgType*                 Pgs;
+  } J1939Tp_ConfigType;
+  ```
+
+  `RxPduRelations`可以对应到每个PDU ID，也就是说，在发送、接收的时候，都是索引到某一个`RxPduRelations`，然后再发送出去。
+
+  `Channels`对应到DA（目的地址）和SA（源地址）相同的所有PDU（无MetaData）。
+
+  `Pgs`对应不同的参数组，一个Channel（也就是相同的发送者和接收者）中可以有多个PG。
 
 ### 4.2.4 PDU Router
 
