@@ -583,6 +583,29 @@ J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路�
 
   `Pgs`对应不同的参数组，一个Channel（也就是相同的发送者和接收者）中可以有多个PG。
 
+* **基于CMDT的数据收发过程**
+
+  ```
+  (1)Sender send RTS, Receiver receive RTS
+  Receiver:
+  	1.根据CAN IF模块的索引，找到Relaitions[i]
+  	2.Relaitions[i]对应到多个RxPdus，进行逐个遍历，具体为CM（连接管理）、DT（数据传输）、DIRECT（直接数据传输）等，而且RxPdus每个都会配置对应到哪个Channel
+  	3.因为是RTS，所以索引到CM时，就可以对应
+  	4.在CM对应的处理函数中，取出RTS数据域中的PGN(Byte[5:7])
+  	5.根据上述PGN遍历Channel中的PGs，找到对应的PG
+  	6.J1939TP管理的ChannelInfoPtr结构体变量（每个Channel都会有一个对应的）进行初始化，准备开始接受，具体包括已接收DT数据帧个数、剩下需要接收的DT数据帧个数、总数据字节个数、currentPgPtr等
+  	7.请求COM准备Buffer，如果有错误就会断开此次连接，否则进行下面
+  	8.开始计时器，发送CTS（会指定到下次发送CTS前，可以发送多少帧DT）
+  
+  (2)Receiver send CTS, Sender receive CTS
+  Sender:
+  	1.根据CTS设置的发送数据帧个数，来逐个发送
+  
+  
+  ```
+
+  
+
 ### 4.2.4 PDU Router
 
 PDUR流程图在`SWS_PDURouter.pdf`文件P87
