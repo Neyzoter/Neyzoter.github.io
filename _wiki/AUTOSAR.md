@@ -599,7 +599,7 @@ J1939协议在卡车领域有非常广泛的应用，J1939描述了数据链路�
   
   (2)Receiver send CTS, Sender receive CTS
   Sender:
-  	1.根据CTS设置的发送数据帧个数，来逐个发送
+  	1.根据CTS设置的发送数据帧个数，来逐个发送DT数据帧
   
   
   ```
