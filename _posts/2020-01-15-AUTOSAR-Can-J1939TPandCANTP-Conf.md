@@ -154,5 +154,19 @@ data: |----------|----------|----------|----------|----------|----------|...
          序列号     后面是7字节数据
 ```
 
+J1939TP对J1939进行了实现，以下是几个接收过程举例，更加详细的过程见`AUTOSAR_SWS_SAEJ1939TransportLayer.pdf`。
 
+* DIRECT
+
+  <img src="/images/wiki/AUTOSAR/J1939_Direct_PG.png" width="700" alt="8字节数据帧，不需要分帧">
+
+  `PduR_J1939TpStartOfReception @ PduR_Logic.c`实现了COM模块的Buffer请求。
+
+* BAM广播
+
+  <img src="/images/wiki/AUTOSAR/J1939Tp_BAM.png" width="700" alt="BAM">
+
+* CMDT点对点通信
+
+  <img src="/images/wiki/AUTOSAR/J1939Tp_CMDT.png" width="700" alt="CMDT">
 
