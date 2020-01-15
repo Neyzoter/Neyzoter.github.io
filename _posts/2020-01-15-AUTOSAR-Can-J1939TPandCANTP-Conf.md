@@ -90,25 +90,25 @@ ISO 15765不像J1939，没有“连接管理”的概念（J1939的连接管理�
 
 J1939协议定义了三种通信方式——广播（BAM, Broadcast Announce Message）、基于连接的数据传输（Connection Mode Data Transfer）、直接数据传输（DIRECT）。如果数据多余8字节，则会通过BAM或者CMDT来发送，而小于等于8字节时，直接发送。
 
-<img src="/images/wiki/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/BAM_CMDT_DIRECT.png" width="600" alt="三个通信方式">
+<img src="/images/post/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/BAM_CMDT_DIRECT.png" width="600" alt="三个通信方式">
 
 * **DIRECT**
 
   在AUTOSAR的J1939TP模块中，会判断需要发送的数据的长度，如果小于等于8字节，则会通过函数`J1939Tp_Internal_DirectTransmit @ J1939Tp.c`直接发送。两台设备间没有交互的过程，如下图所示，
 
-  <img src="/images/wiki/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/direct_transform.png" width="600" alt="直接发送数据交互过程">
+  <img src="/images/post/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/direct_transform.png" width="600" alt="直接发送数据交互过程">
 
 * **BAM**
 
   字节数大于8字节的数据传输方式之一就是BAM。BAM只有发送者向接收者的交互过程，第1帧数据是告诉接收者准备好开始接收，后面会逐个发送数据。第1帧包含PDU字节长度，数据帧个数，PGN（PGN1到3，分别是8位，PGN共24位）的信息。其作用是预先告诉接收者准备存储空间（有上界，具体见[COM配置说明](http://neyzoter.cn/2019/12/30/AUTOSAR-CAN-Com-Related-Conf/#324-bsw%E4%BB%BB%E5%8A%A1%E5%92%8Ccom)），防止接收者存储空间不足。以下是BAM通信过程，
 
-  <img src="/images/wiki/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/bam_transform.png" width="600" alt="BAM交互过程">
+  <img src="/images/post/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/bam_transform.png" width="600" alt="BAM交互过程">
 
 * **CMDT**
 
   另外一个大于8字节的数据传输方式是CMDT，这是一种需要接收者和发送者间进行交互的方式。
 
-  <img src="/images/wiki/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/cmdt_transform.png" width="600" alt="CMDT交互过程">
+  <img src="/images/post/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/cmdt_transform.png" width="600" alt="CMDT交互过程">
 
   形象说明：
 
