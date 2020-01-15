@@ -86,3 +86,73 @@ ISO 15765不像J1939，没有“连接管理”的概念（J1939的连接管理�
 
 # 3.J1939TP(J1939)的通信过程
 
+J1939协议定义了三种通信方式——广播（BAM, Broadcast Announce Message）、基于连接的数据传输（Connection Mode Data Transfer）、直接数据传输（DIRECT）。如果数据多余8字节，则会通过BAM或者CMDT来发送，而小于等于8字节时，直接发送。
+
+<img src="/images/wiki/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/BAM_CMDT_DIRECT.png" width="600" alt="三个通信方式">
+
+* **DIRECT**
+
+  在AUTOSAR的J1939TP模块中，会判断需要发送的数据的长度，如果小于等于8字节，则会通过函数`J1939Tp_Internal_DirectTransmit @ J1939Tp.c`直接发送。两台设备间没有交互的过程，如下图所示，
+
+  <img src="/images/wiki/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/direct_transform.png" width="600" alt="直接发送数据交互过程">
+
+* **BAM**
+
+  字节数大于8字节的数据传输方式之一就是BAM。BAM只有发送者向接收者的交互过程，第1帧数据是告诉接收者准备好开始接收，后面会逐个发送数据。第1帧包含PDU字节长度，数据帧个数，PGN（PGN1到3，分别是8位，PGN共24位）的信息。其作用是预先告诉接收者准备存储空间（有上界，具体见[COM配置说明](http://neyzoter.cn/2019/12/30/AUTOSAR-CAN-Com-Related-Conf/#324-bsw%E4%BB%BB%E5%8A%A1%E5%92%8Ccom)），防止接收者存储空间不足。以下是BAM通信过程，
+
+  <img src="/images/wiki/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/bam_transform.png" width="600" alt="BAM交互过程">
+
+* **CMDT**
+
+  另外一个大于8字节的数据传输方式是CMDT，这是一种需要接收者和发送者间进行交互的方式。
+
+  <img src="/images/wiki/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/cmdt_transform.png" width="600" alt="CMDT交互过程">
+
+  形象说明：
+
+  1. CM_RTS:我有3个数据帧,共16字节数据
+  2. CM_CTS:好的,你先发2个数据帧过来
+  3. CM_DT:发送2次,共14个字节数据
+  4. CM_CTS:再发1个过来
+  5. CM_DT:发送1次,共2个字节数据
+
+以下是上述通信过程中需要用到的数据帧格式，
+
+```
+RSV表示保留，数值是255
+  
+CM_RTS
+byte: |    0     |    1     |    2     |    3     |    4     |    5     |...
+data: |----------|----------|----------|----------|----------|----------|...
+          16            PDU字节长度        数据帧个数                PGN1  PGN2 PGN3
+            
+CM_CTS
+byte: |    0     |    1     |    2     |    3     |    4     |    5     |...
+data: |----------|----------|----------|----------|----------|----------|...
+           17     NumPackets NextPacketSeqNum RSV     RSV         PGN1  PGN2 PGN3
+说明：NumPackets：发送者在下一个CTS发送之前，可以发送的数据帧个数
+     NextPacketSeqNum：下一个数据帧的序列号
+       
+CM_EndofMsgAck
+byte: |    0     |    1     |    2     |    3     |    4     |    5     |...
+data: |----------|----------|----------|----------|----------|----------|...
+           19           总数据长度      已收到DT数据帧个数  RSV        PGN1  PGN2 PGN3
+  
+CM_BAM
+byte: |    0     |    1     |    2     |    3     |    4     |    5     |...
+data: |----------|----------|----------|----------|----------|----------|...
+           32          PDU字节长度        数据帧个数      RVS         PGN1  PGN2 PGN3
+             
+CM_Abort
+byte: |    0     |    1     |    2     |    3     |    4     |    5     |...
+data: |----------|----------|----------|----------|----------|----------|...
+           255       原因        RSV       RSV        RSV          PGN1  PGN2 PGN3 
+  
+DT
+byte: |    0     |    1     |    2     |    3     |    4     |    5     |...
+data: |----------|----------|----------|----------|----------|----------|...
+         序列号     后面是7字节数据
+```
+
+
+
