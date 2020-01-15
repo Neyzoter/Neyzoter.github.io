@@ -86,6 +86,8 @@ ISO 15765不像J1939，没有“连接管理”的概念（J1939的连接管理�
 
 # 3.J1939TP(J1939)的通信过程
 
+## 3.1 J1939协议的通信方式
+
 J1939协议定义了三种通信方式——广播（BAM, Broadcast Announce Message）、基于连接的数据传输（Connection Mode Data Transfer）、直接数据传输（DIRECT）。如果数据多余8字节，则会通过BAM或者CMDT来发送，而小于等于8字节时，直接发送。
 
 <img src="/images/wiki/2020-01-15-AUTOSAR-Can-J1939TPandCANTP-Conf/BAM_CMDT_DIRECT.png" width="600" alt="三个通信方式">
@@ -154,6 +156,8 @@ data: |----------|----------|----------|----------|----------|----------|...
          序列号     后面是7字节数据
 ```
 
+## 3.2 J1939TP模块的实现举例
+
 J1939TP对J1939进行了实现，以下是几个接收过程举例，更加详细的过程见`AUTOSAR_SWS_SAEJ1939TransportLayer.pdf`。
 
 * DIRECT
@@ -170,3 +174,41 @@ J1939TP对J1939进行了实现，以下是几个接收过程举例，更加详�
 
   <img src="/images/wiki/AUTOSAR/J1939Tp_CMDT.png" width="700" alt="CMDT">
 
+## 3.3 J1939TP模块概念理解
+
+* **Channels、PGs和Relations**
+
+  J1939TP顶层的配置结构体是`J1939Tp_ConfigType`，如下
+
+  ```c
+  typedef struct {
+      const J1939Tp_RxPduInfoRelationsType* RxPduRelations;
+      const J1939Tp_ChannelType*            Channels;
+      const J1939Tp_PgType*                 Pgs;
+  } J1939Tp_ConfigType;
+  ```
+
+  `RxPduRelations`可以对应到每个PDU ID，也就是说，在发送、接收的时候，都是索引到某一个`RxPduRelations`，然后再发送出去。
+
+  `Channels`对应到DA（目的地址）和SA（源地址）相同的所有PDU（无MetaData）。
+
+  `Pgs`对应不同的参数组，一个Channel（也就是相同的发送者和接收者）中可以有多个PG。
+
+* **基于CMDT的数据收发过程**
+
+  ```
+  (1)Sender send RTS, Receiver receive RTS
+  Receiver:
+  	1.根据CAN IF模块的索引，找到Relaitions[i]
+  	2.Relaitions[i]对应到多个RxPdus，进行逐个遍历，具体为CM（连接管理）、DT（数据传输）、DIRECT（直接数据传输）等，而且RxPdus每个都会配置对应到哪个Channel
+  	3.因为是RTS，所以索引到CM时，就可以对应
+  	4.在CM对应的处理函数中，取出RTS数据域中的PGN(Byte[5:7])
+  	5.根据上述PGN遍历Channel中的PGs，找到对应的PG
+  	6.J1939TP管理的ChannelInfoPtr结构体变量（每个Channel都会有一个对应的）进行初始化，准备开始接受，具体包括已接收DT数据帧个数、剩下需要接收的DT数据帧个数、总数据字节个数、currentPgPtr等
+  	7.请求COM准备Buffer，如果有错误就会断开此次连接，否则进行下面
+  	8.开始计时器，发送CTS（会指定到下次发送CTS前，可以发送多少帧DT）
+  
+  (2)Receiver send CTS, Sender receive CTS
+  Sender:
+  	1.根据CTS设置的发送数据帧个数，来逐个发送DT数据帧
+  ```
