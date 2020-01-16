@@ -346,4 +346,4 @@ struct mm_struct {
 
 <img src="/images/wiki/OS/Page_Mechanism.png" width="500" alt="页机制">
 
-## 2.2 进程的虚拟内存管理
+## 2.3 进程的虚拟内存管理
