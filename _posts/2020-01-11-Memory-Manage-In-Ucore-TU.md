@@ -93,6 +93,8 @@ const struct pmm_manager default_pmm_manager = {
 
 * `default_alloc_pages`
 
+  分配页的功能
+
 * `default_free_pages`
 
 * `default_nr_free_pages`
@@ -152,7 +154,7 @@ memory: 00040000, [fffc0000, ffffffff], type = 2.
 
 ### 2.2.3 空闲区域 free_area_t 管理
 
-在也就是将可使用的**页对应的页表**加入到`free_area_t`管理的链表中，即有一个`free_area_t`结构体变量，多个`list_entry_t`，。
+在也就是将可使用的一块连续内存空间块的Head Page的`list_entry_t page_link`加入到`free_area_t`管理的链表中。
 
 ```c
  // 该结构体用于管理没有被使用的内存空间
@@ -164,6 +166,21 @@ memory: 00040000, [fffc0000, ffffffff], type = 2.
      struct list_entry *prev, *next;
  };
  typedef struct list_entry list_entry_t;
+```
+
+一个`free_area_t`结构体变量带有多个`list_entry_t`，每个`list_entry_t`都是一块连续内存空间块的Head Page，也就是说`list_entry_t`后面带有一串page，而且是地址连续的。
+
+```
+.-> +------------------+  ->  +------------------+  ->  +------------------+  ---------.
+|   |   free_area_t    |      |   list_entry_t1  |      |   list_entry_t2  |           |
+|   +------------------+  <-  +------------------+  <-  +------------------+  <-.      |
+|   |                                                                           |      |
+|   |                                                                           |      |
+|   |                                                                           |      |
+|   '------------------>  +------------------+  ->  +------------------+  ------'      |
+|                         |   list_entry_t5  |      |   list_entry_t4  |               |
+'-----------------------  +------------------+  <-  +------------------+  <------------'
+
 ```
 
 
