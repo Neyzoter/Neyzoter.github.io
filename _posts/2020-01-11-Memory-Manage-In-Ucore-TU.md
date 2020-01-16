@@ -87,19 +87,19 @@ const struct pmm_manager default_pmm_manager = {
 
   初始化free_area_t结构体对应结构体变量，此时只有一个结构体，自己指向自己（`(&free_list)->prev = (&free_list)->next = (&free_list);`，elm为），free的页个数为0（`nr_free = 0`，也是`free_list`的成员，只在链表头`free_list`有效）。
 
-* `default_init_memmap`函数
+* `init_memmap`函数
 
   初始化一块连续内存空间块（具体解释见下方的物理页管理结构体），连续内存空间块中每个物理页都会对应1个Page结构体，第1个Page会保存该连续内存空间块的总页数信息。
 
-* `default_alloc_pages`
+* `alloc_pages`
 
-  分配页的功能
+  分配页的功能，具体见下方`free_area_t`的解释
 
-* `default_free_pages`
+* `free_pages`
 
-* `default_nr_free_pages`
+* `nr_free_pages`
 
-* `default_check`
+* `check`
 
 ### 2.2.2 物理页管理page结构体
 
@@ -178,12 +178,12 @@ memory: 00040000, [fffc0000, ffffffff], type = 2.
 |   |                                                                           |      |
 |   |                                                                           |      |
 |   '------------------>  +------------------+  ->  +------------------+  ------'      |
-|                         |   list_entry_t5  |      |   list_entry_t4  |               |
+|                         |   list_entry_t4  |      |   list_entry_t3  |               |
 '-----------------------  +------------------+  <-  +------------------+  <------------'
 
 ```
 
-
+`pmm_manager`的`alloc_pages`函数可以使用特定的算法实现从上述链表选取n个page，返回pages的Head Page信息，具体见`default_alloc_pages`函数举例。
 
 ### 2.2.4 虚拟连续内存空间vma管理
 
@@ -250,4 +250,43 @@ struct mm_struct {
 *补充：PDE（Page Directory Entry）、PTE（Page Table Entry）找到的内存空间是一个**4KB连续物理空间的基址**。*
 
 <img src="/images/wiki/OS/Page_Mechanism.png" width="500" alt="页机制">
+
+### 2.2.7 段页式管理基本概念
+
+x86体系结构将内存地址分成三种:逻辑地址(也称虚地址)、线性地址和物理地址。逻辑地址即是程序指令中使用的地址,物理地址是实际访问内存的地址。逻辑地址通过段式管理的地址映射可以得到线性地址,线性地址通过页式管理的地址映射得到物理地址。
+
+<img src="/images/posts/2020-01-11-Memory-Manage-In-Ucore-TU/Segment_Page_Mem_Manage.png" width="700" alt="段页式管理">
+
+**（1）如何实现在建立页表的过程中维护全局段描述符表(GDT)和页表的关系**
+
+* **Bootloader阶段**
+
+  在Bootloader阶段（bootloader的`start @ boot/bootasm.S`），虚拟地址、线性地址、物理地址是一样的：
+
+  `virt addr = linear addr = phy addr`
+
+  并占用了`0x100000`，也就是1MB的空间
+
+* **进入内核阶段**
+
+  在进入内核的阶段（`kern_entry`到`enable_page @ kern/mm/pmm.c`），再次更新段映射，但是还没有启动页机制。此时ucore被bootloader放置从物理地址`0x100000`开始的物理内存中，而虚拟地址是`0xC0100000`。
+
+  `virt addr - 0xC0000000 = linear addr = phy addr`
+
+* **启动页映射阶段**
+
+  启动页映射阶段（`enable_page`到`gdt_init`）
+
+  ```
+  virt addr - 0xC0000000 = linear addr = phy addr   # 物理内存在0-4MB之内
+  virt addr - 0xC0000000 = linear addr = phy addr + 0xC0000000 # 物理内存在0-4MB之外
+  ```
+
+* **最终阶段**
+
+  最终阶段（从`gdt_Init`），第三次更新了段映射，形成新的段页式映射机制，并且取消了临时映射关系。
+
+  `virt addr = linear addr = phy addr + 0xC0000000`
+
+<img src="/images/posts/2020-01-11-Memory-Manage-In-Ucore-TU/LinearAddr2PhyAddr.png" width="700" alt="二级页表管理">
 
