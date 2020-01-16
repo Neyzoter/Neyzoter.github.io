@@ -185,73 +185,7 @@ memory: 00040000, [fffc0000, ffffffff], type = 2.
 
 `pmm_manager`的`alloc_pages`函数可以使用特定的算法实现从上述链表选取n个page，返回pages的Head Page信息，具体见`default_alloc_pages`函数举例。
 
-### 2.2.4 虚拟连续内存空间vma管理
-
-ucore通过`vma_struct`结构体来管理一个虚拟**连续**内存空间（空间大小必须是一个页的整数倍），下面是其具体定义：
-
-```c
-// the virtual continuous memory area(vma)
-struct vma_struct {
-    struct mm_struct *vm_mm; // 使用同一个PDT（页目录表，可以看作一级页表）的vma集合
-    uintptr_t vm_start;      // 一个连续地址的虚拟内存空间（vma）的开始地址
-    uintptr_t vm_end;        // 一个连续地址的虚拟内存空间的结束地址
-    uint32_t vm_flags;       // flags of vma
-    list_entry_t list_link;  // 一个双向链表,按照从小到大的顺序把一系列用vma_struct表示的虚拟内存空间链接起来
-};
-```
-
-如果我们定义两个`vma_struct`对应的结构体变量，则这两个结构体变量分别管理两段虚拟连续内存空间。如下图所示，`vma_struct 1`定义了长度为2 Page的虚拟连续内存空间，`vma_struct 2`定义了长度为3 Page的虚拟连续内存空间。而`mmap_struct`是一个`mm_struct`类型的结构体变量，对于一个PDT有一个`mmap_struct`。下图中的虚拟内存空间就是用PDT组织起来的。
-
-<img src="/images/posts/2020-01-11-Memory-Manage-In-Ucore-TU/VmaMM.png" width="700" alt="vma、mm管理虚拟内空间">
-
-### 2.2.5 页目录管理PDT结构体
-
-ucore操作系统的每个进程都会拥有一个`mm_struct`，用于管理使用同一个PDT的vma集合，具体如下，
-
-```c
-struct mm_struct {
-    list_entry_t mmap_list;        // 双向链表头,链接了所有属于同一页目录表的虚拟内存空间
-    struct vma_struct *mmap_cache; // current accessed vma, used for speed purpose
-    pde_t *pgdir;                  // vma虚拟内存空间的PDT页目录表，用于索引页表
-    int map_count;                 // vma的个数
-    void *sm_priv;                 // the private data for swap manager
-    int mm_count;                  // the number ofprocess which shared the mm
-    semaphore_t mm_sem;            // mutex for using dup_mmap fun to duplicat the mm 
-    int locked_by;                 // the lock owner process's pid
-};
-```
-
-`mm_struct`定义了页表目录（可以找到页目录）、vma（虚拟内存空间）、vma数目等，是一个进程管理其内存空间的总体结构。
-
-其中，`mm_struct.mmap_list`是一个双向链表头,链接了所有属于同一页目录表的虚拟内存空间。
-
-在ucore中可以使用`mm_create() @ /kern/mm/vmm.c`来创建`mm_struct`，主要是对结构体变量的初始化。不过，`pgdir`还没有分配。
-
-### 2.2.6 页目录初始化
-
-在ucore中使用`setup_pgdir(struct proc_struct *proc) @ proc.c`来进行`mm_struct`中的`pde_t pgdir`初始化。
-
-`pgdir`是页目录表的基地址，通过`pgdir`可以找到一个页表，进而映射到物理空间（具体说明见下方补充）。**`pgdir`需要分配一个页来保存页目录表。**
-
-```
-/**
-* PDE2和PDE3...指向的PT省略
-* 
-* |   PTE    |            |    PT1   |
-* |---PDE1---|  ---.      |---PTE1---|
-* |---PDE2---|     |      |---PTE2---|
-* |---PDE3---|     |      |---PTE3---|
-* |----------|     '----->|----------|
-* */
-```
-
-
-
-*补充：PDE（Page Directory Entry）、PTE（Page Table Entry）找到的内存空间是一个**4KB连续物理空间的基址**。*
-
-<img src="/images/wiki/OS/Page_Mechanism.png" width="500" alt="页机制">
-
-### 2.2.7 段页式管理基本概念
+### 2.2.4 段页式管理的实现
 
 x86体系结构将内存地址分成三种:逻辑地址(也称虚地址)、线性地址和物理地址。逻辑地址即是程序指令中使用的地址,物理地址是实际访问内存的地址。逻辑地址通过段式管理的地址映射可以得到线性地址,线性地址通过页式管理的地址映射得到物理地址。
 
@@ -288,5 +222,123 @@ x86体系结构将内存地址分成三种:逻辑地址(也称虚地址)、线�
 
   `virt addr = linear addr = phy addr + 0xC0000000`
 
+**（2）如何建立虚拟页和物理页帧的地址映射关系？**
+
+二级页表结构，页目录表占用4KB空间（即使页目录项很少，也是1个Page单元），同理页表也是。在ucore中，可以通过`alloc_page`函数获得一个空闲物理页作为页目录表或者页表。
+
+页目录表和页表项计算举例：比如有16MB的物理内存空间，每个物理页大小为4KB，则共需要`16MB / 4KB = 4096`个页表项。而每个页表项占用4B空间，也就是说最少需要`4096 * 4B = 16KB`的页表项空间，即4个物理页。在加上页目录表的4KB空间，共需要5KB空间，即5个物理页。
+
+具体而言，在ucore中，通过函数`boot_map_segment(boot_pgdir, KERNBASE, KMEMSIZE, 0, PTE_W);`来实现将内核内存空间的所有物理页都通过页表的形式管理起来，见下图，
+
 <img src="/images/posts/2020-01-11-Memory-Manage-In-Ucore-TU/LinearAddr2PhyAddr.png" width="700" alt="二级页表管理">
+
+> 说明：线性地址`[22:31]`共10个字节，1024个数字，用于表示页目录表PDT（Page Dir Table）的偏移。页目录表共1个物理页4KB，每个页目录表项PDE（Page Dir Entry）占用4B，所以线性地址`[22:31]`可以完全索引到所有的页目录表项。某一个PDE可以指向一个页表PT（Page Table），和PDT一样，用线性地址的10个字节（`[21:12]`）来索引某一个页表项PTE（Page Table Entry）。最后通过PTE找到某个4KB物理页后，可以通过线性地址`[11:0]`来索引到对应物理页的某一个字节。
+
+**内核内存空间的映射（也就是内核内存空间的页表的建立）**具体代码如下：
+
+```c
+pmm_init(void) {
+    // .....
+    boot_map_segment(boot_pgdir, KERNBASE, KMEMSIZE, 0, PTE_W);
+    // ......
+}
+static void
+boot_map_segment(pde_t *pgdir, uintptr_t la, size_t size, uintptr_t pa, uint32_t perm) {
+    // [LAB2 SCC] PGOFF 表示线性地址的物理页偏移，也就是la的低12位，共4KB空间
+    assert(PGOFF(la) == PGOFF(pa));
+    // [LAB2 SCC] ROUNDUP向上取"整"（第二个参数的倍数）
+    size_t n = ROUNDUP(size + PGOFF(la), PGSIZE) / PGSIZE;
+    la = ROUNDDOWN(la, PGSIZE);
+    pa = ROUNDDOWN(pa, PGSIZE);
+    for (; n > 0; n --, la += PGSIZE, pa += PGSIZE) {
+        // [LAB2 SCC] 通过pmm_manager获取一个4KB空间，并作为PTE
+        pte_t *ptep = get_pte(pgdir, la, 1);
+        assert(ptep != NULL); // [LAB2 SCC] 分配失败
+        // [LAB2 SCC] 给这个pte指向要管理的物理页
+        *ptep = pa | PTE_P | perm;
+    }
+}
+```
+
+*说明*：
+
+1. `PGOFF(la)`可以获取线性地址的低12位，也就是对应物理页内的偏移；
+
+2. for循环内实现了将内核所有`KMEMSIZE`大小的内存空间分配给PTE管理（至于PTE和PDE存放在哪里，见上方***那么Page结构体存放在什么地方呢？***）
+
+   1. `get_pte`通过`pmm_manager`会判断PT是否已经分配，如果没有分配就会先分配1个PT，再从中获取1个PTE；如果之前已经分配过PT，则直接获取PTE。具体而言，通过标志位实现`*pdep = pa | PTE_U | PTE_W | PTE_P`。
+
+      *`PTE_U`*:位3,表示用户态的软件可以读取对应地址的物理内存页内容
+
+      *`PTE_W`*:位2,表示物理内存页内容可写
+
+      *`PTE_P`*:位1,表示物理内存页存在，通过这一标志位来实现决定是否需要分配给这个PT一个Page
+
+   2. 而后会给PTE赋值，`*ptep = pa | PTE_P | perm`
+
+### 2.2.5 虚拟连续内存空间vma管理
+
+ucore通过`vma_struct`结构体来管理一个虚拟**连续**内存空间（空间大小必须是一个页的整数倍），下面是其具体定义：
+
+```c
+// the virtual continuous memory area(vma)
+struct vma_struct {
+    struct mm_struct *vm_mm; // 使用同一个PDT（页目录表，可以看作一级页表）的vma集合
+    uintptr_t vm_start;      // 一个连续地址的虚拟内存空间（vma）的开始地址
+    uintptr_t vm_end;        // 一个连续地址的虚拟内存空间的结束地址
+    uint32_t vm_flags;       // flags of vma
+    list_entry_t list_link;  // 一个双向链表,按照从小到大的顺序把一系列用vma_struct表示的虚拟内存空间链接起来
+};
+```
+
+如果我们定义两个`vma_struct`对应的结构体变量，则这两个结构体变量分别管理两段虚拟连续内存空间。如下图所示，`vma_struct 1`定义了长度为2 Page的虚拟连续内存空间，`vma_struct 2`定义了长度为3 Page的虚拟连续内存空间。而`mmap_struct`是一个`mm_struct`类型的结构体变量，对于一个PDT有一个`mmap_struct`。下图中的虚拟内存空间就是用PDT组织起来的。
+
+<img src="/images/posts/2020-01-11-Memory-Manage-In-Ucore-TU/VmaMM.png" width="700" alt="vma、mm管理虚拟内空间">
+
+### 2.2.6 页目录管理PDT结构体
+
+ucore操作系统的每个进程都会拥有一个`mm_struct`，用于管理使用同一个PDT的vma集合，具体如下，
+
+```c
+struct mm_struct {
+    list_entry_t mmap_list;        // 双向链表头,链接了所有属于同一页目录表的虚拟内存空间
+    struct vma_struct *mmap_cache; // current accessed vma, used for speed purpose
+    pde_t *pgdir;                  // vma虚拟内存空间的PDT页目录表，用于索引页表
+    int map_count;                 // vma的个数
+    void *sm_priv;                 // the private data for swap manager
+    int mm_count;                  // the number ofprocess which shared the mm
+    semaphore_t mm_sem;            // mutex for using dup_mmap fun to duplicat the mm 
+    int locked_by;                 // the lock owner process's pid
+};
+```
+
+`mm_struct`定义了页表目录（可以找到页目录）、vma（虚拟内存空间）、vma数目等，是一个进程管理其内存空间的总体结构。
+
+其中，`mm_struct.mmap_list`是一个双向链表头,链接了所有属于同一页目录表的虚拟内存空间。
+
+在ucore中可以使用`mm_create() @ /kern/mm/vmm.c`来创建`mm_struct`，主要是对结构体变量的初始化。不过，`pgdir`还没有分配。
+
+### 2.2.7 页目录初始化
+
+在ucore中使用`setup_pgdir(struct proc_struct *proc) @ proc.c`来进行`mm_struct`中的`pde_t pgdir`初始化。
+
+`pgdir`是页目录表的基地址，通过`pgdir`可以找到一个页表，进而映射到物理空间（具体说明见下方补充）。**`pgdir`需要分配一个页来保存页目录表。**
+
+```
+/**
+* PDE2和PDE3...指向的PT省略
+* 
+* |   PTE    |            |    PT1   |
+* |---PDE1---|  ---.      |---PTE1---|
+* |---PDE2---|     |      |---PTE2---|
+* |---PDE3---|     |      |---PTE3---|
+* |----------|     '----->|----------|
+* */
+```
+
+
+
+*补充：PDE（Page Directory Entry）、PTE（Page Table Entry）找到的内存空间是一个**4KB连续物理空间的基址**。*
+
+<img src="/images/wiki/OS/Page_Mechanism.png" width="500" alt="页机制">
 
