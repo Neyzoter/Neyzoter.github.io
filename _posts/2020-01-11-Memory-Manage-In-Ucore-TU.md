@@ -6,8 +6,6 @@ description: 清华ucore操作系统的内存管理解析
 keywords: OS, 清华, ucore
 ---
 
-> 原创
->
 > 未完待续
 
 # 1.ucore操作系统
@@ -65,9 +63,9 @@ ucore将虚拟内存映射到如下物理内存中，具体的链接情况见ld�
  * */
 ```
 
-## 2.2 内核的虚拟内存管理
+## 2.2 物理内存管理
 
-**本节2.2.1 - 3主要讲述的是内存管理的基本数据结构，而2.2.4则是ppm在初始化时，默认会将内核的页表建立起来。**
+**本节2.2.1 - 3主要讲述的是物理内存管理的基本结构体，而2.2.4则是ppm在初始化时，默认会将内核的页表建立起来。**
 
 ### 2.2.1 物理内存管理pmm结构体
 
@@ -280,9 +278,16 @@ boot_map_segment(pde_t *pgdir, uintptr_t la, size_t size, uintptr_t pa, uint32_t
 
    2. 而后会给PTE赋值，`*ptep = pa | PTE_P | perm`
 
-### 2.2.5 虚拟连续内存空间vma管理
+## 2.3 虚拟内存管理
 
-ucore通过`vma_struct`结构体来管理一个虚拟**连续**内存空间（空间大小必须是一个页的整数倍），下面是其具体定义：
+通过内存地址虚拟化,可以使得软件在没有访问某虚拟内存地址时不分配具体的物理内存，而只有在实际访问某虚拟内存地址时，操作系统再动态地分配物理内存，建立虚拟内存到物理内存的页映射关系，这种技术称为按需分页(demand paging)。这样就可以做到虚拟内存可能比实际物理内存大，实现虚拟内存需要实现内存和外存数据的换入换出操作（将内存中可能暂时用不到的数据存入到外存，将目前需要使用的存在外存中的数据拷贝到内存）、页面替换算法等。
+
+ucore通过vma和mm结构体来实现描述应用程序运行所需的合法内存空间。当访问内存产生page fault异常时，可获得访
+问的内存的方式(读或写)以及具体的虚拟内存地址，这样ucore就可以查询此地址，看是否属于`vma_struct`数据结构中描述的合法地址范围中，如果在，则可根据具体情况进行请求调页/页换入换出处理；如果不在，则报错。
+
+### 2.3.1 虚拟连续内存空间vma管理
+
+ucore通过`vma_struct`结构体来管理一个虚拟**连续**内存空间（空间大小必须是一个页的整数倍），**是描述应用程序对虚拟内存需求的数据结构**，下面是其具体定义：
 
 ```c
 // the virtual continuous memory area(vma)
@@ -290,7 +295,7 @@ struct vma_struct {
     struct mm_struct *vm_mm; // 使用同一个PDT（页目录表，可以看作一级页表）的vma集合
     uintptr_t vm_start;      // 一个连续地址的虚拟内存空间（vma）的开始地址
     uintptr_t vm_end;        // 一个连续地址的虚拟内存空间的结束地址
-    uint32_t vm_flags;       // flags of vma
+    uint32_t vm_flags;       // 虚拟内存空间的属性, 比如只读、可读写、可执行
     list_entry_t list_link;  // 一个双向链表,按照从小到大的顺序把一系列用vma_struct表示的虚拟内存空间链接起来
 };
 ```
@@ -299,7 +304,9 @@ struct vma_struct {
 
 <img src="/images/posts/2020-01-11-Memory-Manage-In-Ucore-TU/VmaMM.png" width="700" alt="vma、mm管理虚拟内空间">
 
-### 2.2.6 页目录管理PDT结构体
+图中的二级页表结构就是**2.2 物理内存管理**小节中提到的段页式管理实现的页表。
+
+### 2.3.2 页目录管理结构体
 
 ucore操作系统的每个进程都会拥有一个`mm_struct`，用于管理使用同一个PDT的vma集合，具体如下，
 
@@ -308,8 +315,8 @@ struct mm_struct {
     list_entry_t mmap_list;        // 双向链表头,链接了所有属于同一页目录表的虚拟内存空间
     struct vma_struct *mmap_cache; // current accessed vma, used for speed purpose
     pde_t *pgdir;                  // vma虚拟内存空间的PDT页目录表，用于索引页表
-    int map_count;                 // vma的个数
-    void *sm_priv;                 // the private data for swap manager
+    int map_count;                 // vma的个数	
+    void *sm_priv;                 // 指向用来链接记录页访问情况的链表头，建立mm_struct和后续要讲到的swap_manager之间的联系
     int mm_count;                  // the number ofprocess which shared the mm
     semaphore_t mm_sem;            // mutex for using dup_mmap fun to duplicat the mm 
     int locked_by;                 // the lock owner process's pid
@@ -322,7 +329,7 @@ struct mm_struct {
 
 在ucore中可以使用`mm_create() @ /kern/mm/vmm.c`来创建`mm_struct`，主要是对结构体变量的初始化。不过，`pgdir`还没有分配。
 
-### 2.2.7 页目录初始化
+### 2.3.3 页目录初始化
 
 在ucore中使用`setup_pgdir(struct proc_struct *proc) @ proc.c`来进行`mm_struct`中的`pde_t pgdir`初始化。
 
@@ -346,4 +353,5 @@ struct mm_struct {
 
 <img src="/images/wiki/OS/Page_Mechanism.png" width="500" alt="页机制">
 
-## 2.3 进程的虚拟内存管理
+### 2.3.4 虚拟内存管理的实现
+
