@@ -1936,7 +1936,7 @@ struct proc_struct {
     uintptr_t kstack;                           // 内核堆栈
     volatile bool need_resched;                 // bool value: need to be rescheduled to release CPU?
     struct proc_struct *parent;                 // the parent process
-    struct mm_struct *mm;                       // Process's memory management field
+    struct mm_struct *mm;                       // mm，对于内核进程而言可以是NULL，因为常驻内存中
     struct context context;                     // 上下文，即一堆寄存器EIP、ESP等
     struct trapframe *tf;                       // Trap frame for current interrupt
     uintptr_t cr3;                              // 指定页表，对于内核线程而言，和进程共享页表
@@ -1971,7 +1971,7 @@ struct vma_struct {
 
 * **mm**
 
-  >内存管理的信息,包括内存映射列表、页表指针等。mm成员变量在lab3中用于虚存管理。但在实际OS中,内核线程常驻内存,不需要考虑swap	page问题,在lab5中涉及到了用户进程,才考虑进程用户内存空间的swap	page问题,mm才会发挥作用。所以在lab4中mm对于内核线程就没有用了,这样内核线程的`proc_struct`的成员变量`mm=0`是合理的。`mm`里有个很重要的项`pgdir`,记录的是该进程使用的一级页表的物理地址。由于`mm=NULL`,所以在`proc_struct`数据结构中需要有一个代替`pgdir`项来记录页表起始地址,这就是`proc_struct`数据结构中的`cr3`成员变量。
+  >内存管理的信息,包括内存映射列表、页表指针等。mm成员变量在lab3中用于虚存管理。但在实际OS中,内核线程常驻内存,不需要考虑swap	page问题,在lab5中涉及到了用户进程,才考虑进程用户内存空间的swap page问题,mm才会发挥作用。所以在lab4中mm对于内核线程就没有用了,这样内核线程的`proc_struct`的成员变量`mm=0`是合理的。`mm`里有个很重要的项`pgdir`,记录的是该进程使用的一级页表的物理地址。由于`mm=NULL`,所以在`proc_struct`数据结构中需要有一个代替`pgdir`项来记录页表起始地址,这就是`proc_struct`数据结构中的`cr3`成员变量。
 
 * **context**
 

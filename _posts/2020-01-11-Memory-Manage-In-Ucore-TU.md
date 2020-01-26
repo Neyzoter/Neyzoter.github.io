@@ -20,6 +20,8 @@ ucore操作系统是清华大学计算机系为了课程需求而维护的一个
 
 ucore将虚拟内存映射到如下物理内存中，具体的链接情况见ld文件。
 
+ucore把用户进程的虚拟地址空间分了两块，一块与内核线程一样，是所有用户进程都共享的内核虚拟地址空间，映射到同样的物理内存空间中，这样在物理内存中只需放置一份内核代码，使得用户进程从用户态进入核心态时，内核代码可以统一应对不同的内核程序；另外一块是**用户虚拟地址空间，虽然虚拟地址范围一样，但映射到不同且没有交集的物理内存空间中**。这样当ucore把用户进程的执行代码（即应用程序的执行代码）和数据（即应用程序的全局变量等）放到用户虚拟地址空间中时，确保了各个进程不会“非法”访问到其他进程的物理内存空间。
+
 ```
 /* *
  * Virtual memory map:                                          Permissions
@@ -305,7 +307,7 @@ struct vma_struct {
 };
 ```
 
-如果我们定义两个`vma_struct`对应的结构体变量，则这两个结构体变量分别管理两段虚拟连续内存空间。如下图所示，`vma_struct 1`定义了长度为2 Page的虚拟连续内存空间，`vma_struct 2`定义了长度为3 Page的虚拟连续内存空间。而`mmap_struct`是一个`mm_struct`类型的结构体变量，对于一个PDT有一个`mmap_struct`。下图中的虚拟内存空间就是用PDT组织起来的。
+如果我们定义两个`vma_struct`对应的结构体变量，则这两个结构体变量分别管理两段虚拟连续内存空间。如下图所示，`vma_struct 1`定义了长度为2 Page的虚拟连续内存空间，`vma_struct 2`定义了长度为3 Page的虚拟连续内存空间。而`mmap_struct`是一个`mm_struct`类型的结构体变量，**对于一个PDT有一个`mmap_struct`**。下图中的虚拟内存空间就是用PDT组织起来的。
 
 <img src="/images/posts/2020-01-11-Memory-Manage-In-Ucore-TU/VmaMM.png" width="700" alt="vma、mm管理虚拟内空间">
 
@@ -313,11 +315,11 @@ struct vma_struct {
 
 ### 2.3.2 页目录管理结构体
 
-ucore操作系统的每个进程都会拥有一个`mm_struct`，用于管理使用同一个PDT的vma集合，具体如下，
+**ucore操作系统的每个进程都会拥有一个`mm_struct`，用于管理使用同一个PDT的vma集合**，具体如下，
 
 ```c
 struct mm_struct {
-    list_entry_t mmap_list;        // 双向链表头,链接了所有属于同一页目录表的虚拟内存空间
+    list_entry_t mmap_list;        // 双向链表头,链接了所有属于同一页目录表的虚拟内存空间vma
     struct vma_struct *mmap_cache; // current accessed vma, used for speed purpose
     pde_t *pgdir;                  // vma虚拟内存空间的PDT页目录表，用于索引页表
     int map_count;                 // vma的个数	
@@ -328,7 +330,7 @@ struct mm_struct {
 };
 ```
 
-`mm_struct`定义了页表目录（可以找到页目录）、vma（虚拟内存空间）、vma数目等，是一个进程管理其内存空间的总体结构。
+`mm_struct`定义了页表目录（可以找到页目录）、vma（虚拟内存空间）、vma数目等，是一个进程管理其内存空间的总体结构。用户进程会分配一个mm，用来实现虚拟内存管理，实现页的换入换出等操作；但是对于内核进程而言，不需要mm，因为内核进程不需要考虑交换问题，常驻内存中。
 
 其中，`mm_struct.mmap_list`是一个双向链表头,链接了所有属于同一页目录表的虚拟内存空间。
 
