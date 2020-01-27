@@ -6,7 +6,7 @@ description: 清华ucore操作系统的内存管理解析
 keywords: OS, 清华, ucore
 ---
 
-> 未完待续
+> 原创
 
 # 1.ucore操作系统
 
@@ -362,3 +362,4 @@ struct mm_struct {
 
 ### 2.3.4 虚拟内存管理的实现
 
+用户进程如何使用mm和vma，具体可见另外一篇文章**进程管理解析**。
