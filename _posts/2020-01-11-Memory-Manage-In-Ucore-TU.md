@@ -362,4 +362,5 @@ struct mm_struct {
 
 ### 2.3.4 虚拟内存管理的实现
 
-用户进程如何使用mm和vma，具体可见另外一篇文章**进程管理解析**。
+用户进程如何使用mm和vma，具体可见另外一篇文章[**进程管理解析**](http://neyzoter.cn/2020/01/27/Process-Manage-In-Ucore-THU/)。
+
