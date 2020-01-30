@@ -176,7 +176,7 @@ ucore的内核进程首先会创建一个空闲进程，而后会创建一个内
 
 * **用户进程创建**
 
-  ucore可以通过系统调用`sys_exec @ syscall.c`来实现用户进程的创建工作，进而调用`do_execve @ proc.c`来实现具体的创建工作。`do_execve`函数主要进行了：
+  ucore可以通过系统调用`sys_exec @ syscall.c`来实现用户进程的创建工作，进而调用`do_execve @ proc.c`来实现具体的创建工作。具体而言，ucore操作系统会fork一个内核线程`user_main`，然后`user_main`进程会将通过系统调用`sys_exec`，进而调用`do_execve`来将该内核线程设置为用户线程。`do_execve`函数主要进行了：
 
   1. 清空mm
 
@@ -208,4 +208,8 @@ ucore的内核进程首先会创建一个空闲进程，而后会创建一个内
      7. 设置中断帧，包括**栈顶USTACKTOP**等
 
      
+
+*补充：*
+
+<img src="/images/posts/2020-01-27-Process-Manage-In-Ucore-THU/QA1.png" width="700" alt="补充">
 
