@@ -2325,6 +2325,115 @@ initproc           proc_init()
 
 * 用户态和内核态数据拷贝时，必须处于内核态
 
+## 9.7 实验六 处理机调度
+
+### 9.7.1 调度过程
+
+* **触发**
+
+  `proc_tick`函数，决定是否需要调度
+
+* **入队**
+
+  `enqueue`函数
+
+  有一个叫作`run_queue`的就绪队列将所有就绪进程链接起来
+
+  当然还有一个等待队列用于链接所有等待进程
+
+* **选取**
+
+  `proc_next`函数
+
+* **出队**
+
+  `dequeue`函数
+
+* **切换**
+
+  `switch_to`函数
+
+### 9.7.2 调度算法支撑框架
+
+| 序号 | 位置               | 原因                                                         |
+| ---- | ------------------ | ------------------------------------------------------------ |
+| 1    | `proc.c:do_exit`   | 用户线程执行结束，主动放弃CPU                                |
+| 2    | `proc.c:do_wait`   | 用户线程等待子进程结束，主动放弃CPU                          |
+| 3    | `proc.c:init_main` | 1. Initproc内核线程等待所有用户进程结束;2. 所有用户进程结束后，回收系统资源 |
+| 4    | `proc.c::cpu_idle` | idleproc内核线程等待处于就绪态的进程或线程，如果有选取一个并切换进程 |
+| 5    | `sync.h::lock`     | 进程如果无法得到锁，则主动放弃CPU                            |
+| 6    | `trap.c::trap`     | 修改当前进程时间片，若时间片用完，则设置`need_resched`为1，让当前进程放弃CPU |
+
+以下是一个调度总函数
+
+```c
+void
+cpu_idle(void) {
+    while (1) {
+        // [LAB6 SCC] 进程需要调度，该标志位周期性的设置为1
+        if (current->need_resched) {
+            schedule();
+        }
+    }
+}
+
+void
+schedule(void) {
+    bool intr_flag;
+    struct proc_struct *next;
+    local_intr_save(intr_flag);
+    {
+        // [LAB6 SCC] 设置为不可调度，因为一般在调用schedule时，为调度的状态
+        current->need_resched = 0;
+        // [LAB6 SCC] 当前的进程入队
+        if (current->state == PROC_RUNNABLE) {
+            sched_class_enqueue(current);
+        }
+        // [LAB6 SCC] 选择一个进程，并从队列中取出
+        if ((next = sched_class_pick_next()) != NULL) {
+            sched_class_dequeue(next);
+        }
+        if (next == NULL) {
+            next = idleproc;
+        }
+        next->runs ++;
+        // [LAB6 SCC] 运行进程
+        if (next != current) {
+            proc_run(next);
+        }
+    }
+    local_intr_restore(intr_flag);
+}
+```
+
+### 9.7.3 时间片轮转调度算法（Round Robin）
+
+RR算法最主要的思想集中于触发函数`proc_tick`，周期性触发计数，使能调度标志位
+
+```c
+struct sched_class {
+    // the name of sched_class
+    const char *name;
+    // Init the run queue
+    void (*init)(struct run_queue *rq);
+    // put the proc into runqueue, and this function must be called with rq_lock
+    void (*enqueue)(struct run_queue *rq, struct proc_struct *proc);
+    // get the proc out runqueue, and this function must be called with rq_lock
+    void (*dequeue)(struct run_queue *rq, struct proc_struct *proc);
+    // choose the next runnable task
+    struct proc_struct *(*pick_next)(struct run_queue *rq);
+    // dealer of the time-tick
+    // [LAB6 SCC] 对于时间片轮转调度算法来说，在此函数中实现计数，如果到达时间窗结束，则使能调度标志位，开始下一个进程的调度
+    void (*proc_tick)(struct run_queue *rq, struct proc_struct *proc);
+};
+```
+
+
+
+### 9.7.4 Stride调度算法
+
+
+
 # 10.拓展
 
 ## 10.1 ld链接文件解析
