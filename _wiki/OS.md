@@ -1720,6 +1720,58 @@ class signal {
   1. 如果A先到达`condition->P()`，则会由于没有资源而等待；直到线程B调用`condition->V()`释放资源（也就是表示完成了X代码部分） ；而后执行N代码
   2. 如果B先到达`condition->V()`，则释放资源（表示已经完成X代码），此时A正常执行资源申请`condition->P()`和N代码
 
+* **生产者-消费者问题**
+
+  * 问题描述
+
+    1. 一个或多个生产者在生成数据后放在一个缓冲区里
+    2. 单个消费者从缓冲区取出数据处理
+    3. 任何时刻只能有一个生产者或消费者可访问缓冲区
+
+  * 问题分析
+
+    1. 任何时刻只能有一个线程操作缓冲区（互斥访问）
+    2. 缓冲区空时，消费者必须等待生产者（条件同步）
+    3. 缓冲区满时，生产者必须等待消费者（条件同步）
+
+  * 信号量设计
+
+    1. 二进制信号量mutex，用于实现任意时刻只有一个线程操作缓冲区
+    2. 资源信号量fullBuffers，用于实现缓冲区空时，消费者等待生产者
+    3. 资源信号量emptyBuffers，用于实现缓冲区满时，生产者必须等待消费者
+
+    ```c
+    class BoundedBuffer {
+        // 二进制信号量，用于实现任意时刻只有一个线程操作缓冲区
+        mutex = new Semaphore(1);
+        // 资源信号量fullBuffers，用于实现缓冲区空时，消费者等待生产者
+        fullBuffers = new Semaphore(0);
+        // 资源信号量emptyBuffers，用于实现缓冲区满时，生产者必须等待消费者
+        emptyBuffers = new Semaphore(n);
+    }
+    // 消费者写入数据
+    BoundedBuffer::Deposit(c) {
+        // 请求资源信号量emptyBuffers，如果没有未使用的空间，则等待缓冲区的空间释放
+        emptyBuffers->P(); 
+        // 请求二进制信号量，如果是被其他进程占用则等待缓冲区释放
+        mutex->P(); 
+        Add c to the buffer;
+        // 释放缓冲区
+        mutex->V();
+        // 缓冲区空间被使用的个数增加1
+        fullBuffers->V();
+    }
+    BoundedBuffer::Remove(c) {
+        fullBuffers->P();
+        mutex->P();
+        Remove c from buffer;
+        mutex->V();
+        emptyBuffers->V();
+    }
+    ```
+
+    
+
 # 7.文件系统
 
 # 8.IO子系统
