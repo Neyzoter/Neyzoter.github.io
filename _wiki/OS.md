@@ -1698,8 +1698,6 @@ class signal {
 
   *为什么此时P和V操作不会被打断呢？*因为操作系统作为保护，不会被打断。
 
-### 6.3.2 信号量使用
-
 * **信号量实现条件同步**
 
   条件同步设置1个信号量，初值设置为0（1才表示有资源）
@@ -1770,7 +1768,84 @@ class signal {
     }
     ```
 
-    
+## 6.4 管程
+
+管程是一种用于多线程互斥访问共享资源的程序结构，在管程中的线程可临时放弃管程的互斥访问，等待事件出现时恢复。一个管程主要包括：1个锁（控制管程代码的互斥访问）、0或者多个条件变量（管理共享数据的并发访问）
+
+* **条件变量**
+
+  * 条件变量是管程内的等待机制
+    1. 进入管程的线程因资源被占用而进入等待状态
+    2. 每个条件变量表示一种等待原因，对应一个等待队列
+  * Wait操作
+    1. 将自己阻塞在等待队列中
+    2. 唤醒一个等待者或释放管程的互斥访问
+  * Signal操作
+    1. 将等待队列中的一个线程唤醒
+    2. 如果等待队列为空，则等同空操作
+
+  ```c
+  // 条件变量
+  Class Condition {
+      int numWaiting = 0;
+      WaitQueue q;
+  }
+  
+  // 等待，将线程加入到该条件变量的等待队列
+  Condition::Wait(lock){
+      numWaiting++;
+      Add this thread t  to q;
+      release(lock); // 释放锁
+      schedule(); //need mutex
+      require(lock);
+  }
+  
+  // 信号，唤醒一个等待队列中的线程
+  Condition::Signal(){
+      if (numWaiting > 0) {
+          Remove a thread t from q;
+          wakeup(t); //need mutex
+          numWaiting--;
+      }
+  }
+  ```
+
+* **解决生产者-消费者问题**
+
+  ```c
+  classBoundedBuffer {
+      …
+      Lock lock;
+      int count = 0;
+      Condition notFull, notEmpty;
+  }
+  
+  // 生产者
+  BoundedBuffer::Deposit(c) {
+      // 锁
+      lock->Acquire();
+      while (count == n)
+          notFull.Wait(&lock); // wait中会释放锁，然后调度其他进程，调度完后再锁住，具体见wait
+      Add c to the buffer;
+      // buffer中的数据量
+      count++;
+      // 唤醒等待队列中的线程来使用资源
+      notEmpty.Signal();
+      lock->Release();
+  }
+  
+  BoundedBuffer::Remove(c) {
+      lock->Acquire();
+      while (count == 0)    
+        notEmpty.Wait(&lock);
+      Remove c from buffer;
+      count--;
+      notFull.Signal();
+      lock->Release();
+  }
+  ```
+
+  
 
 # 7.文件系统
 
