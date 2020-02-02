@@ -1489,6 +1489,237 @@ ucore的`exec()`实现
 
 # 6.同步互斥
 
+## 6.1 概念
+
+* **并发进程的正确性**
+
+  * 独立进程
+
+    不和其他进程共享资源或者状态
+
+    确定性：输入状态决定结果
+
+    可重现：能够重现起始条件
+
+    调度顺序不重要
+
+  * 并发进程
+
+    多个进程间有资源共享
+
+    不确定性
+
+    不可重现
+
+* **原子操作**
+
+  原子操作是值一次不存在在任何中断或者失败的操作
+
+  **操作系统需要利用同步机制在并发执行的同时，保证一些操作是原子操作**
+
+* **互斥**
+
+  一个进程占用资源，其它进程不能使用
+
+* **死锁**
+
+  多个进程各占用部分资源，形成循环等待
+
+* **饥饿**
+
+  其他进程可能轮流占用资源，一个进程一直得不到资源
+
+## 6.2 临界区实现方法
+
+* **禁用硬件中断**
+
+  适用于单处理机
+
+  没有中断，没有上下文切换，因此没有并发
+
+* **基于软件的同步方法**
+
+  ```c
+  // Peterson算法
+  do {
+      // 准备进入临界区
+        flag[i] = true;
+      // 处于临界区，如果其他进程打断并重新设置turn，则本进程在下面的while中等待
+        turn = j;
+      // 如果上面两步有一步
+        while ( flag[j] && turn == j);
+              CRITICAL SECTION  // 临界区代码
+        flag[i] = false;
+              REMAINDER SECTION
+     } while (true);
+  ```
+
+  ```c
+  //Dekkers算法
+  flag[0]:= false; flag[1]:= false; turn:= 0;//or1 
+  	
+  do {
+         flag[i] = true;
+         while flag[j] == true { 
+              if turn ≠ i { 
+                 flag[i] := false 
+                 while turn ≠ i { } 
+                 flag[i] := true 
+              }  
+          } 
+          CRITICAL SECTION
+         turn := j
+         flag[i] = false;
+          EMAINDER SECTION
+     } while (true);
+  ```
+
+* **高级抽象方法**
+
+  * **锁**
+
+    一个二进制变量（锁定/解锁）
+
+    获取锁（Acquire）、释放锁（Release）
+
+  * **原子操作指令**
+
+    使用于共享资源的多处理机
+
+    * 测试和置位（Test-and-Set）指令
+
+    1. 从内存单元中读取值
+
+    2. 测试该值是否为1（然后返回真或者假）
+
+    3. 内存单元值设置为1
+
+    ```c
+    // 如果表达为C语言则是如下
+    boolean TestAndSet (boolean *target) {
+        boolean rv = *target;
+        *target = true;
+        return rv:
+    }
+    ```
+
+    * 交换指令
+
+      交换内存中的两个值
+
+  * 自旋锁Spinlock
+
+    可以使用TS（测试和置位）指令实现
+
+    ```c
+    class Lock {
+       int value = 0;
+    }
+    
+    Lock::Acquire() {
+        // 1. value原值为0,则返回0,设置为1
+       // 2. 原值为1,则返回1,设置为1（相当于没有改动），此时说明有其他进程占用了该锁，本进程一直while等待
+       while (test-and-set(value))
+          ; //spin
+    }
+    Lock::Release() {
+        value = 0;
+    }
+    ```
+
+  * 无忙等待锁
+
+    ```c
+    class Lock {
+       int value = 0;
+       WaitQueue q;
+    }
+    Lock::Acquire() {
+       while (test-and-set(value)) {
+    		将本TCB加入到等待队列
+    		schedule();
+       }
+    }
+    
+    Lock::Release() {
+       value = 0;
+        将1个进程从等待队列移除
+       wakeup(t);
+    }
+    ```
+
+## 6.3 信号量
+
+基本的同步方法：建立临界区（禁用中断、原子操作、软件同步方法）。而**信号量**是操作系统提供的一种协调共享资源访问的方法。
+
+信号量和软件同步方法的区别是：1. 软件同步方法是一种进程间平等共享资源的方法；2. 信号量是OS作为提供者的资源共享方法
+
+信号量主要包括1个整型和2个原子操作（P和V）。初始化完成后，整型sem只能通过P（减小，占用资源，可能被阻塞）和V（增加，也就是释放资源，不会阻塞）操作来修改，PV都是原子操作。而OS保证了不会受到用户进程的打断和干扰，所以可以实现原子操作PV。
+
+```c
+class signal {
+    int sem;
+    P(); // 原子操作：减小
+    V(); // 原子操作：增加
+}
+```
+
+* **信号量假定是公平的**
+  1. 线程不会被无限期阻塞在P操作
+  2. 假定信号量等待按先进先出排队
+
+* **数据结构**
+
+  ```c
+  // 等待队列
+  classSemaphore {
+      int sem;
+      WaitQueue q;
+  }
+  
+  // 请求资源，如果sem<0，说明资源被占用，则将该进程加入到等待队列
+  Semaphore::P() {
+     sem--;
+     if (sem < 0) {
+          Add this thread t to q;
+          block(p);
+       }
+  }
+  
+  // 释放资源，如果sem<=0，说明有其他进程在等待资源，所以将队列第一个进程移除执行
+  Semaphore::V() {
+      sem++; 
+      if (sem<=0) {
+          Remove a thread t from q;
+          wakeup(t);        
+      }
+  }
+  ```
+
+  *为什么此时P和V操作不会被打断呢？*因为操作系统作为保护，不会被打断。
+
+### 6.3.2 信号量使用
+
+* **信号量实现条件同步**
+
+  条件同步设置1个信号量，初值设置为0（1才表示有资源）
+
+  ```c
+  condition = new Semaphore(0)
+  ```
+
+  我们要实现线程B的X代码先于线程A的N代码执行，则
+
+  ```
+        线程A                         线程B
+      ... M ...                   ... X ...
+   condition->P()                condition->V()
+      ... N ...                   ... Y ...
+  ```
+
+  1. 如果A先到达`condition->P()`，则会由于没有资源而等待；直到线程B调用`condition->V()`释放资源（也就是表示完成了X代码部分） ；而后执行N代码
+  2. 如果B先到达`condition->V()`，则释放资源（表示已经完成X代码），此时A正常执行资源申请`condition->P()`和N代码
+
 # 7.文件系统
 
 # 8.IO子系统
@@ -2408,7 +2639,7 @@ schedule(void) {
 
 ### 9.7.3 时间片轮转调度算法（Round Robin）
 
-RR算法最主要的思想集中于触发函数`proc_tick`，周期性触发计数，使能调度标志位
+RR算法最主要的思想集中于触发函数`proc_tick`，周期性触发计数，使能调度标志位。然后调用调度函数`schedule`来实现保存当前进程、运行下一个进程等功能。
 
 ```c
 struct sched_class {
@@ -2431,6 +2662,20 @@ struct sched_class {
 
 
 ### 9.7.4 Stride调度算法
+
+```
++--------------+----------+-------+
+| name         | course   | score |
++--------------+----------+-------+
+| songchaochao | English  |    89 |
+| songchaochao | Physical |    84 |
+| songchaochao | Chinese  |    87 |
+| zhurui       | English  |    89 |
+| zhurui       | Physical |    78 |
+| zhurui       | Chinese  |    87 |
++--------------+----------+-------+
+
+```
 
 
 
