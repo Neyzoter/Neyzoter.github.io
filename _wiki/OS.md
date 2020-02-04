@@ -1845,6 +1845,102 @@ class signal {
   }
   ```
 
+## 6.5 死锁
+
+出现死锁的必要条件：
+
+* 互斥
+
+  任何时刻只能有一个进程使用一个资源实例
+
+* 持有并等待
+
+  进程保持至少一个资源，并正在等待获取其他进程持有的资源
+
+* ，
+
+  资源只能在进程使用后自愿放弃
+
+* 循环等待
+
+  存在等待进程集合
+
+## 6.6 进程间通信
+
+* **信号**
+
+  进程间的软件中断通知和处理机制，比如SIGKILL、SIGSTOP、SIGCONT
+
+  传送信息量少，只有一个信号类型
+
+* **管道**
+
+  进程间基于内存文件的通信机制
+
+  1. 读管道：`read(fd, buffer, nbytes)`
+
+     `scanf()`是基于它实现的
+
+  2. 写管道： `write(fd, buffer, nbytes)`
+
+     `printf()`是基于它实现
+
+  3. 创建管道：`pipe(rgfd)`
+
+     `rgfd`是2个文件描述符组成的数组
+
+     `rgfd[0]`是读文件描述符
+
+     `rgfd[1]`是写文件描述符
+
+  管道实例：
+
+  <img src="/images/wiki/OS/Shell_Pipe_Example.png" width="600" alt="管道">
+
+* **消息队列**
+
+  消息队列是由操作系统维护的以字节序列为基本单位的间接通信机制，每个消息(Message)是一个字节序列，相同标识的消息组成按先进先出顺序组成一个消息队列（Message Queues）
+
+  1. `msgget ( key, flags)`
+
+     获取消息队列标识
+
+  2. `msgsnd ( QID, buf, size, flags )`
+
+     发送消息
+
+  3. `msgrcv ( QID, buf, size, type, flags )`
+
+     接收消息
+
+  4. `msgctl( … )`
+
+     消息队列控制
+
+* **共享内存**
+
+  共享内存是把同一个物理内存区域同时映射到多个进程的内存地址空间的通信机制
+
+  <img src="/images/wiki/OS/Shared_Mem.png" width="600" alt="共享内存">
+
+  1. `shmget( key, size, flags)`
+
+     创建共享段
+
+  2. `shmat( shmid, *shmaddr, flags)`
+
+     把共享段映射到进程地址空间
+
+  3. `shmdt( *shmaddr)`
+
+     取消共享段到进程地址空间的映射
+
+  4. `shmctl( …)`
+
+     共享段控制
+
+  5. 需要信号量等机制协调共享内存的访问冲突
+
   
 
 # 7.文件系统
@@ -2790,19 +2886,9 @@ struct sched_class {
 
 ### 9.7.4 Stride调度算法
 
-```
-+--------------+----------+-------+
-| name         | course   | score |
-+--------------+----------+-------+
-| songchaochao | English  |    89 |
-| songchaochao | Physical |    84 |
-| songchaochao | Chinese  |    87 |
-| zhurui       | English  |    89 |
-| zhurui       | Physical |    78 |
-| zhurui       | Chinese  |    87 |
-+--------------+----------+-------+
 
-```
+
+## 9.8 实验七 同步互斥
 
 
 
