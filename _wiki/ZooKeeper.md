@@ -53,3 +53,33 @@ config（集中式配置管理）和workers（命名）是两个逻辑命名空�
 
 <img src="/images/wiki/ZooKeeper/namespace.jpg" width="600" alt="ZooKeeper的命名空间" />
 
+每个znode都维护着一个stat的数据结构，包括版本号、操作控制列表（ACL）、时间戳和数据长度组成：
+
+* 版本号
+
+  每个znode都有版本号，每当与znode相关联的数据发生变化时，对应的版本号也会变化
+
+* 操作控制列表
+
+  访问znode的认证机制，管理所有znode的写入和读取操作
+
+* 时间戳
+
+  时间戳表示创建和修改znode所经过的时间
+
+* 数据长度
+
+  存储在znode中的数据长度，最长1MB
+
+## 2.2 ZooKeeper工作流
+
+ZooKeeper集合创建好后，客户端的请求流程如下：
+
+1. 客户端连接其中一个节点，可以是Leader，也可以是Follower
+2. 节点向客户端发送会话ID和确认信息
+3. 如果客户端未收到上述信息，则尝试重新连接ZooKeeper集合中的另外一个节点
+4. 连接完成后，节点会不断向客户端发送心跳，以保证连接不丢失
+5. 请求：
+   * 客户端请求获取znode，（和客户端连接的）节点会返回所请求的znode
+   * 客户端请求写入Zookeeper集合，则会将znode路径和数据发送到节点。如果节点不是Leader，则会将该请求转发给Leader节点，Leader节点将该请求发送给所有Follower节点。如果大部分Follower节点写入请求成功，则返回成功代码给客户端
+
