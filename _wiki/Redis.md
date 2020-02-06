@@ -139,96 +139,96 @@ string（字符串），hash（哈希），list（列表），set（集合）及
 
 * String
 
-二进制安全，可以包含任何数据（比如图片、序列化对象）、最大存储512MB
+    二进制安全，可以包含任何数据（比如图片、序列化对象）、最大存储512MB
 
-```bash
-redis 127.0.0.1:6379> SET name "w3cschool.cn"
-OK
-redis 127.0.0.1:6379> GET name
-"w3cschool.cn"
-```
+    ```bash
+    redis 127.0.0.1:6379> SET name "w3cschool.cn"
+    OK
+    redis 127.0.0.1:6379> GET name
+    "w3cschool.cn"
+    ```
 
 * Hash
 
-键值对集合，string类型的field和value的映射表，适合存储对象。
+    键值对集合，string类型的field和value的映射表，适合存储对象。
 
-最多存储`2^(32-1)`个键值对
+    最多存储`2^(32-1)`个键值对
 
-```bash
-redis 127.0.0.1:6379> HMSET user:1 username w3cschool.cn password w3cschool.cn points 200
-OK
-redis 127.0.0.1:6379> HGETALL user:1
-1) "username"
-2) "w3cschool.cn"
-3) "password"
-4) "w3cschool.cn"
-5) "points"
-6) "200"
-```
+    ```bash
+    redis 127.0.0.1:6379> HMSET user:1 username w3cschool.cn password w3cschool.cn points 200
+    OK
+    redis 127.0.0.1:6379> HGETALL user:1
+    1) "username"
+    2) "w3cschool.cn"
+    3) "password"
+    4) "w3cschool.cn"
+    5) "points"
+    6) "200"
+    ```
 
 * List（列表）
 
-简单的字符串列表，按照插入顺序排序，可添加至头部或者尾部。
+    简单的字符串列表，按照插入顺序排序，可添加至头部或者尾部。
 
-最多存储`2^(32-1)`个元素。
+    最多存储`2^(32-1)`个元素。
 
-```bash
-redis 127.0.0.1:6379> lpush w3cschool.cn redis
-(integer) 1
-redis 127.0.0.1:6379> lpush w3cschool.cn mongodb
-(integer) 2
-redis 127.0.0.1:6379> lpush w3cschool.cn rabitmq
-(integer) 3
-redis 127.0.0.1:6379> lrange w3cschool.cn 0 10
-1) "rabitmq"
-2) "mongodb"
-3) "redis"
-```
+    ```bash
+    redis 127.0.0.1:6379> lpush w3cschool.cn redis
+    (integer) 1
+    redis 127.0.0.1:6379> lpush w3cschool.cn mongodb
+    (integer) 2
+    redis 127.0.0.1:6379> lpush w3cschool.cn rabitmq
+    (integer) 3
+    redis 127.0.0.1:6379> lrange w3cschool.cn 0 10
+    1) "rabitmq"
+    2) "mongodb"
+    3) "redis"
+    ```
 
 * Set（集合）
 
-String类型的无序集合，不允许重复，通过哈希表实现，添加、删除、查找的复杂度都是O(1)。
+    String类型的无序集合，不允许重复，通过哈希表实现，添加、删除、查找的复杂度都是O(1)。
 
-```bash
-# sadd key member
-redis 127.0.0.1:6379> sadd w3cschool.cn redis
-(integer) 1
-redis 127.0.0.1:6379> sadd w3cschool.cn mongodb
-(integer) 1
-# rabitmq插入两次，不可重复，所以实际只有一个
-redis 127.0.0.1:6379> sadd w3cschool.cn rabitmq
-(integer) 1
-redis 127.0.0.1:6379> sadd w3cschool.cn rabitmq
-(integer) 0
-redis 127.0.0.1:6379> smembers w3cschool.cn
+    ```bash
+    # sadd key member
+    redis 127.0.0.1:6379> sadd w3cschool.cn redis
+    (integer) 1
+    redis 127.0.0.1:6379> sadd w3cschool.cn mongodb
+    (integer) 1
+    # rabitmq插入两次，不可重复，所以实际只有一个
+    redis 127.0.0.1:6379> sadd w3cschool.cn rabitmq
+    (integer) 1
+    redis 127.0.0.1:6379> sadd w3cschool.cn rabitmq
+    (integer) 0
+    redis 127.0.0.1:6379> smembers w3cschool.cn
 
-1) "rabitmq"
-2) "mongodb"
-3) "redis"
-```
+    1) "rabitmq"
+    2) "mongodb"
+    3) "redis"
+    ```
 
 * zset（sorted set：有序集合）
 
-String类型元素集合，不允许重复。
+    String类型元素集合，不允许重复。
 
-不同点：zset每个元素都会关联一个double类型的分数，通过该分数来为集合中的成员进行从小到大的排序。
+    不同点：zset每个元素都会关联一个double类型的分数，通过该分数来为集合中的成员进行从小到大的排序。
 
-```bash
-# zadd key 分数 member
-redis 127.0.0.1:6379> zadd w3cschool.cn 0 redis
-(integer) 1
-redis 127.0.0.1:6379> zadd w3cschool.cn 0 mongodb
-(integer) 1
-redis 127.0.0.1:6379> zadd w3cschool.cn 0 rabitmq
-(integer) 1
-redis 127.0.0.1:6379> zadd w3cschool.cn 0 rabitmq
-(integer) 0
-redis 127.0.0.1:6379> ZRANGEBYSCORE w3cschool.cn 0 1000
+    ```bash
+    # zadd key 分数 member
+    redis 127.0.0.1:6379> zadd w3cschool.cn 0 redis
+    (integer) 1
+    redis 127.0.0.1:6379> zadd w3cschool.cn 0 mongodb
+    (integer) 1
+    redis 127.0.0.1:6379> zadd w3cschool.cn 0 rabitmq
+    (integer) 1
+    redis 127.0.0.1:6379> zadd w3cschool.cn 0 rabitmq
+    (integer) 0
+    redis 127.0.0.1:6379> ZRANGEBYSCORE w3cschool.cn 0 1000
 
-1) "redis"
-2) "mongodb"
-3) "rabitmq"
-```
+    1) "redis"
+    2) "mongodb"
+    3) "rabitmq"
+    ```
 
 # 2、Redis高级教程
 
