@@ -911,7 +911,7 @@ write：
 ### 启动服务
 
 ```
-目录/mongod**
+目录/mongod
 ```
 
 ### 开始shell

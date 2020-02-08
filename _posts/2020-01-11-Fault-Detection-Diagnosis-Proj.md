@@ -37,3 +37,8 @@ keywords: 大数据, 故障检测, 故障诊断, 分布式
    [Kafka、RabbitMQ、RocketMQ消息中间件的对比 —— 消息发送性能](http://jm.taobao.org/2016/04/01/kafka-vs-rabbitmq-vs-rocketmq-message-send-performance/?utm_source=tuicool&utm_medium=referral)
 
 2. Kafka社区活跃度高，针对Spark、Flink等有案例
+
+## 2.X 性能评估
+
+### 2.X.1 机器学习模型的评估
+
