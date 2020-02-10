@@ -297,4 +297,12 @@ ZooKeeper集合创建好后，客户端的请求流程如下：
   $ stat /path
   ```
 
+* **移除Znode**
+
+  移除指定znode及其子节点
+
+  ```bash
+  $ rmr /path
+  ```
+
   
