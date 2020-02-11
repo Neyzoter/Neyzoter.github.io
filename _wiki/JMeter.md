@@ -45,3 +45,40 @@ $ jmeter -n -t [jmx file] -l [results file] -e -o [Path to web report folder]
 **6. 运行**
 
 点击运行按钮（绿色箭头）。
+
+# 3.测试结果
+
+测试结果举例，
+
+* **结果树**
+
+    ```
+    Thread Name（线程组名称）: 线程组 1-24
+    Sample Start（ 启动开始时间）: 2019-02-15 15:00:14 CST
+    Load time（加载时长）: 290
+    Connect Time（连接时长）: 86
+    Latency（等待时长）: 174
+    Size in bytes（发送的数据总大小）: 2212
+    Sent bytes:821
+    Headers size in bytes（发送数据的其余部分大小）: 1162
+    Body size in bytes: 1050
+    Sample Count（发送统计）: 1
+    Error Count（错误统计）: 0
+    Data type ("text"|"bin"|""): text
+    Response code（返回状态码）: 200
+    Response message（返回信息）: OK
+    ```
+
+* **聚合报告**
+
+  ```
+  Sample:本次测试场景共运行多少线程
+  Average:平均响应时间
+  Median:统计意义上的响应时间中值
+  90% line:所有线程中90%的线程响应时间都小于xx的值
+  Min:响应最小时间
+  Max:响应最大时间
+  Error:出错率
+  ```
+
+  
