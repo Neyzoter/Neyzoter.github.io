@@ -71,14 +71,14 @@ $ jmeter -n -t [jmx file] -l [results file] -e -o [Path to web report folder]
 
 * **聚合报告**
 
-  ```
-  Sample:本次测试场景共运行多少线程
-  Average:平均响应时间
-  Median:统计意义上的响应时间中值
-  90% line:所有线程中90%的线程响应时间都小于xx的值
-  Min:响应最小时间
-  Max:响应最大时间
-  Error:出错率
-  ```
+    ```
+    Sample:本次测试场景共运行多少线程
+    Average:平均响应时间
+    Median:统计意义上的响应时间中值
+    90% line:所有线程中90%的线程响应时间都小于xx的值
+    Min:响应最小时间
+    Max:响应最大时间
+    Error:出错率
+    ```
 
   
