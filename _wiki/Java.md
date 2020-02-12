@@ -2867,6 +2867,57 @@ Asynchronous IO： 异步非阻塞的编程方式。
 
 对于读操作而言，当有流可读取时，操作系统会将可读的流传入read方法的缓冲区，并通知应用程序；对于写操作而言，当操作系统将write方法传递的流写入完毕时，操作系统主动通知应用程序。
 
+# 4、JVM知识
+
+## 4.1 JVM参数配置
+
+### 4.1.1 行为参数
+
+用于改变jvm的一些基础行为
+
+| 参数及其默认值              | 描述                                                         |
+| :-------------------------- | :----------------------------------------------------------- |
+| `-XX:-DisableExplicitGC`    | 禁止调用System.gc()；但jvm的gc仍然有效                       |
+| `-XX:+MaxFDLimit`           | 最大化文件描述符的数量限制                                   |
+| `-XX:+ScavengeBeforeFullGC` | 新生代GC优先于Full GC执行                                    |
+| `-XX:+UseGCOverheadLimit`   | 在抛出OOM之前限制jvm耗费在GC上的时间比例                     |
+| `-XX:-UseConcMarkSweepGC`   | 对老生代采用并发标记交换算法进行GC；指多个线程并发执行GC，一般适用于多处理器系统中，可以提高GC的效率，但算法复杂，系统消耗较大； |
+| `-XX:-UseParallelGC`        | 启用并行GC；指GC运行时，对应用程序运行没有影响，GC和app两者的线程在并发执行，这样可以最大限度不影响app的运行； |
+| `-XX:-UseParallelOldGC`     | 对Full GC启用并行，当-XX:-UseParallelGC启用时该项自动启用    |
+| `-XX:-UseSerialGC`          | 启用串行GC；jvm的默认GC方式，一般适用于小型应用和单处理器，算法比较简单，GC效率也较高，但可能会给应用带来停顿； |
+| `-XX:+UseThreadPriorities`  | 启用本地线程优先级                                           |
+
+### 4.1.2 性能调优
+
+用于jvm的性能调优
+
+| 参数及其默认值                     | 描述                                  |
+| :--------------------------------- | :------------------------------------ |
+| `-XX:LargePageSizeInBytes=4m`      | 设置用于Java堆的大页面尺寸            |
+| `-XX:MaxHeapFreeRatio=70`          | GC后java堆中空闲量占的最大比例        |
+| `-XX:MaxNewSize=size`              | 新生成对象能占用内存的最大值          |
+| `-XX:MaxPermSize=64m`              | 老生代对象能占用内存的最大值          |
+| `-XX:MinHeapFreeRatio=40`          | GC后java堆中空闲量占的最小比例        |
+| `-XX:NewRatio=2`                   | 新生代内存容量与老生代内存容量的比例  |
+| `-XX:NewSize=2.125m`               | 新生代对象生成时占用内存的默认值      |
+| `-XX:ReservedCodeCacheSize=32m`    | 保留代码占用的内存容量                |
+| `-XX:ThreadStackSize=512`          | 设置线程栈大小，若为0则使用系统默认值 |
+| `-XX:+UseLargePages`               | 使用大页面内存                        |
+| `-XX:PretenureSizeThreshold=10000` | 大于指定大小的对象，直接进入老年代    |
+| `-XX:MaxTenuringThreshold=15`      | 晋升老年代的年龄阀值                  |
+| `-XX:+HandlePromotionFailure=true` | 关闭空间分配担保                      |
+
+### 4.1.3 调试参数
+
+一般用于打开跟踪、打印、输出等jvm参数，用于显示jvm更加详细的信息
+
+| 参数及其默认值                           | 描述                                |
+| :--------------------------------------- | :---------------------------------- |
+| `-XX:-CITime`                            | 打印消耗在JIT编译的时间             |
+| `-XX:ErrorFile=./hs_err_pid<pid>.log`    | 保存错误日志或者数据到文件中        |
+| `-XX:-ExtendedDTraceProbes`              | 开启solaris特有的dtrace探针         |
+| `-XX:HeapDumpPath=./java_pid<pid>.hprof` | 指定导出堆信息时的路径或文件名      |
+| `-XX:-HeapDumpOnOutOfMemoryError`        | 当首次遭遇OOM时导出此时堆中相关信息 |
 
 # java备忘
 
