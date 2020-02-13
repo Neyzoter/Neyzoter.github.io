@@ -185,6 +185,31 @@ $ go run hello.go
   _, value = Func();
   ```
 
+* **数据类型转换**
+
+  ```go
+  type_name(expression)
+  ```
+
+  举例，
+
+  ```go
+  package main
+  
+  import "fmt"
+  
+  func main() {
+     var sum int = 17
+     var count int = 5
+     var mean float32
+     
+     mean = float32(sum)/float32(count)
+     fmt.Printf("mean 的值为: %f\n",mean)
+  }
+  ```
+
+  
+
 ### 2.3.3 Go语言常量
 
 常量是一个简单值的标识符，在程序运行时，不会被修改。定义方式如下，
@@ -779,3 +804,460 @@ void myFunction(param []int){
 	// 函数体
 }
 ```
+
+## 2.10 指针
+
+### 2.10.1 指针
+
+```go
+var var_name *var-type
+```
+
+举例，
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+   var a int= 20   /* 声明实际变量 */
+   var ip *int        /* 声明指针变量 */
+
+   ip = &a  /* 指针变量的存储地址 */
+
+   fmt.Printf("a 变量的地址是: %x\n", &a  )
+
+   /* 指针变量的存储地址 */
+   fmt.Printf("ip 变量的存储地址: %x\n", ip )
+
+   /* 使用指针访问值 */
+   fmt.Printf("*ip 变量的值: %d\n", *ip )
+}
+```
+
+### 2.10.2 指针数组
+
+举例，
+
+```go
+package main
+
+import "fmt"
+
+const MAX int = 3
+
+func main() {
+   a := []int{10,100,200}
+   var i int
+   var ptr [MAX]*int;
+
+   for  i = 0; i < MAX; i++ {
+      ptr[i] = &a[i] /* 整数地址赋值给指针数组 */
+   }
+
+   for  i = 0; i < MAX; i++ {
+      fmt.Printf("a[%d] = %d\n", i,*ptr[i] )
+   }
+}
+```
+
+### 2.10.3 函数有指针参数
+
+举例，
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+   /* 定义局部变量 */
+   var a int = 100
+   var b int= 200
+
+   fmt.Printf("交换前 a 的值 : %d\n", a )
+   fmt.Printf("交换前 b 的值 : %d\n", b )
+
+   /* 调用函数用于交换值
+   * &a 指向 a 变量的地址
+   * &b 指向 b 变量的地址
+   */
+   swap(&a, &b);
+
+   fmt.Printf("交换后 a 的值 : %d\n", a )
+   fmt.Printf("交换后 b 的值 : %d\n", b )
+}
+
+func swap(x *int, y *int) {
+   var temp int
+   temp = *x    /* 保存 x 地址的值 */
+   *x = *y      /* 将 y 赋值给 x */
+   *y = temp    /* 将 temp 赋值给 y */
+}
+```
+
+## 2.11 结构体
+
+语法：
+
+```go
+// 结构体定义
+type struct_variable_type struct {
+   member definition;
+   member definition;
+   ...
+   member definition;
+}
+// 变量声明
+variable_name := structure_variable_type {value1, value2...valuen}
+```
+
+举例，
+
+```go
+package main
+
+import "fmt"
+
+type Books struct {
+   title string
+   author string
+   subject string
+   book_id int
+}
+
+func main() {
+   var Book1 Books        /* 声明 Book1 为 Books 类型 */
+   var Book2 Books        /* 声明 Book2 为 Books 类型 */
+
+   /* book 1 描述 */
+   Book1.title = "Go 语言"
+   Book1.author = "www.w3cschool.cn"
+   Book1.subject = "Go 语言教程"
+   Book1.book_id = 6495407
+
+   /* book 2 描述 */
+   Book2.title = "Python 教程"
+   Book2.author = "www.w3cschool.cn"
+   Book2.subject = "Python 语言教程"
+   Book2.book_id = 6495700
+
+   /* 打印 Book1 信息 */
+   fmt.Printf( "Book 1 title : %s\n", Book1.title)
+   fmt.Printf( "Book 1 author : %s\n", Book1.author)
+   fmt.Printf( "Book 1 subject : %s\n", Book1.subject)
+   fmt.Printf( "Book 1 book_id : %d\n", Book1.book_id)
+
+   /* 打印 Book2 信息 */
+   fmt.Printf( "Book 2 title : %s\n", Book2.title)
+   fmt.Printf( "Book 2 author : %s\n", Book2.author)
+   fmt.Printf( "Book 2 subject : %s\n", Book2.subject)
+   fmt.Printf( "Book 2 book_id : %d\n", Book2.book_id)
+}
+```
+
+## 2.12 切片
+
+Go 数组的长度不可改变，在特定场景中这样的集合就不太适用，Go中提供了一种灵活，功能强悍的内置类型切片("动态数组"),与数组相比切片的长度是不固定的，可以追加元素，在追加时可能使切片的容量增大。
+
+### 2.12.1 定义切片
+
+```go
+// 声明一个未指定大小的数组来定义切片
+var identifier []type
+
+// 使用make创建切片
+// make([]T, length, capacity)
+var slice1 []type = make([]type, len)
+slice1 := make([]type, len)
+```
+
+### 2.12.2 切片初始化
+
+```go
+// 直接初始化切片，[]表示是切片类型，{1,2,3}初始化值依次是1,2,3.其cap=len=3
+s :=[] int {1,2,3 } 
+
+// 初始化切片s,是数组arr的引用
+s := arr[:]
+s := arr[startIndex:] 
+// arr的下标startIndex到endIndex-1的元素
+s := arr[startIndex:endIndex] 
+s := arr[:endIndex] 
+```
+
+### 2.12.3 相关函数
+
+* **len()**
+
+  可以获取切片的长度
+
+* **cap()**
+
+  可以获取切片最长的长度
+
+* **append()**
+
+  向切片追加元素
+
+* **copy()**
+
+  拷贝切片，可以用于创建一个新的更大的切片并把原分片的内容都拷贝过来
+
+举例，
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+   var numbers []int
+   printSlice(numbers)
+
+   /* 允许追加空切片 */
+   numbers = append(numbers, 0)
+   printSlice(numbers)
+
+   /* 向切片添加一个元素 */
+   numbers = append(numbers, 1)
+   printSlice(numbers)
+
+   /* 同时添加多个元素 */
+   numbers = append(numbers, 2,3,4)
+   printSlice(numbers)
+
+   /* 创建切片 numbers1 是之前切片的两倍容量*/
+   numbers1 := make([]int, len(numbers), (cap(numbers))*2)
+
+   /* 拷贝 numbers 的内容到 numbers1 */
+   copy(numbers1,numbers)
+   printSlice(numbers1)   
+}
+
+func printSlice(x []int){
+   fmt.Printf("len=%d cap=%d slice=%v\n",len(x),cap(x),x)
+}
+```
+
+输出，
+
+```
+len=0 cap=0 slice=[]
+len=1 cap=2 slice=[0]
+len=2 cap=2 slice=[0 1]
+len=5 cap=8 slice=[0 1 2 3 4]
+len=5 cap=16 slice=[0 1 2 3 4]
+```
+
+## 2.13 范围（Range）
+
+Go 语言中 range 关键字用于for循环中迭代数组(array)、切片(slice)、链表(channel)或集合(map)的元素。在数组和切片中它返回元素的索引值，在集合中返回 key-value 对的 key 值。
+
+```go
+package main
+import "fmt"
+func main() {
+    //这是我们使用range去求一个slice的和。使用数组跟这个很类似
+    nums := []int{2, 3, 4}
+    sum := 0
+    for _, num := range nums {
+        sum += num
+    }
+    fmt.Println("sum:", sum)
+    //在数组上使用range将传入index和值两个变量。上面那个例子我们不需要使用该元素的序号，所以我们使用空白符"_"省略了。有时侯我们确实需要知道它的索引。
+    for i, num := range nums {
+        if num == 3 {
+            fmt.Println("index:", i)
+        }
+    }
+    //range也可以用在map的键值对上。
+    kvs := map[string]string{"a": "apple", "b": "banana"}
+    for k, v := range kvs {
+        fmt.Printf("%s -> %s\n", k, v)
+    }
+    //range也可以用来枚举Unicode字符串。第一个参数是字符的索引，第二个是字符（Unicode的值）本身。
+    for i, c := range "go" {
+        fmt.Println(i, c)
+    }
+}
+```
+
+输出，
+
+```go
+sum: 9
+index: 1
+a -> apple
+b -> banana
+0 103
+1 111
+```
+
+## 2.14 集合（Map）
+
+Map 是一种无序的键值对的集合。Map 最重要的一点是通过 key 来快速检索数据，key 类似于索引，指向数据的值。
+
+Map 是一种集合，所以我们可以像迭代数组和切片那样迭代它。不过，Map 是无序的，我们无法决定它的返回顺序，这是因为 Map 是使用 hash 表来实现的。
+
+### 2.14.1 定义Map
+
+```go
+/* 声明变量，默认 map 是 nil */
+var map_variable map[key_data_type]value_data_type
+
+/* 使用 make 函数 */
+map_variable = make(map[key_data_type]value_data_type)
+```
+
+举例，
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+   var countryCapitalMap map[string]string
+   /* 创建集合 */
+   countryCapitalMap = make(map[string]string)
+   
+   /* map 插入 key-value 对，各个国家对应的首都 */
+   countryCapitalMap["France"] = "Paris"
+   countryCapitalMap["Italy"] = "Rome"
+   countryCapitalMap["Japan"] = "Tokyo"
+   countryCapitalMap["India"] = "New Delhi"
+   
+   /* 使用 key 输出 map 值 */
+   for country := range countryCapitalMap {
+      fmt.Println("Capital of",country,"is",countryCapitalMap[country])
+   }
+   
+   /* 查看元素在集合中是否存在 */
+   captial, ok := countryCapitalMap["United States"]
+   /* 如果 ok 是 true, 则存在，否则不存在 */
+   if(ok){
+      fmt.Println("Capital of United States is", captial)  
+   }else {
+      fmt.Println("Capital of United States is not present") 
+   }
+}
+```
+
+输出，
+
+```
+Capital of France is Paris
+Capital of Italy is Rome
+Capital of Japan is Tokyo
+Capital of India is New Delhi
+Capital of United States is not present
+```
+
+### 2.14.2 删除元素
+
+使用delete()函数来删除Map中的元素
+
+```go
+package main
+
+import "fmt"
+
+func main() {   
+   /* 创建 map */
+   countryCapitalMap := map[string] string {"France":"Paris","Italy":"Rome","Japan":"Tokyo","India":"New Delhi"}
+   
+   fmt.Println("原始 map")   
+   
+   /* 打印 map */
+   for country := range countryCapitalMap {
+      fmt.Println("Capital of",country,"is",countryCapitalMap[country])
+   }
+   
+   /* 删除元素 */
+   delete(countryCapitalMap,"France");
+   fmt.Println("Entry for France is deleted")  
+   
+   fmt.Println("删除元素后 map")   
+   
+   /* 打印 map */
+   for country := range countryCapitalMap {
+      fmt.Println("Capital of",country,"is",countryCapitalMap[country])
+   }
+}
+```
+
+输出，
+
+```
+原始 map
+Capital of France is Paris
+Capital of Italy is Rome
+Capital of Japan is Tokyo
+Capital of India is New Delhi
+Entry for France is deleted
+删除元素后 map
+Capital of Italy is Rome
+Capital of Japan is Tokyo
+Capital of India is New Delhi
+```
+
+## 2.15 接口
+
+Go 语言提供了另外一种数据类型即接口，它把所有的具有共性的方法定义在一起，任何其他类型只要实现了这些方法就是实现了这个接口。
+
+```go
+/* 定义接口 */
+type interface_name interface {
+   method_name1 [return_type]
+   method_name2 [return_type]
+   method_name3 [return_type]
+   ...
+   method_namen [return_type]
+}
+
+/* 定义结构体 */
+type struct_name struct {
+   /* variables */
+}
+
+/* 实现接口方法 */
+func (struct_name_variable struct_name) method_name1() [return_type] {
+   /* 方法实现 */
+}
+...
+func (struct_name_variable struct_name) method_namen() [return_type] {
+   /* 方法实现*/
+}
+```
+
+举例，
+
+```go
+package main
+import (
+    "fmt"
+)
+type Phone interface {
+    call()
+}
+type NokiaPhone struct {
+}
+func (nokiaPhone NokiaPhone) call() {
+    fmt.Println("I am Nokia, I can call you!")
+}
+type IPhone struct {
+}
+func (iPhone IPhone) call() {
+    fmt.Println("I am iPhone, I can call you!")
+}
+func main() {
+    var phone Phone
+    phone = new(NokiaPhone)
+    phone.call()
+    phone = new(IPhone)
+    phone.call()
+}
+```
+
