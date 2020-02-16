@@ -134,6 +134,18 @@ val conf = new SparkConf().setAppName(appName).setMaster(master)
 new SparkContext(conf)
 ```
 
+**初始化Spark**
+
+1. 创建一个SparkConf对象，作为下面的配置信息
+2. 创建一个SparkContext对象
+
+```scala
+val conf = new SparkConf().setAppName(appName).setMaster(master)
+new SparkContext(conf)
+```
+
+appName 参数是你程序的名字，它会显示在 cluster UI 上。master 是 Spark, Mesos 或 YARN 集群的 URL，或运行在本地模式时，使用专用字符串 “local”。在实践中，当应用程序运行在一个集群上时，你并不想要把 master 硬编码到你的程序中，你可以用 spark-submit 启动你的应用程序的时候传递它。然而，你可以在本地测试和单元测试中使用 “local” 运行 Spark 进程。
+
 **使用shell**
 
 在 Spark shell 中，有一个专有的 SparkContext 已经为你创建好。在变量中叫做 sc。可以用 `--master` 参数来设置 SparkContext 要连接的集群，用 `--jars` 来设置需要添加到 classpath 中的 JAR 包，如果有多个 JAR 包使用**逗号**分割符连接它们。
@@ -257,24 +269,30 @@ $ ./bin/spark-shell --master local[4] --jars code.jar
   
 * **RDD持久化**
 
-  可以利用不同的存储级别存储每一个被持久化的RDD。使用方法是通过给`persist()`设置存储级别。
+  Spark最重要的一个功能是它可以通过各种操作（operations）持久化（或者缓存）一个集合到内存中。当你持久化一个RDD的时候，每一个节点都将参与计算的所有分区数据存储到内存中，并且这些 数据可以被这个集合（以及这个集合衍生的其他集合）的动作（action）重复利用。这个能力使后续的动作速度更快（通常快10倍以上）。对应迭代算法和快速的交互使用来说，缓存是一个关键的工具。
 
+  你能通过`persist()`或者`cache()`方法持久化一个rdd。首先，在action中计算得到rdd；然后，将其保存在每个节点的内存中。Spark的缓存是一个容错的技术-如果RDD的任何一个分区丢失，它 可以通过原有的转换（transformations）操作自动的重复计算并且创建出这个分区。
+  
+  此外，我们可以利用不同的存储级别存储每一个被持久化的RDD。例如，它允许我们持久化集合到磁盘上、将集合作为序列化的Java对象持久化到内存中、在节点间复制集合或者存储集合到 [Tachyon](http://tachyon-project.org/)中。我们可以通过传递一个`StorageLevel`对象给`persist()`方法设置这些存储级别。`cache()`方法使用了默认的存储级别—`StorageLevel.MEMORY_ONLY`。
+  
+  可以利用不同的存储级别存储每一个被持久化的RDD。使用方法是通过给`persist()`设置存储级别。
+  
   | Storage Level                              | Meaning                                                      |
   | ------------------------------------------ | ------------------------------------------------------------ |
   | `MEMORY_ONLY`                              | 将RDD作为非序列化的Java对象存储在jvm中。如果RDD不适合存在内存中，一些分区将不会被缓存，从而在每次需要这些分区时都需重新计算它们。这是系统默认的存储级别。 |
-  | `MEMORY_AND_DISK`                          | 将RDD作为非序列化的Java对象存储在jvm中。如果RDD不适合存在内存中，将这些不适合存在内存中的分区存储在磁盘中，每次需要时读出它们。 |
+| `MEMORY_AND_DISK`                          | 将RDD作为非序列化的Java对象存储在jvm中。如果RDD不适合存在内存中，将这些不适合存在内存中的分区存储在磁盘中，每次需要时读出它们。 |
   | `MEMORY_ONLY_SER`                          | 将RDD作为序列化的Java对象存储（每个分区一个byte数组）。这种方式比非序列化方式更节省空间，特别是用到快速的序列化工具时，但是会更耗费cpu资源—密集的读操作。 |
-  | `MEMORY_AND_DISK_SER`                      | 和MEMORY_ONLY_SER类似，但不是在每次需要时重复计算这些不适合存储到内存中的分区，而是将这些分区存储到磁盘中。 |
+| `MEMORY_AND_DISK_SER`                      | 和MEMORY_ONLY_SER类似，但不是在每次需要时重复计算这些不适合存储到内存中的分区，而是将这些分区存储到磁盘中。 |
   | `DISK_ONLY`                                | 仅仅将RDD分区存储到磁盘中                                    |
-  | `MEMORY_ONLY_2`, `MEMORY_AND_DISK_2`, etc. | 和上面的存储级别类似，但是复制每个分区到集群的两个节点上面   |
+| `MEMORY_ONLY_2`, `MEMORY_AND_DISK_2`, etc. | 和上面的存储级别类似，但是复制每个分区到集群的两个节点上面   |
   | `OFF_HEAP `(experimental)                  | 以序列化的格式存储RDD到[Tachyon](http://tachyon-project.org/)中。相对`于MEMORY_ONLY_SER`，`OFF_HEAP`减少了垃圾回收的花费，允许更小的执行者共享内存池。这使其在拥有大量内存的环境下或者多并发应用程序的环境中具有更强的吸引力。 |
 
   *删除内存中的数据*
-
+  
   `RDD.unpersist()`方法
-
+  
   *如何选择存储级别？*
-
+  
   - 如果你的RDD适合默认的存储级别（`MEMORY_ONLY`），就选择默认的存储级别。因为这是cpu利用率最高的选项，会使RDD上的操作尽可能的快。
   - 如果不适合用默认的级别，选择`MEMORY_ONLY_SER`。选择一个更快的序列化库提高对象的空间使用率，但是仍能够相当快的访问。
   - 除非函数计算RDD的花费较大或者它们需要过滤大量的数据，不要将RDD存储到磁盘上，否则，重复计算一个分区就会和重磁盘上读取数据一样慢。
@@ -285,6 +303,8 @@ $ ./bin/spark-shell --master local[4] --jars code.jar
     - 如果单个的执行者崩溃，缓存的数据不会丢失
 
 ### 2.1.4 共享变量
+
+一般情况下，当一个传递给Spark操作(例如map和reduce)的函数在远程节点上面运行时，Spark操作实际上操作的是这个函数所用变量的一个独立副本。这些变量被复制到每台机器上，并且这些变量在远程机器上 的所有更新都不会传递回驱动程序。通常跨任务的读写变量是低效的，但是，Spark还是为两种常见的使用模式提供了两种有限的共享变量：广播变量（broadcast variable）和累加器（accumulator）
 
 #### 2.1.4.1 广播变量
 
@@ -317,11 +337,91 @@ scala> accum.value
 res2: Int = 10
 ```
 
+**开发者可以利用子类[AccumulatorParam](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.AccumulatorParam)创建自己的 累加器类型。**
+
+### 2.1.5 RDD操作
+
+RDDs支持2中类型的操作：转换（transformations）从已经存在的数据集中创建一个新的数据集；动作(actions) 在数据集上进行计算之后返回一个值到驱动程序。例如，map 是一个转换操作，它将每一个数据集元素传递给一个函数并且返回一个新的 RDD。另一方面，reduce 是一个动作，它使用相同的函数来聚合 RDD 的所有元素，并且将最终的结果返回到驱动程序(不过也有一个并行 reduceByKey 能返回一个分布式数据集)。
+
+在 Spark 中，所有的转换(transformations)都是惰性(lazy)的，它们不会马上计算它们的结果。相反的，它们仅仅记录转换操作是应用到哪些基础数据集(例如一个文件)上的。转换仅仅在这个时候计算：当动作(action) 需要一个结果返回给驱动程序的时候。这个设计能够让 Spark 运行得更加高效。例如，我们可以实现：通过 map 创建一个新数据集在 reduce 中使用，并且仅仅返回 reduce 的结果给 driver，而不是整个大的映射过的数据集。
+
+默认情况下，每一个转换过的 RDD 会在每次执行动作(action)的时候重新计算一次。然而，你也可以使用 persist (或 cache)方法持久化(persist)一个 RDD 到内存中。在这个情况下，Spark 会在集群上保存相关的元素，在你下次查询的时候会变得更快。在这里也同样支持持久化 RDD 到磁盘，或在多个节点间复制。
+
+#### 2.1.5.1 传递函数到Spark
+
+* **使用匿名函数**
+
+  
+
+* **全局单例对象的静态方法**
+
+  举例如下，
+
+  ```scala
+  object MyFunctions {
+    def func1(s: String): String = { ... }
+  }
+  myRdd.map(MyFunctions.func1)
+  ```
+
+  **在引用某个对象的值/方法时，需要同时引用整个对象，比如，**
+
+  ```scala
+  /***方法举例**/
+  // 如果map需要使用MyClass类的对象的方法doStuff，则会将整个对象都需要送到集群上
+  class MyClass {
+    def func1(s: String): String = { ... }
+      // 相当于def doStuff(rdd: RDD[String]): RDD[String] = { rdd.map(this.func1) }
+    def doStuff(rdd: RDD[String]): RDD[String] = { rdd.map(func1) }
+  }
+  
+  /**数值举例**/
+  // map使用doStuff时，需要将整个对象送到集群
+  class MyClass {
+    val field = "Hello"
+    def doStuff(rdd: RDD[String]): RDD[String] = { rdd.map(x => field + x) }
+  }
+  // 将数值拷贝到局部变量可以实现只将函数送到集群比如
+  class MyClass {
+    val field = "Hello"
+    def doStuff(rdd: RDD[String]): RDD[String] = {
+    		val field_ = this.field
+    		rdd.map(x => field_ + x)
+  	}
+  }
+  ```
+
+#### 2.1.5.2 使用键值对
+
+虽然很多 Spark 操作工作在包含任意类型对象的 RDDs 上的，但是少数几个特殊操作仅仅在键值(key-value)对 RDDs 上可用。最常见的是分布式 "shuffle" 操作，例如根据一个 key 对一组数据进行分组和聚合。
+
+在 Scala 中，这些操作在包含二元组(Tuple2)(在语言的内建元组中，通过简单的写 (a, b) 创建) 的 RDD 上自动地变成可用的，只要在你的程序中导入 `org.apache.spark.SparkContext._ `来启用 Spark 的隐式转换。在 PairRDDFunctions 的类里键值对操作是可以使用的，如果你导入隐式转换它会自动地包装成元组 RDD。
+
+例如，下面的代码在键值对上使用 reduceByKey 操作来统计在一个文件里每一行文本内容出现的次数：
+
+```scala
+val lines = sc.textFile("data.txt")
+val pairs = lines.map(s => (s, 1))
+val counts = pairs.reduceByKey((a, b) => a + b)
+```
+
+我们也可以使用 `counts.sortByKey()`，例如，将键值对按照字母进行排序，最后` counts.collect() `把它们作为一个对象数组带回到驱动程序。
+
+注意：当使用一个自定义对象作为 key 在使用键值对操作的时候，你需要确保自定义 `equals()` 方法和 `hashCode()` 方法是匹配的。更加详细的内容，查看[ `Object.hashCode()` 文档](https://www.scala-lang.org/api/2.10.4/index.html#scala.Tuple2)中的契约概述。
+
+#### 2.1.5.3 Transformations
+
+[常用的Transformations in gitbook](https://endymecy.gitbooks.io/spark-programming-guide-zh-cn/content/programming-guide/rdds/transformations.html)。具体见RDD API 文档（[Scala](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD), [Java](https://spark.apache.org/docs/latest/api/java/index.html?org/apache/spark/api/java/JavaRDD.html), [Python](https://spark.apache.org/docs/latest/api/python/pyspark.rdd.RDD-class.html)）和 PairRDDFunctions 文档([Scala](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions), [Java](https://spark.apache.org/docs/latest/api/java/index.html?org/apache/spark/api/java/JavaPairRDD.html))
+
+#### 2.1.5.3 Actions
+
+[常用的Actions in gitbook](https://endymecy.gitbooks.io/spark-programming-guide-zh-cn/content/programming-guide/rdds/actions.html)。详细内容请参阅 RDD API 文档([Scala](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.RDD), [Java](https://spark.apache.org/docs/latest/api/java/index.html?org/apache/spark/api/java/JavaRDD.html), [Python](https://spark.apache.org/docs/latest/api/python/pyspark.rdd.RDD-class.html)) 和 PairRDDFunctions 文档([Scala](https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.rdd.PairRDDFunctions), [Java](https://spark.apache.org/docs/latest/api/java/index.html?org/apache/spark/api/java/JavaPairRDD.html))。
+
 ## 2.2 SQL
 
 ## 2.3 Spark Stream
 
-具体见[pdf](https://github.com/Neyzoter/Neyzoter.github.io/temp)
+具体见[pdf](https://github.com/Neyzoter/Neyzoter.github.io/tree/master/temp)
 
 Spark streaming是Spark核心API的一个扩展，它对实时流式数据的处理具有可扩展性、高吞吐量、可容错性等特点。
 
@@ -362,8 +462,6 @@ wordCounts.print()
 ssc.start()             // Start the computation
 ssc.awaitTermination()  // Wait for the computation to terminate
 ```
-
-
 
 
 
