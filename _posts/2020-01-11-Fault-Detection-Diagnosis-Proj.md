@@ -59,7 +59,7 @@ keywords: 大数据, 故障检测, 故障诊断, 分布式
    sc.parallelize(value).reduce(func)
    ```
 
-   
+2. 
 
 ## 2.X 性能评估
 
