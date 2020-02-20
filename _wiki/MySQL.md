@@ -119,8 +119,45 @@ drop 表名 where 条件
 | 5.7       | 命令行,Ubuntu16.04LTS | 默认区分大小写，可以设置成不区分 |
 | 5.7       | `com.mysql.cj.jdbc`   | 不区分大小写，默认转化为小写     |
 
+# 4.MySQL高级用法
+
+## 4.1 MySQL缓存机制
+
+**（1）查看缓存情况**
+
+```text
+mysql> show variables like '%query_cache%';
++------------------------------+---------+
+| Variable_name                | Value   |
++------------------------------+---------+
+| have_query_cache             | YES     |      --查询缓存是否可用
+| query_cache_limit            | 1048576 |      --可缓存具体查询结果的最大值
+| query_cache_min_res_unit     | 4096    |      --查询缓存分配的最小块的大小(字节)
+| query_cache_size             | 599040  |      --查询缓存的大小
+| query_cache_type             | ON      |      --是否支持查询缓存
+| query_cache_wlock_invalidate | OFF     |      --控制当有写锁加在表上的时候，是否先让该表相关的 Query Cache失效
++------------------------------+---------+
+6 rows in set (0.02 sec)
+```
+
+**（2）开启和关闭缓存**
+
+开启缓存
+
+```text
+mysql> set global query_cache_size = 600000; --设置缓存内存大小
+mysql> set global query_cache_type = ON;     --开启查询缓存
+```
+
+关闭缓存
+
+```text
+mysql> set global query_cache_size = 0; --设置缓存内存大小为0， 即初始化是不分配缓存内存
+mysql> set global query_cache_type = OFF;     --关闭查询缓存
+```
 
 # X.MySQL安装
+
 服务器端的安装见，`wiki->Linux`说明。
 
 ## X.1 安装
