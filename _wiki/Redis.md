@@ -505,15 +505,183 @@ public class RedisTest {
 
 ### 2.8.1 简单动态字符表
 
+Redis没有使用C语言的传统字符串（以空字符结尾的字符数组）而是构建了简单动态字符串（Simple Dynamic String, SDS）的抽象类型。
 
+在无需对字符进行修改的地方，比如打印字符串时，才会使用C字符串，一般都是使用SDS。比如，
+
+```bash
+redis> SET msg "hello world"
+OK
+
+redis> RPUSH fruits "apple" "banana" "cherry"
+(integer) 3
+```
+
+* **SDS的定义**
+
+  ```c
+  struct sdshdr {
+      // 记录 buf 数组中已使用字节的数量
+      // 等于 SDS 所保存字符串的长度
+      int len;
+      // 记录 buf 数组中未使用字节的数量
+      int free;
+      // 字节数组，用于保存字符串
+      char buf[];
+  };
+  ```
+
+  - `free` 属性的值为 `0` ， 表示这个 SDS 没有分配任何未使用空间。
+  - `len` 属性的值为 `5` ， 表示这个 SDS 保存了一个五字节长的字符串。
+  - `buf` 属性是一个 `char` 类型的数组， 数组的前五个字节分别保存了 `'R'` 、 `'e'` 、 `'d'` 、 `'i'` 、 `'s'` 五个字符， 而最后一个字节则保存了空字符 `'\0'` 。
+
+  <img src="/images/wiki/Redis/SDS_Example.png" width="500" alt="SDS实例">
 
 ### 2.8.2 链表
 
+以下是Redis链表的定义，
 
+```c
+typedef struct listNode {
+    // 前置节点
+    struct listNode *prev;
+    // 后置节点
+    struct listNode *next;
+    // 节点的值
+    void *value;
+} listNode;
+```
+
+Redis还设定了表头来管理链表，
+
+```c
+typedef struct list {
+    // 表头节点
+    listNode *head;
+    // 表尾节点
+    listNode *tail;
+    // 链表所包含的节点数量
+    unsigned long len;
+    // 节点值复制函数
+    // 用于复制链表节点所保存的值
+    void *(*dup)(void *ptr);
+    // 节点值释放函数
+    // 用于释放链表节点所保存的值
+    void (*free)(void *ptr);
+    // 节点值对比函数
+    // 用于对比链表节点所保存的值和另一个输入值是否相等
+    int (*match)(void *ptr, void *key);
+} list;
+```
+
+<img src="/images/wiki/Redis/redis_list.png" width="500" alt="SDS实例">
+
+可见Redis的链表有以下特点：
+
+- 双端： 链表节点带有 `prev` 和 `next` 指针， 获取某个节点的前置节点和后置节点的复杂度都是 O(1) 。
+- 无环： 表头节点的 `prev` 指针和表尾节点的 `next` 指针都指向 `NULL` ， 对链表的访问以 `NULL` 为终点。
+- 带表头指针和表尾指针： 通过 `list` 结构的 `head` 指针和 `tail` 指针， 程序获取链表的表头节点和表尾节点的复杂度为O(1)。
+- 带链表长度计数器： 程序使用 `list` 结构的 `len` 属性来对 `list` 持有的链表节点进行计数， 程序获取链表中节点数量的复杂度为 O(1)。
+- 多态： 链表节点使用 `void*` 指针来保存节点值， 并且可以通过 `list` 结构的 `dup` 、 `free` 、 `match` 三个属性为节点值设置类型特定函数， 所以链表可以用于保存各种不同类型的值。
 
 ### 2.8.3 字典
 
+字典， 又称符号表（symbol table）、关联数组（associative array）或者映射（map）， 是一种用于保存键值对（key-value pair）的抽象数据结构。
 
+* **哈希表**
+
+  字典是基于哈希表实现的，以下是哈希表的结构，
+
+  ```c
+  // 哈希表
+  typedef struct dictht {
+      // 哈希表数组
+      // 数组地址
+      dictEntry **table;
+      // 哈希表大小
+      unsigned long size;
+      // 哈希表大小掩码，用于计算索引值
+      // 总是等于 size - 1
+      unsigned long sizemask;
+      // 该哈希表已有节点的数量
+      unsigned long used;
+  } dictht;
+  
+  // 哈希表节点
+  typedef struct dictEntry {
+      // 键
+      void *key;
+      // 值
+      union {
+          void *val;
+          uint64_t u64;
+          int64_t s64;
+      } v;
+      // 指向下个哈希表节点，形成链表
+      struct dictEntry *next;
+  } dictEntry;
+  ```
+
+  <img src="/images/wiki/Redis/HashMap.png" width="500" alt="Hash表实例">
+
+* **字典**
+
+  ```c
+  typedef struct dict {
+  
+      // 类型特定函数
+      // 用途不同的字典设置不同的类型特定函数
+      dictType *type;
+      // 私有数据
+      void *privdata;
+      // 哈希表
+      // ht[1] 哈希表只会在对 ht[0] 哈希表进行 rehash 时使用。
+      dictht ht[2];
+      // rehash 索引
+      // 当 rehash 不在进行时，值为 -1
+      int rehashidx; /* rehashing not in progress if rehashidx == -1 */
+  } dict;
+  
+  typedef struct dictType {
+      // 计算哈希值的函数
+      unsigned int (*hashFunction)(const void *key);
+      // 复制键的函数
+      void *(*keyDup)(void *privdata, const void *key);
+      // 复制值的函数
+      void *(*valDup)(void *privdata, const void *obj);
+      // 对比键的函数
+      int (*keyCompare)(void *privdata, const void *key1, const void *key2);
+      // 销毁键的函数
+      void (*keyDestructor)(void *privdata, void *key);
+      // 销毁值的函数
+      void (*valDestructor)(void *privdata, void *obj);
+  } dictType;
+  ```
+
+  <img src="/images/wiki/Redis/redis_dict.png" width="500" alt="Hash表实例">
+
+  *什么是rehash？*
+
+  在随着哈希表节点越来越多，可能冲突而放到同一个链表里的节点越来越多，为了分散开这些节点，可以将哈希表的数组增大，然后将各个节点重新分布到哈表表数组对应的各个链表中。具体过程见下方，
+
+  <img src="/images/wiki/Redis/rehash1.png" width="500" alt="Hash表rehash">
+
+  <img src="/images/wiki/Redis/rehash2.png" width="500" alt="Hash表rehash">
+
+  <img src="/images/wiki/Redis/rehash3.png" width="500" alt="Hash表rehash">
+
+  <img src="/images/wiki/Redis/rehash4.png" width="500" alt="Hash表rehash">
+
+  *rehash的触发机制？*
+
+  1. 服务器目前没有在执行 BGSAVE 命令或者 BGREWRITEAOF 命令， 并且哈希表的负载因子大于等于 `1` ；
+
+  2. 服务器目前正在执行 BGSAVE 命令或者 BGREWRITEAOF 命令， 并且哈希表的负载因子大于等于 `5` ；
+
+     ```c
+     # 负载因子 = 哈希表已保存节点数量 / 哈希表大小
+     load_factor = ht[0].used / ht[0].size
+     ```
 
 ### 2.8.4 跳跃表
 
