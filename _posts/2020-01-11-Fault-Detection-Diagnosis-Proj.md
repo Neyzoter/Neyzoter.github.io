@@ -77,4 +77,66 @@ keywords: 大数据, 故障检测, 故障诊断, 分布式
 
 * **测试响应时间**
 
-  
+
+# 3.项目小问题记录
+
+## 3.1 配置问题
+
+* 如何把Springboot应用打包成Spark可识别
+
+  Spark不可识别`spring-boot-maven-plugin`打包的springboot项目结构，需要使用`maven-shade-plugin`
+
+  ```xml
+  <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-shade-plugin</artifactId>
+      <version>2.3</version>
+      <executions>
+          <execution>
+              <phase>package</phase>
+              <goals>
+                  <goal>shade</goal>
+              </goals>
+              <configuration>
+                  <keepDependenciesWithProvidedScope>false</keepDependenciesWithProvidedScope>
+                  <createDependencyReducedPom>false</createDependencyReducedPom>
+                  <filters>
+                      <filter>
+                          <artifact>*:*</artifact>
+                          <excludes>
+                              <exclude>META-INF/*.SF</exclude>
+                              <exclude>META-INF/*.DSA</exclude>
+                              <exclude>META-INF/*.RSA</exclude>
+                          </excludes>
+                      </filter>
+                  </filters>
+                  <transformers>
+                      <transformer
+                                   implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                          <resource>META-INF/spring.handlers</resource>
+                      </transformer>
+                      <transformer
+                                   implementation="org.springframework.boot.maven.PropertiesMergingResourceTransformer">
+                          <resource>META-INF/spring.factories</resource>
+                      </transformer>
+                      <transformer
+                                   implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                          <resource>META-INF/spring.schemas</resource>
+                      </transformer>
+                      <transformer
+                                   implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                      <transformer
+                                   implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                          <mainClass>cn.neyzoter.aiot.fddp.FddpApplication</mainClass>
+                      </transformer>
+                  </transformers>
+              </configuration>
+          </execution>
+      </executions>
+  </plugin>
+  ```
+
+* Spark的Scala版本2.11和2.12不兼容
+
+  如果下载的Spark安装包使用的是Scala2.11，而应用的maven包中配置了Spark的Scala是2.12，则会找不到对应的Scala包。
+
