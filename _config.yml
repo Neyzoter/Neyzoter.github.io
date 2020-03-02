@@ -84,11 +84,11 @@ repository: Neyzoter/Neyzoter.github.io
 #      Comments    #
 # ---------------- #
 # support provider: disqus, netease_gentie
-comments_provider: gitalk
+comments_provider: disqus
 # !!!重要!!! 请修改下面这些信息为你自己申请的
 # !!!Important!!! Please modify infos below to yours
 disqus:
-    username:	
+    username: songchaochao
 # https://imsun.net/posts/gitment-introduction/
 gitment:
     owner: Neyzoter
