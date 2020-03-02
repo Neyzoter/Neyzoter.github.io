@@ -1,7 +1,7 @@
 ---
 layout: post
 title: AUTOSAR的MemMap介绍
-categories: Life
+categories: AUTOSAR
 description: AUTOSAR的MemMap介绍
 keywords: AUTOSAR, MemMap
 
