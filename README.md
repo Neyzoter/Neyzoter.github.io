@@ -2,8 +2,6 @@
 
 我的个人博客：<http://neyzoter.github.io>，欢迎 Star 和 Fork。
 
-**md文件需要以LF结尾，而不能是CRLF，否则首页预览会出现无法检测到换行，造成所有内容都预览的问题。** 如果不小心用了CRLF，可以使用`dos2unix *.md`来实现将所有的md文件的CFLF都转化为LF。
-
 ## 概览
 
 <!-- vim-markdown-toc GFM -->
@@ -55,8 +53,8 @@ Fork 本项目之后，还需要做一些事情才能让你的页面「正确」
 ## 贴心提示
 
 1. 排版建议遵照一定的规范，推荐 [中文文案排版指北（简体中文版）][1]。
-
 2. 在本地预览博客效果可以参考 [Setting up your Pages site locally with Jekyll][2]。
+3. md文件需要以LF结尾，而不能是CRLF，否则首页预览会出现无法检测到换行，造成所有内容都预览的问题。如果不小心用了CRLF，可以使用`dos2unix *.md`来实现将所有的md文件的CFLF都转化为LF。
 
 ## 经验与思考
 
