@@ -2,7 +2,7 @@
 
 我的个人博客：<http://neyzoter.github.io>，欢迎 Star 和 Fork。
 
-**md文件需要以LF结尾，而不能是CRLF，否则首页预览会出现无法检测到换行，造成所有内容都预览的问题。**如果不小心用了CRLF，可以使用`dos2unix *.md`来实现将所有的md文件的CFLF都转化为LF。
+**md文件需要以LF结尾，而不能是CRLF，否则首页预览会出现无法检测到换行，造成所有内容都预览的问题。** 如果不小心用了CRLF，可以使用`dos2unix *.md`来实现将所有的md文件的CFLF都转化为LF。
 
 ## 概览
 
