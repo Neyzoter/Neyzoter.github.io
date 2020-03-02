@@ -87,15 +87,15 @@ repository: Neyzoter/Neyzoter.github.io
 comments_provider: gitalk
 # !!!重要!!! 请修改下面这些信息为你自己申请的
 # !!!Important!!! Please modify infos below to yours
-#disqus:
-#    username:	
+disqus:
+    username:	
 # https://imsun.net/posts/gitment-introduction/
-#gitment:
-#    owner: Neyzoter
-#    repo: blog-comments
-#    oauth:
-#        client_id: 41b144134fc5e55f9f9a
-#        client_secret: 97df6c1ebfb5ef0db4ed23538f8d3dd2bfb261ad
+gitment:
+    owner: Neyzoter
+    repo: blog-comments
+    oauth:
+        client_id: 456b3bc0565b5575a770
+        client_secret: 3b060e443c0fe0b0a84d296ba5b8f4ecf8c0d11a
 # https://github.com/gitalk/gitalk#install
 gitalk:
     owner: Neyzoter
