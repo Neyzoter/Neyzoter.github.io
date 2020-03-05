@@ -1357,3 +1357,251 @@ errorMsg is:
   divider: 0
 ```
 
+## 2.17 Go的关键字
+
+- go：用于并行
+- chan：用于channel通讯
+- select：用于选择不同类型的通讯
+- defer someCode：在函数退出之前执行
+
+# 3. Go语言进阶
+
+## 3.1 CGO编程
+
+
+
+## 3.2 汇编语言
+
+
+
+## 3.3 RPC和Protobuf
+
+RPC的全程是远程过程调用。
+
+### 3.3.1 Go的RPC实例
+
+* **简单实例**
+
+  将HelloService类型注册为RPC服务：
+
+  ```go
+  type HelloService struct {}
+  // 按照Go的RPC规则：方法只能有两个可序列化的参数，其中第二个参数是指针类型，并且返回一个error类型，同时必须是公开的方法
+  func (p *HelloService) Hello(request string, reply *string) error {
+      // reply是需要返回的数据
+      *reply = "hello:" + request
+      return nil
+  }
+  
+  // 将HelloService 作为RPC服务
+  func main() {
+      rpc.RegisterName("HelloService", new(HelloService))
+  
+      listener, err := net.Listen("tcp", ":1234")
+      if err != nil {
+          log.Fatal("ListenTCP error:", err)
+      }
+  
+      conn, err := listener.Accept()
+      if err != nil {
+          log.Fatal("Accept error:", err)
+      }
+  
+      rpc.ServeConn(conn)
+  }
+  ```
+
+  请求RPC服务的过程：
+
+  ```go
+  func main() {
+      // 建立RPC连接
+      client, err := rpc.Dial("tcp", "localhost:1234")
+      if err != nil {
+          log.Fatal("dialing:", err)
+      }
+  
+      var reply string
+      // 调用具体的RPC方法，即HelloService.Hello
+      err = client.Call("HelloService.Hello", "hello", &reply)
+      if err != nil {
+          log.Fatal(err)
+      }
+  
+      fmt.Println(reply)
+  }
+  ```
+
+  * **更加安全的RPC接口**
+
+    （1）RPC服务器
+
+    RPC规范分为：首先是服务的名字，然后是服务要实现的详细方法列表，最后是注册该类型服务的函数
+
+    ```go
+    // 服务名字
+    const HelloServiceName = "path/to/pkg.HelloService"
+    
+    // 要实现的详细方法列表
+    type HelloServiceInterface = interface {
+        Hello(request string, reply *string) error
+    }
+    
+    // 注册RPC服务的方法
+    // HelloServiceInterface接口作为一个RPC服务
+    func RegisterHelloService(svc HelloServiceInterface) error {
+        return rpc.RegisterName(HelloServiceName, svc)
+    }
+    
+    
+    ```
+
+    主函数
+
+    ```go
+    
+    // 结构体HelloService实现了接口HelloServiceInterface
+    type HelloService struct {}
+    func (p *HelloService) Hello(request string, reply *string) error {
+        *reply = "hello:" + request
+        return nil
+    }
+    
+    func main() {
+        RegisterHelloService(new(HelloService))
+    
+        listener, err := net.Listen("tcp", ":1234")
+        if err != nil {
+            log.Fatal("ListenTCP error:", err)
+        }
+    
+        for {
+            conn, err := listener.Accept()
+            if err != nil {
+                log.Fatal("Accept error:", err)
+            }
+    		// go：表示用于并行
+            go rpc.ServeConn(conn)
+        }
+    }
+    ```
+
+    （2）客户端
+
+    ```go
+    const HelloServiceName = "path/to/pkg.HelloService"
+    
+    func main() {
+        client, err := rpc.Dial("tcp", "localhost:1234")
+        if err != nil {
+            log.Fatal("dialing:", err)
+        }
+    
+        var reply string
+        // 以服务名字+方法的方式调用
+        err = client.Call(HelloServiceName+".Hello", "hello", &reply)
+        if err != nil {
+            log.Fatal(err)
+        }
+    }
+    ```
+
+* **跨语言的RPC**
+
+  标准库的RPC默认采用Go语言特有的gob编码，因此从其它语言调用Go语言实现的RPC服务将比较困难。Go语言的RPC框架有两个比较有特色的设计：**一个是RPC数据打包时可以通过插件实现自定义的编码和解码；另一个是RPC建立在抽象的io.ReadWriteCloser接口之上的，我们可以将RPC架设在不同的通讯协议之上**。
+
+  （1）服务器
+
+  ```go
+  func main() {
+      rpc.RegisterName("HelloService", new(HelloService))
+  
+      listener, err := net.Listen("tcp", ":1234")
+      if err != nil {
+          log.Fatal("ListenTCP error:", err)
+      }
+  
+      for {
+          conn, err := listener.Accept()
+          if err != nil {
+              log.Fatal("Accept error:", err)
+          }
+  		// 使用jsonrpc编码，实现RPC服务
+          go rpc.ServeCodec(jsonrpc.NewServerCodec(conn))
+      }
+  }
+  ```
+
+  （2）客户端
+
+  ```go
+  func main() {
+      conn, err := net.Dial("tcp", "localhost:1234")
+      if err != nil {
+          log.Fatal("net.Dial:", err)
+      }
+  
+      client := rpc.NewClientWithCodec(jsonrpc.NewClientCodec(conn))
+  
+      var reply string
+      err = client.Call("HelloService.Hello", "hello", &reply)
+      if err != nil {
+          log.Fatal(err)
+      }
+  
+      fmt.Println(reply)
+  }
+  ```
+
+  底层来看，其实客户端和服务器间的通信都通过JSON格式的方式实现，比如
+
+  ```go
+  type clientResponse struct {
+      Id     uint64           `json:"id"`
+      Result *json.RawMessage `json:"result"`
+      Error  interface{}      `json:"error"`
+  }
+  
+  type serverResponse struct {
+      Id     *json.RawMessage `json:"id"`
+      Result interface{}      `json:"result"`
+      Error  interface{}      `json:"error"`
+  }
+  ```
+
+* **在HTTP上的RPC**
+
+  ```go
+  func main() {
+      rpc.RegisterName("HelloService", new(HelloService))
+  	//RPC的服务架设在“/jsonrpc”路径
+      http.HandleFunc("/jsonrpc", func(w http.ResponseWriter, r *http.Request) {
+          var conn io.ReadWriteCloser = struct {
+              io.Writer
+              io.ReadCloser
+          }{
+              ReadCloser: r.Body,
+              Writer:     w,
+          }
+  		// 每次HTTP请求处理一次RPC方法调用
+          rpc.ServeRequest(jsonrpc.NewServerCodec(conn))
+      })
+  
+      http.ListenAndServe(":1234", nil)
+  }
+  ```
+
+  客户端HTTP请求：
+
+  ```bash
+  curl localhost:1234/jsonrpc -X POST \
+      --data '{"method":"HelloService.Hello","params":["hello"],"id":0}'
+  ```
+
+  
+
+## 3.4 Go和Web
+
+
+
+## 3.5 分布式系统
