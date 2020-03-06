@@ -977,9 +977,11 @@ slice1 := make([]type, len)
 
 ```go
 // 直接初始化切片，[]表示是切片类型，{1,2,3}初始化值依次是1,2,3.其cap=len=3
+// 区别于数组的是切片未指定长度
 s :=[] int {1,2,3 } 
 
 // 初始化切片s,是数组arr的引用
+// 如果arr改变，则切片也会改变
 s := arr[:]
 s := arr[startIndex:] 
 // arr的下标startIndex到endIndex-1的元素
