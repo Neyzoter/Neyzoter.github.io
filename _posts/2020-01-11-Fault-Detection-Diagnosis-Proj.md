@@ -77,6 +77,9 @@ keywords: 大数据, 故障检测, 故障诊断, 分布式
 
 * **测试响应时间**
 
+### 2.X.3 数据生成与测试
+
+使用Golang实现简单的数据读取，并转化为json格式，通过HTTP发送到服务器进行处理。项目地址为[netest](https://github.com/Neyzoter/cooker/tree/master/netest)。
 
 # 3.项目小问题记录
 
