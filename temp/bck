@@ -2,11 +2,14 @@
 user:root psw:song
 
 # Anki
-user:songchaochao@zju.edu.cn
+user:zju email
 
 # influxdb 2.0 beta
 
 user:song pwd:13859017xxxx
 
 # disqus
-user:sonechaochao@gmail.com
+user:gmail
+
+# slack
+user: zju email
