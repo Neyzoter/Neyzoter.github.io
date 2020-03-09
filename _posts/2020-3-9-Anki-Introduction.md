@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 安利Anki
+title: Anki——强大的卡片记忆工具
 categories: Softwares
 description: 安利Anki
 keywords: Anki
@@ -8,7 +8,7 @@ keywords: Anki
 
 
 
-> Anki是一个卡片记忆工具
+> Anki是一个基于“间隔记忆”的卡片记忆工具，可以用来记忆任何东西，能大大提高记忆效率
 
 # 1.Anki介绍
 
