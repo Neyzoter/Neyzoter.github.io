@@ -6,9 +6,7 @@ description: STM32编译代码后，生成的map文件解析
 keywords: STM32, keil, map
 ---
 
-> 原创
->
-> 转载请注明出处，侵权必究
+> Keil软件的Map文件介绍
 
 ## 1、keil的map简介
 

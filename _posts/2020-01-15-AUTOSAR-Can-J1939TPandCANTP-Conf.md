@@ -6,6 +6,8 @@ description: AUTOSAR架构的CAN通信CANTP和J1939TP模块配置
 keywords: 汽车电子, AUTOSAR, CAN, ISO 15765, SAE J1939
 ---
 
+> AUTOSAR框架的通信部分联系了底层硬件和运行时环境RTE
+
 # 1.前言
 
 ## 1.1 CANTP(ISO 15765)介绍

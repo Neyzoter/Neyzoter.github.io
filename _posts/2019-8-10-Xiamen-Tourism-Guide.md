@@ -6,8 +6,7 @@ description: 厦门旅游攻略
 keywords: Tourism, Xiamen
 ---
 
-> 原创
-> 默认景点门票通过美团购买。
+> 厦门岛旅游功率
 
 # 1、旅游准备
 

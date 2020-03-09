@@ -6,9 +6,7 @@ description: Java中的拷贝方法，应对深拷贝和浅拷贝问题
 keywords: Java, 深拷贝, 浅拷贝
 ---
 
-> 原创
->
-> 未完待续
+> Java中的深拷贝和浅拷贝
 
 # 1.Java中的深拷贝和浅拷贝
 

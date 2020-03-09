@@ -6,7 +6,10 @@ description: TensorFlow的安装出现CondaHTTPError
 keywords: TensorFlow, Error, Anaconda
 ---
 
+> 原创
+
 # 1、问题
+
 anaconda安装tensorflow时可能会出现问题。
 ```
 $ conda install tensorflow

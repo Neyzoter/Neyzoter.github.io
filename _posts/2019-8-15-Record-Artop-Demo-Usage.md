@@ -6,7 +6,7 @@ description: 记录一次Artop Demonstrator使用过程
 keywords: AUTOSAR, ARTop, Automotive, 汽车电子
 ---
 
-> 原创
+> Artop是一个用于构建AUTOSAR工具链的底层工具，Artop Demonstrator是Artop官方推出的一个Demo
 >
 
 

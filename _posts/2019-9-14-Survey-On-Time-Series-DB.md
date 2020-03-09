@@ -6,6 +6,8 @@ description: 时间序列数据库调研
 keywords: IoT, database, 时间序列数据库
 ---
 
+> 时间序列数据库介绍，包括HBase、Druid、InfluxDB、Beringei等
+
 # 1.时间序列数据库介绍
 
 典型的时间序列数据库由两个维度坐标表示，横坐标表示时间，纵坐标由数据源（datasource）和metric组成。

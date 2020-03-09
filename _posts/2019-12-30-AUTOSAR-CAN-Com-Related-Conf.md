@@ -6,6 +6,8 @@ description: AUTOSAR架构的CAN通信配置
 keywords: 汽车电子, AUTOSAR, CAN
 ---
 
+> AUTOSAR框架的CAN通信配置说明，涉及CAN Driver、CAN IF、PDUR、BSW任务、RTE任务等模块的信息流和模块介绍
+
 # 1.AUTOSAR的CAN通信介绍
 
 [CAN通信相关配置资源](https://pan.baidu.com/s/1T5XBiUWna3J3EI5AfY3VFg) 提取码: wjr8

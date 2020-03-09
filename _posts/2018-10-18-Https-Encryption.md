@@ -6,9 +6,8 @@ description: https加密的知识
 keywords: https,对称加密,非对称加密
 ---
 
-> 原创
+> HTTPS的加密是如何实现的
 >
-> 转载请注明出处，侵权必究
 
 # 1、http
 

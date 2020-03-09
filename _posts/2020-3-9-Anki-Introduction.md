@@ -4,12 +4,11 @@ title: 安利Anki
 categories: Softwares
 description: 安利Anki
 keywords: Anki
-
 ---
 
 
 
-> 原创
+> Anki是一个卡片记忆工具
 
 # 1.Anki介绍
 

@@ -6,6 +6,8 @@ description: 在IDEA编辑器上实现Springboot的web应用有选择性的使�
 keywords: IDEA, Springboot, properties, modules
 ---
 
+> Springboot在不同的模块配置多个properties的方法
+
 # 1.问题描述
 
 在我们使用Springboot的时候，有时想：

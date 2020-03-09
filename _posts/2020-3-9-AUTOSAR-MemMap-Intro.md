@@ -4,12 +4,11 @@ title: AUTOSAR的MemMap介绍
 categories: AUTOSAR
 description: AUTOSAR的MemMap介绍
 keywords: AUTOSAR, MemMap
-
 ---
 
 
 
-> 原创
+> AUTOSAR框架下的MemMap介绍
 
 # 1.MemMap介绍
 

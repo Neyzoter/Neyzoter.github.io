@@ -8,7 +8,6 @@ keywords: HTTP, HTTPS, Network
 
 > 原创
 >
-> 转载请注明出处，侵权必究
 
 ## 1、HTTP
 

@@ -6,9 +6,7 @@ description: Core21.0.0如何组织模块已有代码
 keywords: AUTOSAR
 ---
 
-> 原创
->
-> 转载请注明出处，侵权必究
+> Core21.0.0是原ARCORE公司（已被VECTOR收购）的符合AUTOSAR规范的代码，本文对该代码进行梳理
 
 # 1、[工程介绍](<https://github.com/Neyzoter/autosar_core21.0.0>)
 
@@ -16,7 +14,7 @@ keywords: AUTOSAR
 
 `*.mk: examples\HelloWorld\HelloWorld\config\stm32_stm3210c\`下的`*.mk`（将各种模块加入到`MOD_USE`变量, 会在`rules.mk`中转化为一个个`USE_XXX`变量，赋值为`y`(表示编译进内核)）或者`examples\HelloWorld\HelloWorld\config\stm32_stm3210c\Rte\Config`下的`*.mk`（将RTE相关目标文件`.o`加入到内核编译，也是编译过程）
 
-`cc_gcc.mk`:配置编译器（`CFLAGS`）、预处理器、链接器（`LDFLAGS`、`LDOUT`、`LDMAPFILE`）、汇编器（`ASFLAGS`、`ASOUT`）、Dumper、归档（`AROUT`），说明: 这里`$(COMPILER)`是`gcc`, 所以指向`cc_​$(COMPILER.mk)`, 还有`cc_armcc.mk`、`cc_iar.mk`等
+`cc_gcc.mk`:配置编译器（`CFLAGS`）、预处理器、链接器（`LDFLAGS`、`LDOUT`、`LDMAPFILE`）、汇编器（`ASFLAGS`、`ASOUT`）、Dumper、归档（`AROUT`），说明: 这里`$(COMPILER)`是`gcc`, 所以指向`cc_$(COMPILER.mk)`, 还有`cc_armcc.mk`、`cc_iar.mk`等
 
 `gcc.mk: \core\system\Os\osal\arm\armv7_m\scripts\gcc.mk`   一些gcc的乱七八糟的配置
 

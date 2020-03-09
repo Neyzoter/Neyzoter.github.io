@@ -6,7 +6,7 @@ description: 在双硬盘上安装Win10出现的问题
 keywords: Windows, Windows10, Install, Problems
 ---
 
-> 原创
+> 解决在Thinkpad E480（带有双硬盘）上无法安装Win10的解决方法
 
 
 

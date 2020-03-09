@@ -6,9 +6,8 @@ description: 项目难点笔记（用于制动器整车测试的无线物联系�
 keywords: 大数据, 故障检测, 故障诊断, 分布式
 ---
 
-> 原创
+> 基于深度学习的故障诊断平台，使用Java、Python实现，在Spark上部署，另外涉及Kafka、Springboot、Tensorflow、Go等内容
 >
-> 未完待续
 
 # 1.项目介绍
 

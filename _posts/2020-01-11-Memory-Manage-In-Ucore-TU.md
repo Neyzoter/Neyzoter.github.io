@@ -6,7 +6,7 @@ description: 清华ucore操作系统的内存管理解析
 keywords: OS, 清华, ucore
 ---
 
-> 原创
+> ucore是清华大学推出的一个用于教学目的的操作系统
 
 # 1.ucore操作系统
 

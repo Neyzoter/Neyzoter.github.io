@@ -6,9 +6,7 @@ description: Ubuntu安装stlink
 keywords: stlink, Ubuntu
 ---
 
-> 备注：
->
-> 目前可下载，但是下载后无法运行
+> Ubuntu16安装和使用stlink
 
 # 1、准备
 

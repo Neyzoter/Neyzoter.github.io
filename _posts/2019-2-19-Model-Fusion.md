@@ -6,9 +6,7 @@ description: 模型融合的方法
 keywords: AI,Bagging,Boosting
 ---
 
-> 原创
->
-> 转载请注明出处，侵权必究
+> 机器学习中模型融合的方法
 
 # 1、基础方式
 

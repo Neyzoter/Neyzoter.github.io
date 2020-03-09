@@ -6,9 +6,8 @@ description: 时间序列分析的一般流程
 keywords: AI,Time Series
 ---
 
-> 原创
+> 时序数据是物联网领域广泛存在的数据类型，具有一定的时空特性，处理难度大
 >
-> 转载请注明出处，侵权必究
 
 
 
@@ -53,7 +52,7 @@ keywords: AI,Time Series
 
 
 ## 3、模型训练
-###3.1 选择模型
+### 3.1 选择模型
 * 异常检测模型
 
 （1）IsolationForest
