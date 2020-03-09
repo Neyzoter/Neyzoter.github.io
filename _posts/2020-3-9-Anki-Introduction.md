@@ -66,7 +66,7 @@ keywords: Anki
 
   Anki官网提供免费的远程同步保存功能，如果想要手动同步只需要点击Sync按钮或者快捷键Y。同步包括下行和上行两个方面，也就是下载本地没有的远程数据，上传远程没有的本地数据。不过在这之前需要注册Anki用户，这样才能同步到对应的账户下。用户还可以在[Anki Web](https://ankiweb.net/decks/)上，通过浏览器查看自己的卡片。有了同步功能，用户就可以在不同设备上进行在多设备上进行卡片记忆啦。
 
-  <img src="/images/posts/2020-3-9-Anki-Introduction/AnkiWeb.png" width="400" alt="Anki Web">
+  <img src="/images/posts/2020-3-9-Anki-Introduction/AnkiWeb.png" width="800" alt="Anki Web">
 
 * **导出卡片**
 
