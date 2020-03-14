@@ -62,11 +62,29 @@ Shuffle是任意两节点之间的通信机制，比如把map阶段RDD的数据�
 
 `f(x + delta) = g(f(x),delta)`
 
-* 阿里提出的**MRM**（Map-Reduce-Merge）
+* **阿里提出的MRM**（Map-Reduce-Merge）
 
   Map作为Local计算；Reduce作为本批内的Aggregate计算；Merge进行跨批全局聚合操作。
 
   以WordCount举例，map将单词变成k是单词名，v是1的键值对；Reduce进行求和操作；Merge实现将本次和之前的结果的聚合。
+
+  MRM的M和R兼容传统的Map和Reduce，而Merge实现了将旧的数据和新的数据进行合并。
+
+  ```java
+  void map(BatchInfo batchInfo, Record recore, Emitter<X, Y> emitter){}
+  void reduce(X key, List<Y> values, Emitter<Z> emitter){}
+  T merge(T oldValue, X key, Z Value, State state, Emitter emitter)()
+  ```
+
+  **有状态计算-增量**
+
+  加、乘可以实现简单的增量；开方等不可以。可以增量的计算不需要将所有的历史数据都保存，而不可以增量的计算需要保存历史数据。这个时候就需要辅助存储设备，需要考虑到容错、存储等问题。storm和Kinesis系统将状态处理问题抛给了用户（问题是对于用户而言太过复杂），而MillWheel系统则将状态存储在Bigtable（Google技术）中（问题是Bigtable也有吞吐上限）。阿里采用存储与计算合一的方法，
+
+  
+
+  
+
+  
 
 #### 1.1.1.4 Batch
 
@@ -77,8 +95,6 @@ Shuffle是任意两节点之间的通信机制，比如把map阶段RDD的数据�
   2. 一条数据处理一次
 
 #### 1.1.1.5 消息机制
-
-* 
 
 * 消息丢失问题
 
@@ -97,20 +113,6 @@ Shuffle是任意两节点之间的通信机制，比如把map阶段RDD的数据�
   3. 上述两种方法自动选择（alibaba）
 
      DAG部分源头重发，部分父亲节点重发
-
-* 
-
-### 1.1.2 分布式计算典型技术
-
-#### 1.1.2.1 Twitter Storm
-
-
-
-#### 1.1.2.2 Kinesis
-
-
-
-#### 1.1.2.3 MillWheel
 
 # 2.分布式存储
 
