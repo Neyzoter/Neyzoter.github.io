@@ -6,7 +6,7 @@ description: 厦门旅游攻略
 keywords: Tourism, Xiamen
 ---
 
-> 厦门岛旅游功率
+> 厦门岛旅游攻略
 
 # 1、旅游准备
 
