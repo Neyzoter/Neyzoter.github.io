@@ -12,7 +12,7 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |-|-|-|
-|Java、C/C++、Python、Matlab、R、Shell、Go |Linux、 Git、Maven、JMeter| Spring、Tomcat、 Netty、 MongoDB、 Docker、Hadoop、Ngnix、HBase、Redis、HTML、React、JUnit、Spring JPA、SpringBoot |
+|Java、C/C++、Python、Matlab、R、Shell、Go |Linux、 Git、Maven、JMeter| Spring、Tomcat、 Netty、 MongoDB、 Docker、Hadoop、Ngnix、HBase、Redis、HTML、React、JUnit、Spring JPA、SpringBoot、Spark、ZooKeeper、InfluxDB |
 
 ## 算法
 
@@ -34,7 +34,7 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |:--|-|-|
-| [Go](http://neyzoter.cn/wiki/Golang/) | [JMeter](http://neyzoter.cn/wiki/JMeter/) |      |
+| [Go](http://neyzoter.cn/wiki/Golang/) | [JMeter](http://neyzoter.cn/wiki/JMeter/) | [Spark](http://neyzoter.cn/wiki/Spark/)、[ZooKeeper](http://neyzoter.cn/wiki/ZooKeeper/)、[InfluxDB](http://neyzoter.cn/wiki/InfluxDb/) |
 
 * 算法
 
