@@ -5,9 +5,9 @@ baseurl:
 url: http://neyzoter.github.io
 date_format: "ordinal"
 title: "宋超超"
-subtitle: "科技人生"
+subtitle: "快乐编程, 幸福生活"
 description: "B.A. of Automation,M.S. of Control sciece and engineering"
-keywords: IoT, 控制, 人工智能, Python
+keywords: 物联网, 后端开发, 大数据
 favicon: /favicon.ico
 timezone: Asia/Shanghai
 encoding: "utf-8"
