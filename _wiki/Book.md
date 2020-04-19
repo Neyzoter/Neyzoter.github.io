@@ -180,4 +180,198 @@ keywords: Book, Note
 
   终止连接需要4次握手，有TCP的半关闭（Half-Close）造成的。一个TCP连接是全双工（两个方向上同时传递），因此每个方向必须单独进行关闭。这一原则就是当一方完成它的数据发送任务后就能发送一个FIN来终止该方向的连接。当一端接受到一个FIN，它必须通知应用层另一端已经终止了那个方向的数据传输（也就是FIN的ack）。
 
+# 3. 大型分布式网站架构设计与实践
+
+通过服务（SOA系统）的方式进行交互，保证交互的标准性；
+
+采用可水平伸缩的集群方式来支撑巨大的访问量，设计到负载均衡问题；
+
+通过分布式缓存解决大量的数据缓存问题；
+
+通过监控、恢复措施提高系统的稳定性；
+
+## 3.1 面向服务的体系架构（SOA）
+
+### 3.1.1 基于TCP协议的RPC
+
+RPC：远程过程调用。
+
+* **对象的序列化**
+
+  数据需要转化为二进制流在网络上传输，涉及到对象的序列化和反序列化问题。解决方案包括Google的Protocal Buffer、Java自带的序列化方式、Hessian、JSON、XML、Spark的Kryo。下面是一个Java序列化的例子，
+
+  ```java
+  public class SerializationUtil implements Serializable {
+      private static final long serialVersionUID = 1065846828160869484L;
+      public static byte[] serialize(Object obj) throws Exception{
+          ByteArrayOutputStream baos = null;
+          ObjectOutputStream oos = null;
+          try{
+              // create byte array output stream
+              baos = new ByteArrayOutputStream();
+              // create obj output stream, write into baos
+              oos = new ObjectOutputStream(baos);
+              // write obj into baos
+              oos.writeObject(obj);
+              // trans to byte[]
+              byte[] bytes = baos.toByteArray();
+              oos.close();
+              return bytes;
+          }catch (Exception e){
+              throw e;
+          }
+      }
+      public static Object deserialize(byte[] bytes){
+          ByteArrayInputStream bais = null;
+          Object tmpObject = null;
+          try {
+              // trans to ByteArrayInputStream
+              bais = new ByteArrayInputStream(bytes);
+              // trans to obj InputStream
+              ObjectInputStream ois = new ObjectInputStream(bais);
+              // trans to obj
+              tmpObject = (Object)ois.readObject();
+              ois.close();
+              return tmpObject;
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+          return null;
+      }
+  }
+  ```
+
+* **基于TCP的RPC简单实现**
+
+  1. 服务（接口）和实现类
+
+  ```java
+  /**
+   * RPC 服务接口
+   * @author Charles Song
+   * @date 2020-4-19
+   */
+  public interface RpcService {
+      String printString (String str) ;
+  }
+  
+  /**
+   * RPC服务实现
+   */
+  public class RpcServiceImpl implements RpcService{
+      @Override
+      public String printString (String str) {
+          System.out.println(str);
+          return str;
+      }
+  }
+  
+  ```
+
+  2. 服务提供者
+
+  ```java
+  /**
+   * RPC 服务提供者
+   * @author Charles Song
+   * @date 2020-4-19
+   */
+  public class RpcProvider {
+      public static final int PORT = 5000;
+      public static void main (String[] args) {
+          // 创建保存服务实现类的对象
+          HashMap<String, Object> servicesImpl = new HashMap<>(10);
+          // 加入RpcService接口实现RpcServiceImpl
+          servicesImpl.put(RpcService.class.getName(), new RpcServiceImpl());
+  
+          try{
+              ServerSocket serverSocket = new ServerSocket(PORT);
+              System.out.println("Waiting for RPC...");
+              while (true) {
+                  Socket socket = serverSocket.accept();
+  
+                  ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+                  // 获取接口名称
+                  String ifName = objectInputStream.readUTF();
+                  System.out.println("Interface Name : " + ifName);
+                  // 获取方法名称
+                  String methodName = objectInputStream.readUTF();
+                  System.out.println("Method Name : " + methodName);
+                  // 获取方法参数类型
+                  Class<?>[] methodArgClass = (Class<?>[]) objectInputStream.readObject();
+                  // 获取方法的参数
+                  Object[] arguments = (Object[]) objectInputStream.readObject();
+  
+                  // 获取接口
+                  Class serviceIfClass = Class.forName(ifName);
+                  // 获取接口的实现
+                  Object serviceImpl = servicesImpl.get(ifName);
+                  // 获取方法
+                  Method method = serviceIfClass.getMethod(methodName, methodArgClass);
+                  // 调用函数methodArgClass
+                  Object result = method.invoke(serviceImpl, arguments);
+                  // 将结果发送给消费者
+                  ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                  objectOutputStream.writeObject(result);
+              }
+          } catch (Exception e) {
+              System.err.println(e);
+          }
+  
+      }
+  }
+  ```
+
+  3. 服务消费者
+
+  ```java
+  /**
+   * RPC 服务使用者
+   * @author Charles Song
+   * @date 2020-4-19
+   */
+  public class RpcConsumer {
+      public static void main (String[] args) {
+          try {
+              String ifName = RpcService.class.getName();
+              Method method = RpcService.class.getMethod("printString", String.class);
+              String methodName = method.getName();
+              Class[] methodArgClass = method.getParameterTypes();
+              Object[] arguments = {"Msg Received..."};
+  
+              Socket socket = new Socket("127.0.0.1", RpcProvider.PORT);
+  
+              ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+              // 接口名称
+              objectOutputStream.writeUTF(ifName);
+              // 方法名称
+              objectOutputStream.writeUTF(methodName);
+              // 方法参数类型
+              objectOutputStream.writeObject(methodArgClass);
+              // 方法参数
+              objectOutputStream.writeObject(arguments);
+  
+              ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+              Object result = objectInputStream.readObject();
+              System.out.println("result = " + (String)result);
+          } catch (Exception e) {
+              System.out.println(e);
+          }
+      }
+  }
+  ```
+
+  运行结果：
+
+  ```
+  ## 服务提供者
+  Waiting for RPC...
+  Interface Name : cn.neyzoter.oj.test.rpc.RpcService
+  Method Name : printString
+  Msg Received...
+  
+  ## 服务消费者
+  result = Msg Received...
+  ```
+
   
