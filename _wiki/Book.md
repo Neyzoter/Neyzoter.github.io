@@ -119,6 +119,28 @@ keywords: Book, Note
 
   所以，**适合的才是最好的，不要总是追求样样精通**。
 
+* **笛米特法则**
+
+  任何对象都不需要知道与之交互的那个对象的任何内部细节。
+
+  比如，下面的方法是不合适的，
+
+  ```java
+  Job job = new Job("Safety Engineer", 5000.00);
+  Person homer = new person("Homer", job);
+  // 通过Person来获取Job，直接操作Job对象是不合适的
+  homer.getJob().setPosition("Janitor");
+  ```
+
+  正确的做法应该是在Person类中定义可以更改Position的方法
+
+  ```java
+  // 正确的做法应该是在Person类中定义可以更改Position的方法
+  homer.changeJobPositionTo("Janitor");
+  ```
+
+  
+
 # 2. TCP-IP详解卷1：协议
 
 ## 第17章 TCP：传输控制协议
