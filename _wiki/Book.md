@@ -139,7 +139,9 @@ keywords: Book, Note
   homer.changeJobPositionTo("Janitor");
   ```
 
-  
+## 1.3 多语言编程
+
+计算机语言会越来越细分领域，追求通用性的语言会被抛弃。
 
 # 2. TCP-IP详解卷1：协议
 
