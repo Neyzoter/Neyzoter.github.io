@@ -374,4 +374,44 @@ RPC：远程过程调用。
   result = Msg Received...
   ```
 
-  
+### 3.1.2 基于HTTP协议RPC
+
+服务消费者在HTTP的URL中加入要调用的服务名称、服务参数等信息，服务提供者根据服务名称从Map中获取服务实现对象，进而执行。
+
+* **JSON和XML**
+
+  对象可以通过JSON和XML工具类转化为字符串流。
+
+  ```java
+  Person person = new Person();
+  // jackson 的ObjectMapper可以将对象转化为JSON
+  ObjectMapper = new ObjectMapper();
+  StringWriter sw = new StringWriter();
+  JsonGenerator gen = new JsonFactory().createJsonGenerator(sw);
+  mapper.writeValue(gen, person);
+  gen.close;
+  ```
+
+### 3.1.3 服务的路由和负载均衡
+
+公共业务被拆分，形成共用的服务，最大程度保证代码和逻辑的复用，这种设计称为SOA（Service-Oriented Architecture）。服务消费者通过**路由**可以找到对应的服务地址列表。负载较高的服务，可以通过**负载均衡**策略，将服务请求发送到集群中的其中一个节点来执行。
+
+```
+                 +-------------------+       +------------+
+                 |     service1      |       |    addr1   |
+                 |     service2      |       |    addr2   |
+consumer  --->   |     service3      | --->  |    addr3   |
+                 |     service4      |       |    addr4   |
+                 |     service5      |       +------------+
+                 +-------------------+
+                       服务路由                  地址列表
+```
+
+当服务越来越多，集群规模变大，人工维护成本大，路由/负载均衡压力变大，容易出现单点故障。比如下图中，单个路由查询服务集群，负载均衡算法将请求指向到某一个服务器上。
+
+<img src="/images/wiki/Book/Single_Router_to_Several_Services.png" width="600" alt="服务路由和负载均衡">
+
+**服务配置中心**，一个动态注册和获取服务的地方来统一管理服务名称和对应的服务器列表信息。服务提供者启动时，将其提供的服务名称、服务器地址注册到服务配置中心，服务消费者通过服务配置中心来获得需要调用的服务的机器列表，通过相应的负载均衡算法，选取其中的一台服务器进行调用。服务器宕机或者下线时，机器需要动态从服务配置中心里面移除，并通知服务消费者。因为为了提高效率，服务消费者会将服务和机器地址缓存在本地。这种**无中心化**的结构解决了之前负载均衡设备所导致的单点故障问题，并大大减轻了服务配置中心的压力。ZooKeeper可以作为服务配置中心的实现，
+
+<img src="/images/wiki/Book/Service_Config_Center_Arch.png" width="600" alt="ZooKeeper实现服务配置中心">
+
