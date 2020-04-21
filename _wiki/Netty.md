@@ -1686,6 +1686,16 @@ public static void writeFlushFuture(ChannelHandlerContext ctx,ByteBuf msg) {
 
 2.对端读取速度小于己方发送速度，导致自身 TCP 发送缓冲区满，频繁发生 write 0 字节时，待发送消息会在 Netty 发送队列排队。
 
+### 3.1.4 内存泄漏的查询
+
+Netty的内存泄漏日志级别包括DISABLE, SIMPLE(默认),ADVANCED, PARANOID，可以在VM参数设置
+
+```
+-Dio.netty.leakDetectionLevel=ADVANCED
+```
+
+进而更加详细的追踪泄漏信息。
+
 ## 3.2 ByteBuf 的释放策略
 有一种说法认为 Netty 框架分配的 ByteBuf 框架会自动释放，业务不需要释放；业务创建的 ByteBuf 则需要自己释放，Netty 框架不会释放。
 
