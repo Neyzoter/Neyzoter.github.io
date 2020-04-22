@@ -516,6 +516,8 @@ consumer  --->   |     service3      | --->  |    addr3   |
 
 * **内存使用**
 
+  通过free可以查看内存和交换区使用情况
+
   ```
   # -g : GB
   $ free -m
@@ -532,5 +534,32 @@ consumer  --->   |     service3      | --->  |    addr3   |
   Swap:         15624           0       15624
   ```
 
-  
+  通过vmstat可以查看交换区的详细使用情况
+
+  ```
+  $ vmstat 
+  # si : 每秒从磁盘交换到内存的数据量, KB/s
+  # s0 : 每秒从内存交换到磁盘的数据量, KB/s
+  procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+   r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+   0  0      0 2886424 997720 6139968    0    0    24    45  261  243  8  2 90  0  0
+  ```
+
+* **qps(query per second)**
+
+  每秒查询数。qps超过阈值，需要对集群扩容，以应对高请求。
+
+* **rt(response time)**
+
+  请求响应时间。可以通过Ngnix的访问日志，得到每个请求的响应时间。
+
+* **数据库操作ps**
+
+  `select/ps` ： 每秒处理select的数量；
+
+  `update/ps`：每秒处理update的数量；
+
+  `delete/ps`：每秒处理delete的数量。
+
+
 
