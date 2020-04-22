@@ -415,3 +415,122 @@ consumer  --->   |     service3      | --->  |    addr3   |
 
 <img src="/images/wiki/Book/Service_Config_Center_Arch.png" width="600" alt="ZooKeeper实现服务配置中心">
 
+## 3.4 系统稳定性
+
+### 3.4.1 监控指标
+
+集群指标包括：系统负载、CPU使用率、IO繁忙程度、网络拥堵情况、内存利用率、应用心跳等。
+
+* **系统负载load**
+
+  特定时间间隔内运行队列中的平均线程数。
+
+  ```
+  # 获取load，这个load是多个核共同的load，平均负载需要处以核的个数
+  $ uptime
+   18:52:16 up  8:09,  1 user,  load average: 0.59, 0.58, 0.69
+  ```
+
+* **CPU利用率**
+
+  ```
+  # 获取CPU利用率
+  $ top | grep Cpu
+   # 用户时间  系统时间  Nice时间 空闲时间 等待时间 硬件中断处理时间 软件中断处理时间 丢失时间
+   # 用户时间，CPU执行用户进程占用的时间
+   # 系统时间，CPU内核态占用的时间
+   # Nice时间，系统调度进程优先级的时间
+   # 空闲时间，系统处于空闲状态
+   # 等待时间，CPU等待IO操作的时间
+   # 硬件中断时间，系统处理硬件中断的时间
+   # 软件中断时间，系统处理软件终端的时间
+   # 丢失时间，强制等待虚拟CPU的时间（虚拟化服务）
+   %Cpu(s):  8.0 us,  1.5 sy,  0.0 ni, 90.2 id,  0.1 wa,  0.0 hi,  0.2 si,  0.0 st
+  ```
+
+  可以按`1`来得到所有CPU单独的使用率情况。
+
+* **磁盘剩余空间**
+
+  ```
+  $ df -h
+  Filesystem      Size  Used Avail Use% Mounted on
+  udev            7.8G     0  7.8G   0% /dev
+  tmpfs           1.6G  9.6M  1.6G   1% /run
+  /dev/nvme0n1p7   29G   21G  5.9G  78% /
+  tmpfs           7.8G  189M  7.6G   3% /dev/shm
+  tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+  tmpfs           7.8G     0  7.8G   0% /sys/fs/cgroup
+  ```
+
+* **网络拥堵情况**
+
+  ```
+  # -n : 回报网络情况
+  # DEV : 查看各个网卡的情况
+  # 第一个1 : 每1秒采样1次
+  # 第二个1 : 总共采样1次
+  $ sar -n DEV 1 1
+  # lo表示本地回环网络
+  # docker0表示docker
+  # enp3s0表示网卡
+  # rxpck/s : 接收的数据包个数
+  # txpck/s : 发送的数据包个数
+  # rxkB/s : 接收的数据字节数
+  # txkB/s : 发送的数据字节数
+  # rxcmp/s : 接收到的压缩包数量
+  # txcmp/s : 发送的压缩包数量
+  # rxmcst/s : 每秒收到的广播包的数量
+  # Average : 采样平均值
+  Linux 4.15.0-96-generic (neyzoter) 	2020年04月22日 	_x86_64_	(8 CPU)
+  
+  19时12分41秒     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+  19时12分42秒        lo     25.00     25.00      3.91      3.91      0.00      0.00      0.00      0.00
+  19时12分42秒   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+  19时12分42秒    enp3s0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+  
+  Average:        IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+  Average:           lo     25.00     25.00      3.91      3.91      0.00      0.00      0.00      0.00
+  Average:      docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+  Average:       enp3s0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+  ```
+
+* **磁盘IO**
+
+  磁盘IO繁忙度反映了系统负载情况
+
+  ```
+  $ iostat -d -k
+  # tps : 每秒处理的IO请求数
+  # kB_read/s : 每秒读
+  # kB_wrtn/s : 每秒写
+  # kB_read : 读总量
+  # kB_wrtn : 写总量
+  Linux 4.15.0-96-generic (neyzoter) 	2020年04月22日 	_x86_64_	(8 CPU)
+  
+  Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+  loop0             0.00         0.00         0.00         12          0
+  nvme0n1          14.82       107.94       201.57    3368298    6289637
+  sda               0.06         2.44         5.34      76250     166712
+  ```
+
+* **内存使用**
+
+  ```
+  # -g : GB
+  $ free -m
+  # total : 总内存
+  # used : 已经使用的内存
+  # free : 未使用的内存
+  # shared : 多个进程共享的内存空间大小
+  # buff/cache : 缓存大小
+  # available : 可使用的大小
+  # Mem : 内存
+  # Swap : 交换区
+                total        used        free      shared  buff/cache   available
+  Mem:          15937        6117        2844        1011        6974        8344
+  Swap:         15624           0       15624
+  ```
+
+  
+
