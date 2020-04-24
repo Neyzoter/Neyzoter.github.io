@@ -503,7 +503,7 @@ public class RedisTest {
 
 ## 2.8 Redis的数据结构
 
-### 2.8.1 简单动态字符表
+### 2.8.1 简单动态字符串
 
 Redis没有使用C语言的传统字符串（以空字符结尾的字符数组）而是构建了简单动态字符串（Simple Dynamic String, SDS）的抽象类型。
 
