@@ -1969,5 +1969,3 @@ Reassignment of partition [foo2,0] completed successfully
 Reassignment of partition [foo2,1] completed successfully
 Reassignment of partition [foo2,2] completed successfully
 ```
-
-# 
