@@ -17,6 +17,8 @@ keywords: 大数据, 故障检测, 故障诊断, 分布式
 
 ## 2.1 降低模型加载的IO瓶颈
 
+**通过Java来加载模型进而运行在实际部署过程中需要较多工作量来实现数据的分发工作，而且模型在网络中传输是否会影响性能？后期拟采用Google提供的[Serving方案](https://tensorflow.google.cn/tfx/guide/serving)。**
+
 ### 2.1.1 问题描述
 
 1. 接入车辆多，无法每个服务器都加载所有的类型的车辆模型，也没有必要
@@ -58,7 +60,33 @@ keywords: 大数据, 故障检测, 故障诊断, 分布式
    sc.parallelize(value).reduce(func)
    ```
 
-2. 
+
+## 2.5 TF模型部署
+
+通过TF的[Serving](https://tensorflow.google.cn/tfx/serving/)来进行部署。
+
+```bash
+# Download the TensorFlow Serving Docker image and repo
+docker pull tensorflow/serving
+
+git clone https://github.com/tensorflow/serving
+# Location of demo models
+TESTDATA="$(pwd)/serving/tensorflow_serving/servables/tensorflow/testdata"
+
+# Start TensorFlow Serving container and open the REST API port
+docker run -t --rm -p 8501:8501 \
+    -v "$TESTDATA/saved_model_half_plus_two_cpu:/models/half_plus_two" \
+    -e MODEL_NAME=half_plus_two \
+    tensorflow/serving &
+
+# Query the model using the predict API
+curl -d '{"instances": [1.0, 2.0, 5.0]}' \
+    -X POST http://localhost:8501/v1/models/half_plus_two:predict
+
+# Returns => { "predictions": [2.5, 3.0, 4.5] }
+```
+
+
 
 ## 2.X 性能评估
 
