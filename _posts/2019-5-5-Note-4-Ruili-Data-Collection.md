@@ -399,7 +399,7 @@ Docker容器在运行时可以输入给定配置文件`xxx.env`。
 
 * 设备相关
 
-  FotaLoaders表：下载器的信息，
+  FotaLoaders表：下载器的信息，包括IMEI、ISMI、在线状态、
 
 # 3、硬件难点
 
