@@ -2619,7 +2619,105 @@ public class TaskRunnable implements Runnable{
 }
 ```
 
+## 3.5 Java注解
+
+### 3.5.1 元注解类型
+
+所谓元注解即注解的注解。
+
+- @Retention 
+
+  标识这个注解怎么保存，是只在代码中，还是编入class文件中，或者是在运行时可以通过反射访问。
+
+  ```java
+  public enum RetentionPolicy {
+      SOURCE,/* Annotation信息仅存在于编译器处理期间，编译器处理完之后就没有该Annotation信息了,比如@Override  */
+      CLASS,  /* 编译器将Annotation存储于类对应的.class文件中。默认行为  */
+      RUNTIME  /* 编译器将Annotation存储于class文件中，并且可由JVM读入 */
+  }
+  ```
+
+- @Documented - 标记这些注解是否包含在用户文档中。
+
+- @Target - 标记这个注解应该是哪种 Java 成员。
+
+  ```java
+  public enum ElementType {
+      TYPE,               /* 类、接口（包括注释类型）或枚举声明  */
+      FIELD,              /* 字段声明（包括枚举常量）  */
+      METHOD,             /* 方法声明  */
+      PARAMETER,          /* 参数声明  */
+      CONSTRUCTOR,        /* 构造方法声明  */
+      LOCAL_VARIABLE,     /* 局部变量声明  */
+      ANNOTATION_TYPE,    /* 注释类型声明  */
+      PACKAGE             /* 包声明  */
+  }
+  ```
+
+- @Inherited - 标记这个注解是继承于哪个注解类(默认 注解并没有继承于任何子类)
+
+
+
+### 3.5.2 Annotation架构
+
+<img src="/images/wiki/Java/annotation-arch.jpg" width="700" alt="annotation架构" />
+
+**(01) 1 个 Annotation 和 1 个 RetentionPolicy 关联。**
+
+可以理解为：每1个Annotation对象，都会有唯一的RetentionPolicy属性。
+
+**(02) 1 个 Annotation 和 1~n 个 ElementType 关联。**
+
+可以理解为：对于每 1 个 Annotation 对象，可以有若干个 ElementType 属性。
+
+**(03) Annotation 有许多实现类，包括：Deprecated, Documented, Inherited, Override 等等。**
+
+Annotation 的每一个实现类，都 "和 1 个 RetentionPolicy 关联" 并且 " 和 1~n 个 ElementType 关联"。
+
+### 3.5.3 Annotation三要素
+
+* **注解声明**
+
+  ```java
+  // @Document表示可以出现在javadoc中
+  @Documented
+  // @Target 表示该注解的作用对象
+  @Target(ElementType.TYPE)
+  // @Retention 指定注解的策略属性，比如RUNTIME表示编译器会将该 Annotation 信息保留在 .class 文件中，并且能被虚拟机读取。
+  @Retention(RetentionPolicy.RUNTIME)
+  // @interface表示实现了Annotation接口
+  public @interface MyAnnotation1 {
+  }
+  ```
+
+* **使用注解的元素**
+
+  也就是注解内部变量。
+
+* **注解处理器**
+
+  从getAnnotation进去可以看到java.lang.class实现了AnnotatedElement方法
+
+  ```java
+  //public final class Class<T> implements java.io.Serializable,
+  //                              GenericDeclaration,
+  //                              Type,
+  //                              AnnotatedElement
+  MyAnTargetType t = AnnotationTest.class.getAnnotation(MyAnTargetType.class);
+  ```
+
+  java.lang.reflect.AnnotatedElement 接口是所有程序元素（Class、Method和Constructor）的父接口，所以程序通过反射获取了某个类的AnnotatedElement对象之后，程序就可以调用该对象的如下四个个方法来访问Annotation信息
+
+  1. 方法1：`<T extends Annotation> T getAnnotation(Class<T> annotationClass)`: 返回改程序元素上存在的、指定类型的注解，如果该类型注解不存在，则返回null。
+     　　
+  2. 方法2：`Annotation[] getAnnotations()`:返回该程序元素上存在的所有注解。
+     　   
+  3.  方法3：`boolean is AnnotationPresent(Class<?extends Annotation> annotationClass)`:判断该程序元素上是否包含指定类型的注解，存在则返回true，否则返回false.
+     　　
+  4. 方法4：`Annotation[] getDeclaredAnnotations()`：返回直接存在于此元素上的所有注释。与此接口中的其他方法不同，该方法将忽略继承的注释。（如果没有注释直接存在于此元素上，则返回长度为零的一个数组。）该方法的调用者可以随意修改返回的数组；这不会对其他调用者返回的数组产生任何影响
+
 # 4、网络编程
+
 ## 4.1 TCP连接过程
 
 服务器实例化一个 ServerSocket 对象，表示通过服务器上的端口通信。
@@ -2638,104 +2736,59 @@ Socket 类的构造函数试图将客户端连接到指定的服务器和端口�
 
 * 构造方法
 
-|1 |**public ServerSocket(int port) throws IOException**
-创建**绑定**到特定端口的服务器套接字。|
+|1 |**public ServerSocket(int port) throws IOException** 创建**绑定**到特定端口的服务器套接字。|
 |-|-|
-|2 | **public ServerSocket(int port, int backlog) throws IOException**
-利用指定的 backlog 创建服务器套接字并将其绑定到指定的本地端口号。|
-|-|-|
-|3 | **public ServerSocket(int port, int backlog, InetAddress address) throws IOException**
-使用指定的端口、侦听 backlog 和要绑定到的本地 IP 地址创建服务器。|
-|-|-|
-|4| **public ServerSocket() throws IOException**
-创建非绑定服务器套接字。|
+|2 | **public ServerSocket(int port, int backlog) throws IOException** 利用指定的 backlog 创建服务器套接字并将其绑定到指定的本地端口号。|
+|3 | **public ServerSocket(int port, int backlog, InetAddress address) throws IOException** 使用指定的端口、侦听 backlog 和要绑定到的本地 IP 地址创建服务器。|
+|4| **public ServerSocket() throws IOException**  创建非绑定服务器套接字。|
 
 说明：创建非绑定服务器套接字。 如果 ServerSocket 构造方法没有抛出异常，就意味着你的应用程序已经成功绑定到指定的端口，并且侦听客户端请求。
 
 * 常用方法
 
-|1 |**public int getLocalPort()**
-  返回此套接字在其上侦听的端口。|
+|1 |**public int getLocalPort()**  返回此套接字在其上侦听的端口。|
 |-|-|
-|2 |**public Socket accept() throws IOException**
-侦听并接受到此套接字的连接。|
-|-|-|
-|3 |**public void setSoTimeout(int timeout)**
- 通过指定超时值启用/禁用 SO_TIMEOUT，以毫秒为单位。|
- |-|-|
-|4 |**public void bind(SocketAddress host, int backlog)**
-将 ServerSocket 绑定到特定地址（IP 地址和端口号）。|
+|2 |**public Socket accept() throws IOException**  侦听并接受到此套接字的连接。|
+|3 |**public void setSoTimeout(int timeout)** 通过指定超时值启用/禁用 SO_TIMEOUT，以毫秒为单位。|
+|4 |**public void bind(SocketAddress host, int backlog)** 将 ServerSocket 绑定到特定地址（IP 地址和端口号）。|
 
 ### 4.2.2 Socket类
 java.net.Socket 类代表客户端和服务器都用来互相沟通的套接字。客户端要获取一个 Socket 对象通过实例化 ，而 服务器获得一个 Socket 对象则通过 accept() 方法的返回值。
 
 * 构造方法
 
-|1 |**public Socket(String host, int port) throws UnknownHostException, IOException.**
-创建一个流套接字并将其连接到指定主机上的指定端口号。|
+|1 |**public Socket(String host, int port) throws UnknownHostException, IOException.** 创建一个流套接字并将其连接到指定主机上的指定端口号。|
 |-|-|
-|2 |**public Socket(InetAddress host, int port) throws IOException**
-创建一个流套接字并将其连接到指定 IP 地址的指定端口号。|
-|-|-|
-|3 |**public Socket(String host, int port, InetAddress localAddress, int localPort) throws IOException.**
-创建一个套接字并将其连接到指定远程主机上的指定远程端口。|
-|-|-|
-|4 |**public Socket(InetAddress host, int port, InetAddress localAddress, int localPort) throws IOException.**
-创建一个套接字并将其连接到指定远程地址上的指定远程端口。|
-|-|-|
+|2 |**public Socket(InetAddress host, int port) throws IOException** 创建一个流套接字并将其连接到指定 IP 地址的指定端口号。|
+|3 |**public Socket(String host, int port, InetAddress localAddress, int localPort) throws IOException.** 创建一个套接字并将其连接到指定远程主机上的指定远程端口。|
+|4 |**public Socket(InetAddress host, int port, InetAddress localAddress, int localPort) throws IOException.** 创建一个套接字并将其连接到指定远程地址上的指定远程端口。|
 |5 |**public Socket()**
 通过系统默认类型的 SocketImpl 创建未连接套接字|
 
 * 常用方法
 
-|1 |**public void connect(SocketAddress host, int timeout) throws IOException**
-将此套接字连接到服务器，并指定一个超时值。|
+|1 |**public void connect(SocketAddress host, int timeout) throws IOException** 将此套接字连接到服务器，并指定一个超时值。|
 |-|-|
-|2 |**public InetAddress getInetAddress()**
- 返回套接字连接的地址。|
- |-|-|
-|3 |**public int getPort()**
-返回此套接字连接到的远程端口。|
-|-|-|
-|4 |**public int getLocalPort()**
-返回此套接字绑定到的本地端口。|
-|-|-|
-|5 |**public SocketAddress getRemoteSocketAddress()**
-返回此套接字连接的端点的地址，如果未连接则返回 null。|
-|-|-|
-|6 |**public InputStream getInputStream() throws IOException**
-返回此套接字的输入流。|
-|-|-|
-|7 |**public OutputStream getOutputStream() throws IOException**
-返回此套接字的输出流。|
-|-|-|
-|8 |**public void close() throws IOException**
-关闭此套接字。|
+|2 |**public InetAddress getInetAddress()**  返回套接字连接的地址。|
+|3 |**public int getPort()**  返回此套接字连接到的远程端口。|
+|4 |**public int getLocalPort()**  返回此套接字绑定到的本地端口。|
+|5 |**public SocketAddress getRemoteSocketAddress()** 返回此套接字连接的端点的地址，如果未连接则返回 null。|
+|6 |**public InputStream getInputStream() throws IOException** 返回此套接字的输入流。|
+|7 |**public OutputStream getOutputStream() throws IOException** 返回此套接字的输出流。|
+|8 |**public void close() throws IOException**  关闭此套接字。|
 
 ### 4.2.3 InetAddress类
 
 这个类表示互联网协议(IP)地址。
 
-|1 |**static InetAddress getByAddress(byte[] addr)**
-在给定原始 IP 地址的情况下，返回 InetAddress 对象。|
+|1 |**static InetAddress getByAddress(byte[] addr)** 在给定原始 IP 地址的情况下，返回 InetAddress 对象。|
 |-|-|
-|2 |**static InetAddress getByAddress(String host, byte[] addr)**
-根据提供的主机名和 IP 地址创建 InetAddress。|
-|-|-|
-|3 |**static InetAddress getByName(String host)**
-在给定主机名的情况下确定主机的 IP 地址。|
-|-|-|
-|4 |**String getHostAddress()**
-返回 IP 地址字符串（以文本表现形式）。|
-|-|-|
-|5 |**String getHostName()**
- 获取此 IP 地址的主机名。|
- |-|-|
-|6 |**static InetAddress getLocalHost()**
-返回本地主机。|
-|-|-|
-|7 |**String toString()**
-将此 IP 地址转换为 String。|
+|2 |**static InetAddress getByAddress(String host, byte[] addr)**  根据提供的主机名和 IP 地址创建 InetAddress。|
+|3 |**static InetAddress getByName(String host)** 在给定主机名的情况下确定主机的 IP 地址。|
+|4 |**String getHostAddress()** 返回 IP 地址字符串（以文本表现形式）。|
+|5 |**String getHostName()**  获取此 IP 地址的主机名。|
+|6 |**static InetAddress getLocalHost()** 返回本地主机。|
+|7 |**String toString()** 将此 IP 地址转换为 String。|
 
 ## 4.3 实例
 
