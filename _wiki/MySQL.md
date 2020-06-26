@@ -156,6 +156,118 @@ mysql> set global query_cache_size = 0; --设置缓存内存大小为0， 即初
 mysql> set global query_cache_type = OFF;     --关闭查询缓存
 ```
 
+## 4.2 binlog
+
+### 4.2.1 介绍
+
+### 4.2.2 使用
+
+（1）启动
+
+```bash
+# my.cnf文件配置binlog
+# 默认在 /var/lib/mysql目录下以mysqld-bin.00000X等作为名称
+# mysqld-bin.index记录了所有的log的文件名称
+bin_log=mysql_bin
+# 格式：STATEMENT、ROW、MIXED，主要用于主从复制
+# 对应三种模式：基于SQL语句的复制(statement-based replication, SBR)，基于行的复制(row-based replication, RBR)，混合模式复制(mixed-based replication, MBR)
+binlog_format=Row
+# 服务器ID
+server_id=1
+# 追踪database操作
+mysqlbinlog /var/lib/mysql|grep "*****"	
+```
+
+（2）配置格式
+
+```bash
+# 查看默认格式
+mysql> show variables like 'character%';
++--------------------------+----------------------------+
+| Variable_name            | Value                      |
++--------------------------+----------------------------+
+| character_set_client     | utf8                       |
+| character_set_connection | utf8                       |
+| character_set_database   | latin1                     |
+| character_set_filesystem | binary                     |
+| character_set_results    | utf8                       |
+| character_set_server     | latin1                     |
+| character_set_system     | utf8                       |
+| character_sets_dir       | /usr/share/mysql/charsets/ |
++--------------------------+----------------------------+
+# 更改格式
+# 在my.cnf后面追加
+collation-server=utf8_unicode_ci
+init-connect='SET NAMES utf8'
+character-set-server=utf8
+sql_mode=NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+[client]
+default-character-set=utf8
+[mysql]
+default-character-set=utf8
+# 重启mysqld
+
+# 查看格式
+mysql> SHOW VARIABLES LIKE 'character%';
++--------------------------+----------------------------+
+| Variable_name            | Value                      |
++--------------------------+----------------------------+
+| character_set_client     | utf8                       |
+| character_set_connection | utf8                       |
+| character_set_database   | utf8                       |
+| character_set_filesystem | binary                     |
+| character_set_results    | utf8                       |
+| character_set_server     | utf8                       |
+| character_set_system     | utf8                       |
+| character_sets_dir       | /usr/share/mysql/charsets/ |
++--------------------------+----------------------------+
+```
+
+（3）备份实现
+
+周期性运行备份脚本，比如使用crontab
+
+```bash
+# 找到mysqldump位置
+whereis mysqldump
+# 运行mysqldump
+# 周期性将test数据库保存到文件
+# -l：读锁
+# -F：flush logs指令，重新生成日志文件，方便后边恢复（从新的bignlog文件开始就可以）
+/usr/bin/mysqldump -uroot -p123456 -l - F test > /tmp/test.sql
+# 查看bin日志当前位置
+# 可以记录下来，方便下次备份
+mysql> show master status;
++------------------+----------+--------------+------------------+-------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++------------------+----------+--------------+------------------+-------------------+
+| mysql_bin.000002 |     5427 |              |                  |                   |
++------------------+----------+--------------+------------------+-------------------+
+```
+
+恢复数据
+
+```bash
+# 首先恢复sql备份
+## -v：查看导入的详细信息
+## -f：当中间遇到错误时，可以skip过去，继续执行下面的语句
+mysql -uroot -p123456 test -v -f < /tmp/test.sql
+# 查看binlog
+## 直接查看文件（需要mysqlbinlog打开，cat等无法识别）
+/usr/bin/mysqlbinlog --no-defaults  /var/lib/mysql/mysql_bin.000002 --start-position="794" --stop-position="1055" | more
+## 通过mysql查看（更加直观）
+mysql > show binlog events in 'mysql_bin.000002'
+# 从binlog恢复没有备份的内容
+## --no-defaults ： mysqlbinlog无法识别default-character-set=utf8这个指令，需要加上--no-defaults
+## --start-position：开始位置
+##  --stop-position=5911：结束位置
+## --database：指定数据库
+## -v：表示执行该mysql命令
+/usr/bin/mysqlbinlog  --no-defaults --start-position=378 --stop-position=5911 --database=test  /var/lib/mysql/mysql_bin.000002 | /usr/bin/mysql -uroot -pRoot123456@ -v test
+```
+
+
+
 # X.MySQL安装
 
 服务器端的安装见，`wiki->Linux`说明。
