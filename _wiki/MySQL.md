@@ -221,6 +221,12 @@ mysql> SHOW VARIABLES LIKE 'character%';
 | character_set_system     | utf8                       |
 | character_sets_dir       | /usr/share/mysql/charsets/ |
 +--------------------------+----------------------------+
+
+# 设置过期天数
+## 查看过期天数
+mysql > show variables like '%expire_logs_days%'
+## 设置过期天数
+mysql > set global expire_logs_days=7;
 ```
 
 （3）备份实现
