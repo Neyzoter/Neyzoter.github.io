@@ -2165,3 +2165,43 @@ Newprog :: bar.c
 	$(cc) $(CFLAGS) $< -o $@	
 ```
 
+# 8、Linux系统参数
+
+## 8.1 参数总览
+
+| 参数                                               | 描述                                                         |
+| :------------------------------------------------- | :----------------------------------------------------------- |
+| net.core.rmem_default                              | 默认的TCP数据接收窗口大小（字节）。                          |
+| net.core.rmem_max                                  | 最大的TCP数据接收窗口（字节）。                              |
+| net.core.wmem_default                              | 默认的TCP数据发送窗口大小（字节）。                          |
+| net.core.wmem_max                                  | 最大的TCP数据发送窗口（字节）。                              |
+| net.core.netdev_max_backlog                        | 当内核处理速度比网卡接收速度慢时，这部分多出来的包就会被保存在网卡的接收队列上，而该参数说明了这个队列的数量上限。在每个网络接口接收数据包的速率比内核处理这些包的速率快时，允许送到队列的数据包的最大数目。 |
+| net.core.somaxconn                                 | 该参数定义了系统中每一个端口最大的监听队列的长度，是个全局参数。该参数和`net.ipv4.tcp_max_syn_backlog`有关联，后者指的是还在三次握手的半连接的上限，该参数指的是处于ESTABLISHED的数量上限。若您的ECS实例业务负载很高，则有必要调高该参数。`listen(2)`函数中的参数`backlog` 同样是指明监听的端口处于ESTABLISHED的数量上限，当`backlog`大于`net.core.somaxconn`时，以`net.core.somaxconn`参数为准。 |
+| net.core.optmem_max                                | 表示每个套接字所允许的最大缓冲区的大小。                     |
+| net.ipv4.tcp_mem                                   | 确定TCP栈应该如何反映内存使用，每个值的单位都是内存页（通常是4KB）。 第一个值是内存使用的下限。 第二个值是内存压力模式开始对缓冲区使用应用压力的上限。 第三个值是内存使用的上限。在这个层次上可以将报文丢弃，从而减少对内存的使用。对于较大的BDP可以增大这些值（注：其单位是内存页而不是字节）。 |
+| net.ipv4.tcp_rmem                                  | 为自动调优定义Socket使用的内存。 第一个值是为Socket接收缓冲区分配的最少字节数。 第二个值是默认值（该值会被rmem_default覆盖），缓冲区在系统负载不重的情况下可以增长到这个值。 第三个值是接收缓冲区空间的最大字节数（该值会被rmem_max覆盖）。 |
+| net.ipv4.tcp_wmem                                  | 为自动调优定义Socket使用的内存。 第一个值是为Socket发送缓冲区分配的最少字节数。 第二个值是默认值（该值会被wmem_default覆盖），缓冲区在系统负载不重的情况下可以增长到这个值。 第三个值是发送缓冲区空间的最大字节数（该值会被wmem_max覆盖）。 |
+| net.ipv4.tcp_keepalive_time                        | TCP发送keepalive探测消息的间隔时间（秒），用于确认TCP连接是否有效。 |
+| net.ipv4.tcp_keepalive_intvl                       | 探测消息未获得响应时，重发该消息的间隔时间（秒）。           |
+| net.ipv4.tcp_keepalive_probes                      | 在认定TCP连接失效之前，最多发送多少个keepalive探测消息。     |
+| net.ipv4.tcp_sack                                  | 启用有选择的应答（1表示启用），通过有选择地应答乱序接收到的报文来提高性能，让发送者只发送丢失的报文段，（对于广域网通信来说）这个选项应该启用，但是会增加对CPU的占用。 |
+| net.ipv4.tcp_fack                                  | 启用转发应答，可以进行有选择应答（SACK）从而减少拥塞情况的发生，这个选项也应该启用。 |
+| net.ipv4.tcp_timestamps                            | TCP时间戳（会在TCP包头增加12B），以一种比重发超时更精确的方法（参考RFC 1323）来启用对RTT的计算，为实现更好的性能应该启用这个选项。 |
+| net.ipv4.tcp_window_scaling                        | 启用RFC 1323定义的window scaling，要支持超过64KB的TCP窗口，必须启用该值（1表示启用），TCP窗口最大至1GB，TCP连接双方都启用时才生效。 |
+| net.ipv4.tcp_syncookies                            | 该参数表示是否打开TCP同步标签（`SYN_COOKIES`），内核必须开启并编译CONFIG_SYN_COOKIES，`SYN_COOKIES`可以防止一个套接字在有过多试图连接到达时，引起过载。默认值0表示关闭。 当该参数被设置为1，且`SYN_RECV`队列满了之后，内核会对SYN包的回复做一定的修改，即在响应的SYN+ACK包中，初始的序列号是由源IP+Port、目的IP+Port及时间这五个参数共同计算出一个值组成精心组装的TCP包。由于ACK包中确认的序列号并不是之前计算出的值，恶意攻击者无法响应或误判，而请求者会根据收到的SYN+ACK包做正确的响应。启用`net.ipv4.tcp_syncookies`后，会忽略`net.ipv4.tcp_max_syn_backlog`。 |
+| net.ipv4.tcp_tw_reuse                              | 表示是否允许将处于TIME-WAIT状态的Socket（TIME-WAIT的端口）用于新的TCP连接。 |
+| net.ipv4.tcp_tw_recycle                            | 能够更快地回收TIME-WAIT套接字。                              |
+| net.ipv4.tcp_fin_timeout                           | 对于本端断开的Socket连接，TCP保持在FIN-WAIT-2状态的时间（秒）。对方可能会断开连接或一直不结束连接或不可预料的进程死亡。 |
+| net.ipv4.ip_local_port_range                       | 表示TCP/UDP协议允许使用的本地端口号。                        |
+| net.ipv4.tcp_max_syn_backlog                       | 该参数决定了系统中处于`SYN_RECV`状态的TCP连接数量。`SYN_RECV`状态指的是当系统收到SYN后，作为SYN+ACK响应后等待对方回复三次握手阶段中的最后一个ACK的阶段。对于还未获得对方确认的连接请求，可保存在队列中的最大数目。如果服务器经常出现过载，可以尝试增加这个数字。默认为1024。 |
+| net.ipv4.tcp_low_latency                           | 允许TCP/IP栈适应在高吞吐量情况下低延时的情况，这个选项应该禁用。 |
+| net.ipv4.tcp_westwood                              | 启用发送者端的拥塞控制算法，它可以维护对吞吐量的评估，并试图对带宽的整体利用情况进行优化，对于WAN通信来说应该启用这个选项。 |
+| net.ipv4.tcp_bic                                   | 为快速长距离网络启用Binary Increase Congestion，这样可以更好地利用以GB速度进行操作的链接，对于WAN通信应该启用这个选项。 |
+| net.ipv4.tcp_max_tw_buckets                        | 该参数设置系统的TIME_WAIT的数量，如果超过默认值则会被立即清除。默认为180000。 |
+| net.ipv4.tcp_synack_retries                        | 指明了处于SYN_RECV状态时重传SYN+ACK包的次数。                |
+| net.ipv4.tcp_abort_on_overflow                     | 设置该参数为1时，当系统在短时间内收到了大量的请求，而相关的应用程序未能处理时，就会发送Reset包直接终止这些链接。建议通过优化应用程序的效率来提高处理能力，而不是简单地Reset。默认值为0。 |
+| net.ipv4.route.max_size                            | 内核所允许的最大路由数目。                                   |
+| net.ipv4.ip_forward                                | 接口间转发报文。                                             |
+| net.ipv4.ip_default_ttl                            | 报文可以经过的最大跳数。                                     |
+| net.netfilter.nf_conntrack_tcp_timeout_established | 在指定之间内，已经建立的连接如果没有活动，则通过iptables进行清除。 |
+| net.netfilter.nf_conntrack_max                     | 哈希表项最大值。                                             |
