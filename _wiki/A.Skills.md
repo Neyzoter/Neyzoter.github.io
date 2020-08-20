@@ -12,7 +12,7 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |-|-|-|
-|Java、C/C++、Python、Matlab、R、Shell、Go |Linux、 Git、Maven、JMeter| Spring、Tomcat、 Netty、 MongoDB、 Docker、Hadoop、Ngnix、HBase、Redis、HTML、React、JUnit、Spring JPA、SpringBoot、Spark、ZooKeeper、InfluxDB |
+|Java、C/C++、Python、Matlab、R、Shell、Go |Linux、 Git、Maven、JMeter、Locust| Spring、Tomcat、 Netty、 MongoDB、 Docker、Hadoop、Ngnix、HBase、Redis、HTML、React、JUnit、Spring JPA、SpringBoot、Spark、ZooKeeper、InfluxDB、Kafka |
 
 ## 算法
 
@@ -34,7 +34,7 @@ keywords: skills
 
 |编程语言|编程技能|框架|
 |:--|-|-|
-| [Go](http://neyzoter.cn/wiki/Golang/) | [JMeter](http://neyzoter.cn/wiki/JMeter/) | [Spark](http://neyzoter.cn/wiki/Spark/)、[ZooKeeper](http://neyzoter.cn/wiki/ZooKeeper/)、[InfluxDB](http://neyzoter.cn/wiki/InfluxDb/) |
+| [Go](http://neyzoter.cn/wiki/Golang/) | [JMeter](http://neyzoter.cn/wiki/JMeter/)、[Locust](https://neyzoter.cn/wiki/locust/) | [Spark](http://neyzoter.cn/wiki/Spark/)、[ZooKeeper](http://neyzoter.cn/wiki/ZooKeeper/)、[InfluxDB](http://neyzoter.cn/wiki/InfluxDb/)、[Kafka](https://neyzoter.cn/wiki/Kafka/) |
 
 * 算法
 
