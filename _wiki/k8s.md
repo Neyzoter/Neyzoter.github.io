@@ -137,6 +137,28 @@ K8s的API由HTTP+JSON组成，通过HTTP访问，content的内容是JSON格式�
 
 **Spec**的status，表达该资源当前的状态，如正在被调度、running、terminates或者执行完毕。
 
+# 2、K8S集群搭建
+
+* 准备工作
+
+  ```bash
+  # 1、关闭防火墙、selinux
+  # selinux(Security-Enhanced Linux)：加强安全性的一个组件，但非常容易出错且难以定位
+  # k8s是需要用防火墙做ip转发和修改的，当然也看使用的网络模式，如果采用的网络模式不需要防火墙也是可以直接关闭的
+  $ systemctl disable --now firewalld
+  # 2、setenforce 0 (临时生效可以直接用setenforce 0 ) 1 启用  0 告警，不启用
+  $ setenforce 0
+  setenforce: SELinux is disabled
+  # 3、将/etc/selinux/config文件中的SELINUX参数数值改为disabled
+  # 4、关闭swap分区，提高性能
+  swapoff -a
+  ## 未知作用，待考证
+  ## /etc/fstab文件包含众多文件系统的描述信息
+  sed -i.bak 's/^.*centos-swap/#&/g' /etc/fstab
+  ```
+
+* 
+
 # 参考
 
 [1.云栖社区推文](https://mp.weixin.qq.com/s/avLAGdLw210BOKn-aaFvIw)
