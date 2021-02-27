@@ -10,7 +10,7 @@ keywords: 汽车电子, AUTOSAR, CAN
 
 # 1.AUTOSAR的CAN通信介绍
 
-[CAN通信相关配置资源](https://pan.baidu.com/s/1T5XBiUWna3J3EI5AfY3VFg) 提取码: wjr8
+[CAN通信相关配置资源](https://pan.baidu.com/s/1m3uolhnf1HOUL_6P33fKwg) 提取码: 5r2i
 
 AUTOSAR的通信是其最复杂的部分之一，其中CAN在汽车上有大量的应用，故对CAN通信进行介绍、配置和实验。
 
