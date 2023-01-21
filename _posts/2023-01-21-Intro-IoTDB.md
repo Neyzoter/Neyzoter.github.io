@@ -30,7 +30,7 @@ keywords: TSDB, IoTDB
 
 IoTDB按照路径组织物理量，以下图为例，可以通过 `root.ln.wf01.wt01.status`唯一定位到一个物理量。
 
-<img src="/images/posts/2022-01-21-Intro-IoTDB/data-model-example.png" width="300" alt="按照路径组织物理量" />
+<img src="/images/posts/2023-01-21-Intro-IoTDB/data-model-example.png" width="300" alt="按照路径组织物理量" />
 
 路径第一级为root，系统默认创建。路径第二级为数据库名，在存储概念中也称为逻辑存储组。存储路径倒数第二级表示实体，可以包含多个物理量。最后一级表示物理量。
 
@@ -40,7 +40,7 @@ IoTDB按照路径组织物理量，以下图为例，可以通过 `root.ln.wf01.
 
 IoTDB支持创建模板，能够做到快速实例化实体。模板支持创建、挂载、激活、解绑、删除等方式。
 
-<img src="/images/posts/2022-01-21-Intro-IoTDB/template-manage.png" width="300" alt="IoTDB的元数据模板" />
+<img src="/images/posts/2023-01-21-Intro-IoTDB/template-manage.png" width="300" alt="IoTDB的元数据模板" />
 
 这里有一个问题，如果想要修改某个实体的模板，是做不到的。但**实际的场景中，施工会出现频繁而持续的模板改动，甚至不同的实体会分化到不同的模板下。在系统维护节点，偶尔也会改动模板。**如果需要改动模板，则需要将原来的实体删除，造成所有数据丢失。用户不得已进行数据的备份和恢复工作。
 
@@ -107,11 +107,11 @@ IoTDB支持创建模板，能够做到快速实例化实体。模板支持创建
 
 **data**目录是时序数据的存储目录，分为顺序sequence和乱序unsequence。IoTDB会为每个物理量维护顺序sequence的最新时间戳，如果新数据早于该时间戳，则认为是乱序的，需要将数据保存到乱序unsequence目录下。这么做的原因是IoTDB的特点（也是所有时序数据库的特点，具体可以看LSM树）决定的，即数据先缓存再批量刷盘。下图是IoTDB数据上报-缓存-刷盘-合并等过程的示意图。
 
-<img src="/images/posts/2022-01-21-Intro-IoTDB/iotdb-lsm.png" width="300" alt="IoTDB存储引擎" />
+<img src="/images/posts/2023-01-21-Intro-IoTDB/iotdb-lsm.png" width="300" alt="IoTDB存储引擎" />
 
 为了提高数据写入速度，IoTDB会先数据缓存到内存也就是memtable。memtable达到一定的大小后，会将不同的时序数据组织成一条一条、按照时间排序的连续存储块（Chunk，每个Chunk下有多个存储页Page）批量刷入磁盘。在这个过程中会进行编码（比如二阶查分编码TS_2DIFF、游程编码RLE、字典编码DICTIONARY等）、压缩（比如SNAPPY压缩、LZ4压缩、GZIP压缩等）。Page的大小会限制在一定数据量，比如100个数据带你，是IoTDB编解码、压解缩的单位。回到“如果新数据早于该时间戳，则认为是乱序的，需要将数据保存到乱序unsequence目录下”的问题。如果允许乱序的数据立刻插入顺序sequence文件中，则需要定位到对应的Page，将其解压缩、解码、插入数据、编码、压缩并重新写入磁盘，搬迁所在的Chunk后其他数据并重新组织Chunk的索引。在上述过程中，会消耗较多的CPU和IO资源。
 
-<img src="/images/posts/2022-01-21-Intro-IoTDB/tsfile.png" width="300" alt="IoTDB的TsFile" />
+<img src="/images/posts/2023-01-21-Intro-IoTDB/tsfile.png" width="300" alt="IoTDB的TsFile" />
 
 编码/压缩算法会根据历史数据进行学习，提高压缩率。所以为了进一步提高压缩率，IoTDB会将不同的文件进行合并，防止同一个物理量的数据无序/零散分布在不同的文件。与此同时，也会将乱序unsequence的数据合并到顺序sequence中。乱序和顺序合并后，也会在一定程度上提高查询效率。不然，我们可想而知，查询引擎需要在两个目录下都搜索一遍。
 
@@ -174,7 +174,7 @@ IoTDB有较多值得我们学习的地方，也有一些问题，值得我们去
 
 * Chunk中的Page Header连续存储，而不是和Data混合
 
-  <img src="/images/posts/2022-01-21-Intro-IoTDB/chunk-page-header-opt.png" width="300" alt="IoTDB的TsFile" />
+  <img src="/images/posts/2023-01-21-Intro-IoTDB/chunk-page-header-opt.png" width="300" alt="IoTDB的TsFile" />
 
 * 区分编码和压缩
 
