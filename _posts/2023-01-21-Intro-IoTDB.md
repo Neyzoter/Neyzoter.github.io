@@ -3,7 +3,7 @@ layout: post
 title: IoTDB技术内幕初探
 categories: TSDB
 description: IoTDB技术内幕初探
-keywords:TSDB,IoTDB
+keywords: TSDB, IoTDB
 ---
 
 > IoTDB的数据模型、存储引擎。
