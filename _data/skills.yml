@@ -1,12 +1,17 @@
-- name: Database
+- name: 数据库
   keywords:
-      - Kernel
-      - TSDB
-      - RDBMS
+      - 内核
+      - 时序数据库
+      - 关系型数据库
 
-- name: Computer Language
+- name: 编程语言
   keywords:
       - Golang
       - Rust
       - Java
       - Python
+
+- name: 行业
+  keywords:
+      - 工业SCADA
+      - 时序数据库
