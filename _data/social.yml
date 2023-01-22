@@ -1,16 +1,8 @@
-- sitename: 简 历
-  name: CV
-  url: https://github.com/Neyzoter/Neyzoter.github.io/tree/master/CV
-
 - sitename: GitHub
   name: Neyzoter
   url: https://github.com/Neyzoter
 
 - sitename: 知 乎
-  name: Neyzoter
+  name: 宋超超
   url: https://www.zhihu.com/people/Neyzoter
-
-- sitename: Docker Hub
-  name: neyzoter
-  url: https://hub.docker.com/u/neyzoter
 

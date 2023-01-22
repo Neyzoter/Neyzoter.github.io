@@ -7,7 +7,7 @@ date_format: "ordinal"
 title: "宋超超 | Charles"
 subtitle: "编码物语"
 description: "B.A. of Automation,M.S. of Control sciece and engineering"
-keywords: 物联网, 后端开发, 大数据
+keywords: 物联网, 后端开发, 数据库
 favicon: /favicon.ico
 timezone: Asia/Shanghai
 encoding: "utf-8"
@@ -17,8 +17,8 @@ side_bar_repo_limit: 5
 #      Author      #
 # ---------------- #
 author: songchaochao
-organization: NESCAR
-organization_url: http://www.nescar.icu/
+organization: Aliyun
+organization_url: https://supet.com/
 github_username: Neyzoter
 location: Hangzhou, China
 email: sonechaochao@gmail.com

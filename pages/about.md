@@ -10,7 +10,7 @@ permalink: /about/
 
 我是宋超超。
 
-座右铭：坚持就是胜利。
+座右铭：让进步发生。
 
 ## contact(联系)
 
@@ -18,7 +18,7 @@ permalink: /about/
 * {{ website.sitename }}：[@{{ website.name }}]({{ website.url }})
 {% endfor %}
 
-## Skill Keywords(技能)
+## Skill Keywords
 
 {% for category in site.data.skills %}
 ### {{ category.name }}
