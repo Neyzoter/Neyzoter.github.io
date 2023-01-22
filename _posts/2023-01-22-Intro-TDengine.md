@@ -76,7 +76,7 @@ TDengine可以通过定义表来创建一些数据的集合，类似于IoTDB的�
 
 TDengine支持通过定义超级表来实现快速创建表。用户可以在超级表定义列、标签名等信息。
 
-<img src="/images/posts/2023-01-21-Intro-TDengine/data-model.png" width="600" alt="TDengine数据模型" />
+<img src="/images/posts/2023-01-22-Intro-TDengine/data-model.png" width="600" alt="TDengine数据模型" />
 
 TDengine的标签不同于InfluxDB，不是时间线的标记，而是落在表上。在创建表的时候设定标签。这一点类似于IoTDB。在某种程度上阻止用户为标签设定变化的值，造成大量的时间线创建（InfluxDB）。
 
@@ -162,7 +162,7 @@ TDengine的标签不同于InfluxDB，不是时间线的标记，而是落在表�
 
 **vnode**目录用于存储时序数据以及相关的元数据。下图是数据的存储层级：
 
-<img src="/images/posts/2023-01-21-Intro-TDengine/data-model-level.png" width="600" alt="TDengine数据模型层级" />
+<img src="/images/posts/2023-01-22-Intro-TDengine/data-model-level.png" width="600" alt="TDengine数据模型层级" />
 
 我们可以看到目录下有node{数字}这类目录名。在创建数据库的时候即可设定VGROUPS，也就是vnode组的个数。TDengine通过数字编号来区分不同的vnode。TDengine基于一致性Hash算法去分配数据。一致性Hash算法在集群增加节点时，能够使得数据尽可能少地搬迁。需要说明的是，目前没有看到TDengine创建数据库后更改VGROUPS的能力，也就是说一致性Hash“使得数据尽可能少地搬迁”的能力没有用到。一致性Hash在TDengine中只起到了Hash来对数据进行负载均衡的作用。
 
@@ -172,15 +172,15 @@ TDengine的标签不同于InfluxDB，不是时间线的标记，而是落在表�
 select *,groupid,location from meters where groupid=9 order by ts desc limit 10;
 ```
 
-<img src="/images/posts/2023-01-21-Intro-TDengine/list-all-tables.png" width="600" alt="TDengine根据TAG查询" />
+<img src="/images/posts/2023-01-22-Intro-TDengine/list-all-tables.png" width="600" alt="TDengine根据TAG查询" />
 
 tsdb目录是重头戏，包括.head、.data、.stt、.sma。.head文件是主索引文件。TDengine根据表名、时间等信息可以快速索引到.data文件的数据块。数据块索引中记录了数据块存放的文件、偏移、数据时间的范围，TDengine可以通过BRIN索引方式来查询数据。
 
-<img src="/images/posts/2023-01-21-Intro-TDengine/head-file.png" width="600" alt="TDengine的head文件" />
+<img src="/images/posts/2023-01-22-Intro-TDengine/head-file.png" width="600" alt="TDengine的head文件" />
 
 .data文件数据追加式写入（LSM树的理念）数据块。**每个数据块只属于vnode的一张表**。数据块的数据按照时间排列，同一列的数据存放在一起。数据块某一列信息中包括类型、压缩算法、列数据偏移、列数据长度。
 
-<img src="/images/posts/2023-01-21-Intro-TDengine/data-file.png" width="600" alt="TDengine的data文件" />
+<img src="/images/posts/2023-01-22-Intro-TDengine/data-file.png" width="600" alt="TDengine的data文件" />
 
 .stt文件也就是last文件，主要用于解决数据碎片化的问题。在多表低频场景下，产生数据落盘后，数据块内的列信息的数据少，压缩效果不好。为了解决这个问题，TDengine将同一个超级表下的列信息存放在一起，提高压缩率。在先前的文章“[IoTDB技术内幕初探](https://neyzoter.cn/2023/01/21/Intro-IoTDB/)”中提到过这个问题。IoTDB没有last文件的概念，而是将数据一股脑追加进文件。IoTDB会通过不断合并文件来提高Page中数据的个数。
 
@@ -212,7 +212,7 @@ TDengine有较多值得我们学习的地方，也有一些问题，值得我们
 
   将不同时间段的数据存储在挂载的不同介质的目录里，从而实现不同“热度”的数据存储在不同的存储介质上，充分利用存储。
 
-  <img src="/images/posts/2023-01-21-Intro-TDengine/tdengine-level-storage.png" width="600" alt="TDengine的分级存储" />
+  <img src="/images/posts/2023-01-22-Intro-TDengine/tdengine-level-storage.png" width="600" alt="TDengine的分级存储" />
 
 * 基于WAL的订阅服务
 
